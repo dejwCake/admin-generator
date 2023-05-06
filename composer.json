@@ -72,9 +72,6 @@
             "providers": [
                 "Brackets\\AdminGenerator\\AdminGeneratorServiceProvider"
             ]
-        },
-        "branch-alias": {
-            "dev-master": "6.0-dev"
         }
     }
 }
