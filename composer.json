@@ -1,6 +1,8 @@
 {
     "name": "dejwcake/admin-generator",
     "description": "Laravel 8 CRUD generator for dejwcake/craftable",
+    "license": "MIT",
+    "type": "project",
     "keywords": [
         "generator",
         "make",
@@ -10,8 +12,6 @@
         "laravel",
         "craftable"
     ],
-    "license": "MIT",
-    "type": "project",
     "authors": [
         {
             "name": "Pavol Perdík",
@@ -46,21 +46,21 @@
     ],
     "require": {
         "php": "^8.1",
-        "illuminate/support": "^10.0",
-        "illuminate/console": "^10.0",
         "doctrine/dbal": "^3.6",
+        "illuminate/console": "^10.0",
+        "illuminate/support": "^10.0",
         "laravel/helpers": "~1.6"
     },
     "require-dev": {
-        "orchestra/testbench": "~8.5",
         "mockery/mockery": "^1.0",
+        "orchestra/testbench": "~8.5",
         "phpunit/phpunit": "^10.1"
     },
     "autoload": {
-        "classmap": [],
         "psr-4": {
             "Brackets\\AdminGenerator\\": "src/"
-        }
+        },
+        "classmap": []
     },
     "autoload-dev": {
         "psr-4": {
