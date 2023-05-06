@@ -73,5 +73,8 @@
                 "Brackets\\AdminGenerator\\AdminGeneratorServiceProvider"
             ]
         }
+    },
+    "branch-alias": {
+        "dev-master": "1.0"
     }
 }
