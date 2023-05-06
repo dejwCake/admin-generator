@@ -32,9 +32,11 @@ class GenerateAdmin extends Command {
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @param Filesystem $files
+     * @return void
      */
-    public function handle(Filesystem $files) {
+    public function handle(Filesystem $files): void
+    {
         $this->files = $files;
 
         $tableNameArgument = $this->argument('table_name');
@@ -149,13 +151,15 @@ class GenerateAdmin extends Command {
 
     }
 
-    protected function getArguments() {
+    protected function getArguments(): array
+    {
         return [
             ['table_name', InputArgument::REQUIRED, 'Name of the existing table'],
         ];
     }
 
-    protected function getOptions() {
+    protected function getOptions(): array
+    {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Specify custom model name'],
             ['controller-name', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom controller name'],
@@ -166,7 +170,8 @@ class GenerateAdmin extends Command {
         ];
     }
 
-    protected function shouldGeneratePermissionsMigration() {
+    protected function shouldGeneratePermissionsMigration(): bool
+    {
         if (class_exists('\Brackets\Craftable\CraftableServiceProvider')) {
             return true;
         }

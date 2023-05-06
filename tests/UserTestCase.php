@@ -2,6 +2,7 @@
 
 namespace Brackets\AdminGenerator\Tests;
 
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Illuminate\Database\Schema\Blueprint;
@@ -20,7 +21,7 @@ abstract class UserTestCase extends Orchestra
     }
 
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      */
     protected function setUpDatabase($app)
     {
@@ -127,7 +128,7 @@ abstract class UserTestCase extends Orchestra
     }
 
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      */
     protected function getEnvironmentSetUp($app)
     {
@@ -164,7 +165,7 @@ abstract class UserTestCase extends Orchestra
     }
 
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      *
      * @return array
      */

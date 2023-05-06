@@ -30,7 +30,7 @@ class GenerateAdminProfile extends Command
     /**
      * Create a new controller creator command instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem $files
+     * @param Filesystem $files
      */
     public function __construct(Filesystem $files)
     {
@@ -42,9 +42,9 @@ class GenerateAdminProfile extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $tableNameArgument = !empty($this->argument('table_name')) ? $this->argument('table_name') : 'admin_users';
         $modelOption = $this->option('model-name');
@@ -109,14 +109,14 @@ class GenerateAdminProfile extends Command
         $this->info('Generating whole admin "My Profile" finished');
     }
 
-    protected function getArguments()
+    protected function getArguments(): array
     {
         return [
             ['table_name', InputArgument::OPTIONAL, 'Name of the existing table'],
         ];
     }
 
-    protected function getOptions()
+    protected function getOptions(): array
     {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Specify custom model name'],

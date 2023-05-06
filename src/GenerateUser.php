@@ -26,7 +26,7 @@ class GenerateUser extends Command {
     /**
      * Create a new controller creator command instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param Filesystem $files
      */
     public function __construct(Filesystem $files)
     {
@@ -38,9 +38,9 @@ class GenerateUser extends Command {
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $tableNameArgument = 'users';
         $modelOption = $this->option('model-name');
@@ -169,12 +169,14 @@ class GenerateUser extends Command {
 
     }
 
-    protected function getArguments() {
+    protected function getArguments(): array
+    {
         return [
         ];
     }
 
-    protected function getOptions() {
+    protected function getOptions(): array
+    {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Specify custom model name'],
             ['controller-name', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom controller name'],
@@ -185,5 +187,4 @@ class GenerateUser extends Command {
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
         ];
     }
-
 }
