@@ -159,7 +159,7 @@ Vue.component(\'admin-user-form\'', File::get($formJsPath));
         $this->assertStringStartsWith('import \'./Listing\';', File::get($indexJsPath));
         $this->assertStringStartsWith('<?php
 
-/** @var  \Illuminate\Database\Eloquent\Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(Brackets\AdminAuth\Models\AdminUser::class', File::get($factoryPath));
     }
 

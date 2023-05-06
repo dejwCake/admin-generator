@@ -135,7 +135,7 @@ Vue.component(\'user-listing\'', File::get($indexJsPath));
 Vue.component(\'user-form\'', File::get($formJsPath));
         $this->assertStringStartsWith('<?php
 
-/** @var  \Illuminate\Database\Eloquent\Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\User::class', File::get($factoryPath));
     }
 
@@ -150,7 +150,7 @@ $factory->define(App\User::class', File::get($factoryPath));
 
         $this->assertStringStartsWith('<?php
 
-/** @var  \Illuminate\Database\Eloquent\Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Auth\User::class', File::get($filePath));
     }
 

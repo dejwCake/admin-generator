@@ -153,7 +153,7 @@ Vue.component(\'user-form\'', File::get($formJsPath));
         $this->assertStringStartsWith('import \'./Listing\';', File::get($indexJsPath));
         $this->assertStringStartsWith('<?php
 
-/** @var  \Illuminate\Database\Eloquent\Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\User::class', File::get($factoryPath));
     }
 }

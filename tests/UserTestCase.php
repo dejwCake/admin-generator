@@ -2,6 +2,7 @@
 
 namespace Brackets\AdminGenerator\Tests;
 
+use Brackets\AdminGenerator\AdminGeneratorServiceProvider;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
@@ -23,7 +24,7 @@ abstract class UserTestCase extends Orchestra
     /**
      * @param Application $app
      */
-    protected function setUpDatabase($app)
+    protected function setUpDatabase(Application $app): void
     {
         $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
             $table->increments('id');
@@ -52,9 +53,11 @@ abstract class UserTestCase extends Orchestra
             $table->unique(['email', 'deleted_at']);
         });
 
-        $app['db']->connection()->getSchemaBuilder()->table('admin_users', function (Blueprint $table) {
-            DB::statement('CREATE UNIQUE INDEX admin_users_email_null_deleted_at ON admin_users (email) WHERE deleted_at IS NULL;');
-        });
+        if(env('DB_CONNECTION') === 'pgsql') {
+            $app['db']->connection()->getSchemaBuilder()->table('admin_users', function (Blueprint $table) {
+                DB::statement('CREATE UNIQUE INDEX admin_users_email_null_deleted_at ON admin_users (email) WHERE deleted_at IS NULL;');
+            });
+        }
 
         $app['db']->connection()->getSchemaBuilder()->create('password_resets', function (Blueprint $table) {
             $table->string('email')->index();
@@ -130,7 +133,7 @@ abstract class UserTestCase extends Orchestra
     /**
      * @param Application $app
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
 
         $newBasePath = $app->basePath().DIRECTORY_SEPARATOR.'testing_folder';
@@ -144,8 +147,22 @@ abstract class UserTestCase extends Orchestra
             $app['config']->set('database.default', 'pgsql');
             $app['config']->set('database.connections.pgsql', [
                 'driver' => 'pgsql',
-                'host' => 'testing',
+                'host' => 'pgsql',
                 'port' => '5432',
+                'database' => env('DB_DATABASE', 'laravel'),
+                'username' => env('DB_USERNAME', 'root'),
+                'password' => env('DB_PASSWORD', 'bestsecret'),
+                'charset' => 'utf8',
+                'prefix' => '',
+                'schema' => 'public',
+                'sslmode' => 'prefer',
+            ]);
+        } else if(env('DB_CONNECTION') === 'mysql') {
+            $app['config']->set('database.default', 'mysql');
+            $app['config']->set('database.connections.mysql', [
+                'driver' => 'mysql',
+                'host' => 'mysql',
+                'port' => '3306',
                 'database' => env('DB_DATABASE', 'laravel'),
                 'username' => env('DB_USERNAME', 'root'),
                 'password' => env('DB_PASSWORD', 'bestsecret'),
@@ -169,15 +186,15 @@ abstract class UserTestCase extends Orchestra
      *
      * @return array
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
-            \Brackets\AdminGenerator\AdminGeneratorServiceProvider::class
+            AdminGeneratorServiceProvider::class
         ];
     }
 
 
-    protected function initializeDirectory($directory)
+    protected function initializeDirectory($directory): void
     {
         if (File::isDirectory($directory)) {
             File::deleteDirectory($directory);

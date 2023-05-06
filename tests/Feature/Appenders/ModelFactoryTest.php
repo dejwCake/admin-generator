@@ -21,7 +21,7 @@ class ModelFactoryTest extends TestCase
 
         $this->assertStringStartsWith('<?php
 
-/** @var  \Illuminate\Database\Eloquent\Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Category::class', File::get($filePath));
     }
 
@@ -37,7 +37,7 @@ $factory->define(App\Models\Category::class', File::get($filePath));
 
         $this->assertStringStartsWith('<?php
 
-/** @var  \Illuminate\Database\Eloquent\Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Billing\Cat::class', File::get($filePath));
     }
 
@@ -53,7 +53,7 @@ $factory->define(App\Models\Billing\Cat::class', File::get($filePath));
 
         $this->assertStringStartsWith('<?php
 
-/** @var  \Illuminate\Database\Eloquent\Factory $factory */
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Billing\MyCat::class', File::get($filePath));
     }
 
