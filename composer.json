@@ -1,6 +1,6 @@
 {
-    "name": "brackets/admin-generator",
-    "description": "Laravel 8 CRUD generator for brackets/craftable",
+    "name": "dejwcake/admin-generator",
+    "description": "Laravel 8 CRUD generator for dejwcake/craftable",
     "keywords": [
         "generator",
         "make",
