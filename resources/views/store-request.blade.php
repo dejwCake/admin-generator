@@ -2,6 +2,8 @@
 @endphp
 
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
 @php
     if($translatable->count() > 0) {
@@ -14,22 +16,35 @@ namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
     }
 @endphp
 
+use ArondeParon\RequestSanitizer\Traits\SanitizesInputs;
+use Brackets\AdminUI\Http\Requests\Sanitizers\StringToArray;
+use Brackets\AdminUI\Http\Requests\Traits\Validated;
 @if($translatable->count() > 0)use Brackets\Translatable\TranslatableFormRequest;
 @else
 use Illuminate\Foundation\Http\FormRequest;
 @endif
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
 
 @if($translatable->count() > 0)class Store{{ $modelBaseName }} extends TranslatableFormRequest
 @else
 class Store{{ $modelBaseName }} extends FormRequest
 @endif
 {
+    use Validated;
+    use SanitizesInputs;
+
+    /**
+     * {{'@'}}var array{{'<'}}string, array{{'<'}}class-string>>
+     * {{'@'}}phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected $sanitizers = [
+        // add your sanitizers for fields
+    ];
+
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * {{'@'}}return bool
      */
     public function authorize(): bool
     {
@@ -39,7 +54,7 @@ class Store{{ $modelBaseName }} extends FormRequest
 @if($translatable->count() > 0)/**
      * Get the validation rules that apply to the requests untranslatable fields.
      *
-     * {{'@'}}return array
+     * {{'@'}}return array{{'<'}}string, string>
      */
     public function untranslatableRules(): array {
         return [
@@ -59,7 +74,7 @@ class Store{{ $modelBaseName }} extends FormRequest
     /**
      * Get the validation rules that apply to the requests translatable fields.
      *
-     * {{'@'}}return array
+     * {{'@'}}return array{{'<'}}string, string|Unique>
      */
     public function translatableRules($locale): array {
         return [
@@ -72,7 +87,7 @@ class Store{{ $modelBaseName }} extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * {{'@'}}return array
+     * {{'@'}}return array{{'<'}}string, string|Unique>
      */
     public function rules(): array
     {
@@ -88,22 +103,7 @@ class Store{{ $modelBaseName }} extends FormRequest
             @endforeach
     @endif
 @endif
-
         ];
     }
 @endif
-
-    /**
-    * Modify input data
-    *
-    * {{'@'}}return array
-    */
-    public function getSanitized(): array
-    {
-        $sanitized = $this->validated();
-
-        //Add your code for manipulation with request data here
-
-        return $sanitized;
-    }
 }

@@ -2,6 +2,8 @@
 @endphp
 
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
 @php
     if ($translatable->count() > 0) {
@@ -14,25 +16,47 @@ namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
     }
 @endphp
 
+use App\Models\{{ $modelBaseName }};
+use ArondeParon\RequestSanitizer\Traits\SanitizesInputs;
+use Brackets\AdminUI\Http\Requests\Sanitizers\StringToArray;
+use Brackets\AdminUI\Http\Requests\Traits\Validated;
+
+@if($translatable->count() > 0)use Brackets\Translatable\TranslatableFormRequest;
 @if($containsPublishedAtColumn)
 use Carbon\Carbon;
 @endif
-@if($translatable->count() > 0)use Brackets\Translatable\TranslatableFormRequest;
 @else
+@if($containsPublishedAtColumn)
+use Carbon\Carbon;
+@endif
 use Illuminate\Foundation\Http\FormRequest;
 @endif
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
+
+/**
+ * @property {{ $modelBaseName }} ${{ $modelVariableName }}
+ */
 
 @if($translatable->count() > 0)class Update{{ $modelBaseName }} extends TranslatableFormRequest
 @else
 class Update{{ $modelBaseName }} extends FormRequest
 @endif
 {
+    use Validated;
+    use SanitizesInputs;
+
+    /**
+     * {{'@'}}var array{{'<'}}string, array{{'<'}}class-string>>
+     * {{'@'}}phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected $sanitizers = [
+        // add your sanitizers for fields
+    ];
+
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * {{'@'}}return bool
      */
     public function authorize(): bool
     {
@@ -42,7 +66,7 @@ class Update{{ $modelBaseName }} extends FormRequest
 @if($translatable->count() > 0)/**
      * Get the validation rules that apply to the requests untranslatable fields.
      *
-     * {{'@'}}return array
+     * {{'@'}}return array{{'<'}}string, string>
      */
     public function untranslatableRules(): array {
         return [
@@ -63,7 +87,7 @@ class Update{{ $modelBaseName }} extends FormRequest
     /**
      * Get the validation rules that apply to the requests translatable fields.
      *
-     * {{'@'}}return array
+     * {{'@'}}return array{{'<'}}string, string|Unique>
      */
     public function translatableRules($locale): array {
         return [
@@ -76,7 +100,7 @@ class Update{{ $modelBaseName }} extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * {{'@'}}return array
+     * {{'@'}}return array{{'<'}}string, string|Unique>
      */
     public function rules(): array
     {
@@ -103,24 +127,20 @@ class Update{{ $modelBaseName }} extends FormRequest
     /**
      * Modify input data
      *
-     * {{'@'}}return array
+     * {{'@'}}phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHint
      */
-    public function getSanitized(): array
+    protected function filterValidated(array $validated): array
     {
-        $sanitized = $this->validated();
-
 @if($containsPublishedAtColumn)
-        if (isset($sanitized['publish_now']) && $sanitized['publish_now'] === true) {
-            $sanitized['published_at'] = Carbon::now();
+        if (isset($validated['publish_now']) && $validated['publish_now'] === true) {
+            $validated['published_at'] = Carbon::now();
         }
 
-        if (isset($sanitized['unpublish_now']) && $sanitized['unpublish_now'] === true) {
-            $sanitized['published_at'] = null;
+        if (isset($validated['unpublish_now']) && $validated['unpublish_now'] === true) {
+            $validated['published_at'] = null;
         }
+
 @endif
-
-        //Add your code for manipulation with request data here
-
-        return $sanitized;
+        return $validated;
     }
 }

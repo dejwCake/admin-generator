@@ -6,7 +6,7 @@
         return in_array($column['name'], $translatable->toArray());
     });
 @endphp
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+/** {{'@'}}var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define({{ $modelFullName }}::class, static function (Faker\Generator $faker) {
     return [
         @foreach($standardColumn as $col)'{{ $col['name'] }}' => {!! $col['faker'] !!},

@@ -2,17 +2,20 @@
 @endphp
 
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\In;
+
 
 class Index{{ $modelBaseName }} extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * {{'@'}}return bool
      */
     public function authorize(): bool
     {
@@ -22,17 +25,16 @@ class Index{{ $modelBaseName }} extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * {{'@'}}return array
+     * {{'@'}}return array{{'<'}}string, string|In>
      */
     public function rules(): array
     {
         return [
-            'orderBy' => 'in:{{ implode(',', $columnsToQuery) }}|nullable',
-            'orderDirection' => 'in:asc,desc|nullable',
-            'search' => 'string|nullable',
-            'page' => 'integer|nullable',
-            'per_page' => 'integer|nullable',
-
+            'orderBy' => ['nullable', Rule::in(['{{ implode('\', \'', $columnsToQuery) }}']),],
+            'orderDirection' => ['nullable', Rule::in(['asc', 'desc']),],
+            'search' => ['nullable', 'string',],
+            'page' => ['nullable', 'integer',],
+            'per_page' => ['nullable', 'integer',],
         ];
     }
 }

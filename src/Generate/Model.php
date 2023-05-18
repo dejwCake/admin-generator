@@ -80,6 +80,7 @@ class Model extends ClassGenerator {
                 return $column['name'] == "deleted_at";
             })->count() > 0,
             'resource' => $this->resource,
+            'variableName' => $this->modelVariableName,
 
             'relations' => $this->relations,
         ])->render();
