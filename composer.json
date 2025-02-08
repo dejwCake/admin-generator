@@ -1,6 +1,6 @@
 {
     "name": "dejwcake/admin-generator",
-    "description": "Laravel 8 CRUD generator for dejwcake/craftable",
+    "description": "Laravel CRUD generator for dejwcake/craftable",
     "license": "MIT",
     "type": "project",
     "keywords": [
@@ -14,14 +14,14 @@
     ],
     "authors": [
         {
-            "name": "Pavol Perdík",
-            "email": "pavol.perdik@brackets.sk",
-            "homepage": "https://www.brackets.sk",
+            "name": "David Běhal",
+            "email": "david.behal@dejw.sk",
+            "homepage": "https://www.dejw.sk",
             "role": "Developer"
         },
         {
-            "name": "David Běhal",
-            "email": "david.behal@brackets.sk",
+            "name": "Pavol Perdík",
+            "email": "pavol.perdik@brackets.sk",
             "homepage": "https://www.brackets.sk",
             "role": "Developer"
         },
@@ -45,16 +45,15 @@
         }
     ],
     "require": {
-        "php": "^8.1",
-        "doctrine/dbal": "^3.6",
-        "illuminate/console": "^10.0",
-        "illuminate/support": "^10.0",
-        "laravel/helpers": "~1.6"
+        "php": "^8.2",
+        "doctrine/dbal": "^4.2",
+        "illuminate/console": "^11.41",
+        "illuminate/support": "^11.41"
     },
     "require-dev": {
-        "mockery/mockery": "^1.0",
-        "orchestra/testbench": "~8.5",
-        "phpunit/phpunit": "^10.1"
+        "mockery/mockery": "^1.6",
+        "orchestra/testbench": "^9.9",
+        "phpunit/phpunit": "^11.5"
     },
     "autoload": {
         "psr-4": {
@@ -75,6 +74,6 @@
         }
     },
     "branch-alias": {
-        "dev-main": "0.9-dev"
+        "dev-main": "1.0-dev"
     }
 }
