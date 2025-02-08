@@ -1,6 +1,6 @@
 <?php
 
-namespace Brackets\AdminGenerator\Tests\Feature\Classes;
+namespace Brackets\AdminGenerator\Tests\Feature;
 
 use Brackets\AdminGenerator\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -9,8 +9,7 @@ class WholeAdminGeneratorTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    public function whole_admin_generator_produces_all_the_files(): void
+    public function testWholeAdminGeneratorProducesAllTheFiles(): void
     {
         $modelPath = base_path('app/Models/Category.php');
         $controllerPath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
