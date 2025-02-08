@@ -8,6 +8,7 @@ class Lang extends FileAppender {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:lang';
 
@@ -15,29 +16,24 @@ class Lang extends FileAppender {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Append admin translations into a admin lang file';
 
     /**
      * Path for view
-     *
-     * @var string
      */
-    protected $view = 'lang';
+    protected string $view = 'lang';
 
     /**
      * Lang has also export translation
-     *
-     * @return mixed
      */
-    protected $export = false;
+    protected bool $export = false;
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
 //        //TODO check if exists
 //        //TODO make global for all generator
@@ -67,7 +63,7 @@ class Lang extends FileAppender {
         }
     }
 
-    protected function buildClass() {
+    protected function buildClass(): string {
         return view('brackets/admin-generator::'.$this->view, [
             'modelLangFormat' => $this->modelLangFormat,
             'modelBaseName' => $this->modelBaseName,
@@ -85,7 +81,8 @@ class Lang extends FileAppender {
         ])->render();
     }
 
-    protected function getOptions() {
+    /** @return array<array<string|int>> */
+    protected function getOptions(): array {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a controller for the given model'],
             ['locale', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom locale'],

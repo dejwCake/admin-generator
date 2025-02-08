@@ -9,6 +9,7 @@ class Routes extends FileAppender {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:routes';
 
@@ -16,31 +17,26 @@ class Routes extends FileAppender {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Append admin routes into a web routes file';
 
     /**
      * Path for view
-     *
-     * @var string
      */
-    protected $view = 'routes';
+    protected string $view = 'routes';
 
     /**
      * Routes have also export route
-     *
-     * @return mixed
      */
-    protected $export = false;
+    protected bool $export = false;
 
     /**
      * Routes have also bulk options route
-     *
-     * @return mixed
      */
-    protected $withoutBulk = false;
+    protected bool $withoutBulk = false;
 
-    public function handle()
+    public function handle(): void
     {
         if($this->option('with-export')){
             $this->export = true;
@@ -62,7 +58,7 @@ class Routes extends FileAppender {
         }
     }
 
-    protected function buildClass() {
+    protected function buildClass(): string {
 
         return view('brackets/admin-generator::'.$this->view, [
             'controllerPartiallyFullName' => $this->controllerWithNamespaceFromDefault,
@@ -74,7 +70,8 @@ class Routes extends FileAppender {
         ])->render();
     }
 
-    protected function getOptions() {
+    /** @return array<array<string|int>> */
+    protected function getOptions(): array {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a controller for the given model'],
             ['controller-name', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom controller name'],

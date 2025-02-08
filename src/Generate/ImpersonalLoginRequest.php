@@ -8,6 +8,7 @@ class ImpersonalLoginRequest extends ClassGenerator {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:request:impersonal-login';
 
@@ -15,15 +16,14 @@ class ImpersonalLoginRequest extends ClassGenerator {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Generate a Impersonal login request class';
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $force = $this->option('force');
 
@@ -32,7 +32,7 @@ class ImpersonalLoginRequest extends ClassGenerator {
         }
     }
 
-    protected function buildClass() {
+    protected function buildClass(): string {
 
         return view('brackets/admin-generator::templates.admin-user.impersonal-login-request', [
             'modelBaseName' => $this->modelBaseName,
@@ -42,24 +42,19 @@ class ImpersonalLoginRequest extends ClassGenerator {
         ])->render();
     }
 
-    protected function getOptions() {
+    /** @return array<array<string|int>> */
+    protected function getOptions(): array {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
         ];
     }
 
-    public function generateClassNameFromTable($tableName) {
+    public function generateClassNameFromTable(string $tableName): string {
         return 'ImpersonalLogin'.$this->modelBaseName;
     }
 
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace)
+    protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace.'\Http\Requests\Admin\\'.$this->modelWithNamespaceFromDefault;
     }

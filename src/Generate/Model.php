@@ -9,6 +9,7 @@ class Model extends ClassGenerator {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:model';
 
@@ -16,22 +17,19 @@ class Model extends ClassGenerator {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Generate a model class';
 
     /**
      * Path for view
-     *
-     * @var string
      */
-    protected $view = 'model';
+    protected string $view = 'model';
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $force = $this->option('force');
 
@@ -53,7 +51,7 @@ class Model extends ClassGenerator {
         // TODO think if we should use ide-helper:models ?
     }
 
-    protected function buildClass() {
+    protected function buildClass(): string {
         return view('brackets/admin-generator::'.$this->view, [
             'modelBaseName' => $this->classBaseName,
             'modelNameSpace' => $this->classNamespace,
@@ -85,7 +83,8 @@ class Model extends ClassGenerator {
         ])->render();
     }
 
-    protected function getOptions() {
+    /** @return array<array<string|int>> */
+    protected function getOptions(): array {
         return [
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
@@ -93,17 +92,11 @@ class Model extends ClassGenerator {
         ];
     }
 
-    public function generateClassNameFromTable($tableName) {
+    public function generateClassNameFromTable(string $tableName): string {
         return Str::studly(Str::singular($tableName));
     }
 
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace)
+    protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace.'\Models';
     }

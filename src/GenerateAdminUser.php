@@ -13,6 +13,7 @@ class GenerateAdminUser extends Command {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:admin-user';
 
@@ -20,19 +21,13 @@ class GenerateAdminUser extends Command {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Scaffold complete admin CRUD for specified admin user model from admin-auth package. This differs from admin:generate command in many additional features (password handling, roles, ...).';
 
-    /**
-     * Create a new controller creator command instance.
-     *
-     * @param Filesystem $files
-     */
-    public function __construct(Filesystem $files)
+    public function __construct(protected readonly Filesystem $files)
     {
         parent::__construct();
-
-        $this->files = $files;
     }
 
     /**
@@ -70,10 +65,11 @@ class GenerateAdminUser extends Command {
         // we need to replace this before controller generation happens
         $this->strReplaceInFile(
             resource_path('views/admin/layout/sidebar.blade.php'),
-            '|url\(\'admin\/admin-users\'\)|',
             '{{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
-            '<li class="nav-item"><a class="nav-link" href="{{ url(\'admin/admin-users\') }}"><i class="nav-icon icon-user"></i> {{ __(\'Manage access\') }}</a></li>
-            {{-- Do not delete me :) I\'m also used for auto-generation menu items --}}');
+            '<li class="nav-item"><a class="nav-link" href="{{ url(\'admin/admin-users\') }}"><i class="nav-icon icon-user"></i> {{ __(\'Manage access\') }}</a></li>            
+            {{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
+            '|url\(\'admin\/admin-users\'\)|',
+        );
 
         $this->call('admin:generate:controller', [
             'table_name' => $tableNameArgument,
@@ -160,19 +156,21 @@ class GenerateAdminUser extends Command {
 
         if ($this->option('seed')) {
             $this->info('Seeding testing data');
-            factory($this->modelFullName, 20)->create();
+            $this->modelFullName::factory()->count(20)->create();
         }
 
         $this->info('Generating whole user admin finished');
 
     }
 
+    /** @return array<array<string|int>> */
     protected function getArguments(): array
     {
         return [
         ];
     }
 
+    /** @return array<array<string|int>> */
     protected function getOptions(): array
     {
         return [

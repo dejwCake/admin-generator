@@ -9,6 +9,7 @@ class ViewForm extends ViewGenerator {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:form';
 
@@ -16,50 +17,39 @@ class ViewForm extends ViewGenerator {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Generate create and edit view templates';
 
     /**
      * Path for create view
-     *
-     * @var string
      */
-    protected $create = 'create';
+    protected string $create = 'create';
 
     /**
      * Path for edit view
-     *
-     * @var string
      */
-    protected $edit = 'edit';
+    protected string $edit = 'edit';
 
     /**
      * Path for form view
-     *
-     * @var string
      */
-    protected $form = 'form';
+    protected string $form = 'form';
 
     /**
      * Path for form right view
-     *
-     * @var string
      */
-    protected $formRight = 'form-right';
+    protected string $formRight = 'form-right';
 
     /**
      * Path for js view
-     *
-     * @var string
      */
-    protected $formJs = 'form-js';
+    protected string $formJs = 'form-js';
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $force = $this->option('force');
 
@@ -176,7 +166,7 @@ class ViewForm extends ViewGenerator {
         return in_array("published_at", array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'));
     }
 
-    protected function buildForm() {
+    protected function buildForm(): string {
 
         return view('brackets/admin-generator::'.$this->form, [
             'modelBaseName' => $this->modelBaseName,
@@ -196,7 +186,7 @@ class ViewForm extends ViewGenerator {
         ])->render();
     }
 
-    protected function buildFormRight() {
+    protected function buildFormRight(): string {
 
         return view('brackets/admin-generator::'.$this->formRight, [
             'modelBaseName' => $this->modelBaseName,
@@ -217,7 +207,7 @@ class ViewForm extends ViewGenerator {
         ])->render();
     }
 
-    protected function buildCreate() {
+    protected function buildCreate(): string {
 
         return view('brackets/admin-generator::'.$this->create, [
             'modelBaseName' => $this->modelBaseName,
@@ -239,7 +229,7 @@ class ViewForm extends ViewGenerator {
     }
 
 
-    protected function buildEdit() {
+    protected function buildEdit(): string {
 
         return view('brackets/admin-generator::'.$this->edit, [
             'modelBaseName' => $this->modelBaseName,
@@ -263,7 +253,7 @@ class ViewForm extends ViewGenerator {
         ])->render();
     }
 
-    protected function buildFormJs() {
+    protected function buildFormJs(): string {
         return view('brackets/admin-generator::'.$this->formJs, [
             'modelViewsDirectory' => $this->modelViewsDirectory,
             'modelJSName' => $this->modelJSName,
@@ -272,7 +262,8 @@ class ViewForm extends ViewGenerator {
         ])->render();
     }
 
-    protected function getOptions() {
+    /** @return array<array<string|int>> */
+    protected function getOptions(): array {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],

@@ -1,6 +1,5 @@
 <?php namespace Brackets\AdminGenerator\Generate;
 
-use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class ViewIndex extends ViewGenerator {
@@ -9,6 +8,7 @@ class ViewIndex extends ViewGenerator {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:index';
 
@@ -16,38 +16,31 @@ class ViewIndex extends ViewGenerator {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Generate an index view template';
 
     /**
      * Path for view
-     *
-     * @var string
      */
-    protected $view = 'index';
+    protected string $view = 'index';
 
     /**
      * Path for js view
-     *
-     * @var string
      */
-    protected $viewJs = 'listing-js';
+    protected string $viewJs = 'listing-js';
 
     /**
      * Index view has also export button
-     *
-     * @return mixed
      */
-    protected $export = false;
+    protected bool $export = false;
 
     /**
      * Index view has also bulk options
-     *
-     * @return mixed
      */
-    protected $withoutBulk = false;
+    protected bool $withoutBulk = false;
 
-    public function handle()
+    public function handle(): void
     {
         $force = $this->option('force');
 
@@ -111,7 +104,7 @@ class ViewIndex extends ViewGenerator {
 		};
     }
 
-    protected function buildView() {
+    protected function buildView(): string {
 
         return view('brackets/admin-generator::'.$this->view, [
             'modelBaseName' => $this->modelBaseName,
@@ -154,14 +147,15 @@ class ViewIndex extends ViewGenerator {
         ])->render();
     }
 
-    protected function buildListingJs() {
+    protected function buildListingJs(): string {
         return view('brackets/admin-generator::'.$this->viewJs, [
             'modelViewsDirectory' => $this->modelViewsDirectory,
             'modelJSName' => $this->modelJSName,
         ])->render();
     }
 
-    protected function getOptions() {
+    /** @return array<array<string|int>> */
+    protected function getOptions(): array {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],

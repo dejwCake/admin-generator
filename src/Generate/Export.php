@@ -9,6 +9,7 @@ class Export extends ClassGenerator {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:export';
 
@@ -16,22 +17,19 @@ class Export extends ClassGenerator {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Generate an export class';
 
     /**
      * Path for view
-     *
-     * @var string
      */
-    protected $view = 'export';
+    protected string $view = 'export';
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $force = $this->option('force');
 
@@ -45,7 +43,7 @@ class Export extends ClassGenerator {
 
     }
 
-    protected function buildClass() {
+    protected function buildClass(): string {
         return view('brackets/admin-generator::'.$this->view, [
             'exportNamespace' => $this->classNamespace,
             'modelFullName' => $this->modelFullName,
@@ -59,7 +57,8 @@ class Export extends ClassGenerator {
         ])->render();
     }
 
-    protected function getOptions() {
+    /** @return array<array<string|int>> */
+    protected function getOptions(): array {
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
             ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
@@ -67,16 +66,11 @@ class Export extends ClassGenerator {
         ];
     }
 
-    public function generateClassNameFromTable($tableName) {
+    public function generateClassNameFromTable(string $tableName): string {
         return $this->exportBaseName;
     }
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace)
+
+    protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace.'\Exports';
     }

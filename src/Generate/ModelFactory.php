@@ -1,6 +1,5 @@
 <?php namespace Brackets\AdminGenerator\Generate;
 
-use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class ModelFactory extends FileAppender {
@@ -9,6 +8,7 @@ class ModelFactory extends FileAppender {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:factory';
 
@@ -16,22 +16,19 @@ class ModelFactory extends FileAppender {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Append a new factory';
 
     /**
      * Path for view
-     *
-     * @var string
      */
-    protected $view = 'factory';
+    protected string $view = 'factory';
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle():void
     {
         //TODO check if exists
         //TODO make global for all generator
@@ -46,11 +43,11 @@ class ModelFactory extends FileAppender {
 
         if ($this->option('seed')) {
             $this->info('Seeding testing data');
-            factory($this->modelFullName , 50)->create();
+            $this->modelFullName::factory()->count(50)->create();
         }
     }
 
-    protected function buildClass() {
+    protected function buildClass(): string {
 
         return view('brackets/admin-generator::'.$this->view, [
             'modelFullName' => $this->modelFullName,
@@ -107,7 +104,8 @@ class ModelFactory extends FileAppender {
         ])->render();
     }
 
-    protected function getOptions() {
+    /** @return array<array<string|int>> */
+    protected function getOptions(): array {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],

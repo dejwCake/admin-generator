@@ -4,9 +4,7 @@ use Brackets\AdminGenerator\Generate\Traits\Helpers;
 use Brackets\AdminGenerator\Generate\Traits\Names;
 use Brackets\AdminGenerator\Generate\Traits\Columns;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Schema;
 use Symfony\Component\Console\Input\InputArgument;
-use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,30 +14,17 @@ abstract class ViewGenerator extends Command {
     use Helpers, Columns, Names;
 
     /**
-     * @var Filesystem
+     * @var array<string>
      */
-    protected $files;
+    protected array $relations = [];
 
-    /**
-     * Relations
-     *
-     * @var string
-     */
-    protected $relations = [];
-
-    /**
-     * Create a new controller creator command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     */
-    public function __construct(Filesystem $files)
+    public function __construct(protected readonly Filesystem $files)
     {
         parent::__construct();
-
-        $this->files = $files;
     }
 
-    protected function getArguments() {
+    /** @return array<array<string|int>> */
+    protected function getArguments(): array {
         return [
             ['table_name', InputArgument::REQUIRED, 'Name of the existing table'],
             // FIXME add OPTIONAL file_name argument
@@ -49,12 +34,8 @@ abstract class ViewGenerator extends Command {
 
     /**
      * Append content to file only if if the content is not present in the file
-     *
-     * @param $path
-     * @param $content
-     * @return bool
      */
-    protected function appendIfNotAlreadyAppended($path, $content)
+    protected function appendIfNotAlreadyAppended(string $path, string $content): bool
     {
         if (!$this->files->exists($path)) {
             $this->makeDirectory($path);
@@ -69,20 +50,11 @@ abstract class ViewGenerator extends Command {
 
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return mixed
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initCommonNames($this->argument('table_name'), $this->option('model-name'));
 
-        $output = parent::execute($input, $output);
-
-        return $output;
+        return parent::execute($input, $output);
     }
 
 }

@@ -8,6 +8,7 @@ class StoreRequest extends ClassGenerator {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:request:store';
 
@@ -15,22 +16,19 @@ class StoreRequest extends ClassGenerator {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Generate a Store request class';
 
     /**
      * Path for view
-     *
-     * @var string
      */
-    protected $view = 'store-request';
+    protected string $view = 'store-request';
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $force = $this->option('force');
 
@@ -50,7 +48,7 @@ class StoreRequest extends ClassGenerator {
         }
     }
 
-    protected function buildClass() {
+    protected function buildClass(): string {
 
         return view('brackets/admin-generator::'.$this->view, [
             'modelBaseName' => $this->modelBaseName,
@@ -67,7 +65,8 @@ class StoreRequest extends ClassGenerator {
         ])->render();
     }
 
-    protected function getOptions() {
+    /** @return array<array<string|int>> */
+    protected function getOptions(): array {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
@@ -76,17 +75,11 @@ class StoreRequest extends ClassGenerator {
         ];
     }
 
-    public function generateClassNameFromTable($tableName) {
+    public function generateClassNameFromTable(string $tableName): string {
         return 'Store'.$this->modelBaseName;
     }
 
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace)
+    protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace.'\Http\Requests\Admin\\'.$this->modelWithNamespaceFromDefault;
     }

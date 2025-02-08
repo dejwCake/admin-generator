@@ -17,6 +17,7 @@ class GenerateAdminProfile extends Command
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:admin-user:profile';
 
@@ -24,26 +25,15 @@ class GenerateAdminProfile extends Command
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Scaffold admin "My Profile" feature (controller, views, routes)';
 
-    /**
-     * Create a new controller creator command instance.
-     *
-     * @param Filesystem $files
-     */
-    public function __construct(Filesystem $files)
+    public function __construct(protected readonly Filesystem $files)
     {
         parent::__construct();
-
-        $this->files = $files;
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return void
-     */
     public function handle(): void
     {
         $tableNameArgument = !empty($this->argument('table_name')) ? $this->argument('table_name') : 'admin_users';
@@ -92,23 +82,24 @@ class GenerateAdminProfile extends Command
 
         $this->strReplaceInFile(
             resource_path('views/admin/layout/profile-dropdown.blade.php'),
-            '|url\(\'admin\/profile\'\)|',
             '{{-- Do not delete me :) I\'m used for auto-generation menu items --}}',
             '<a href="{{ url(\'admin/profile\') }}" class="dropdown-item"><i class="fa fa-user"></i>  {{ trans(\'brackets/admin-auth::admin.profile_dropdown.profile\') }}</a>
-    {{-- Do not delete me :) I\'m used for auto-generation menu items --}}'
+    {{-- Do not delete me :) I\'m used for auto-generation menu items --}}',
+            '|url\(\'admin\/profile\'\)|',
         );
 
         $this->strReplaceInFile(
             resource_path('views/admin/layout/profile-dropdown.blade.php'),
-            '|url\(\'admin\/password\'\)|',
             '{{-- Do not delete me :) I\'m used for auto-generation menu items --}}',
             '<a href="{{ url(\'admin/password\') }}" class="dropdown-item"><i class="fa fa-key"></i>  {{ trans(\'brackets/admin-auth::admin.profile_dropdown.password\') }}</a>
-    {{-- Do not delete me :) I\'m used for auto-generation menu items --}}'
+    {{-- Do not delete me :) I\'m used for auto-generation menu items --}}',
+            '|url\(\'admin\/password\'\)|',
         );
 
         $this->info('Generating whole admin "My Profile" finished');
     }
 
+    /** @return array<array<string|int>> */
     protected function getArguments(): array
     {
         return [
@@ -116,6 +107,7 @@ class GenerateAdminProfile extends Command
         ];
     }
 
+    /** @return array<array<string|int>> */
     protected function getOptions(): array
     {
         return [

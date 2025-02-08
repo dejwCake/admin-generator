@@ -13,6 +13,7 @@ class Controller extends ClassGenerator {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:controller';
 
@@ -20,31 +21,26 @@ class Controller extends ClassGenerator {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Generate a controller class';
 
     /**
      * Path for view
-     *
-     * @var string
      */
-    protected $view = 'controller';
+    protected string $view = 'controller';
 
     /**
      * Controller has also export method
-     *
-     * @return mixed
      */
-    protected $export = false;
+    protected bool $export = false;
 
     /**
      * Controller has also bulk options method
-     *
-     * @return mixed
      */
-    protected $withoutBulk = false;
+    protected bool $withoutBulk = false;
 
-    public function handle()
+    public function handle(): void
     {
         $force = $this->option('force');
 
@@ -75,9 +71,9 @@ class Controller extends ClassGenerator {
             $icon = Arr::random(['icon-graduation', 'icon-puzzle', 'icon-compass', 'icon-drop', 'icon-globe', 'icon-ghost', 'icon-book-open', 'icon-flag', 'icon-star', 'icon-umbrella', 'icon-energy', 'icon-plane', 'icon-magnet', 'icon-diamond']);
             if ($this->strReplaceInFile(
                 resource_path('views/admin/layout/sidebar.blade.php'),
-                '|url\(\'admin\/'.$this->resource.'\'\)|',
                 "{{-- Do not delete me :) I'm used for auto-generation menu items --}}",
-                "<li class=\"nav-item\"><a class=\"nav-link\" href=\"{{ url('admin/".$this->resource."') }}\"><i class=\"nav-icon ".$icon."\"></i> {{ trans('admin.".$this->modelLangFormat.".title') }}</a></li>".PHP_EOL."           {{-- Do not delete me :) I'm used for auto-generation menu items --}}"
+                "<li class=\"nav-item\"><a class=\"nav-link\" href=\"{{ url('admin/".$this->resource."') }}\"><i class=\"nav-icon ".$icon."\"></i> {{ trans('admin.".$this->modelLangFormat.".title') }}</a></li>".PHP_EOL."           {{-- Do not delete me :) I'm used for auto-generation menu items --}}",
+                '|url\(\'admin\/'.$this->resource.'\'\)|',
             )) {
                 $this->info('Updating sidebar');
             }
@@ -85,8 +81,7 @@ class Controller extends ClassGenerator {
 
     }
 
-    protected function buildClass() {
-
+    protected function buildClass(): string {
         return view('brackets/admin-generator::'.$this->view, [
             'controllerBaseName' => $this->classBaseName,
             'controllerNamespace' => $this->classNamespace,
@@ -129,7 +124,8 @@ class Controller extends ClassGenerator {
         ])->render();
     }
 
-    protected function getOptions() {
+    /** @return array<array<string|int>> */
+    protected function getOptions(): array {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
@@ -141,17 +137,11 @@ class Controller extends ClassGenerator {
         ];
     }
 
-    public function generateClassNameFromTable($tableName) {
+    public function generateClassNameFromTable(string $tableName): string {
         return Str::studly($tableName).'Controller';
     }
 
-    /**
-     * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
-     */
-    protected function getDefaultNamespace($rootNamespace)
+    protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace.'\Http\Controllers\Admin';
     }

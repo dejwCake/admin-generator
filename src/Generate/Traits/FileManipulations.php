@@ -1,17 +1,21 @@
 <?php namespace Brackets\AdminGenerator\Generate\Traits;
 
-use Illuminate\Support\Facades\File;
+use Illuminate\Filesystem\Filesystem;
 
 trait FileManipulations {
 
-    protected function strReplaceInFile($fileName, $ifExistsRegex, $find, $replaceWith) {
-        $content = File::get($fileName);
-        if (preg_match($ifExistsRegex, $content)) {
-            return;
+    private function strReplaceInFile(
+        string $filePath,
+        string $find,
+        string $replaceWith,
+        ?string $ifRegexNotExists = null,
+    ): bool|int {
+        $filesystem = app(Filesystem::class);
+        $content = $filesystem->get($filePath);
+        if ($ifRegexNotExists !== null && preg_match($ifRegexNotExists, $content)) {
+            return false;
         }
 
-        return File::put($fileName, str_replace($find, $replaceWith, $content));
+        return $filesystem->put($filePath, str_replace($find, $replaceWith, $content));
     }
-
-
 }

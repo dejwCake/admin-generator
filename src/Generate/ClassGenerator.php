@@ -3,6 +3,7 @@
 use Brackets\AdminGenerator\Generate\Traits\Helpers;
 use Brackets\AdminGenerator\Generate\Traits\Names;
 use Brackets\AdminGenerator\Generate\Traits\Columns;
+use Hoa\File\File;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Schema;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,35 +16,26 @@ abstract class ClassGenerator extends Command {
 
     use Helpers, Columns, Names;
 
-    public $classBaseName;
-    public $classFullName;
-    public $classNamespace;
+    public string $classBaseName;
+    public string $classFullName;
+    public string $classNamespace;
 
     /**
-     * @var Filesystem
+     * @var array<string>
      */
-    protected $files;
-
-    /**
-     * Relations
-     *
-     * @var string
-     */
-    protected $relations = [];
+    protected array $relations = [];
 
     /**
      * Create a new controller creator command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      */
-    public function __construct(Filesystem $files)
+    public function __construct(protected readonly Filesystem $files)
     {
         parent::__construct();
-
-        $this->files = $files;
     }
 
-    protected function getArguments() {
+    /** @return array<array<string|int>> */
+    protected function getArguments(): array
+    {
         return [
             ['table_name', InputArgument::REQUIRED, 'Name of the existing table'],
             ['class_name', InputArgument::OPTIONAL, 'Name of the generated class'],
@@ -52,20 +44,15 @@ abstract class ClassGenerator extends Command {
 
     /**
      * Generate default class name (for case if not passed as argument) from table name
-     *
-     * @param $tableName
-     * @return mixed
      */
-    abstract public function generateClassNameFromTable($tableName);
+    abstract public function generateClassNameFromTable(string $tableName): string;
 
     /**
      * Build the class with the given name.
-     *
-     * @return string
      */
-    abstract protected function buildClass();
+    abstract protected function buildClass(): string;
 
-    public function getPathFromClassName($name) {
+    public function getPathFromClassName(string $name): string {
         $path = str_replace('\\', '/', $name).".php";
 
         return preg_replace('|^App/|', 'app/', $path);
@@ -73,32 +60,24 @@ abstract class ClassGenerator extends Command {
 
     /**
      * Get the full namespace for a given class, without the class name.
-     *
-     * @param  string  $name
-     * @return string
      */
-    protected function getNamespace($name)
+    protected function getNamespace(string $name): string
     {
         return trim(implode('\\', array_slice(explode('\\', $name), 0, -1)), '\\');
     }
 
     /**
      * Get the root namespace for the class.
-     *
-     * @return string
      */
-    public function rootNamespace()
+    public function rootNamespace(): string
     {
         return $this->laravel->getNamespace();
     }
 
     /**
      * Parse the class name and format according to the root namespace.
-     *
-     * @param  string  $name
-     * @return string
      */
-    public function qualifyClass($name)
+    public function qualifyClass(string $name): string
     {
         $name = str_replace('/', '\\', $name);
 
@@ -115,16 +94,13 @@ abstract class ClassGenerator extends Command {
 
     /**
      * Get the default namespace for the class.
-     *
-     * @param  string  $rootNamespace
-     * @return string
      */
-    protected function getDefaultNamespace($rootNamespace)
+    protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace;
     }
 
-    protected function generateClass($force = false) {
+    protected function generateClass(bool $force = false): bool {
         $path = base_path($this->getPathFromClassName($this->classFullName));
 
         if ($this->alreadyExists($path)) {
@@ -145,12 +121,8 @@ abstract class ClassGenerator extends Command {
 
     /**
      * Execute the console command.
-     *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return mixed
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this instanceof Model) {
             $this->initCommonNames($this->argument('table_name'), $this->argument('class_name'), null, $this->option('model-with-full-namespace'));
@@ -160,13 +132,11 @@ abstract class ClassGenerator extends Command {
 
         $this->initClassNames($this->argument('class_name'));
 
-        $output = parent::execute($input, $output);
-
-        return $output;
+        return parent::execute($input, $output);
     }
 
-    protected function initClassNames($className = null) {
-        if (empty($className)) {
+    protected function initClassNames(?string $className = null): void {
+        if ($className === null) {
             $className = $this->generateClassNameFromTable($this->tableName);
         }
 

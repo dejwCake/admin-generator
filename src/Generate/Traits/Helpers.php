@@ -1,23 +1,21 @@
 <?php namespace Brackets\AdminGenerator\Generate\Traits;
 
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 trait Helpers {
 
-    public function option($key = null) {
+    public function option(?string $key = null) {
         return ($key === null || $this->hasOption($key)) ? parent::option($key) : null;
     }
 
     /**
      * Build the directory for the class if necessary.
-     *
-     * @param  string  $path
-     * @return string
      */
-    protected function makeDirectory($path)
+    protected function makeDirectory(string $path): string
     {
-        if (! $this->files->isDirectory(dirname($path))) {
+        if (!$this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0777, true, true);
         }
 
@@ -26,11 +24,8 @@ trait Helpers {
 
     /**
      * Determine if the file already exists.
-     *
-     * @param $path
-     * @return bool
      */
-    protected function alreadyExists($path)
+    protected function alreadyExists(string $path): bool
     {
         return $this->files->exists($path);
     }
@@ -38,25 +33,20 @@ trait Helpers {
 
     /**
      * Check if provided relation has a table
-     *
-     * @param $relationTable
-     * @return mixed
      */
-    public function checkRelationTable($relationTable)
+    public function checkRelationTable(string $relationTable): bool
     {
-        return Schema::hasTable($relationTable);
+        $schema = app(Builder::class);
+        return $schema->hasTable($relationTable);
     }
 
     /**
-     * sets Relation of Belongs To Many type
-     *
-     * @param $belongsToMany
-     * @return mixed
+     * Sets relation of belongs to many type
      */
     //TODO add other relation types
-    public function setBelongToManyRelation($belongsToMany)
+    public function setBelongToManyRelation(string $belongsToMany)
     {
-        $this->relations['belongsToMany'] = collect(explode(',', $belongsToMany))->filter(function($belongToManyRelation) {
+        $this->relations['belongsToMany'] = (new Collection(explode(',', $belongsToMany)))->filter(function($belongToManyRelation) {
             return $this->checkRelationTable($belongToManyRelation);
         })->map(function($belongsToMany) {
             return [
@@ -81,14 +71,10 @@ trait Helpers {
 
     /**
      * Determine if the content is already present in the file
-     *
-     * @param $path
-     * @param $content
-     * @return bool
      */
-    protected function alreadyAppended($path, $content)
+    protected function alreadyAppended(string $path, string $content): bool
     {
-        if (strpos($this->files->get($path), $content) !== false) {
+        if (str_contains($this->files->get($path), $content)) {
             return true;
         }
         return false;

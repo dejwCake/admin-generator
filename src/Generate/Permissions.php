@@ -8,6 +8,7 @@ class Permissions extends ClassGenerator {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:permissions';
 
@@ -15,22 +16,19 @@ class Permissions extends ClassGenerator {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Generate permissions migration';
 
     /**
      * Permissions has also bulk options
-     *
-     * @return mixed
      */
-    protected $withoutBulk = false;
+    protected bool $withoutBulk = false;
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $force = $this->option('force');
 
@@ -43,7 +41,7 @@ class Permissions extends ClassGenerator {
         }
     }
 
-    protected function generateClass($force = false) {
+    protected function generateClass(bool $force = false): bool {
         $fileName = 'fill_permissions_for_'.$this->modelRouteAndViewName.'.php';
         $path = database_path('migrations/'.date('Y_m_d_His', time()).'_'.$fileName);
 
@@ -66,11 +64,8 @@ class Permissions extends ClassGenerator {
 
     /**
      * Determine if the file already exists.
-     *
-     * @param $path
-     * @return bool
      */
-    protected function alreadyExists($path)
+    protected function alreadyExists(string $path): bool|string
     {
         foreach ($this->files->files(database_path('migrations')) as $file) {
             if(str_contains($file->getFilename(), $path)) {
@@ -80,7 +75,7 @@ class Permissions extends ClassGenerator {
         return false;
     }
 
-    protected function buildClass() {
+    protected function buildClass(): string {
 
         return view('brackets/admin-generator::permissions', [
             'modelBaseName' => $this->modelBaseName,
@@ -90,7 +85,8 @@ class Permissions extends ClassGenerator {
         ])->render();
     }
 
-    protected function getOptions() {
+    /** @return array<array<string|int>> */
+    protected function getOptions(): array {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
@@ -98,7 +94,7 @@ class Permissions extends ClassGenerator {
         ];
     }
 
-    public function generateClassNameFromTable($tableName) {
+    public function generateClassNameFromTable(string $tableName): string {
         return 'FillPermissionsFor'.$this->modelBaseName;
     }
 }

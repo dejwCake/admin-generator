@@ -1,20 +1,17 @@
 <?php namespace Brackets\AdminGenerator\Generate\Traits;
 
+use Illuminate\Database\Schema\Builder as Schema;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
 
 trait Columns {
 
-    /**
-     * @param $tableName
-     * @return Collection
-     */
-    protected function readColumnsFromTable($tableName) {
-
+    /** @return Collection<string, string|bool> */
+    protected function readColumnsFromTable(string $tableName): Collection {
+        $schema = app(Schema::class);
         // TODO how to process jsonb & json translatable columns? need to figure it out
 
-        $indexes = collect(Schema::getConnection()->getDoctrineSchemaManager()->listTableIndexes($tableName));
-        return collect(Schema::getColumnListing($tableName))->map(function($columnName) use ($tableName, $indexes) {
+        $indexes = new Collection($schema->getConnection()->getDoctrineSchemaManager()->listTableIndexes($tableName));
+        return (new Collection($schema->getColumnListing($tableName)))->map(function($columnName) use ($tableName, $indexes, $schema) {
 
             //Checked unique index
             $columnUniqueIndexes = $indexes->filter(function($index) use ($columnName) {
@@ -28,15 +25,16 @@ trait Columns {
 
             return [
                 'name' => $columnName,
-                'type' => Schema::getColumnType($tableName, $columnName),
-                'required' => boolval(Schema::getConnection()->getDoctrineColumn($tableName, $columnName)->getNotnull()),
+                'type' => $schema->getColumnType($tableName, $columnName),
+                'required' => boolval($schema->getConnection()->getDoctrineColumn($tableName, $columnName)->getNotnull()),
                 'unique' => $columnUniqueIndexes->count() > 0,
                 'unique_deleted_at_condition' => $columnUniqueDeleteAtCondition->count() > 0,
             ];
         });
     }
 
-    protected function getVisibleColumns($tableName, $modelVariableName) {
+    /** @return Collection<string, string|array> */
+    protected function getVisibleColumns(string $tableName, string $modelVariableName): Collection {
         $columns = $this->readColumnsFromTable($tableName);
         $hasSoftDelete = ($columns->filter(function($column) {
                 return $column['name'] == "deleted_at";
@@ -44,9 +42,9 @@ trait Columns {
         return $columns->filter(function($column) {
             return !in_array($column['name'],  ["id", "created_at", "updated_at", "deleted_at", "remember_token", "last_login_at"]);
         })->map(function($column) use ($tableName, $hasSoftDelete, $modelVariableName){
-            $serverStoreRules = collect([]);
-            $serverUpdateRules = collect([]);
-            $frontendRules = collect([]);
+            $serverStoreRules = new Collection([]);
+            $serverUpdateRules = new Collection([]);
+            $frontendRules = new Collection([]);
             if ($column['required']) {
                 $serverStoreRules->push('\'required\'');
                 $serverUpdateRules->push('\'sometimes\'');

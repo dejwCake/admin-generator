@@ -14,30 +14,20 @@ abstract class FileAppender extends Command {
     use Helpers, Columns, Names;
 
     /**
-     * @var Filesystem
+     * @var array<string>
      */
-    protected $files;
-
-    /**
-     * Relations
-     *
-     * @var string
-     */
-    protected $relations = [];
+    protected array $relations = [];
 
     /**
      * Create a new controller creator command instance.
-     *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
      */
-    public function __construct(Filesystem $files)
+    public function __construct(protected readonly Filesystem $files)
     {
         parent::__construct();
-
-        $this->files = $files;
     }
 
-    protected function getArguments() {
+    /** @return array<array<string|int>> */
+    protected function getArguments():array {
         return [
             ['table_name', InputArgument::REQUIRED, 'Name of the existing table'],
         ];
@@ -46,12 +36,10 @@ abstract class FileAppender extends Command {
     /**
      * Append content to file only if if the content is not present in the file
      *
-     * @param $path
-     * @param $content
-     * @param string $defaultContent content that will be used to populated with newly created file (in case it does not already exists)
-     * @return bool
+     * @param string $defaultContent content that will be used to populated with newly created file
+     * (in case it does not already exists)
      */
-    protected function appendIfNotAlreadyAppended($path, $content, $defaultContent = "<?php".PHP_EOL.PHP_EOL)
+    protected function appendIfNotAlreadyAppended(string $path, string $content, string $defaultContent = "<?php".PHP_EOL.PHP_EOL): bool
     {
         if (!$this->files->exists($path)) {
             $this->makeDirectory($path);
@@ -68,13 +56,10 @@ abstract class FileAppender extends Command {
     /**
      * Append content to file only if if the content is not present in the file
      *
-     * @param $path
-     * @param $search
-     * @param $replace
-     * @param string $defaultContent content that will be used to populated with newly created file (in case it does not already exists)
-     * @return bool
+     * @param string $defaultContent content that will be used to populated with newly created file
+     * (in case it does not already exists)
      */
-    protected function replaceIfNotPresent($path, $search, $replace, $defaultContent = "<?php".PHP_EOL.PHP_EOL)
+    protected function replaceIfNotPresent(string $path, string $search, string $replace, string $defaultContent = "<?php".PHP_EOL.PHP_EOL): bool
     {
         if (!$this->files->exists($path)) {
             $this->makeDirectory($path);
@@ -91,17 +76,11 @@ abstract class FileAppender extends Command {
 
     /**
      * Execute the console command.
-     *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return mixed
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initCommonNames($this->argument('table_name'), $this->option('model-name'), $this->option('controller-name'), $this->option('model-with-full-namespace'));
 
-        $output = parent::execute($input, $output);
-
-        return $output;
+        return parent::execute($input, $output);
     }
 }

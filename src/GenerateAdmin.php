@@ -12,6 +12,7 @@ class GenerateAdmin extends Command {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate';
 
@@ -19,26 +20,17 @@ class GenerateAdmin extends Command {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Scaffold complete CRUD admin interface';
 
-    /**
-     * The filesysem object
-     *
-     * @var Filesystem
-     */
-    protected $files;
-
-    /**
-     * Execute the console command.
-     *
-     * @param Filesystem $files
-     * @return void
-     */
-    public function handle(Filesystem $files): void
+    public function __construct(protected readonly Filesystem $files)
     {
-        $this->files = $files;
+        parent::__construct();
+    }
 
+    public function handle(): void
+    {
         $tableNameArgument = $this->argument('table_name');
         $modelOption = $this->option('model-name');
         $controllerOption = $this->option('controller-name');
@@ -151,6 +143,7 @@ class GenerateAdmin extends Command {
 
     }
 
+    /** @return array<array<string|int>> */
     protected function getArguments(): array
     {
         return [
@@ -158,6 +151,7 @@ class GenerateAdmin extends Command {
         ];
     }
 
+    /** @return array<array<string|int>> */
     protected function getOptions(): array
     {
         return [

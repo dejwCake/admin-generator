@@ -7,32 +7,32 @@ use Illuminate\Support\Str;
 trait Names
 {
 
-    public $tableName;
+    public string $tableName;
 
-    public $modelBaseName;
-    public $modelFullName;
-    public $modelPlural;
-    public $modelVariableName;
-    public $modelRouteAndViewName;
-    public $modelNamespace;
-    public $modelWithNamespaceFromDefault;
-    public $modelViewsDirectory;
-    public $modelDotNotation;
-    public $modelJSName;
-    public $modelLangFormat;
-    public $resource;
-    public $exportBaseName;
-    public $titleSingular;
-    public $titlePlural;
+    public string $modelBaseName;
+    public string $modelFullName;
+    public string $modelPlural;
+    public string $modelVariableName;
+    public string $modelRouteAndViewName;
+    public string $modelNamespace;
+    public string $modelWithNamespaceFromDefault;
+    public string $modelViewsDirectory;
+    public string $modelDotNotation;
+    public string $modelJSName;
+    public string $modelLangFormat;
+    public string $resource;
+    public string $exportBaseName;
+    public string $titleSingular;
+    public string $titlePlural;
 
-    public $controllerWithNamespaceFromDefault;
+    public string $controllerWithNamespaceFromDefault;
 
     protected function initCommonNames(
-        $tableName,
-        $modelName = null,
-        $controllerName = null,
-        $modelWithFullNamespace = null
-    ) {
+        string $tableName,
+        ?string $modelName = null,
+        ?string $controllerName = null,
+        ?string $modelWithFullNamespace = null,
+    ): void {
         $this->tableName = $tableName;
 
         if ($this instanceof Model) {
@@ -100,7 +100,7 @@ trait Names
         $this->titlePlural = str_replace(['_'], ' ', Str::title($this->tableName));
     }
 
-    public function valueWithoutId($string)
+    public function valueWithoutId(string $string): string
     {
         if (Str::endsWith(Str::lower($string), '_id')) {
             $string = Str::substr($string, 0, -3);

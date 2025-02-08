@@ -9,6 +9,7 @@ class ViewFullForm extends ViewGenerator {
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin:generate:full-form';
 
@@ -16,48 +17,36 @@ class ViewFullForm extends ViewGenerator {
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Generate a full-form view template';
 
     /**
      * Path for view
-     *
-     * @var string
      */
-    protected $view = 'full-form';
+    protected string $view = 'full-form';
 
     /**
      * Path for js view
-     *
-     * @var string
      */
-    protected $viewJs = 'form-js';
+    protected string $viewJs = 'form-js';
 
     /**
      * Name of view, will be used in directory
-     *
-     * @var string
      */
-    protected $fileName;
+    protected string $fileName;
 
     /**
      * Route to process form
-     *
-     * @var string
      */
-    protected $route;
+    protected string $route;
 
-    /**
-     * @var string
-     */
-    protected $formJsRelativePath;
+    protected string $formJsRelativePath;
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         $force = $this->option('force');
 
@@ -138,7 +127,7 @@ class ViewFullForm extends ViewGenerator {
 
     }
 
-    protected function buildForm() {
+    protected function buildForm(): string {
 
         return view('brackets/admin-generator::'.$this->view, [
             'modelBaseName' => $this->modelBaseName,
@@ -162,7 +151,7 @@ class ViewFullForm extends ViewGenerator {
         ])->render();
     }
 
-    protected function buildFormJs() {
+    protected function buildFormJs(): string {
         return view('brackets/admin-generator::'.$this->viewJs, [
             'modelJSName' => $this->formJsRelativePath,
 
@@ -170,7 +159,8 @@ class ViewFullForm extends ViewGenerator {
         ])->render();
     }
 
-    protected function getOptions() {
+    /** @return array<array<string|int>> */
+    protected function getOptions(): array {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
