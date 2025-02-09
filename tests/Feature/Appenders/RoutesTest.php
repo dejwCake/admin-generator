@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature\Appenders;
 
 use Brackets\AdminGenerator\Tests\TestCase;
@@ -15,10 +17,11 @@ class RoutesTest extends TestCase
         $filePath = base_path('routes/web.php');
 
         $this->artisan('admin:generate:routes', [
-            'table_name' => 'categories'
+            'table_name' => 'categories',
         ]);
 
-        $this->assertStringStartsWith('<?php
+        $this->assertStringStartsWith(
+            '<?php
 
 
 
@@ -36,7 +39,8 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
         });
     });
 });',
-            File::get($filePath));
+            File::get($filePath),
+        );
     }
 
     public function testCustomModelAndControllerName(): void
@@ -49,7 +53,8 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
             '--controller-name' => 'Billing\\CategOryController',
         ]);
 
-        $this->assertStringStartsWith('<?php
+        $this->assertStringStartsWith(
+            '<?php
 
 
 
@@ -67,6 +72,7 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
         });
     });
 });',
-            File::get($filePath));
+            File::get($filePath),
+        );
     }
 }

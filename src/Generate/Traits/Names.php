@@ -1,4 +1,8 @@
-<?php namespace Brackets\AdminGenerator\Generate\Traits;
+<?php
+
+declare(strict_types=1);
+
+namespace Brackets\AdminGenerator\Generate\Traits;
 
 use Brackets\AdminGenerator\Generate\Controller;
 use Brackets\AdminGenerator\Generate\Model;
@@ -6,7 +10,6 @@ use Illuminate\Support\Str;
 
 trait Names
 {
-
     public string $tableName;
 
     public string $modelBaseName;
@@ -26,6 +29,15 @@ trait Names
     public string $titlePlural;
 
     public string $controllerWithNamespaceFromDefault;
+
+    public function valueWithoutId(string $string): string
+    {
+        if (Str::endsWith(Str::lower($string), '_id')) {
+            $string = Str::substr($string, 0, -3);
+        }
+
+        return Str::ucfirst(str_replace('_', ' ', $string));
+    }
 
     protected function initCommonNames(
         string $tableName,
@@ -52,16 +64,18 @@ trait Names
         $this->modelVariableName = lcfirst(Str::singular(class_basename($this->modelBaseName)));
         $this->modelRouteAndViewName = Str::lower(Str::kebab($this->modelBaseName));
         $this->modelNamespace = Str::replaceLast("\\" . $this->modelBaseName, '', $this->modelFullName);
-        if (!Str::startsWith($this->modelFullName,
-            $startsWith = trim($modelGenerator->rootNamespace(), '\\') . '\Models\\')) {
-            $this->modelWithNamespaceFromDefault = $this->modelBaseName;
-        } else {
-            $this->modelWithNamespaceFromDefault = Str::replaceFirst($startsWith, '', $this->modelFullName);
-        }
-        $this->modelViewsDirectory = Str::lower(Str::kebab(implode('/',
-            collect(explode('\\', $this->modelWithNamespaceFromDefault))->map(function ($part) {
-                return lcfirst($part);
-            })->toArray())));
+        $this->modelWithNamespaceFromDefault =
+            !Str::startsWith(
+                $this->modelFullName,
+                $startsWith = trim($modelGenerator->rootNamespace(), '\\') . '\Models\\',
+            )
+         ? $this->modelBaseName : Str::replaceFirst($startsWith, '', $this->modelFullName);
+        $this->modelViewsDirectory = Str::lower(Str::kebab(implode(
+            '/',
+            collect(explode('\\', $this->modelWithNamespaceFromDefault))->map(
+                static fn ($part) => lcfirst($part),
+            )->toArray(),
+        )));
 
         $parts = collect(explode('\\', $this->modelWithNamespaceFromDefault));
         $parts->pop();
@@ -84,12 +98,12 @@ trait Names
         }
 
         $controllerFullName = $controllerGenerator->qualifyClass($controllerName);
-        if (!Str::startsWith($controllerFullName,
-            $startsWith = trim($controllerGenerator->rootNamespace(), '\\') . '\Http\\Controllers\\Admin\\')) {
-            $this->controllerWithNamespaceFromDefault = $controllerFullName;
-        } else {
-            $this->controllerWithNamespaceFromDefault = Str::replaceFirst($startsWith, '', $controllerFullName);
-        }
+        $this->controllerWithNamespaceFromDefault =
+            !Str::startsWith(
+                $controllerFullName,
+                $startsWith = trim($controllerGenerator->rootNamespace(), '\\') . '\Http\\Controllers\\Admin\\',
+            )
+         ? $controllerFullName : Str::replaceFirst($startsWith, '', $controllerFullName);
 
         if (!empty($modelWithFullNamespace)) {
             $this->modelFullName = $modelWithFullNamespace;
@@ -99,14 +113,4 @@ trait Names
         $this->titleSingular = Str::singular(str_replace(['_'], ' ', Str::title($this->tableName)));
         $this->titlePlural = str_replace(['_'], ' ', Str::title($this->tableName));
     }
-
-    public function valueWithoutId(string $string): string
-    {
-        if (Str::endsWith(Str::lower($string), '_id')) {
-            $string = Str::substr($string, 0, -3);
-        }
-
-        return Str::ucfirst(str_replace('_', ' ', $string));
-    }
-
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature\Appenders;
 
 use Brackets\AdminGenerator\Tests\TestCase;
@@ -15,7 +17,7 @@ class LangTest extends TestCase
         $filePath = resource_path('lang/en/admin.php');
 
         $this->artisan('admin:generate:lang', [
-            'table_name' => 'categories'
+            'table_name' => 'categories',
         ]);
 
         $this->assertStringStartsWith('<?php

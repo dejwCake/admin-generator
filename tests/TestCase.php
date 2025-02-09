@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests;
 
 use Brackets\AdminGenerator\AdminGeneratorServiceProvider;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
-use Illuminate\Database\Schema\Blueprint;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
@@ -16,12 +18,13 @@ abstract class TestCase extends Orchestra
     public function setUp(): void
     {
         parent::setUp();
+
         $this->setUpDatabase($this->app);
     }
 
     protected function setUpDatabase(Application $app): void
     {
-        $app['db']->connection()->getSchemaBuilder()->create('categories', function (Blueprint $table) {
+        $app['db']->connection()->getSchemaBuilder()->create('categories', static function (Blueprint $table): void {
             $table->increments('id');
             $table->string('title');
         });
@@ -33,15 +36,15 @@ abstract class TestCase extends Orchestra
      */
     protected function getEnvironmentSetUp($app): void
     {
-        $newBasePath = $app->basePath().DIRECTORY_SEPARATOR.'testing_folder';
+        $newBasePath = $app->basePath() . DIRECTORY_SEPARATOR . 'testing_folder';
 
         $app->getNamespace();
         $app->setBasePath($newBasePath);
         $this->initializeDirectory($newBasePath);
 
-        File::copyDirectory(__DIR__.'/fixtures/resources', resource_path());
+        File::copyDirectory(__DIR__ . '/fixtures/resources', resource_path());
 
-        if(env('DB_CONNECTION') === 'pgsql') {
+        if (env('DB_CONNECTION') === 'pgsql') {
             $app['config']->set('database.default', 'pgsql');
             $app['config']->set('database.connections.pgsql', [
                 'driver' => 'pgsql',
@@ -55,7 +58,7 @@ abstract class TestCase extends Orchestra
                 'schema' => 'public',
                 'sslmode' => 'prefer',
             ]);
-        } else if(env('DB_CONNECTION') === 'mysql') {
+        } else if (env('DB_CONNECTION') === 'mysql') {
             $app['config']->set('database.default', 'mysql');
             $app['config']->set('database.connections.mysql', [
                 'driver' => 'mysql',
@@ -87,10 +90,9 @@ abstract class TestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         return [
-            AdminGeneratorServiceProvider::class
+            AdminGeneratorServiceProvider::class,
         ];
     }
-
 
     protected function initializeDirectory(string $directory): void
     {

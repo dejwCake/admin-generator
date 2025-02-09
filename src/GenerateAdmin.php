@@ -1,13 +1,16 @@
-<?php namespace Brackets\AdminGenerator;
+<?php
+
+declare(strict_types=1);
+
+namespace Brackets\AdminGenerator;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
-class GenerateAdmin extends Command {
-
+class GenerateAdmin extends Command
+{
     /**
      * The name and signature of the console command.
      *
@@ -83,7 +86,7 @@ class GenerateAdmin extends Command {
             '--force' => $force,
         ]);
 
-        if(!$withoutBulkOptions) {
+        if (!$withoutBulkOptions) {
             $this->call('admin:generate:request:bulk-destroy', [
                 'table_name' => $tableNameArgument,
                 '--model-name' => $modelOption,
@@ -119,7 +122,7 @@ class GenerateAdmin extends Command {
             '--with-export' => $exportOption,
         ]);
 
-        if($exportOption){
+        if ($exportOption) {
             $this->call('admin:generate:export', [
                 'table_name' => $tableNameArgument,
                 '--force' => $force,
@@ -134,13 +137,15 @@ class GenerateAdmin extends Command {
                 '--without-bulk' => $withoutBulkOptions,
             ]);
 
-            if ($this->option('no-interaction') || $this->confirm('Do you want to attach generated permissions to the default role now?', true)) {
-               $this->call('migrate');
+            if (
+                $this->option('no-interaction')
+                || $this->confirm('Do you want to attach generated permissions to the default role now?', true)
+            ) {
+                $this->call('migrate');
             }
         }
 
         $this->info('Generating whole admin finished');
-
     }
 
     /** @return array<array<string|int>> */
@@ -172,7 +177,6 @@ class GenerateAdmin extends Command {
 
         return false;
     }
-
 }
 
 
@@ -210,6 +214,4 @@ class GenerateAdmin extends Command {
  * ViewFullForm: file_name, model_name, template, name, view_name, route
  *
  * ViewIndex: file_name, model_name, template
- *
- *
  */

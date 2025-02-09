@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature\AdminUsers;
 
 use Brackets\AdminGenerator\Tests\UserTestCase;
@@ -51,7 +53,8 @@ use Illuminate\View\View;
 
 class AdminUsersController extends Controller', File::get($filePathController));
 
-        $this->assertStringStartsWith('<?php
+        $this->assertStringStartsWith(
+            '<?php
 
 
 
@@ -70,7 +73,8 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
         });
     });
 });',
-            File::get($filePathRoutes));
+            File::get($filePathRoutes),
+        );
     }
 
     public function testAdminUserControllerNameCanBeOutsideDefaultDirectory(): void

@@ -1,9 +1,13 @@
-<?php namespace Brackets\AdminGenerator\Generate\Traits;
+<?php
+
+declare(strict_types=1);
+
+namespace Brackets\AdminGenerator\Generate\Traits;
 
 use Illuminate\Filesystem\Filesystem;
 
-trait FileManipulations {
-
+trait FileManipulations
+{
     private function strReplaceInFile(
         string $filePath,
         string $find,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature\Users;
 
 use Brackets\AdminGenerator\Tests\UserTestCase;
@@ -120,7 +122,8 @@ use Illuminate\Support\Facades\Gate;
 
 class DestroyUser extends FormRequest
 {', File::get($destroyPath));
-        $this->assertStringStartsWith('<?php
+        $this->assertStringStartsWith(
+            '<?php
 
 
 
@@ -138,7 +141,8 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
         });
     });
 });',
-            File::get($routesPath));
+            File::get($routesPath),
+        );
         $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($indexPath));
         $this->assertStringStartsWith('import AppListing from \'../app-components/Listing/AppListing\';
 

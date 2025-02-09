@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature\Profile;
 
 use Brackets\AdminGenerator\Tests\UserTestCase;

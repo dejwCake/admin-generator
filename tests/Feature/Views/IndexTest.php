@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature\Views;
 
 use Brackets\AdminGenerator\Tests\TestCase;
@@ -22,7 +24,7 @@ class IndexTest extends TestCase
         $this->assertFileDoesNotExist($indexJsPath);
 
         $this->artisan('admin:generate:index', [
-            'table_name' => 'categories'
+            'table_name' => 'categories',
         ]);
 
         $this->assertFileExists($indexPath);
@@ -52,7 +54,7 @@ Vue.component(\'category-listing\', {
 
         $this->artisan('admin:generate:index', [
             'table_name' => 'categories',
-            '--model-name' => 'Billing\\MyArticle'
+            '--model-name' => 'Billing\\MyArticle',
         ]);
 
         $this->assertFileExists($indexPath);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature\Views;
 
 use Brackets\AdminGenerator\Tests\TestCase;
@@ -19,7 +21,7 @@ class FullFormTest extends TestCase
         $this->assertFileDoesNotExist($formJsPath);
 
         $this->artisan('admin:generate:full-form', [
-            'table_name' => 'categories'
+            'table_name' => 'categories',
         ]);
 
         $this->assertFileExists($formPath);
@@ -41,14 +43,16 @@ Vue.component(\'category-form\', {
 
         $this->artisan('admin:generate:full-form', [
             'table_name' => 'categories',
-            '--file-name' => 'profile/edit-password'
+            '--file-name' => 'profile/edit-password',
         ]);
 
         $this->assertFileExists($formPath);
         $this->assertFileExists($formJsPath);
         $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($formPath));
-        $this->assertStringContainsString(':action="\'{{ route(\'admin/profile/edit-password\', [\'category\' => $category]) }}\'"',
-            File::get($formPath));
+        $this->assertStringContainsString(
+            ':action="\'{{ route(\'admin/profile/edit-password\', [\'category\' => $category]) }}\'"',
+            File::get($formPath),
+        );
         $this->assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
 
 Vue.component(\'profile-edit-password-form\', {

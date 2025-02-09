@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature\Users;
 
 use Brackets\AdminGenerator\Tests\UserTestCase;
@@ -17,7 +19,7 @@ class UserCrudGeneratorWithGenerateModelTest extends UserTestCase
         $this->assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:user', [
-            '--generate-model' => true
+            '--generate-model' => true,
         ]);
 
         $this->assertFileExists($filePath);
@@ -45,7 +47,7 @@ class User extends Authenticatable implements CanActivateContract
 
         $this->artisan('admin:generate:user', [
             '--model-name' => 'Auth\\User',
-            '--generate-model' => true
+            '--generate-model' => true,
         ]);
 
         $this->assertFileExists($filePath);
@@ -73,7 +75,7 @@ class User extends Authenticatable implements CanActivateContract
 
         $this->artisan('admin:generate:user', [
             '--model-name' => 'App\\Auth\\User',
-            '--generate-model' => true
+            '--generate-model' => true,
         ]);
 
         $this->assertFileExists($filePath);
@@ -92,5 +94,4 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements CanActivateContract
 {', File::get($filePath));
     }
-
 }

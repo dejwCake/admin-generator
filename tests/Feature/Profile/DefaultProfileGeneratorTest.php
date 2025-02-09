@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature\Profile;
 
 use Brackets\AdminGenerator\Tests\UserTestCase;
@@ -55,7 +57,8 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {', File::get($filePathController));
-        $this->assertStringStartsWith('<?php
+        $this->assertStringStartsWith(
+            '<?php
 
 
 
@@ -68,7 +71,8 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
         Route::post(\'/password\',                                    \'ProfileController@updatePassword\')->name(\'update-password\');
     });
 });',
-            File::get($filePathRoute));
+            File::get($filePathRoute),
+        );
         $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')
 
 @section(\'title\', trans(\'admin.admin-user.actions.edit_profile\'))

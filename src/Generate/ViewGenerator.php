@@ -1,21 +1,25 @@
-<?php namespace Brackets\AdminGenerator\Generate;
+<?php
 
+declare(strict_types=1);
+
+namespace Brackets\AdminGenerator\Generate;
+
+use Brackets\AdminGenerator\Generate\Traits\Columns;
 use Brackets\AdminGenerator\Generate\Traits\Helpers;
 use Brackets\AdminGenerator\Generate\Traits\Names;
-use Brackets\AdminGenerator\Generate\Traits\Columns;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-abstract class ViewGenerator extends Command {
+abstract class ViewGenerator extends Command
+{
+    use Helpers;
+    use Columns;
+    use Names;
 
-    use Helpers, Columns, Names;
-
-    /**
-     * @var array<string>
-     */
+    /** @var array<string> */
     protected array $relations = [];
 
     public function __construct(protected readonly Filesystem $files)
@@ -24,13 +28,13 @@ abstract class ViewGenerator extends Command {
     }
 
     /** @return array<array<string|int>> */
-    protected function getArguments(): array {
+    protected function getArguments(): array
+    {
         return [
             ['table_name', InputArgument::REQUIRED, 'Name of the existing table'],
             // FIXME add OPTIONAL file_name argument
         ];
     }
-
 
     /**
      * Append content to file only if if the content is not present in the file
@@ -47,7 +51,6 @@ abstract class ViewGenerator extends Command {
         }
 
         return true;
-
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -56,5 +59,4 @@ abstract class ViewGenerator extends Command {
 
         return parent::execute($input, $output);
     }
-
 }

@@ -1,9 +1,13 @@
-<?php namespace Brackets\AdminGenerator\Generate;
+<?php
+
+declare(strict_types=1);
+
+namespace Brackets\AdminGenerator\Generate;
 
 use Symfony\Component\Console\Input\InputOption;
 
-class ModelFactory extends FileAppender {
-
+class ModelFactory extends FileAppender
+{
     /**
      * The name and signature of the console command.
      *
@@ -28,17 +32,17 @@ class ModelFactory extends FileAppender {
     /**
      * Execute the console command.
      */
-    public function handle():void
+    public function handle(): void
     {
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        if(!empty($template = $this->option('template'))) {
-            $this->view = 'templates.'.$template.'.factory';
+        if (!empty($template = $this->option('template'))) {
+            $this->view = 'templates.' . $template . '.factory';
         }
 
-        if ($this->appendIfNotAlreadyAppended(base_path('database/factories/ModelFactory.php'), $this->buildClass())){
-            $this->info('Appending '.$this->modelBaseName.' model to ModelFactory finished');
+        if ($this->appendIfNotAlreadyAppended(base_path('database/factories/ModelFactory.php'), $this->buildClass())) {
+            $this->info('Appending ' . $this->modelBaseName . ' model to ModelFactory finished');
         }
 
         if ($this->option('seed')) {
@@ -47,65 +51,71 @@ class ModelFactory extends FileAppender {
         }
     }
 
-    protected function buildClass(): string {
-
-        return view('brackets/admin-generator::'.$this->view, [
+    protected function buildClass(): string
+    {
+        return view('brackets/admin-generator::' . $this->view, [
             'modelFullName' => $this->modelFullName,
 
             'columns' => $this->readColumnsFromTable($this->tableName)
                 // we skip primary key
-                ->filter(function($col){
-                    return $col['name'] != 'id';
-                })
-                ->map(function($col) {
-                if($col['name'] == 'deleted_at') {
-                    $type = 'null';
-                } else if($col['name'] == 'remember_token') {
-                    $type = 'null';
-                } else {
-                    if ($col['type'] == 'date') {
-                        $type = '$faker->date()';
-                    } elseif ($col['type'] == 'time') {
-                        $type = '$faker->time()';
-                    } elseif ($col['type'] == 'datetime') {
-                        $type = '$faker->dateTime';
-                    } elseif ($col['type'] == 'text') {
-                        $type = '$faker->text()';
-                    } elseif ($col['type'] == 'boolean') {
-                        $type = '$faker->boolean()';
-                    } elseif ($col['type'] == 'integer' || $col['type'] == 'numeric' || $col['type'] == 'decimal') {
-                        $type = '$faker->randomNumber(5)';
-                    } elseif ($col['type'] == 'float') {
-                        $type = '$faker->randomFloat';
-                    } elseif ($col['name'] == 'title') {
-                        $type = '$faker->sentence';
-                    } elseif ($col['name'] == 'email') {
-                        $type = '$faker->email';
-                    } elseif ($col['name'] == 'name' || $col['name'] == 'first_name') {
-                        $type = '$faker->firstName';
-                    } elseif ($col['name'] == 'surname' || $col['name'] == 'last_name') {
-                        $type = '$faker->lastName';
-                    } elseif ($col['name'] == 'slug') {
-                        $type = '$faker->unique()->slug';
-                    } elseif ($col['name'] == 'password') {
-                        $type = 'bcrypt($faker->password)';
+                ->filter(static fn ($col) => $col['name'] !== 'id')
+                ->map(static function ($col) {
+                    if ($col['name'] === 'deleted_at') {
+                        $type = 'null';
+                    } else if ($col['name'] === 'remember_token') {
+                        $type = 'null';
                     } else {
-                        $type = '$faker->sentence';
+                        if ($col['type'] === 'date') {
+                            $type = '$faker->date()';
+                        } elseif ($col['type'] === 'time') {
+                            $type = '$faker->time()';
+                        } elseif ($col['type'] === 'datetime') {
+                            $type = '$faker->dateTime';
+                        } elseif ($col['type'] === 'text') {
+                            $type = '$faker->text()';
+                        } elseif ($col['type'] === 'boolean') {
+                            $type = '$faker->boolean()';
+                        } elseif (
+                            $col['type'] === 'integer'
+                            || $col['type'] === 'numeric'
+                            || $col['type'] === 'decimal'
+                        ) {
+                            $type = '$faker->randomNumber(5)';
+                        } elseif ($col['type'] === 'float') {
+                            $type = '$faker->randomFloat';
+                        } elseif ($col['name'] === 'title') {
+                            $type = '$faker->sentence';
+                        } elseif ($col['name'] === 'email') {
+                            $type = '$faker->email';
+                        } elseif ($col['name'] === 'name' || $col['name'] === 'first_name') {
+                            $type = '$faker->firstName';
+                        } elseif ($col['name'] === 'surname' || $col['name'] === 'last_name') {
+                            $type = '$faker->lastName';
+                        } elseif ($col['name'] === 'slug') {
+                            $type = '$faker->unique()->slug';
+                        } elseif ($col['name'] === 'password') {
+                            $type = 'bcrypt($faker->password)';
+                        } else {
+                            $type = '$faker->sentence';
+                        }
                     }
-                }
-                return [
+
+                    return [
                     'name' => $col['name'],
                     'faker' => $type,
-                ];
-            }),
-            'translatable' => $this->readColumnsFromTable($this->tableName)->filter(function($column) {
-                return $column['type'] == "json";
-            })->pluck('name'),
+                    ];
+                }),
+            'translatable' => $this->readColumnsFromTable($this->tableName)->filter(
+                static fn ($column) => $column['type'] === "json",
+            )->pluck(
+                'name',
+            ),
         ])->render();
     }
 
     /** @return array<array<string|int>> */
-    protected function getOptions(): array {
+    protected function getOptions(): array
+    {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
@@ -113,5 +123,4 @@ class ModelFactory extends FileAppender {
             ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
         ];
     }
-
 }

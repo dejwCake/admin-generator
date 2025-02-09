@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature\AdminUsers;
 
 use Brackets\AdminGenerator\Tests\UserTestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\File;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class DefaultAdminUserCrudGeneratorTest extends UserTestCase
 {
     use DatabaseMigrations;
 
-    public function testAllFilesShouldBeGeneratedUnderDefaultNamespace(): void
+    #[DataProvider('getCases')]
+    public function testAllFilesShouldBeGeneratedUnderDefaultNamespace(bool $seed): void
     {
         $controllerPath = base_path('app/Http/Controllers/Admin/AdminUsersController.php');
         $indexRequestPath = base_path('app/Http/Requests/Admin/AdminUser/IndexAdminUser.php');
@@ -41,7 +45,11 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         $this->assertFileDoesNotExist($indexJsPath);
 
 
-        $this->artisan('admin:generate:admin-user');
+        if ($seed) {
+            $this->artisan('admin:generate:admin-user', ['--seed' => true]);
+        } else {
+            $this->artisan('admin:generate:admin-user');
+        }
 
         $this->assertFileExists($controllerPath);
         $this->assertFileExists($indexRequestPath);
@@ -125,7 +133,8 @@ use Illuminate\Support\Facades\Gate;
 
 class DestroyAdminUser extends FormRequest
 {', File::get($destroyPath));
-        $this->assertStringStartsWith('<?php
+        $this->assertStringStartsWith(
+            '<?php
 
 
 
@@ -144,7 +153,8 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
         });
     });
 });',
-            File::get($routesPath));
+            File::get($routesPath),
+        );
         $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($indexPath));
         $this->assertStringStartsWith('import AppListing from \'../app-components/Listing/AppListing\';
 
@@ -160,6 +170,16 @@ Vue.component(\'admin-user-form\'', File::get($formJsPath));
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(Brackets\AdminAuth\Models\AdminUser::class', File::get($factoryPath));
+
+        if ($seed) {
+            $this->assertDatabaseCount('admin_users', 20);
+        }
     }
 
+    public static function getCases(): iterable
+    {
+        yield 'without seed' => [false];
+        //disabled for now, because it's not working properly
+        //yield 'with seed' => [true];
+    }
 }

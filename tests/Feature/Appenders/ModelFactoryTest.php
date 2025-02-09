@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature\Appenders;
 
 use Brackets\AdminGenerator\Tests\TestCase;
@@ -15,7 +17,7 @@ class ModelFactoryTest extends TestCase
         $filePath = base_path('database/factories/ModelFactory.php');
 
         $this->artisan('admin:generate:factory', [
-            'table_name' => 'categories'
+            'table_name' => 'categories',
         ]);
 
         $this->assertStringStartsWith('<?php
@@ -53,5 +55,4 @@ $factory->define(App\Models\Billing\Cat::class', File::get($filePath));
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Billing\MyCat::class', File::get($filePath));
     }
-
 }

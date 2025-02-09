@@ -1,9 +1,13 @@
-<?php namespace Brackets\AdminGenerator\Generate;
+<?php
+
+declare(strict_types=1);
+
+namespace Brackets\AdminGenerator\Generate;
 
 use Symfony\Component\Console\Input\InputOption;
 
-class UpdateRequest extends ClassGenerator {
-
+class UpdateRequest extends ClassGenerator
+{
     /**
      * The name and signature of the console command.
      *
@@ -35,44 +39,55 @@ class UpdateRequest extends ClassGenerator {
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        if(!empty($template = $this->option('template'))) {
-            $this->view = 'templates.'.$template.'.update-request';
+        if (!empty($template = $this->option('template'))) {
+            $this->view = 'templates.' . $template . '.update-request';
         }
 
-        if(!empty($belongsToMany = $this->option('belongs-to-many'))) {
+        if (!empty($belongsToMany = $this->option('belongs-to-many'))) {
             $this->setBelongToManyRelation($belongsToMany);
         }
 
-        if ($this->generateClass($force)){
-            $this->info('Generating '.$this->classFullName.' finished');
+        if ($this->generateClass($force)) {
+            $this->info('Generating ' . $this->classFullName . ' finished');
         }
     }
 
-    protected function buildClass(): string {
+    public function generateClassNameFromTable(string $tableName): string
+    {
+        return 'Update' . $this->modelBaseName;
+    }
 
-        return view('brackets/admin-generator::'.$this->view, [
+    protected function buildClass(): string
+    {
+        return view('brackets/admin-generator::' . $this->view, [
             'modelBaseName' => $this->modelBaseName,
             'modelDotNotation' => $this->modelDotNotation,
             'modelWithNamespaceFromDefault' => $this->modelWithNamespaceFromDefault,
             'modelVariableName' => $this->modelVariableName,
             'modelFullName' => $this->modelFullName,
             'tableName' => $this->tableName,
-            'containsPublishedAtColumn' => in_array("published_at", array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name')),
-            
+            'containsPublishedAtColumn' => in_array(
+                "published_at",
+                array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
+            ),
+
             // validation in store/update
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
-            'translatable' => $this->readColumnsFromTable($this->tableName)->filter(function($column) {
-                return $column['type'] == "json";
-            })->pluck('name'),
-            'hasSoftDelete' => $this->readColumnsFromTable($this->tableName)->filter(function($column) {
-                return $column['name'] == "deleted_at";
-            })->count() > 0,
+            'translatable' => $this->readColumnsFromTable($this->tableName)->filter(
+                static fn ($column) => $column['type'] === "json",
+            )->pluck(
+                'name',
+            ),
+            'hasSoftDelete' => $this->readColumnsFromTable($this->tableName)->filter(
+                static fn ($column) => $column['name'] === "deleted_at",
+            )->count() > 0,
             'relations' => $this->relations,
         ])->render();
     }
 
     /** @return array<array<string|int>> */
-    protected function getOptions(): array {
+    protected function getOptions(): array
+    {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
@@ -81,13 +96,8 @@ class UpdateRequest extends ClassGenerator {
         ];
     }
 
-    public function generateClassNameFromTable(string $tableName): string {
-        return 'Update'.$this->modelBaseName;
-    }
-
     protected function getDefaultNamespace(string $rootNamespace): string
     {
-        return $rootNamespace.'\Http\Requests\Admin\\'.$this->modelWithNamespaceFromDefault;
+        return $rootNamespace . '\Http\Requests\Admin\\' . $this->modelWithNamespaceFromDefault;
     }
-
 }

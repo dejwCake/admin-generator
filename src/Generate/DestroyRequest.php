@@ -1,9 +1,13 @@
-<?php namespace Brackets\AdminGenerator\Generate;
+<?php
+
+declare(strict_types=1);
+
+namespace Brackets\AdminGenerator\Generate;
 
 use Symfony\Component\Console\Input\InputOption;
 
-class DestroyRequest extends ClassGenerator {
-
+class DestroyRequest extends ClassGenerator
+{
     /**
      * The name and signature of the console command.
      *
@@ -27,13 +31,18 @@ class DestroyRequest extends ClassGenerator {
     {
         $force = $this->option('force');
 
-        if ($this->generateClass($force)){
-            $this->info('Generating '.$this->classFullName.' finished');
+        if ($this->generateClass($force)) {
+            $this->info('Generating ' . $this->classFullName . ' finished');
         }
     }
 
-    protected function buildClass(): string {
+    public function generateClassNameFromTable(string $tableName): string
+    {
+        return 'Destroy' . $this->modelBaseName;
+    }
 
+    protected function buildClass(): string
+    {
         return view('brackets/admin-generator::destroy-request', [
             'modelBaseName' => $this->modelBaseName,
             'modelDotNotation' => $this->modelDotNotation,
@@ -43,20 +52,16 @@ class DestroyRequest extends ClassGenerator {
     }
 
     /** @return array<array<string|int>> */
-    protected function getOptions(): array {
+    protected function getOptions(): array
+    {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
         ];
     }
 
-    public function generateClassNameFromTable(string $tableName): string {
-        return 'Destroy'.$this->modelBaseName;
-    }
-
     protected function getDefaultNamespace(string $rootNamespace): string
     {
-        return $rootNamespace.'\Http\Requests\Admin\\'.$this->modelWithNamespaceFromDefault;
+        return $rootNamespace . '\Http\Requests\Admin\\' . $this->modelWithNamespaceFromDefault;
     }
-
 }

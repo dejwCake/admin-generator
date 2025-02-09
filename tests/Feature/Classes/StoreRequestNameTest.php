@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature\Classes;
 
 use Brackets\AdminGenerator\Tests\TestCase;
@@ -17,7 +19,7 @@ class StoreRequestNameTest extends TestCase
         $this->assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:request:store', [
-            'table_name' => 'categories'
+            'table_name' => 'categories',
         ]);
 
         $this->assertFileExists($filePath);

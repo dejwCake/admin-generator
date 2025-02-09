@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature;
 
 use Brackets\AdminGenerator\Tests\TestCase;
@@ -46,7 +48,7 @@ class WholeAdminGeneratorTest extends TestCase
         $this->assertFileDoesNotExist($langPath);
 
         $this->artisan('admin:generate', [
-            'table_name' => 'categories'
+            'table_name' => 'categories',
         ]);
 
         $this->assertFileExists($controllerPath);
@@ -66,5 +68,4 @@ class WholeAdminGeneratorTest extends TestCase
         $this->assertFileExists($indexJsPath);
         $this->assertFileExists($langPath);
     }
-
 }

@@ -1,12 +1,16 @@
-<?php namespace Brackets\AdminGenerator;
+<?php
+
+declare(strict_types=1);
+
+namespace Brackets\AdminGenerator;
 
 use Brackets\AdminGenerator\Generate\Traits\FileManipulations;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputOption;
 
-class GenerateUser extends Command {
-
+class GenerateUser extends Command
+{
     use FileManipulations;
 
     /**
@@ -32,8 +36,6 @@ class GenerateUser extends Command {
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
     public function handle(): void
     {
@@ -44,12 +46,12 @@ class GenerateUser extends Command {
         $exportOption = $this->option('with-export');
         $force = $this->option('force');
 
-        if($force) {
+        if ($force) {
             //remove all files
-            if($generateModelOption) {
+            if ($generateModelOption) {
                 $this->files->delete(app_path('Models/User.php'));
             }
-            if($exportOption){
+            if ($exportOption) {
                 $this->files->delete(app_path('Exports/UsersExport.php'));
             }
             $this->files->delete(app_path('Http/Controllers/Admin/UsersController.php'));
@@ -60,7 +62,7 @@ class GenerateUser extends Command {
             $this->info('Deleting previous files finished.');
         }
 
-        if($generateModelOption) {
+        if ($generateModelOption) {
             $this->call('admin:generate:model', [
                 'table_name' => $tableNameArgument,
                 'class_name' => $modelOption,
@@ -149,7 +151,7 @@ class GenerateUser extends Command {
             '--template' => 'user',
         ]);
 
-        if($exportOption){
+        if ($exportOption) {
             $this->call('admin:generate:export', [
                 'table_name' => $tableNameArgument,
                 '--force' => $force,
@@ -158,11 +160,10 @@ class GenerateUser extends Command {
 
         if ($this->option('seed')) {
             $this->info('Seeding testing data');
-            $this->modelFullName::factory()->count(20)->create();
+            $modelOption::factory()->count(20)->create();
         }
 
         $this->info('Generating whole user admin finished');
-
     }
 
     /** @return array<array<string|int>> */

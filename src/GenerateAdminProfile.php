@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator;
 
 use Brackets\AdminGenerator\Generate\Traits\FileManipulations;
@@ -10,7 +12,6 @@ use Symfony\Component\Console\Input\InputOption;
 
 class GenerateAdminProfile extends Command
 {
-
     use FileManipulations;
 
     /**
@@ -38,7 +39,9 @@ class GenerateAdminProfile extends Command
     {
         $tableNameArgument = !empty($this->argument('table_name')) ? $this->argument('table_name') : 'admin_users';
         $modelOption = $this->option('model-name');
-        $controllerOption = !empty($this->option('controller-name')) ? $this->option('controller-name') : 'ProfileController';
+        $controllerOption = !empty($this->option('controller-name'))
+            ? $this->option('controller-name')
+            : 'ProfileController';
         $force = $this->option('force');
 
         if ($force) {

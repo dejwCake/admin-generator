@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests;
 
 use Brackets\AdminGenerator\AdminGeneratorServiceProvider;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\File;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class UserTestCase extends Orchestra
@@ -23,7 +25,7 @@ abstract class UserTestCase extends Orchestra
 
     protected function setUpDatabase(Application $app): void
     {
-        $app['db']->connection()->getSchemaBuilder()->create('users', function (Blueprint $table) {
+        $app['db']->connection()->getSchemaBuilder()->create('users', static function (Blueprint $table): void {
             $table->increments('id');
             $table->string('name');
             $table->string('email')->unique();
@@ -32,7 +34,7 @@ abstract class UserTestCase extends Orchestra
             $table->timestamps();
         });
 
-        $app['db']->connection()->getSchemaBuilder()->create('admin_users', function (Blueprint $table) {
+        $app['db']->connection()->getSchemaBuilder()->create('admin_users', static function (Blueprint $table): void {
             $table->increments('id');
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
@@ -50,17 +52,25 @@ abstract class UserTestCase extends Orchestra
             $table->unique(['email', 'deleted_at']);
         });
 
-        if(env('DB_CONNECTION') === 'pgsql') {
-            $app['db']->connection()->getSchemaBuilder()->table('admin_users', function (Blueprint $table) {
-                DB::statement('CREATE UNIQUE INDEX admin_users_email_null_deleted_at ON admin_users (email) WHERE deleted_at IS NULL;');
-            });
+        if (env('DB_CONNECTION') === 'pgsql') {
+            $app['db']->connection()->getSchemaBuilder()->table(
+                'admin_users',
+                static function (Blueprint $table): void {
+                    DB::statement(
+                        'CREATE UNIQUE INDEX admin_users_email_null_deleted_at ON admin_users (email) WHERE deleted_at IS NULL;',
+                    );
+                },
+            );
         }
 
-        $app['db']->connection()->getSchemaBuilder()->create('password_resets', function (Blueprint $table) {
-            $table->string('email')->index();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
+        $app['db']->connection()->getSchemaBuilder()->create(
+            'password_resets',
+            static function (Blueprint $table): void {
+                $table->string('email')->index();
+                $table->string('token');
+                $table->timestamp('created_at')->nullable();
+            },
+        );
 
         $tableNames = [
             'roles' => 'roles',
@@ -70,61 +80,75 @@ abstract class UserTestCase extends Orchestra
             'role_has_permissions' => 'role_has_permissions',
         ];
 
-        $app['db']->connection()->getSchemaBuilder()->create($tableNames['permissions'], function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->string('guard_name');
-            $table->timestamps();
-        });
+        $app['db']->connection()->getSchemaBuilder()->create(
+            $tableNames['permissions'],
+            static function (Blueprint $table): void {
+                $table->increments('id');
+                $table->string('name');
+                $table->string('guard_name');
+                $table->timestamps();
+            },
+        );
 
-        $app['db']->connection()->getSchemaBuilder()->create($tableNames['roles'], function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->string('guard_name');
-            $table->timestamps();
-        });
+        $app['db']->connection()->getSchemaBuilder()->create(
+            $tableNames['roles'],
+            static function (Blueprint $table): void {
+                $table->increments('id');
+                $table->string('name');
+                $table->string('guard_name');
+                $table->timestamps();
+            },
+        );
 
-        $app['db']->connection()->getSchemaBuilder()->create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames) {
-            $table->integer('permission_id')->unsigned();
-            $table->morphs('model');
+        $app['db']->connection()->getSchemaBuilder()->create(
+            $tableNames['model_has_permissions'],
+            static function (Blueprint $table) use ($tableNames): void {
+                $table->integer('permission_id')->unsigned();
+                $table->morphs('model');
 
-            $table->foreign('permission_id')
-                ->references('id')
-                ->on($tableNames['permissions'])
-                ->onDelete('cascade');
+                $table->foreign('permission_id')
+                    ->references('id')
+                    ->on($tableNames['permissions'])
+                    ->onDelete('cascade');
 
-            $table->primary(['permission_id', 'model_id', 'model_type']);
-        });
+                $table->primary(['permission_id', 'model_id', 'model_type']);
+            },
+        );
 
-        $app['db']->connection()->getSchemaBuilder()->create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames) {
-            $table->integer('role_id')->unsigned();
-            $table->morphs('model');
+        $app['db']->connection()->getSchemaBuilder()->create(
+            $tableNames['model_has_roles'],
+            static function (Blueprint $table) use ($tableNames): void {
+                $table->integer('role_id')->unsigned();
+                $table->morphs('model');
 
-            $table->foreign('role_id')
-                ->references('id')
-                ->on($tableNames['roles'])
-                ->onDelete('cascade');
+                $table->foreign('role_id')
+                    ->references('id')
+                    ->on($tableNames['roles'])
+                    ->onDelete('cascade');
 
-            $table->primary(['role_id', 'model_id', 'model_type']);
-        });
+                $table->primary(['role_id', 'model_id', 'model_type']);
+            },
+        );
 
-        $app['db']->connection()->getSchemaBuilder()->create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
-            $table->integer('permission_id')->unsigned();
-            $table->integer('role_id')->unsigned();
+        $app['db']->connection()->getSchemaBuilder()->create(
+            $tableNames['role_has_permissions'],
+            static function (Blueprint $table) use ($tableNames): void {
+                $table->integer('permission_id')->unsigned();
+                $table->integer('role_id')->unsigned();
 
-            $table->foreign('permission_id')
-                ->references('id')
-                ->on($tableNames['permissions'])
-                ->onDelete('cascade');
+                $table->foreign('permission_id')
+                    ->references('id')
+                    ->on($tableNames['permissions'])
+                    ->onDelete('cascade');
 
-            $table->foreign('role_id')
-                ->references('id')
-                ->on($tableNames['roles'])
-                ->onDelete('cascade');
+                $table->foreign('role_id')
+                    ->references('id')
+                    ->on($tableNames['roles'])
+                    ->onDelete('cascade');
 
-            $table->primary(['permission_id', 'role_id']);
-        });
-
+                $table->primary(['permission_id', 'role_id']);
+            },
+        );
     }
 
     /**
@@ -134,14 +158,14 @@ abstract class UserTestCase extends Orchestra
     protected function getEnvironmentSetUp($app): void
     {
 
-        $newBasePath = $app->basePath().DIRECTORY_SEPARATOR.'testing_folder';
+        $newBasePath = $app->basePath() . DIRECTORY_SEPARATOR . 'testing_folder';
         $app->getNamespace();
         $app->setBasePath($newBasePath);
         $this->initializeDirectory($newBasePath);
 
-        File::copyDirectory(__DIR__.'/fixtures/resources', resource_path());
+        File::copyDirectory(__DIR__ . '/fixtures/resources', resource_path());
 
-        if(env('DB_CONNECTION') === 'pgsql') {
+        if (env('DB_CONNECTION') === 'pgsql') {
             $app['config']->set('database.default', 'pgsql');
             $app['config']->set('database.connections.pgsql', [
                 'driver' => 'pgsql',
@@ -155,7 +179,7 @@ abstract class UserTestCase extends Orchestra
                 'schema' => 'public',
                 'sslmode' => 'prefer',
             ]);
-        } else if(env('DB_CONNECTION') === 'mysql') {
+        } else if (env('DB_CONNECTION') === 'mysql') {
             $app['config']->set('database.default', 'mysql');
             $app['config']->set('database.connections.mysql', [
                 'driver' => 'mysql',
@@ -187,10 +211,9 @@ abstract class UserTestCase extends Orchestra
     protected function getPackageProviders($app): array
     {
         return [
-            AdminGeneratorServiceProvider::class
+            AdminGeneratorServiceProvider::class,
         ];
     }
-
 
     protected function initializeDirectory(string $directory): void
     {
@@ -199,5 +222,4 @@ abstract class UserTestCase extends Orchestra
         }
         File::makeDirectory($directory);
     }
-
 }

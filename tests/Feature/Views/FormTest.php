@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminGenerator\Tests\Feature\Views;
 
 use Brackets\AdminGenerator\Tests\TestCase;
@@ -28,7 +30,7 @@ class FormTest extends TestCase
 
 
         $this->artisan('admin:generate:form', [
-            'table_name' => 'categories'
+            'table_name' => 'categories',
         ]);
 
         $this->assertFileExists($elementsPath);
@@ -66,7 +68,7 @@ Vue.component(\'category-form\', {
 
         $this->artisan('admin:generate:form', [
             'table_name' => 'categories',
-            '--model-name' => 'Billing\\MyArticle'
+            '--model-name' => 'Billing\\MyArticle',
         ]);
 
         $this->assertFileExists($elementsPath);
