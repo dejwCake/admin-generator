@@ -1,6 +1,6 @@
 <?php
 
-namespace Brackets\AdminGenerator\Tests\Feature\Users;
+namespace Brackets\AdminGenerator\Tests\Feature\Profile;
 
 use Brackets\AdminGenerator\Tests\UserTestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
