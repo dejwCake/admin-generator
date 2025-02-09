@@ -10,8 +10,7 @@ class ModelNameTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    public function model_name_should_auto_generate_from_table_name(): void
+    public function testModelNameShouldAutoGenerateFromTableName(): void
     {
         $filePath = base_path('app/Models/Category.php');
 
@@ -31,8 +30,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model', File::get($filePath));
     }
 
-    /** @test */
-    public function you_can_pass_custom_class_name_for_the_model(): void
+    public function testYouCanPassCustomClassNameForTheModel(): void
     {
         $filePath = base_path('app/Models/Billing/Category.php');
 
@@ -53,8 +51,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model', File::get($filePath));
     }
 
-    /** @test */
-    public function class_name_can_be_outside_default_folder(): void
+    public function testClassNameCanBeOutsideDefaultFolder(): void
     {
         $filePath = base_path('app/Billing/Category.php');
 

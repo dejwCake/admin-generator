@@ -10,8 +10,7 @@ class UpdateRequestNameTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    public function update_request_generation_should_generate_an_update_request_name(): void
+    public function testUpdateRequestGenerationShouldGenerateAnUpdateRequestName(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Category/UpdateCategory.php');
 
@@ -33,8 +32,7 @@ use Illuminate\Validation\Rule;
 class UpdateCategory extends FormRequest', File::get($filePath));
     }
 
-    /** @test */
-    public function is_generated_correct_name_for_custom_model_name(): void
+    public function testIsGeneratedCorrectNameForCustomModelName(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/UpdateCat.php');
 

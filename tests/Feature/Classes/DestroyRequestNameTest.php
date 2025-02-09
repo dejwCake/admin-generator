@@ -10,8 +10,7 @@ class DestroyRequestNameTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    public function destroy_request_generation_should_generate_an_update_request_name(): void
+    public function testDestroyRequestGenerationShouldGenerateAnUpdateRequestName(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Category/DestroyCategory.php');
 
@@ -32,8 +31,7 @@ use Illuminate\Support\Facades\Gate;
 class DestroyCategory extends FormRequest', File::get($filePath));
     }
 
-    /** @test */
-    public function is_generated_correct_name_for_custom_model_name_in_destroy_request(): void
+    public function testIsGeneratedCorrectNameForCustomModelNameInDestroyRequest(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/DestroyCat.php');
 

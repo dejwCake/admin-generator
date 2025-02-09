@@ -10,8 +10,7 @@ class ControllerNameTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    public function controller_should_be_generated_under_default_namespace(): void
+    public function testControllerShouldBeGeneratedUnderDefaultNamespace(): void
     {
         $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
 
@@ -47,8 +46,7 @@ use Illuminate\View\View;
 class CategoriesController extends Controller', File::get($filePath));
     }
 
-    /** @test */
-    public function controller_name_can_be_namespaced(): void
+    public function testControllerNameCanBeNamespaced(): void
     {
         $filePath = base_path('app/Http/Controllers/Admin/Billing/MyNameController.php');
 
@@ -85,8 +83,7 @@ use Illuminate\View\View;
 class MyNameController extends Controller', File::get($filePath));
     }
 
-    /** @test */
-    public function you_can_generate_controller_outside_default_directory(): void
+    public function testYouCanGenerateControllerOutsideDefaultDirectory(): void
     {
         $filePath = base_path('app/Http/Controllers/Billing/CategoriesController.php');
 
@@ -124,8 +121,7 @@ class CategoriesController extends Controller', File::get($filePath));
     }
 
 
-    /** @test */
-    public function you_can_pass_a_model_class_name(): void
+    public function testYouCanPassAModelClassName(): void
     {
         $filePath = base_path('app/Http/Controllers/Billing/CategoriesController.php');
 
@@ -162,5 +158,4 @@ use Illuminate\View\View;
 
 class CategoriesController extends Controller', File::get($filePath));
     }
-
 }

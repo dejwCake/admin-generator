@@ -10,8 +10,7 @@ class UserCrudGeneratorWithGenerateModelTest extends UserTestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    public function user_model_name_should_auto_generate_from_table_name_if_required(): void
+    public function testUserModelNameShouldAutoGenerateFromTableNameIfRequired(): void
     {
         $filePath = base_path('app/Models/User.php');
 
@@ -38,8 +37,7 @@ class User extends Authenticatable implements CanActivateContract
 {', File::get($filePath));
     }
 
-    /** @test */
-    public function user_model_name_should_use_custom_name_if_required(): void
+    public function testUserModelNameShouldUseCustomNameIfRequired(): void
     {
         $filePath = base_path('app/Models/Auth/User.php');
 
@@ -67,8 +65,7 @@ class User extends Authenticatable implements CanActivateContract
 {', File::get($filePath));
     }
 
-    /** @test */
-    public function user_model_name_should_use_custom_name_outside_default_folder_if_required(): void
+    public function testUserModelNameShouldUseCustomNameOutsideDefaultFolderIfRequired(): void
     {
         $filePath = base_path('app/Auth/User.php');
 

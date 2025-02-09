@@ -10,8 +10,7 @@ class UserCrudGeneratorWithCustomControllerNameTest extends UserTestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    public function user_controller_name_can_be_namespaced(): void
+    public function testUserControllerNameCanBeNamespaced(): void
     {
         $filePathController = base_path('app/Http/Controllers/Admin/Auth/UsersController.php');
         $filePathRoutes = base_path('routes/web.php');

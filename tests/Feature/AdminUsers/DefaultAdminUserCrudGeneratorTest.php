@@ -10,8 +10,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    public function all_files_should_be_generated_under_default_namespace(): void
+    public function testAllFilesShouldBeGeneratedUnderDefaultNamespace(): void
     {
         $controllerPath = base_path('app/Http/Controllers/Admin/AdminUsersController.php');
         $indexRequestPath = base_path('app/Http/Requests/Admin/AdminUser/IndexAdminUser.php');

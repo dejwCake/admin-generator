@@ -10,8 +10,7 @@ class AdminUserCrudGeneratorWithCustomControllerNameTest extends UserTestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    public function admin_user_controller_name_can_be_namespaced(): void
+    public function testAdminUserControllerNameCanBeNamespaced(): void
     {
         $filePathController = base_path('app/Http/Controllers/Admin/Auth/AdminUsersController.php');
         $filePathRoutes = base_path('routes/web.php');
@@ -74,8 +73,7 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
             File::get($filePathRoutes));
     }
 
-    /** @test */
-    public function admin_user_controller_name_can_be_outside_default_directory(): void
+    public function testAdminUserControllerNameCanBeOutsideDefaultDirectory(): void
     {
         $filePath = base_path('app/Http/Controllers/Auth/AdminUsersController.php');
 

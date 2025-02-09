@@ -10,8 +10,7 @@ class UserCrudGeneratorWithCustomModelNameTest extends UserTestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    public function all_files_should_be_generated_with_custom_model(): void
+    public function testAllFilesShouldBeGeneratedWithCustomModel(): void
     {
         $controllerPath = base_path('app/Http/Controllers/Admin/Auth/UsersController.php');
         $storePath = base_path('app/Http/Requests/Admin/User/StoreUser.php');
@@ -134,8 +133,7 @@ Vue.component(\'user-form\'', File::get($formJsPath));
 $factory->define(App\User::class', File::get($factoryPath));
     }
 
-    /** @test */
-    public function user_factory_generator_should_generate_everything_with_custom_model_name(): void
+    public function testUserFactoryGeneratorShouldGenerateEverythingWithCustomModelName(): void
     {
         $filePath = base_path('database/factories/ModelFactory.php');
 

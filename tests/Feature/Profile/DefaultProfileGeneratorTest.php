@@ -11,7 +11,7 @@ class DefaultProfileGeneratorTest extends UserTestCase
     use DatabaseMigrations;
 
     /** @test */
-    public function all_files_should_be_generated_under_default_namespace(): void
+    public function testAllFilesShouldBeGeneratedUnderDefaultNamespace(): void
     {
         $filePathController = base_path('app/Http/Controllers/Admin/ProfileController.php');
         $filePathRoute = base_path('routes/web.php');

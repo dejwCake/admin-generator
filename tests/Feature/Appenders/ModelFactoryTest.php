@@ -10,8 +10,7 @@ class ModelFactoryTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    public function factory_generator_should_auto_generate_everything_from_table(): void
+    public function testFactoryGeneratorShouldAutoGenerateEverythingFromTable(): void
     {
         $filePath = base_path('database/factories/ModelFactory.php');
 
@@ -25,8 +24,7 @@ class ModelFactoryTest extends TestCase
 $factory->define(App\Models\Category::class', File::get($filePath));
     }
 
-    /** @test */
-    public function you_can_specify_a_model_name(): void
+    public function testYouCanSpecifyAModelName(): void
     {
         $filePath = base_path('database/factories/ModelFactory.php');
 
@@ -41,8 +39,7 @@ $factory->define(App\Models\Category::class', File::get($filePath));
 $factory->define(App\Models\Billing\Cat::class', File::get($filePath));
     }
 
-    /** @test */
-    public function you_can_specify_a_model_name_outside_default_folder(): void
+    public function testYouCanSpecifyAModelNameOutsideDefaultFolder(): void
     {
         $filePath = base_path('database/factories/ModelFactory.php');
 

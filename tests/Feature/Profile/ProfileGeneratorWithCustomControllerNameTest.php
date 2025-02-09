@@ -10,8 +10,7 @@ class ProfileGeneratorWithCustomControllerNameTest extends UserTestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    public function profile_controller_name_can_be_namespaced(): void
+    public function testProfileControllerNameCanBeNamespaced(): void
     {
         $filePathController = base_path('app/Http/Controllers/Admin/Auth/ProfileController.php');
         $filePathRoute = base_path('routes/web.php');
@@ -55,8 +54,7 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
             File::get($filePathRoute));
     }
 
-    /** @test */
-    public function profile_controller_name_can_be_outside_default_directory(): void
+    public function testProfileControllerNameCanBeOutsideDefaultDirectory(): void
     {
         $filePath = base_path('app/Http/Controllers/Auth/ProfileController.php');
 

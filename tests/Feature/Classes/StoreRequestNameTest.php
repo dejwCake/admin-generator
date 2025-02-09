@@ -10,8 +10,7 @@ class StoreRequestNameTest extends TestCase
 {
     use DatabaseMigrations;
 
-    /** @test */
-    public function store_request_generation_should_generate_a_store_request_name(): void
+    public function testStoreRequestGenerationShouldGenerateAStoreRequestName(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Category/StoreCategory.php');
 
@@ -33,8 +32,7 @@ use Illuminate\Validation\Rule;
 class StoreCategory extends FormRequest', File::get($filePath));
     }
 
-    /** @test */
-    public function is_generated_correct_name_for_custom_model_name(): void
+    public function testIsGeneratedCorrectNameForCustomModelName(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/StoreCat.php');
 
@@ -57,8 +55,7 @@ use Illuminate\Validation\Rule;
 class StoreCat extends FormRequest', File::get($filePath));
     }
 
-    /** @test */
-    public function is_generated_correct_name_for_custom_model_name_outside_default_folder(): void
+    public function testIsGeneratedCorrectNameForCustomModelNameOutsideDefaultFolder(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Cat/StoreCat.php');
 

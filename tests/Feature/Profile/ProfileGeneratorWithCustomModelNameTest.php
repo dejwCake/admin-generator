@@ -11,7 +11,7 @@ class ProfileGeneratorWithCustomModelNameTest extends UserTestCase
     use DatabaseMigrations;
 
     /** @test */
-    public function profile_controller_should_be_generated_with_custom_model(): void
+    public function testProfileControllerShouldBeGeneratedWithCustomModel(): void
     {
         $filePath = base_path('app/Http/Controllers/Admin/Auth/ProfileController.php');
 
