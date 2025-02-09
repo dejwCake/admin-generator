@@ -29,9 +29,6 @@ class StoreRequest extends ClassGenerator
      */
     protected string $view = 'store-request';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
         $force = $this->option('force');
@@ -70,11 +67,9 @@ class StoreRequest extends ClassGenerator
 
             // validation in store/update
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
-            'translatable' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => $column['type'] === "json",
-            )->pluck(
-                'name',
-            ),
+            'translatable' => $this->readColumnsFromTable($this->tableName)
+                ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                ->pluck('name'),
             'relations' => $this->relations,
         ])->render();
     }

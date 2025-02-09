@@ -1,3 +1,92 @@
 parameters:
 	ignoreErrors:
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Generate/BulkDestroyRequest.php
+
+		-
+			message: '#^Method Brackets\\AdminGenerator\\Generate\\ClassGenerator\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<string, array\<string\>\|string\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, serverStoreRules\: array\<mixed\>, serverUpdateRules\: array\<mixed\>, frontendRules\: array\<mixed\>\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Generate/ClassGenerator.php
+
+		-
+			message: '#^Property Brackets\\AdminGenerator\\Generate\\ClassGenerator\:\:\$relations \(array\<string, string\>\) does not accept array\<string, array\<mixed\>\|string\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Generate/ClassGenerator.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Generate/DestroyRequest.php
+
+		-
+			message: '#^Method Brackets\\AdminGenerator\\Generate\\FileAppender\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<string, array\<string\>\|string\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, serverStoreRules\: array\<mixed\>, serverUpdateRules\: array\<mixed\>, frontendRules\: array\<mixed\>\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Generate/FileAppender.php
+
+		-
+			message: '#^Property Brackets\\AdminGenerator\\Generate\\FileAppender\:\:\$relations \(array\<string, string\>\) does not accept array\<string, array\<mixed\>\|string\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Generate/FileAppender.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Generate/ImpersonalLoginRequest.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Generate/IndexRequest.php
+
+		-
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Generate/Permissions.php
+
+		-
+			message: '#^Method Brackets\\AdminGenerator\\Generate\\ViewGenerator\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<string, array\<string\>\|string\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, serverStoreRules\: array\<mixed\>, serverUpdateRules\: array\<mixed\>, frontendRules\: array\<mixed\>\}\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Generate/ViewGenerator.php
+
+		-
+			message: '#^Property Brackets\\AdminGenerator\\Generate\\ViewGenerator\:\:\$relations \(array\<string, string\>\) does not accept array\<string, array\<mixed\>\|string\>\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Generate/ViewGenerator.php
+
+		-
+			message: '#^Call to method Illuminate\\Support\\Collection\<\*NEVER\*,\*NEVER\*\>\:\:isNotEmpty\(\) will always evaluate to false\.$#'
+			identifier: method.impossibleType
+			count: 1
+			path: src/Generate/ViewIndex.php
+
+		-
+			message: '#^Cannot call static method factory\(\) on array\|bool\|string\.$#'
+			identifier: staticMethod.nonObject
+			count: 1
+			path: src/GenerateUser.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 8
+			path: tests/TestCase.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 9
+			path: tests/UserTestCase.php
 

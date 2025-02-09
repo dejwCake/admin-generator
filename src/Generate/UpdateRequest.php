@@ -29,9 +29,6 @@ class UpdateRequest extends ClassGenerator
      */
     protected string $view = 'update-request';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
         $force = $this->option('force');
@@ -70,21 +67,19 @@ class UpdateRequest extends ClassGenerator
             'modelFullName' => $this->modelFullName,
             'tableName' => $this->tableName,
             'containsPublishedAtColumn' => in_array(
-                "published_at",
+                'published_at',
                 array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
                 true,
             ),
 
             // validation in store/update
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
-            'translatable' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => $column['type'] === "json",
-            )->pluck(
-                'name',
-            ),
-            'hasSoftDelete' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => $column['name'] === "deleted_at",
-            )->count() > 0,
+            'translatable' => $this->readColumnsFromTable($this->tableName)
+                ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                ->pluck('name'),
+            'hasSoftDelete' => $this->readColumnsFromTable($this->tableName)
+                ->filter(static fn (array $column): bool => $column['name'] === 'deleted_at')
+                ->count() > 0,
             'relations' => $this->relations,
         ])->render();
     }

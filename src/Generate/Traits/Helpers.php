@@ -35,33 +35,25 @@ trait Helpers
     //TODO add other relation types
     public function setBelongToManyRelation(string $belongsToMany): void
     {
-        $this->relations['belongsToMany'] = (new Collection(
-            explode(',', $belongsToMany),
-        ))->filter(
-            fn ($belongToManyRelation) => $this->checkRelationTable($belongToManyRelation),
-        )->map(
-            fn ($belongsToMany) => [
+        $this->relations['belongsToMany'] = (new Collection(explode(',', $belongsToMany)))
+            ->filter(fn (string $belongToManyRelation): bool => $this->checkRelationTable($belongToManyRelation))
+            ->map(fn (string $belongsToMany): array => [
                     'current_table' => $this->tableName,
                     'related_table' => $belongsToMany,
-                    'related_model' => $belongsToMany === 'roles' ? "Spatie\\Permission\\Models\\Role" : "App\\Models\\" . Str::studly(
-                        Str::singular($belongsToMany),
-                    ),
-                    'related_model_class' => $belongsToMany === 'roles' ? "Spatie\\Permission\\Models\\Role::class" : "App\\Models\\" . Str::studly(
-                        Str::singular($belongsToMany),
-                    ) . '::class',
+                    'related_model' => $belongsToMany === 'roles'
+                        ? 'Spatie\\Permission\\Models\\Role'
+                        : 'App\\Models\\' . Str::studly(Str::singular($belongsToMany),),
+                    'related_model_class' => $belongsToMany === 'roles'
+                        ? 'Spatie\\Permission\\Models\\Role::class'
+                        : 'App\\Models\\' . Str::studly(Str::singular($belongsToMany)) . '::class',
                     'related_model_name' => Str::studly(Str::singular($belongsToMany)),
                     'related_model_name_plural' => Str::studly($belongsToMany),
                     'related_model_variable_name' => lcfirst(Str::singular(class_basename($belongsToMany))),
-                    'relation_table' => trim(
-                        collect([$this->tableName, $belongsToMany])->sortBy(static fn ($table) => $table)->reduce(
-                            static fn ($relationTable, $table) => $relationTable . '_' . $table,
-                        ),
-                        '_',
-                    ),
+                    'relation_table' => trim($this->getRelationTable($belongsToMany), '_'),
                     'foreign_key' => Str::singular($this->tableName) . '_id',
                     'related_key' => Str::singular($belongsToMany) . '_id',
-                ],
-        )->keyBy('related_table');
+                ])->keyBy('related_table')
+            ->toArray();
     }
 
     /**
@@ -90,5 +82,15 @@ trait Helpers
     protected function alreadyAppended(string $path, string $content): bool
     {
         return str_contains($this->files->get($path), $content);
+    }
+
+    protected function getRelationTable(string $belongsToMany): string
+    {
+        return (string) (new Collection([$this->tableName, $belongsToMany]))
+            ->sortBy(static fn (string $table): string => $table)
+            ->reduce(
+                static fn (string $relationTable, string $table): string => $relationTable . '_' . $table,
+                '',
+            );
     }
 }

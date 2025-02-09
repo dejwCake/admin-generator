@@ -80,13 +80,13 @@ class ViewFullForm extends ViewGenerator
         $this->generateFormJs($formJsPath, $force);
         $indexJsPath = $this->generateIndexJs($force);
 
-        if ($this->appendIfNotAlreadyAppended($indexJsPath, "import './Form';" . PHP_EOL)) {
+        if ($this->appendIfNotAlreadyAppended($indexJsPath, 'import \'./Form\';' . PHP_EOL)) {
             $this->info('Appending Form to ' . $indexJsPath . ' finished');
         }
         if (
             $this->appendIfNotAlreadyAppended(
                 $bootstrapJsPath,
-                "import './" . $this->formJsRelativePath . "';" . PHP_EOL,
+                'import \'./' . $this->formJsRelativePath . '\';' . PHP_EOL,
             )
         ) {
             $this->info('Appending ' . $this->formJsRelativePath . '/index.js to ' . $bootstrapJsPath . ' finished');
@@ -118,22 +118,18 @@ class ViewFullForm extends ViewGenerator
             'modelJSName' => $this->formJsRelativePath,
             'modelDotNotation' => $this->modelDotNotation,
             'modelLangFormat' => $this->modelLangFormat,
-            'modelTitle' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => in_array($column['name'], ['title', 'name', 'first_name', 'email'], true),
-            )->first(
-                null,
-                ['name' => 'id'],
-            )['name'],
-
-            'columns' => $this->getVisibleColumns(
-                $this->tableName,
-                $this->modelVariableName,
-            )->sortByDesc(
-                static fn ($column) => $column['type'] === "json",
-            ),
-            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => $column['type'] === "json",
-            )->count() > 0,
+            'modelTitle' => $this->readColumnsFromTable($this->tableName)
+                ->filter(static fn (array $column): bool => in_array(
+                    $column['name'],
+                    ['title', 'name', 'first_name', 'email'],
+                    true,
+                ))
+                ->first(null, ['name' => 'id'])['name'],
+            'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)
+                ->sortByDesc(static fn (array $column): bool => $column['type'] === 'json'),
+            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
+                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->count() > 0,
             'translatableTextarea' => ['perex', 'text'],
             'relations' => $this->relations,
         ])->render();

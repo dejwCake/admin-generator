@@ -47,7 +47,7 @@ class ViewIndex extends ViewGenerator
 
     public function handle(): void
     {
-        $force = $this->option('force');
+        $force = (bool) $this->option('force');
 
         if ($this->option('with-export')) {
             $this->export = true;
@@ -82,7 +82,7 @@ class ViewIndex extends ViewGenerator
         }
     }
 
-    public function generateView(string $viewPath, bool|array|string|null $force): void
+    public function generateView(string $viewPath, bool $force): void
     {
         if ($this->alreadyExists($viewPath) && !$force) {
             $this->error('File ' . $viewPath . ' already exists!');
@@ -100,7 +100,7 @@ class ViewIndex extends ViewGenerator
         }
     }
 
-    public function generateListingJs(string $listingJsPath, bool|array|string|null $force): void
+    public function generateListingJs(string $listingJsPath, bool $force): void
     {
         if ($this->alreadyExists($listingJsPath) && !$force) {
             $this->error('File ' . $listingJsPath . ' already exists!');
@@ -163,7 +163,7 @@ class ViewIndex extends ViewGenerator
         ];
     }
 
-    /** @return array<string, string|int> */
+    /** @param array<string, string|int> $column */
     private function isSwitch(array $column): bool
     {
         return $column['type'] === 'boolean'
@@ -176,18 +176,23 @@ class ViewIndex extends ViewGenerator
 
     private function getColumns(): Collection
     {
-        return $this->readColumnsFromTable($this->tableName)->reject(static fn ($column) => $column['type'] === 'text'
+        return $this->readColumnsFromTable($this->tableName)
+            ->reject(static fn (array $column): bool => $column['type'] === 'text'
             || in_array(
                 $column['name'],
                 ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'],
                 true,
             )
-            || ($column['type'] === 'json' && in_array($column['name'], ['perex', 'text', 'body'], true)))->map(
-                function ($column) {
-                    $filters = collect([]);
-                    $column['switch'] = false;
+            || ($column['type'] === 'json' && in_array(
+                $column['name'],
+                ['perex', 'text', 'body'],
+                true,
+            )))->map(
+                function (array $column): array {
+                        $filters = new Collection([]);
+                        $column['switch'] = false;
 
-                    if ($column['type'] === 'date' || $column['type'] === 'time' || $column['type'] === 'datetime') {
+                    if (in_array($column['type'], ['date', 'time', 'datetime'], true)) {
                         $filters->push($column['type']);
                     }
 
@@ -196,13 +201,8 @@ class ViewIndex extends ViewGenerator
                     }
 
                         $column['filters'] = $filters->isNotEmpty()
-
-                        ? ' | ' . implode(
-                            ' | ',
-                            $filters->toArray(),
-                        )
-
-                        : '';
+                            ? ' | ' . implode(' | ', $filters->toArray())
+                            : '';
 
                         return $column;
                 },

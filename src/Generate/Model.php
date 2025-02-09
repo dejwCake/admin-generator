@@ -30,9 +30,6 @@ class Model extends ClassGenerator
      */
     protected string $view = 'model';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
         $force = $this->option('force');
@@ -69,39 +66,31 @@ class Model extends ClassGenerator
             'modelNameSpace' => $this->classNamespace,
 
             // if table name differs from the snake case plural form of the classname, then we need to specify the table name
-            'tableName' => $this->tableName !== Str::snake(
-                Str::plural($this->classBaseName),
-            ) ? $this->tableName : null,
+            'tableName' => $this->tableName !== Str::snake(Str::plural($this->classBaseName))
+                ? $this->tableName
+                : null,
 
             'dates' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => $column['type'] === "datetime" || $column['type'] === "date",
-            )->pluck(
-                'name',
-            ),
+                static fn (array $column): bool => $column['type'] === 'datetime' || $column['type'] === 'date',
+            )->pluck('name'),
             'fillable' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => !in_array(
+                static fn (array $column): bool => !in_array(
                     $column['name'],
                     ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token'],
                     true,
                 ),
-            )->pluck(
-                'name',
-            ),
+            )->pluck('name'),
             'hidden' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => in_array($column['name'], ['password', 'remember_token'], true),
-            )->pluck(
-                'name',
-            ),
+                static fn (array $column): bool => in_array($column['name'], ['password', 'remember_token'], true),
+            )->pluck('name'),
             'translatable' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => $column['type'] === "json",
-            )->pluck(
-                'name',
-            ),
+                static fn (array $column): bool => $column['type'] === 'json',
+            )->pluck('name'),
             'timestamps' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => in_array($column['name'], ['created_at', 'updated_at'], true),
+                static fn (array $column): bool => in_array($column['name'], ['created_at', 'updated_at'], true),
             )->count() > 0,
             'hasSoftDelete' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => $column['name'] === "deleted_at",
+                static fn (array $column): bool => $column['name'] === 'deleted_at',
             )->count() > 0,
             'resource' => $this->resource,
 

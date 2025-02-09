@@ -20,16 +20,12 @@ trait Columns
         return (new Collection(
             $schema->getColumns($tableName),
         ))->map(
-            static function ($column) use ($tableName, $indexes, $schema) {
-
+            static function (array $column) use ($tableName, $indexes, $schema): array {
                 //Checked unique index
-                $columnUniqueIndexes = $indexes->filter(static fn ($index) => in_array(
-                    $column['name'],
-                    $index['columns'],
-                    true,
-                ) && ($index['unique'] && !$index['primary']));
+                $columnUniqueIndexes = $indexes->filter(static fn (array $index): bool
+                => in_array($column['name'], $index['columns'], true) && ($index['unique'] && !$index['primary']));
                 $columnUniqueDeleteAtCondition = $columnUniqueIndexes->filter(
-                    static fn ($index) => str_contains($index['name'], 'null_deleted_at'),
+                    static fn (array $index): bool => str_contains($index['name'], 'null_deleted_at'),
                 );
                 // TODO add foreign key
 
@@ -44,74 +40,98 @@ trait Columns
         );
     }
 
-    /** @return Collection<string, string|array> */
+    /** @return Collection<string, string|array<string>> */
     protected function getVisibleColumns(string $tableName, string $modelVariableName): Collection
     {
         $columns = $this->readColumnsFromTable($tableName);
-        $hasSoftDelete = ($columns->filter(static fn ($column) => $column['name'] === "deleted_at")->count() > 0);
+        $hasSoftDelete = (
+            $columns->filter(static fn (array $column): bool => $column['name'] === 'deleted_at')
+                ->count() > 0
+        );
 
-        return $columns->filter(static fn ($column) => !in_array(
+        return $columns->filter(static fn (array $column): bool => !in_array(
             $column['name'],
-            ["id", "created_at", "updated_at", "deleted_at", "remember_token", "last_login_at"],
+            ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token', 'last_login_at'],
             true,
-        ))->map(function ($column) use ($tableName, $hasSoftDelete, $modelVariableName) {
-            $serverStoreRules = new Collection([]);
-            $serverStoreRules = $this->getServerStoreRulesByRequire($column, $serverStoreRules);
-            $serverStoreRules = $this->getServerStoreRulesByName($column['name'], $serverStoreRules);
-            $serverStoreRules = $this->getServerStoreRulesByUnique(
-                $column,
-                $tableName,
-                $hasSoftDelete,
-                $serverStoreRules,
-            );
-            $serverStoreRules = $this->getServerStoreRulesByUniqueJson(
-                $column,
-                $tableName,
-                $hasSoftDelete,
-                $serverStoreRules,
-            );
-            $serverStoreRules = $this->getServerStoreRulesByType($column['type'], $serverStoreRules);
-
-            $serverUpdateRules = new Collection([]);
-            $serverUpdateRules = $this->getServerUpdateRulesByRequire($column, $serverUpdateRules);
-            $serverUpdateRules = $this->getServerUpdateRulesByName($column['name'], $serverUpdateRules);
-            $serverUpdateRules = $this->getServerUpdateRulesByUnique(
-                $column,
-                $tableName,
-                $modelVariableName,
-                $hasSoftDelete,
-                $serverUpdateRules,
-            );
-            $serverUpdateRules = $this->getServerUpdateRulesByUniqueJson(
-                $column,
-                $tableName,
-                $modelVariableName,
-                $hasSoftDelete,
-                $serverUpdateRules,
-            );
-            $serverUpdateRules = $this->getServerUpdateRulesByType($column['type'], $serverUpdateRules);
-
-            $frontendRules = new Collection([]);
-            $frontendRules = $this->getFrontendRulesByRequire($column, $frontendRules);
-            $frontendRules = $this->getFrontendRulesByName($column['name'], $frontendRules);
-            $frontendRules = $this->getFrontendRulesByType($column['type'], $frontendRules);
-
-            return [
+        ))->map(fn (array $column): array => [
                 'name' => $column['name'],
                 'type' => $column['type'],
-                'serverStoreRules' => $serverStoreRules->toArray(),
-                'serverUpdateRules' => $serverUpdateRules->toArray(),
-                'frontendRules' => $frontendRules->toArray(),
-            ];
-        });
+                'serverStoreRules' => $this->getServerStoreRules($column, $tableName, $hasSoftDelete)->toArray(),
+                'serverUpdateRules' => $this->getServerUpdateRules(
+                    $column,
+                    $tableName,
+                    $modelVariableName,
+                    $hasSoftDelete,
+                )
+                    ->toArray(),
+                'frontendRules' => $this->getFrontendRules($column)->toArray(),
+            ]);
     }
 
     /**
      * @param array<string, string|bool> $column
      */
-    protected function getServerStoreRulesByRequire(array $column, Collection $serverStoreRules): Collection
+    protected function getServerStoreRules(array $column, string $tableName, bool $hasSoftDelete): Collection
     {
-        if ($column['required']) {
+        $serverStoreRules = new Collection([]);
+        $serverStoreRules = $this->getServerStoreRulesByRequire($column['required'], $serverStoreRules);
+        $serverStoreRules = $this->getServerStoreRulesByName($column['name'], $serverStoreRules);
+        $serverStoreRules = $this->getServerStoreRulesByUnique($column, $tableName, $hasSoftDelete, $serverStoreRules);
+        $serverStoreRules = $this->getServerStoreRulesByUniqueJson(
+            $column,
+            $tableName,
+            $hasSoftDelete,
+            $serverStoreRules,
+        );
+
+        return $this->getServerStoreRulesByType($column['type'], $serverStoreRules);
+    }
+
+    /**
+     * @param array<string, string|bool> $column
+     */
+    protected function getServerUpdateRules(
+        array $column,
+        string $tableName,
+        string $modelVariableName,
+        bool $hasSoftDelete,
+    ): Collection {
+        $serverUpdateRules = new Collection([]);
+        $serverUpdateRules = $this->getServerUpdateRulesByRequire($column['required'], $serverUpdateRules);
+        $serverUpdateRules = $this->getServerUpdateRulesByName($column['name'], $serverUpdateRules);
+        $serverUpdateRules = $this->getServerUpdateRulesByUnique(
+            $column,
+            $tableName,
+            $modelVariableName,
+            $hasSoftDelete,
+            $serverUpdateRules,
+        );
+        $serverUpdateRules = $this->getServerUpdateRulesByUniqueJson(
+            $column,
+            $tableName,
+            $modelVariableName,
+            $hasSoftDelete,
+            $serverUpdateRules,
+        );
+
+        return $this->getServerUpdateRulesByType($column['type'], $serverUpdateRules);
+    }
+
+    /**
+     * @param array<string, string|bool> $column
+     */
+    protected function getFrontendRules(array $column): Collection
+    {
+        $frontendRules = new Collection([]);
+        $frontendRules = $this->getFrontendRulesByRequire($column, $frontendRules);
+        $frontendRules = $this->getFrontendRulesByName($column['name'], $frontendRules);
+
+        return $this->getFrontendRulesByType($column['type'], $frontendRules);
+    }
+
+    protected function getServerStoreRulesByRequire(bool $required, Collection $serverStoreRules): Collection
+    {
+        if ($required) {
             $serverStoreRules->push('\'required\'');
         } else {
             $serverStoreRules->push('\'nullable\'');
@@ -120,12 +140,9 @@ trait Columns
         return $serverStoreRules;
     }
 
-    /**
-     * @param array<string, string|bool> $column
-     */
-    protected function getServerUpdateRulesByRequire(array $column, Collection $serverUpdateRules): Collection
+    protected function getServerUpdateRulesByRequire(bool $required, Collection $serverUpdateRules): Collection
     {
-        if ($column['required']) {
+        if ($required) {
             $serverUpdateRules->push('\'sometimes\'');
         } else {
             $serverUpdateRules->push('\'nullable\'');

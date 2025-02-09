@@ -29,9 +29,6 @@ class Export extends ClassGenerator
      */
     protected string $view = 'export';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
         $force = $this->option('force');
@@ -62,10 +59,13 @@ class Export extends ClassGenerator
             'modelVariableName' => $this->modelVariableName,
             'modelLangFormat' => $this->modelLangFormat,
             'columnsToExport' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => !($column['name'] === "password" || $column['name'] === "remember_token" || $column['name'] === "updated_at" || $column['name'] === "created_at" || $column['name'] === "deleted_at"),
-            )->pluck(
-                'name',
-            )->toArray(),
+                static fn (array $column): bool => !in_array(
+                    $column['name'],
+                    ['password', 'remember_token', 'updated_at', 'created_at', 'deleted_at'],
+                    true,
+                ),
+            )->pluck('name')
+                ->toArray(),
         ])->render();
     }
 

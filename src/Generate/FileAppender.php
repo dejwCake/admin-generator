@@ -19,12 +19,9 @@ abstract class FileAppender extends Command
     use Columns;
     use Names;
 
-    /** @var array<string> */
+    /** @var array<string, string> */
     protected array $relations = [];
 
-    /**
-     * Create a new controller creator command instance.
-     */
     public function __construct(protected readonly Filesystem $files)
     {
         parent::__construct();
@@ -47,7 +44,7 @@ abstract class FileAppender extends Command
     protected function appendIfNotAlreadyAppended(
         string $path,
         string $content,
-        string $defaultContent = "<?php" . PHP_EOL . PHP_EOL,
+        string $defaultContent = '<?php' . PHP_EOL . PHP_EOL,
     ): bool {
         if (!$this->files->exists($path)) {
             $this->makeDirectory($path);
@@ -71,7 +68,7 @@ abstract class FileAppender extends Command
         string $path,
         string $search,
         string $replace,
-        string $defaultContent = "<?php" . PHP_EOL . PHP_EOL,
+        string $defaultContent = '<?php' . PHP_EOL . PHP_EOL,
     ): bool {
         if (!$this->files->exists($path)) {
             $this->makeDirectory($path);
@@ -87,9 +84,6 @@ abstract class FileAppender extends Command
         }
     }
 
-    /**
-     * Execute the console command.
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initCommonNames(

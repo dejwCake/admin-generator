@@ -1,3 +1,12 @@
 <?xml version="1.0"?>
 <phpmd-baseline>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="src/AdminGeneratorServiceProvider.php"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/GenerateAdmin.php" method="handle"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/GenerateAdminUser.php" method="handle"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/GenerateUser.php" method="handle"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/AdminUsers/AdminUserCrudGeneratorWithCustomModelNameTest.php" method="testAllFilesShouldBeGeneratedWithCustomModel"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/Users/DefaultUserCrudGeneratorTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/Users/UserCrudGeneratorWithCustomModelNameTest.php" method="testAllFilesShouldBeGeneratedWithCustomModel"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/UserTestCase.php" method="setUpDatabase"/>
 </phpmd-baseline>

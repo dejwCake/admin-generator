@@ -74,7 +74,22 @@ class Controller extends ClassGenerator
             $this->info('Generating ' . $this->classFullName . ' finished');
 
             $icon = Arr::random(
-                ['icon-graduation', 'icon-puzzle', 'icon-compass', 'icon-drop', 'icon-globe', 'icon-ghost', 'icon-book-open', 'icon-flag', 'icon-star', 'icon-umbrella', 'icon-energy', 'icon-plane', 'icon-magnet', 'icon-diamond'],
+                [
+                    'icon-graduation',
+                    'icon-puzzle',
+                    'icon-compass',
+                    'icon-drop',
+                    'icon-globe',
+                    'icon-ghost',
+                    'icon-book-open',
+                    'icon-flag',
+                    'icon-star',
+                    'icon-umbrella',
+                    'icon-energy',
+                    'icon-plane',
+                    'icon-magnet',
+                    'icon-diamond',
+                ],
             );
             if (
                 $this->strReplaceInFile(
@@ -112,17 +127,19 @@ class Controller extends ClassGenerator
             'exportBaseName' => $this->exportBaseName,
             'resource' => $this->resource,
             'containsPublishedAtColumn' => in_array(
-                "published_at",
+                'published_at',
                 array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
                 true,
             ),
             // index
             'columnsToQuery' => $this->getColumnsToQuery(),
             'columnsToSearchIn' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => ($column['type'] === 'json' || $column['type'] === 'text' || $column['type'] === 'string' || $column['name'] === "id") && !($column['name'] === "password" || $column['name'] === "remember_token"),
-            )->pluck(
-                'name',
-            )->toArray(),
+                static fn (array $column): bool => (
+                    in_array($column['type'], ['json', 'text', 'string'], true)
+                    || $column['name'] === 'id')
+                    && !in_array($column['name'], ['password', 'remember_token'], true),
+            )->pluck('name')
+            ->toArray(),
             //            'filters' => $this->readColumnsFromTable($tableName)->filter(function($column) {
             //                return $column['type'] == 'boolean' || $column['type'] == 'date';
             //            }),
@@ -130,7 +147,7 @@ class Controller extends ClassGenerator
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
             'relations' => $this->relations,
             'hasSoftDelete' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => $column['name'] === "deleted_at",
+                static fn (array $column): bool => $column['name'] === 'deleted_at',
             )->count() > 0,
         ])->render();
     }

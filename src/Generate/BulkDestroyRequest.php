@@ -24,9 +24,6 @@ class BulkDestroyRequest extends ClassGenerator
      */
     protected $description = 'Generate a Bulk Destroy request class';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
         $force = $this->option('force');

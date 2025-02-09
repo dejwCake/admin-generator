@@ -49,9 +49,6 @@ class ViewForm extends ViewGenerator
      */
     protected string $formJs = 'form-js';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
         $force = (bool) $this->option('force');
@@ -82,10 +79,10 @@ class ViewForm extends ViewGenerator
         $indexJsPath = resource_path('js/admin/' . $this->modelJSName . '/index.js');
         $bootstrapJsPath = resource_path('js/admin/index.js');
 
-        if ($this->appendIfNotAlreadyAppended($indexJsPath, "import './Form';" . PHP_EOL)) {
+        if ($this->appendIfNotAlreadyAppended($indexJsPath, 'import \'./Form\';' . PHP_EOL)) {
             $this->info('Appending Form to ' . $indexJsPath . ' finished');
         }
-        if ($this->appendIfNotAlreadyAppended($bootstrapJsPath, "import './" . $this->modelJSName . "';" . PHP_EOL)) {
+        if ($this->appendIfNotAlreadyAppended($bootstrapJsPath, 'import \'./' . $this->modelJSName . '\';' . PHP_EOL)) {
             $this->info('Appending Form to ' . $bootstrapJsPath . ' finished');
         }
     }
@@ -93,7 +90,7 @@ class ViewForm extends ViewGenerator
     protected function isUsedTwoColumnsLayout(): bool
     {
         return in_array(
-            "published_at",
+            'published_at',
             array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
             true,
         );
@@ -108,15 +105,11 @@ class ViewForm extends ViewGenerator
             'modelDotNotation' => $this->modelDotNotation,
             'modelLangFormat' => $this->modelLangFormat,
 
-            'columns' => $this->getVisibleColumns(
-                $this->tableName,
-                $this->modelVariableName,
-            )->sortBy(
-                static fn ($column) => !($column['type'] === "json"),
-            ),
-            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => $column['type'] === "json",
-            )->count() > 0,
+            'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)
+                ->sortBy(static fn (array $column): bool => !($column['type'] === 'json')),
+            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
+                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->count() > 0,
             'wysiwygTextColumnNames' => ['text', 'body', 'description'],
             'relations' => $this->relations,
         ])->render();
@@ -132,15 +125,11 @@ class ViewForm extends ViewGenerator
             'modelLangFormat' => $this->modelLangFormat,
             'modelVariableName' => $this->modelVariableName,
 
-            'columns' => $this->getVisibleColumns(
-                $this->tableName,
-                $this->modelVariableName,
-            )->sortBy(
-                static fn ($column) => !($column['type'] === "json"),
-            ),
-            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => $column['type'] === "json",
-            )->count() > 0,
+            'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)
+                ->sortBy(static fn (array $column): bool => !($column['type'] === 'json')),
+            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
+                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->count() > 0,
             'translatableTextarea' => ['perex', 'text', 'body'],
             'relations' => $this->relations,
         ])->render();
@@ -161,9 +150,9 @@ class ViewForm extends ViewGenerator
             'isUsedTwoColumnsLayout' => $this->isUsedTwoColumnsLayout(),
 
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
-            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => $column['type'] === "json",
-            )->count() > 0,
+            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
+                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->count() > 0,
         ])->render();
     }
 
@@ -181,16 +170,16 @@ class ViewForm extends ViewGenerator
             'resource' => $this->resource,
             'isUsedTwoColumnsLayout' => $this->isUsedTwoColumnsLayout(),
 
-            'modelTitle' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => in_array($column['name'], ['title', 'name', 'first_name', 'email'], true),
-            )->first(
-                null,
-                ['name' => 'id'],
-            )['name'],
+            'modelTitle' => $this->readColumnsFromTable($this->tableName)
+                ->filter(static fn (array $column): bool => in_array(
+                    $column['name'],
+                    ['title', 'name', 'first_name', 'email'],
+                    true,
+                ))->first(null, ['name' => 'id'])['name'],
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
-            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => $column['type'] === "json",
-            )->count() > 0,
+            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
+                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->count() > 0,
         ])->render();
     }
 
@@ -238,8 +227,11 @@ class ViewForm extends ViewGenerator
     {
         if (
             in_array(
-                "published_at",
-                array_column($this->getVisibleColumns($this->tableName, $this->modelVariableName)->toArray(), 'name'),
+                'published_at',
+                array_column(
+                    $this->getVisibleColumns($this->tableName, $this->modelVariableName)->toArray(),
+                    'name',
+                ),
                 true,
             )
         ) {

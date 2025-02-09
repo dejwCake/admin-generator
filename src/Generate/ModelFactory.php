@@ -29,9 +29,6 @@ class ModelFactory extends FileAppender
      */
     protected string $view = 'factory';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
         //TODO check if exists
@@ -59,16 +56,14 @@ class ModelFactory extends FileAppender
 
             'columns' => $this->readColumnsFromTable($this->tableName)
                 // we skip primary key
-                ->filter(static fn ($column) => $column['name'] !== 'id')
-                ->map(fn ($column) => [
+                ->filter(static fn (array $column): bool => $column['name'] !== 'id')
+                ->map(fn (array $column): array => [
                         'name' => $column['name'],
                         'faker' => $this->getType($column),
                     ]),
-            'translatable' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => $column['type'] === "json",
-            )->pluck(
-                'name',
-            ),
+            'translatable' => $this->readColumnsFromTable($this->tableName)
+                ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                ->pluck('name'),
         ])->render();
     }
 
@@ -125,10 +120,6 @@ class ModelFactory extends FileAppender
             default => '$faker->sentence',
         };
 
-        if ($type !== null) {
-            return $type;
-        }
-
-        return '$faker->sentence';
+        return $type;
     }
 }

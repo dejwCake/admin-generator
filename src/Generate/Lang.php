@@ -34,9 +34,6 @@ class Lang extends FileAppender
      */
     protected bool $export = false;
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
 //        //TODO check if exists
@@ -87,16 +84,17 @@ class Lang extends FileAppender
             'titlePlural' => $this->titlePlural,
             'export' => $this->export,
             'containsPublishedAtColumn' => in_array(
-                "published_at",
+                'published_at',
                 array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
                 true,
             ),
 
-            'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)->map(function ($column) {
-                $column['defaultTranslation'] = $this->valueWithoutId($column['name']);
+            'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)
+                ->map(function (array $column): array {
+                    $column['defaultTranslation'] = $this->valueWithoutId($column['name']);
 
-                return $column;
-            }),
+                    return $column;
+                }),
             'relations' => $this->relations,
         ])->render();
     }

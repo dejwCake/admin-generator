@@ -24,7 +24,7 @@ abstract class ClassGenerator extends Command
     protected string $classFullName;
     protected string $classNamespace;
 
-    /** @var array<string> */
+    /** @var array<string, string> */
     protected array $relations = [];
 
     /**
@@ -47,7 +47,7 @@ abstract class ClassGenerator extends Command
 
     public function getPathFromClassName(string $name): string
     {
-        $path = str_replace('\\', '/', $name) . ".php";
+        $path = str_replace('\\', '/', $name) . '.php';
 
         return preg_replace('|^App/|', 'app/', $path);
     }
@@ -159,6 +159,6 @@ abstract class ClassGenerator extends Command
 
         $this->classFullName = $this->qualifyClass($className);
         $this->classBaseName = class_basename($this->classFullName);
-        $this->classNamespace = Str::replaceLast("\\" . $this->classBaseName, '', $this->classFullName);
+        $this->classNamespace = Str::replaceLast('\\' . $this->classBaseName, '', $this->classFullName);
     }
 }

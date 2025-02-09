@@ -29,9 +29,6 @@ class Permissions extends ClassGenerator
      */
     protected bool $withoutBulk = false;
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
         $force = $this->option('force');

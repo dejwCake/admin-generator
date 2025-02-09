@@ -24,9 +24,6 @@ class IndexRequest extends ClassGenerator
      */
     protected $description = 'Generate an Index request class';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
         $force = $this->option('force');
@@ -51,10 +48,16 @@ class IndexRequest extends ClassGenerator
             'modelVariableName' => $this->modelVariableName,
 
             'columnsToQuery' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => !($column['type'] === 'text' || $column['name'] === "password" || $column['name'] === "remember_token" || $column['name'] === "slug" || $column['name'] === "created_at" || $column['name'] === "updated_at" || $column['name'] === "deleted_at"),
-            )->pluck(
-                'name',
-            )->toArray(),
+                static fn (array $column): bool => !(
+                    $column['type'] === 'text'
+                    || in_array(
+                        $column['name'],
+                        ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'],
+                        true,
+                    )
+                ),
+            )->pluck('name')
+                ->toArray(),
         ])->render();
     }
 

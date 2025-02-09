@@ -34,9 +34,6 @@ class GenerateAdminUser extends Command
         parent::__construct();
     }
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
         $tableNameArgument = 'admin_users';

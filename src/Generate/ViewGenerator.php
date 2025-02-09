@@ -19,7 +19,7 @@ abstract class ViewGenerator extends Command
     use Columns;
     use Names;
 
-    /** @var array<string> */
+    /** @var array<string, string> */
     protected array $relations = [];
 
     public function __construct(protected readonly Filesystem $files)

@@ -24,9 +24,6 @@ class ImpersonalLoginRequest extends ClassGenerator
      */
     protected $description = 'Generate a Impersonal login request class';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
         $force = $this->option('force');
