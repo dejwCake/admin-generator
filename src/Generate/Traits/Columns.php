@@ -54,36 +54,33 @@ trait Columns
             $column['name'],
             ["id", "created_at", "updated_at", "deleted_at", "remember_token", "last_login_at"],
             true,
-        ))->map(static function ($column) use ($tableName, $hasSoftDelete, $modelVariableName) {
+        ))->map(function ($column) use ($tableName, $hasSoftDelete, $modelVariableName) {
             $serverStoreRules = new Collection([]);
-            $serverUpdateRules = new Collection([]);
-            $frontendRules = new Collection([]);
             $serverStoreRules = $this->getServerStoreRulesByRequire($column, $serverStoreRules);
-            $serverUpdateRules = $this->getServerUpdateRulesByRequire($column, $serverUpdateRules);
-            $frontendRules = $this->getFrontendRulesByRequire($column, $frontendRules);
-
             $serverStoreRules = $this->getServerStoreRulesByName($column['name'], $serverStoreRules);
-            $serverUpdateRules = $this->getServerUpdateRulesByName($column['name'], $serverUpdateRules);
-            $frontendRules = $this->getFrontendRulesByName($column['name'], $frontendRules);
-
             $serverStoreRules = $this->getServerStoreRulesByUnique(
                 $column,
                 $tableName,
                 $hasSoftDelete,
                 $serverStoreRules,
             );
+            $serverStoreRules = $this->getServerStoreRulesByUniqueJson(
+                $column,
+                $tableName,
+                $hasSoftDelete,
+                $serverStoreRules,
+            );
+            $serverStoreRules = $this->getServerStoreRulesByType($column['type'], $serverStoreRules);
+
+            $serverUpdateRules = new Collection([]);
+            $serverUpdateRules = $this->getServerUpdateRulesByRequire($column, $serverUpdateRules);
+            $serverUpdateRules = $this->getServerUpdateRulesByName($column['name'], $serverUpdateRules);
             $serverUpdateRules = $this->getServerUpdateRulesByUnique(
                 $column,
                 $tableName,
                 $modelVariableName,
                 $hasSoftDelete,
                 $serverUpdateRules,
-            );
-            $serverStoreRules = $this->getServerStoreRulesByUniqueJson(
-                $column,
-                $tableName,
-                $hasSoftDelete,
-                $serverStoreRules,
             );
             $serverUpdateRules = $this->getServerUpdateRulesByUniqueJson(
                 $column,
@@ -92,9 +89,11 @@ trait Columns
                 $hasSoftDelete,
                 $serverUpdateRules,
             );
-
-            $serverStoreRules = $this->getServerStoreRulesByType($column['type'], $serverStoreRules);
             $serverUpdateRules = $this->getServerUpdateRulesByType($column['type'], $serverUpdateRules);
+
+            $frontendRules = new Collection([]);
+            $frontendRules = $this->getFrontendRulesByRequire($column, $frontendRules);
+            $frontendRules = $this->getFrontendRulesByName($column['name'], $frontendRules);
             $frontendRules = $this->getFrontendRulesByType($column['type'], $frontendRules);
 
             return [

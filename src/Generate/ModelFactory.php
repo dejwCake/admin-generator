@@ -60,7 +60,7 @@ class ModelFactory extends FileAppender
             'columns' => $this->readColumnsFromTable($this->tableName)
                 // we skip primary key
                 ->filter(static fn ($column) => $column['name'] !== 'id')
-                ->map(static fn ($column) => [
+                ->map(fn ($column) => [
                         'name' => $column['name'],
                         'faker' => $this->getType($column),
                     ]),
