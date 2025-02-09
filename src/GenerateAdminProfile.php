@@ -37,11 +37,9 @@ class GenerateAdminProfile extends Command
 
     public function handle(): void
     {
-        $tableNameArgument = !empty($this->argument('table_name')) ? $this->argument('table_name') : 'admin_users';
+        $tableNameArgument = $this->argument('table_name') ?: 'admin_users';
         $modelOption = $this->option('model-name');
-        $controllerOption = !empty($this->option('controller-name'))
-            ? $this->option('controller-name')
-            : 'ProfileController';
+        $controllerOption = $this->option('controller-name') ?: 'ProfileController';
         $force = $this->option('force');
 
         if ($force) {

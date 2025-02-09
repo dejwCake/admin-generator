@@ -36,6 +36,7 @@ class ImpersonalLoginRequest extends ClassGenerator
         }
     }
 
+    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
     public function generateClassNameFromTable(string $tableName): string
     {
         return 'ImpersonalLogin' . $this->modelBaseName;

@@ -52,7 +52,8 @@ class Routes extends FileAppender
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        if (!empty($template = $this->option('template'))) {
+        $template = $this->option('template');
+        if ($template !== null) {
             $this->view = 'templates.' . $template . '.routes';
         }
 

@@ -20,9 +20,9 @@ abstract class ClassGenerator extends Command
     use Columns;
     use Names;
 
-    public string $classBaseName;
-    public string $classFullName;
-    public string $classNamespace;
+    protected string $classBaseName;
+    protected string $classFullName;
+    protected string $classNamespace;
 
     /** @var array<string> */
     protected array $relations = [];

@@ -39,11 +39,13 @@ class StoreRequest extends ClassGenerator
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        if (!empty($template = $this->option('template'))) {
+        $template = $this->option('template');
+        if ($template !== null) {
             $this->view = 'templates.' . $template . '.store-request';
         }
 
-        if (!empty($belongsToMany = $this->option('belongs-to-many'))) {
+        $belongsToMany = $this->option('belongs-to-many');
+        if ($belongsToMany !== null) {
             $this->setBelongToManyRelation($belongsToMany);
         }
 
@@ -52,6 +54,7 @@ class StoreRequest extends ClassGenerator
         }
     }
 
+    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
     public function generateClassNameFromTable(string $tableName): string
     {
         return 'Store' . $this->modelBaseName;

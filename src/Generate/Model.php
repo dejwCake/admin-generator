@@ -40,11 +40,13 @@ class Model extends ClassGenerator
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        if (!empty($template = $this->option('template'))) {
+        $template = $this->option('template');
+        if ($template !== null) {
             $this->view = 'templates.' . $template . '.model';
         }
 
-        if (!empty($belongsToMany = $this->option('belongs-to-many'))) {
+        $belongsToMany = $this->option('belongs-to-many');
+        if ($belongsToMany !== null) {
             $this->setBelongToManyRelation($belongsToMany);
         }
 
@@ -80,12 +82,13 @@ class Model extends ClassGenerator
                 static fn ($column) => !in_array(
                     $column['name'],
                     ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token'],
+                    true,
                 ),
             )->pluck(
                 'name',
             ),
             'hidden' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => in_array($column['name'], ['password', 'remember_token']),
+                static fn ($column) => in_array($column['name'], ['password', 'remember_token'], true),
             )->pluck(
                 'name',
             ),
@@ -95,7 +98,7 @@ class Model extends ClassGenerator
                 'name',
             ),
             'timestamps' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => in_array($column['name'], ['created_at', 'updated_at']),
+                static fn ($column) => in_array($column['name'], ['created_at', 'updated_at'], true),
             )->count() > 0,
             'hasSoftDelete' => $this->readColumnsFromTable($this->tableName)->filter(
                 static fn ($column) => $column['name'] === "deleted_at",

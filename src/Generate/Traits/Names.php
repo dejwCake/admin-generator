@@ -10,25 +10,25 @@ use Illuminate\Support\Str;
 
 trait Names
 {
-    public string $tableName;
+    protected string $tableName;
 
-    public string $modelBaseName;
-    public string $modelFullName;
-    public string $modelPlural;
-    public string $modelVariableName;
-    public string $modelRouteAndViewName;
-    public string $modelNamespace;
-    public string $modelWithNamespaceFromDefault;
-    public string $modelViewsDirectory;
-    public string $modelDotNotation;
-    public string $modelJSName;
-    public string $modelLangFormat;
-    public string $resource;
-    public string $exportBaseName;
-    public string $titleSingular;
-    public string $titlePlural;
+    protected string $modelBaseName;
+    protected string $modelFullName;
+    protected string $modelPlural;
+    protected string $modelVariableName;
+    protected string $modelRouteAndViewName;
+    protected string $modelNamespace;
+    protected string $modelWithNamespaceFromDefault;
+    protected string $modelViewsDirectory;
+    protected string $modelDotNotation;
+    protected string $modelJSName;
+    protected string $modelLangFormat;
+    protected string $resource;
+    protected string $exportBaseName;
+    protected string $titleSingular;
+    protected string $titlePlural;
 
-    public string $controllerWithNamespaceFromDefault;
+    protected string $controllerWithNamespaceFromDefault;
 
     public function valueWithoutId(string $string): string
     {
@@ -105,7 +105,7 @@ trait Names
             )
          ? $controllerFullName : Str::replaceFirst($startsWith, '', $controllerFullName);
 
-        if (!empty($modelWithFullNamespace)) {
+        if ($modelWithFullNamespace !== null) {
             $this->modelFullName = $modelWithFullNamespace;
         }
         $this->exportBaseName = Str::studly($tableName) . 'Export';

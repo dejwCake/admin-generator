@@ -60,11 +60,13 @@ class Controller extends ClassGenerator
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        if (!empty($template = $this->option('template'))) {
+        $template = $this->option('template');
+        if ($template !== null) {
             $this->view = 'templates.' . $template . '.controller';
         }
 
-        if (!empty($belongsToMany = $this->option('belongs-to-many'))) {
+        $belongsToMany = $this->option('belongs-to-many');
+        if ($belongsToMany !== null) {
             $this->setBelongToManyRelation($belongsToMany);
         }
 
@@ -112,27 +114,10 @@ class Controller extends ClassGenerator
             'containsPublishedAtColumn' => in_array(
                 "published_at",
                 array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
+                true,
             ),
             // index
-            'columnsToQuery' => $this->readColumnsFromTable($this->tableName)->filter(function ($column) {
-                if ($this->readColumnsFromTable($this->tableName)->contains('name', 'created_by_admin_user_id')) {
-                    return !($column['type'] === 'text' || $column['name'] === "password" || $column['name'] === "remember_token" || $column['name'] === "slug" || $column['name'] === "updated_at" || $column['name'] === "deleted_at");
-                } else if (
-                    $this->readColumnsFromTable($this->tableName)->contains(
-                        'name',
-                        'updated_by_admin_user_id',
-                    )
-                ) {
-                    return !($column['type'] === 'text' || $column['name'] === "password" || $column['name'] === "remember_token" || $column['name'] === "slug" || $column['name'] === "created_at" || $column['name'] === "deleted_at");
-                } else if (
-                    $this->readColumnsFromTable($this->tableName)->contains('name', 'created_by_admin_user_id')
-                    && $this->readColumnsFromTable($this->tableName)->contains('name', 'updated_by_admin_user_id')
-                ) {
-                    return !($column['type'] === 'text' || $column['name'] === "password" || $column['name'] === "remember_token" || $column['name'] === "slug" || $column['name'] === "deleted_at");
-                }
-
-                return !($column['type'] === 'text' || $column['name'] === "password" || $column['name'] === "remember_token" || $column['name'] === "slug" || $column['name'] === "created_at" || $column['name'] === "updated_at" || $column['name'] === "deleted_at");
-            })->pluck('name')->toArray(),
+            'columnsToQuery' => $this->getColumnsToQuery(),
             'columnsToSearchIn' => $this->readColumnsFromTable($this->tableName)->filter(
                 static fn ($column) => ($column['type'] === 'json' || $column['type'] === 'text' || $column['type'] === 'string' || $column['name'] === "id") && !($column['name'] === "password" || $column['name'] === "remember_token"),
             )->pluck(
@@ -167,5 +152,27 @@ class Controller extends ClassGenerator
     protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace . '\Http\Controllers\Admin';
+    }
+
+    /** @return array<string> */
+    private function getColumnsToQuery(): array
+    {
+        $columns = $this->readColumnsFromTable($this->tableName);
+        $createdByAdminUserIdPresent = $columns->contains('name', 'created_by_admin_user_id');
+        $updatedByAdminUserIdPresent = $columns->contains('name', 'updated_by_admin_user_id');
+
+        return $columns
+            ->filter(static function (array $column) use ($createdByAdminUserIdPresent, $updatedByAdminUserIdPresent) {
+                $haystack = ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'];
+                if ($createdByAdminUserIdPresent && $updatedByAdminUserIdPresent) {
+                    $haystack = ['password', 'remember_token', 'slug', 'deleted_at'];
+                } else if ($createdByAdminUserIdPresent) {
+                    $haystack = ['password', 'remember_token', 'slug', 'updated_at', 'deleted_at'];
+                } else if ($updatedByAdminUserIdPresent) {
+                    $haystack = ['password', 'remember_token', 'slug', 'created_at', 'deleted_at'];
+                }
+
+                return !($column['type'] === 'text' || in_array($column['name'], $haystack, true,));
+            })->pluck('name')->toArray();
     }
 }

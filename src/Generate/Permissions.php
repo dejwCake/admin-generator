@@ -45,6 +45,7 @@ class Permissions extends ClassGenerator
         }
     }
 
+    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
     public function generateClassNameFromTable(string $tableName): string
     {
         return 'FillPermissionsFor' . $this->modelBaseName;
@@ -55,7 +56,8 @@ class Permissions extends ClassGenerator
         $fileName = 'fill_permissions_for_' . $this->modelRouteAndViewName . '.php';
         $path = database_path('migrations/' . date('Y_m_d_His', time()) . '_' . $fileName);
 
-        if ($oldPath = $this->alreadyExists($fileName)) {
+        $oldPath = $this->alreadyExists($fileName);
+        if ($oldPath) {
             $path = $oldPath;
             if ($force) {
                 $this->warn('File ' . $path . ' already exists! File will be deleted.');

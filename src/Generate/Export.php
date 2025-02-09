@@ -36,7 +36,8 @@ class Export extends ClassGenerator
     {
         $force = $this->option('force');
 
-        if (!empty($template = $this->option('template'))) {
+        $template = $this->option('template');
+        if ($template !== null) {
             $this->view = 'templates.' . $template . '.export';
         }
 
@@ -45,6 +46,7 @@ class Export extends ClassGenerator
         }
     }
 
+    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
     public function generateClassNameFromTable(string $tableName): string
     {
         return $this->exportBaseName;

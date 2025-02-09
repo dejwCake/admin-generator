@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 
 trait Columns
 {
-    /** @return Collection<string, string|bool> */
+    /** @return Collection<array<string, string|bool>> */
     protected function readColumnsFromTable(string $tableName): Collection
     {
         $schema = app(Schema::class);
@@ -53,184 +53,321 @@ trait Columns
         return $columns->filter(static fn ($column) => !in_array(
             $column['name'],
             ["id", "created_at", "updated_at", "deleted_at", "remember_token", "last_login_at"],
+            true,
         ))->map(static function ($column) use ($tableName, $hasSoftDelete, $modelVariableName) {
-                $serverStoreRules = new Collection([]);
-                $serverUpdateRules = new Collection([]);
-                $frontendRules = new Collection([]);
-            if ($column['required']) {
-                $serverStoreRules->push('\'required\'');
-                $serverUpdateRules->push('\'sometimes\'');
-                if ($column['type'] !== 'boolean' && $column['name'] !== 'password') {
-                    $frontendRules->push('required');
-                }
-            } else {
-                $serverStoreRules->push('\'nullable\'');
-                $serverUpdateRules->push('\'nullable\'');
-            }
+            $serverStoreRules = new Collection([]);
+            $serverUpdateRules = new Collection([]);
+            $frontendRules = new Collection([]);
+            $serverStoreRules = $this->getServerStoreRulesByRequire($column, $serverStoreRules);
+            $serverUpdateRules = $this->getServerUpdateRulesByRequire($column, $serverUpdateRules);
+            $frontendRules = $this->getFrontendRulesByRequire($column, $frontendRules);
 
-            if ($column['name'] === 'email') {
-                $serverStoreRules->push('\'email\'');
-                $serverUpdateRules->push('\'email\'');
-                $frontendRules->push('email');
-            }
+            $serverStoreRules = $this->getServerStoreRulesByName($column['name'], $serverStoreRules);
+            $serverUpdateRules = $this->getServerUpdateRulesByName($column['name'], $serverUpdateRules);
+            $frontendRules = $this->getFrontendRulesByName($column['name'], $frontendRules);
 
-            if ($column['name'] === 'password') {
-                $serverStoreRules->push('\'confirmed\'');
-                $serverUpdateRules->push('\'confirmed\'');
-                $frontendRules->push('confirmed:password');
+            $serverStoreRules = $this->getServerStoreRulesByUnique(
+                $column,
+                $tableName,
+                $hasSoftDelete,
+                $serverStoreRules,
+            );
+            $serverUpdateRules = $this->getServerUpdateRulesByUnique(
+                $column,
+                $tableName,
+                $modelVariableName,
+                $hasSoftDelete,
+                $serverUpdateRules,
+            );
+            $serverStoreRules = $this->getServerStoreRulesByUniqueJson(
+                $column,
+                $tableName,
+                $hasSoftDelete,
+                $serverStoreRules,
+            );
+            $serverUpdateRules = $this->getServerUpdateRulesByUniqueJson(
+                $column,
+                $tableName,
+                $modelVariableName,
+                $hasSoftDelete,
+                $serverUpdateRules,
+            );
 
-                $serverStoreRules->push('\'min:7\'');
-                $serverUpdateRules->push('\'min:7\'');
-                $frontendRules->push('min:7');
+            $serverStoreRules = $this->getServerStoreRulesByType($column['type'], $serverStoreRules);
+            $serverUpdateRules = $this->getServerUpdateRulesByType($column['type'], $serverUpdateRules);
+            $frontendRules = $this->getFrontendRulesByType($column['type'], $frontendRules);
 
-                $serverStoreRules->push('\'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/\'');
-                $serverUpdateRules->push('\'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/\'');
-                //TODO not working, need fixing
-    //                $frontendRules->push(''regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!$#%]).*$/g'');
-            }
-
-            if ($column['unique'] || $column['name'] === 'slug') {
-                if ($column['type'] === 'json') {
-                    $storeRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '->\'.$locale)';
-                    $updateRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '->\'.$locale)->ignore($this->' . $modelVariableName . '->getKey(), $this->' . $modelVariableName . '->getKeyName())';
-                    if ($hasSoftDelete && $column['unique_deleted_at_condition']) {
-                        $storeRule .= '->whereNull(\'deleted_at\')';
-                        $updateRule .= '->whereNull(\'deleted_at\')';
-                    }
-                        $serverStoreRules->push($storeRule);
-                        $serverUpdateRules->push($updateRule);
-                } else {
-                    $storeRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '\')';
-                    $updateRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '\')->ignore($this->' . $modelVariableName . '->getKey(), $this->' . $modelVariableName . '->getKeyName())';
-                    if ($hasSoftDelete && $column['unique_deleted_at_condition']) {
-                        $storeRule .= '->whereNull(\'deleted_at\')';
-                        $updateRule .= '->whereNull(\'deleted_at\')';
-                    }
-                    $serverStoreRules->push($storeRule);
-                    $serverUpdateRules->push($updateRule);
-                }
-            }
-
-            switch ($column['type']) {
-                case 'datetime':
-                    $serverStoreRules->push('\'date\'');
-                    $serverUpdateRules->push('\'date\'');
-                    $frontendRules->push('date_format:yyyy-MM-dd HH:mm:ss');
-
-                    break;
-                case 'date':
-                    $serverStoreRules->push('\'date\'');
-                    $serverUpdateRules->push('\'date\'');
-                    $frontendRules->push('date_format:yyyy-MM-dd HH:mm:ss');
-
-                    break;
-                case 'time':
-                    $serverStoreRules->push('\'date_format:H:i:s\'');
-                    $serverUpdateRules->push('\'date_format:H:i:s\'');
-                    $frontendRules->push('date_format:HH:mm:ss');
-
-                    break;
-                case 'integer':
-                    $serverStoreRules->push('\'integer\'');
-                    $serverUpdateRules->push('\'integer\'');
-                    $frontendRules->push('integer');
-
-                    break;
-                case 'tinyInteger':
-                    $serverStoreRules->push('\'integer\'');
-                    $serverUpdateRules->push('\'integer\'');
-                    $frontendRules->push('integer');
-
-                    break;
-                case 'smallInteger':
-                    $serverStoreRules->push('\'integer\'');
-                    $serverUpdateRules->push('\'integer\'');
-                    $frontendRules->push('integer');
-
-                    break;
-                case 'mediumInteger':
-                    $serverStoreRules->push('\'integer\'');
-                    $serverUpdateRules->push('\'integer\'');
-                    $frontendRules->push('integer');
-
-                    break;
-                case 'bigInteger':
-                    $serverStoreRules->push('\'integer\'');
-                    $serverUpdateRules->push('\'integer\'');
-                    $frontendRules->push('integer');
-
-                    break;
-                case 'unsignedInteger':
-                    $serverStoreRules->push('\'integer\'');
-                    $serverUpdateRules->push('\'integer\'');
-                    $frontendRules->push('integer');
-
-                    break;
-                case 'unsignedTinyInteger':
-                    $serverStoreRules->push('\'integer\'');
-                    $serverUpdateRules->push('\'integer\'');
-                    $frontendRules->push('integer');
-
-                    break;
-                case 'unsignedSmallInteger':
-                    $serverStoreRules->push('\'integer\'');
-                    $serverUpdateRules->push('\'integer\'');
-                    $frontendRules->push('integer');
-
-                    break;
-                case 'unsignedMediumInteger':
-                    $serverStoreRules->push('\'integer\'');
-                    $serverUpdateRules->push('\'integer\'');
-                    $frontendRules->push('integer');
-
-                    break;
-                case 'unsignedBigInteger':
-                    $serverStoreRules->push('\'integer\'');
-                    $serverUpdateRules->push('\'integer\'');
-                    $frontendRules->push('integer');
-
-                    break;
-                case 'boolean':
-                    $serverStoreRules->push('\'boolean\'');
-                    $serverUpdateRules->push('\'boolean\'');
-                    $frontendRules->push('');
-
-                    break;
-                case 'float':
-                    $serverStoreRules->push('\'numeric\'');
-                    $serverUpdateRules->push('\'numeric\'');
-                    $frontendRules->push('decimal');
-
-                    break;
-                case 'decimal':
-                    $serverStoreRules->push('\'numeric\'');
-                    $serverUpdateRules->push('\'numeric\'');
-                    // FIXME?? I'm not sure about this one
-                    $frontendRules->push('decimal');
-
-                    break;
-                case 'string':
-                    $serverStoreRules->push('\'string\'');
-                    $serverUpdateRules->push('\'string\'');
-
-                    break;
-                case 'text':
-                    $serverStoreRules->push('\'string\'');
-                    $serverUpdateRules->push('\'string\'');
-
-                    break;
-                default:
-                    $serverStoreRules->push('\'string\'');
-                    $serverUpdateRules->push('\'string\'');
-            }
-
-                return [
+            return [
                 'name' => $column['name'],
                 'type' => $column['type'],
                 'serverStoreRules' => $serverStoreRules->toArray(),
                 'serverUpdateRules' => $serverUpdateRules->toArray(),
                 'frontendRules' => $frontendRules->toArray(),
-                ];
+            ];
         });
+    }
+
+    /**
+     * @param array<string, string|bool> $column
+     */
+    protected function getServerStoreRulesByRequire(array $column, Collection $serverStoreRules): Collection
+    {
+        if ($column['required']) {
+            $serverStoreRules->push('\'required\'');
+        } else {
+            $serverStoreRules->push('\'nullable\'');
+        }
+
+        return $serverStoreRules;
+    }
+
+    /**
+     * @param array<string, string|bool> $column
+     */
+    protected function getServerUpdateRulesByRequire(array $column, Collection $serverUpdateRules): Collection
+    {
+        if ($column['required']) {
+            $serverUpdateRules->push('\'sometimes\'');
+        } else {
+            $serverUpdateRules->push('\'nullable\'');
+        }
+
+        return $serverUpdateRules;
+    }
+
+    /**
+     * @param array<string, string|bool> $column
+     */
+    protected function getFrontendRulesByRequire(array $column, Collection $frontendRules): Collection
+    {
+        if ($column['required'] && $column['type'] !== 'boolean' && $column['name'] !== 'password') {
+            $frontendRules->push('required');
+        }
+
+        return $frontendRules;
+    }
+
+    protected function getServerStoreRulesByName(string $name, Collection $serverStoreRules): Collection
+    {
+        if ($name === 'email') {
+            $serverStoreRules->push('\'email\'');
+        }
+
+        if ($name === 'password') {
+            $serverStoreRules->push('\'confirmed\'');
+            $serverStoreRules->push('\'min:7\'');
+            $serverStoreRules->push('\'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/\'');
+        }
+
+        return $serverStoreRules;
+    }
+
+    protected function getServerUpdateRulesByName(string $name, Collection $serverUpdateRules): Collection
+    {
+        if ($name === 'email') {
+            $serverUpdateRules->push('\'email\'');
+        }
+
+        if ($name === 'password') {
+            $serverUpdateRules->push('\'confirmed\'');
+            $serverUpdateRules->push('\'min:7\'');
+            $serverUpdateRules->push('\'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/\'');
+        }
+
+        return $serverUpdateRules;
+    }
+
+    protected function getFrontendRulesByName(string $name, Collection $frontendRules): Collection
+    {
+        if ($name === 'email') {
+            $frontendRules->push('email');
+        }
+
+        if ($name === 'password') {
+            $frontendRules->push('confirmed:password');
+            $frontendRules->push('min:7');
+            //TODO not working, need fixing
+//            $frontendRules->push('regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!$#%]).*$/g');
+        }
+
+        return $frontendRules;
+    }
+
+    /**
+     * @param array<string, string|bool> $column
+     */
+    protected function getServerStoreRulesByUnique(
+        array $column,
+        string $tableName,
+        bool $hasSoftDelete,
+        Collection $serverStoreRules,
+    ): Collection {
+        if ($column['type'] === 'json') {
+            return $serverStoreRules;
+        }
+
+        if ($column['unique'] || $column['name'] === 'slug') {
+            $storeRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '\')';
+            if ($hasSoftDelete && $column['unique_deleted_at_condition']) {
+                $storeRule .= '->whereNull(\'deleted_at\')';
+            }
+            $serverStoreRules->push($storeRule);
+        }
+
+        return $serverStoreRules;
+    }
+
+    /**
+     * @param array<string, string|bool> $column
+     */
+    protected function getServerUpdateRulesByUnique(
+        array $column,
+        string $tableName,
+        string $modelVariableName,
+        bool $hasSoftDelete,
+        Collection $serverUpdateRules,
+    ): Collection {
+        if ($column['type'] === 'json') {
+            return $serverUpdateRules;
+        }
+
+        if ($column['unique'] || $column['name'] === 'slug') {
+            $updateRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '\')->ignore($this->' . $modelVariableName . '->getKey(), $this->' . $modelVariableName . '->getKeyName())';
+            if ($hasSoftDelete && $column['unique_deleted_at_condition']) {
+                $updateRule .= '->whereNull(\'deleted_at\')';
+            }
+            $serverUpdateRules->push($updateRule);
+        }
+
+        return $serverUpdateRules;
+    }
+
+    /**
+     * @param array<string, string|bool> $column
+     */
+    protected function getServerStoreRulesByUniqueJson(
+        array $column,
+        string $tableName,
+        bool $hasSoftDelete,
+        Collection $serverStoreRules,
+    ): Collection {
+        if ($column['type'] !== 'json') {
+            return $serverStoreRules;
+        }
+
+        if ($column['unique'] || $column['name'] === 'slug') {
+            $storeRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '->\'.$locale)';
+            if ($hasSoftDelete && $column['unique_deleted_at_condition']) {
+                $storeRule .= '->whereNull(\'deleted_at\')';
+            }
+            $serverStoreRules->push($storeRule);
+        }
+
+        return $serverStoreRules;
+    }
+
+    /**
+     * @param array<string, string|bool> $column
+     */
+    protected function getServerUpdateRulesByUniqueJson(
+        array $column,
+        string $tableName,
+        string $modelVariableName,
+        bool $hasSoftDelete,
+        Collection $serverUpdateRules,
+    ): Collection {
+        if ($column['type'] !== 'json') {
+            return $serverUpdateRules;
+        }
+
+        if ($column['unique'] || $column['name'] === 'slug') {
+            $updateRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '->\'.$locale)->ignore($this->' . $modelVariableName . '->getKey(), $this->' . $modelVariableName . '->getKeyName())';
+            if ($hasSoftDelete && $column['unique_deleted_at_condition']) {
+                $updateRule .= '->whereNull(\'deleted_at\')';
+            }
+            $serverUpdateRules->push($updateRule);
+        }
+
+        return $serverUpdateRules;
+    }
+
+    protected function getServerStoreRulesByType(string $type, Collection $serverStoreRules): Collection
+    {
+        $rule = match ($type) {
+            'datetime',
+            'date' => '\'date\'',
+            'time' => '\'date_format:H:i:s\'',
+            'integer',
+            'tinyInteger',
+            'smallInteger',
+            'mediumInteger',
+            'bigInteger',
+            'unsignedInteger',
+            'unsignedTinyInteger',
+            'unsignedSmallInteger',
+            'unsignedMediumInteger',
+            'unsignedBigInteger' => '\'integer\'',
+            'boolean' => '\'boolean\'',
+            'float',
+            'decimal' => '\'numeric\'',
+            default => '\'string\'',
+        };
+
+        return $serverStoreRules->push($rule);
+    }
+
+    protected function getServerUpdateRulesByType(string $type, Collection $serverUpdateRules): Collection
+    {
+        $rule = match ($type) {
+            'datetime',
+            'date' => '\'date\'',
+            'time' => '\'date_format:H:i:s\'',
+            'integer',
+            'tinyInteger',
+            'smallInteger',
+            'mediumInteger',
+            'bigInteger',
+            'unsignedInteger',
+            'unsignedTinyInteger',
+            'unsignedSmallInteger',
+            'unsignedMediumInteger',
+            'unsignedBigInteger' => '\'integer\'',
+            'boolean' => '\'boolean\'',
+            'float',
+            'decimal' => '\'numeric\'',
+            default => '\'string\'',
+        };
+
+        return $serverUpdateRules->push($rule);
+    }
+
+    protected function getFrontendRulesByType(string $type, Collection $frontendRules): Collection
+    {
+        $rule = match ($type) {
+            'datetime',
+            'date' => 'date_format:yyyy-MM-dd HH:mm:ss',
+            'time' => 'date_format:HH:mm:ss',
+            'integer',
+            'tinyInteger',
+            'smallInteger',
+            'mediumInteger',
+            'bigInteger',
+            'unsignedInteger',
+            'unsignedTinyInteger',
+            'unsignedSmallInteger',
+            'unsignedMediumInteger',
+            'unsignedBigInteger' => 'integer',
+            'boolean' => '',
+            'float',
+                // FIXME?? I'm not sure about this one
+            'decimal' => 'decimal',
+            default => null,
+        };
+
+        if ($rule !== null) {
+            $frontendRules->push($rule);
+        }
+
+        return $frontendRules;
     }
 }

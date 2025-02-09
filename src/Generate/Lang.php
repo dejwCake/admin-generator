@@ -42,11 +42,13 @@ class Lang extends FileAppender
 //        //TODO check if exists
 //        //TODO make global for all generator
 //        //TODO also with prefix
-        if (!empty($template = $this->option('template'))) {
+        $template = $this->option('template');
+        if ($template !== null) {
             $this->view = 'templates.' . $template . '.lang';
         }
 
-        if (empty($locale = $this->option('locale'))) {
+        $locale = $this->option('locale');
+        if ($locale === null) {
             $locale = 'en';
         }
 
@@ -54,7 +56,8 @@ class Lang extends FileAppender
             $this->export = true;
         }
 
-        if (!empty($belongsToMany = $this->option('belongs-to-many'))) {
+        $belongsToMany = $this->option('belongs-to-many');
+        if ($belongsToMany !== null) {
             $this->setBelongToManyRelation($belongsToMany);
         }
 
@@ -86,6 +89,7 @@ class Lang extends FileAppender
             'containsPublishedAtColumn' => in_array(
                 "published_at",
                 array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
+                true,
             ),
 
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)->map(function ($column) {

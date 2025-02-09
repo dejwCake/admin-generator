@@ -39,11 +39,13 @@ class UpdateRequest extends ClassGenerator
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        if (!empty($template = $this->option('template'))) {
+        $template = $this->option('template');
+        if ($template !== null) {
             $this->view = 'templates.' . $template . '.update-request';
         }
 
-        if (!empty($belongsToMany = $this->option('belongs-to-many'))) {
+        $belongsToMany = $this->option('belongs-to-many');
+        if ($belongsToMany !== null) {
             $this->setBelongToManyRelation($belongsToMany);
         }
 
@@ -52,6 +54,7 @@ class UpdateRequest extends ClassGenerator
         }
     }
 
+    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
     public function generateClassNameFromTable(string $tableName): string
     {
         return 'Update' . $this->modelBaseName;
@@ -69,6 +72,7 @@ class UpdateRequest extends ClassGenerator
             'containsPublishedAtColumn' => in_array(
                 "published_at",
                 array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
+                true,
             ),
 
             // validation in store/update

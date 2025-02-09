@@ -36,6 +36,7 @@ class BulkDestroyRequest extends ClassGenerator
         }
     }
 
+    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
     public function generateClassNameFromTable(string $tableName): string
     {
         return 'BulkDestroy' . $this->modelBaseName;

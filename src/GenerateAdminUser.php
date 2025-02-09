@@ -45,7 +45,7 @@ class GenerateAdminUser extends Command
         $exportOption = $this->option('with-export');
         $force = $this->option('force');
 
-        if (empty($modelOption)) {
+        if ($modelOption === null) {
             $modelOption = 'AdminUser';
             $modelWithFullNamespace = 'Brackets\AdminAuth\Models\AdminUser';
         } else {

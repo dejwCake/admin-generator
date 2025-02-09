@@ -10,6 +10,10 @@ use Illuminate\Support\Str;
 
 trait Helpers
 {
+    /**
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingAnyTypeHint
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingAnyTypeHint
+     */
     public function option($key = null)
     {
         return $key === null || $this->hasOption($key) ? parent::option($key) : null;
@@ -85,10 +89,6 @@ trait Helpers
      */
     protected function alreadyAppended(string $path, string $content): bool
     {
-        if (str_contains($this->files->get($path), $content)) {
-            return true;
-        }
-
-        return false;
+        return str_contains($this->files->get($path), $content);
     }
 }

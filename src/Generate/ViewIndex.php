@@ -74,11 +74,11 @@ class ViewIndex extends ViewGenerator
         $this->generateView($viewPath, $force);
         $this->generateListingJs($listingJsPath, $force);
 
-        if ($this->appendIfNotAlreadyAppended($indexJsPath, 'import ' . / Listing';' . PHP_EOL)) {
+        if ($this->appendIfNotAlreadyAppended($indexJsPath, 'import \' . / Listing\';' . PHP_EOL)) {
             $this->info('Appending Listing to ' . $indexJsPath . ' finished');
         }
         if (
-            $this->appendIfNotAlreadyAppended($bootstrapJsPath, 'import ' . / ' . $this->modelJSName . '';' . PHP_EOL)
+            $this->appendIfNotAlreadyAppended($bootstrapJsPath, 'import \' . / ' . $this->modelJSName . '\';' . PHP_EOL)
         ) {
             $this->info('Appending ' . $this->modelJSName . '/index.js to ' . $bootstrapJsPath . ' finished');
         }
