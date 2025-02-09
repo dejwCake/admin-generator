@@ -46,9 +46,6 @@ class ViewFullForm extends ViewGenerator
 
     protected string $formJsRelativePath;
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
         $force = $this->option('force');
@@ -56,7 +53,8 @@ class ViewFullForm extends ViewGenerator
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        if (!empty($template = $this->option('template'))) {
+        $template = $this->option('template');
+        if ($template !== null) {
             $this->view = 'templates.' . $template . '.full-form';
             $this->viewJs = 'templates.' . $template . '.form-js';
         }
@@ -74,49 +72,13 @@ class ViewFullForm extends ViewGenerator
                 : 'admin/' . $this->resource . '/update';
         }
 
-        $viewPath = resource_path('views/admin/' . $this->fileName . '.blade.php');
-        if ($this->alreadyExists($viewPath) && !$force) {
-            $this->error('File ' . $viewPath . ' already exists!');
-        } else {
-            if ($this->alreadyExists($viewPath) && $force) {
-                $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
-                $this->files->delete($viewPath);
-            }
-
-            $this->makeDirectory($viewPath);
-
-            $this->files->put($viewPath, $this->buildForm());
-
-            $this->info('Generating ' . $viewPath . ' finished');
-        }
+        $this->generateBlade($force);
 
         $formJsPath = resource_path('js/admin/' . $this->formJsRelativePath . '/Form.js');
         $bootstrapJsPath = resource_path('js/admin/index.js');
 
-        if ($this->alreadyExists($formJsPath) && !$force) {
-            $this->error('File ' . $formJsPath . ' already exists!');
-        } else {
-            if ($this->alreadyExists($formJsPath) && $force) {
-                $this->warn('File ' . $formJsPath . ' already exists! File will be deleted.');
-                $this->files->delete($formJsPath);
-            }
-
-            $this->makeDirectory($formJsPath);
-
-            $this->files->put($formJsPath, $this->buildFormJs());
-            $this->info('Generating ' . $formJsPath . ' finished');
-        }
-
-        $indexJsPath = resource_path('js/admin/' . $this->formJsRelativePath . '/index.js');
-        if ($this->alreadyExists($indexJsPath) && !$force) {
-            $this->error('File ' . $indexJsPath . ' already exists!');
-        } else {
-            if ($this->alreadyExists($indexJsPath) && $force) {
-                $this->warn('File ' . $indexJsPath . ' already exists! File will be deleted.');
-                $this->files->delete($indexJsPath);
-            }
-            $this->makeDirectory($indexJsPath);
-        }
+        $this->generateFormJs($formJsPath, $force);
+        $indexJsPath = $this->generateIndexJs($force);
 
         if ($this->appendIfNotAlreadyAppended($indexJsPath, "import './Form';" . PHP_EOL)) {
             $this->info('Appending Form to ' . $indexJsPath . ' finished');
@@ -131,6 +93,22 @@ class ViewFullForm extends ViewGenerator
         }
     }
 
+    public function generateIndexJs(bool $force): string
+    {
+        $indexJsPath = resource_path('js/admin/' . $this->formJsRelativePath . '/index.js');
+        if ($this->alreadyExists($indexJsPath) && !$force) {
+            $this->error('File ' . $indexJsPath . ' already exists!');
+        } else {
+            if ($this->alreadyExists($indexJsPath) && $force) {
+                $this->warn('File ' . $indexJsPath . ' already exists! File will be deleted.');
+                $this->files->delete($indexJsPath);
+            }
+            $this->makeDirectory($indexJsPath);
+        }
+
+        return $indexJsPath;
+    }
+
     protected function buildForm(): string
     {
         return view('brackets/admin-generator::' . $this->view, [
@@ -141,7 +119,7 @@ class ViewFullForm extends ViewGenerator
             'modelDotNotation' => $this->modelDotNotation,
             'modelLangFormat' => $this->modelLangFormat,
             'modelTitle' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => in_array($column['name'], ['title', 'name', 'first_name', 'email']),
+                static fn ($column) => in_array($column['name'], ['title', 'name', 'first_name', 'email'], true),
             )->first(
                 null,
                 ['name' => 'id'],
@@ -180,5 +158,41 @@ class ViewFullForm extends ViewGenerator
             ['route', 'r', InputOption::VALUE_OPTIONAL, 'Specify custom route for form'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating full form'],
         ];
+    }
+
+    private function generateBlade(bool $force): void
+    {
+        $viewPath = resource_path('views/admin/' . $this->fileName . '.blade.php');
+        if ($this->alreadyExists($viewPath) && !$force) {
+            $this->error('File ' . $viewPath . ' already exists!');
+        } else {
+            if ($this->alreadyExists($viewPath) && $force) {
+                $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
+                $this->files->delete($viewPath);
+            }
+
+            $this->makeDirectory($viewPath);
+
+            $this->files->put($viewPath, $this->buildForm());
+
+            $this->info('Generating ' . $viewPath . ' finished');
+        }
+    }
+
+    private function generateFormJs(string $formJsPath, bool $force): void
+    {
+        if ($this->alreadyExists($formJsPath) && !$force) {
+            $this->error('File ' . $formJsPath . ' already exists!');
+        } else {
+            if ($this->alreadyExists($formJsPath) && $force) {
+                $this->warn('File ' . $formJsPath . ' already exists! File will be deleted.');
+                $this->files->delete($formJsPath);
+            }
+
+            $this->makeDirectory($formJsPath);
+
+            $this->files->put($formJsPath, $this->buildFormJs());
+            $this->info('Generating ' . $formJsPath . ' finished');
+        }
     }
 }

@@ -54,12 +54,13 @@ class ViewForm extends ViewGenerator
      */
     public function handle(): void
     {
-        $force = $this->option('force');
+        $force = (bool) $this->option('force');
 
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        if (!empty($template = $this->option('template'))) {
+        $template = $this->option('template');
+        if ($template !== null) {
             $this->create = 'templates.' . $template . '.create';
             $this->edit = 'templates.' . $template . '.edit';
             $this->form = 'templates.' . $template . '.form';
@@ -67,99 +68,16 @@ class ViewForm extends ViewGenerator
             $this->formJs = 'templates.' . $template . '.form-js';
         }
 
-        if (!empty($belongsToMany = $this->option('belongs-to-many'))) {
+        $belongsToMany = $this->option('belongs-to-many');
+        if ($belongsToMany !== null) {
             $this->setBelongToManyRelation($belongsToMany);
         }
 
-        $viewPath = resource_path('views/admin/' . $this->modelViewsDirectory . '/components/form-elements.blade.php');
-        if ($this->alreadyExists($viewPath) && !$force) {
-            $this->error('File ' . $viewPath . ' already exists!');
-        } else {
-            if ($this->alreadyExists($viewPath) && $force) {
-                $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
-                $this->files->delete($viewPath);
-            }
-
-            $this->makeDirectory($viewPath);
-
-            $this->files->put($viewPath, $this->buildForm());
-
-            $this->info('Generating ' . $viewPath . ' finished');
-        }
-
-        if (
-            in_array(
-                "published_at",
-                array_column($this->getVisibleColumns($this->tableName, $this->modelVariableName)->toArray(), 'name'),
-            )
-        ) {
-            $viewPath = resource_path(
-                'views/admin/' . $this->modelViewsDirectory . '/components/form-elements-right.blade.php',
-            );
-            if ($this->alreadyExists($viewPath) && !$force) {
-                $this->error('File ' . $viewPath . ' already exists!');
-            } else {
-                if ($this->alreadyExists($viewPath) && $force) {
-                    $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
-                    $this->files->delete($viewPath);
-                }
-
-                $this->makeDirectory($viewPath);
-
-                $this->files->put($viewPath, $this->buildFormRight());
-
-                $this->info('Generating ' . $viewPath . ' finished');
-            }
-        }
-
-        $viewPath = resource_path('views/admin/' . $this->modelViewsDirectory . '/create.blade.php');
-        if ($this->alreadyExists($viewPath) && !$force) {
-            $this->error('File ' . $viewPath . ' already exists!');
-        } else {
-            if ($this->alreadyExists($viewPath) && $force) {
-                $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
-                $this->files->delete($viewPath);
-            }
-
-            $this->makeDirectory($viewPath);
-
-            $this->files->put($viewPath, $this->buildCreate());
-
-            $this->info('Generating ' . $viewPath . ' finished');
-        }
-
-
-        $viewPath = resource_path('views/admin/' . $this->modelViewsDirectory . '/edit.blade.php');
-        if ($this->alreadyExists($viewPath) && !$force) {
-            $this->error('File ' . $viewPath . ' already exists!');
-        } else {
-            if ($this->alreadyExists($viewPath) && $force) {
-                $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
-                $this->files->delete($viewPath);
-            }
-
-            $this->makeDirectory($viewPath);
-
-            $this->files->put($viewPath, $this->buildEdit());
-
-            $this->info('Generating ' . $viewPath . ' finished');
-        }
-
-        $formJsPath = resource_path('js/admin/' . $this->modelJSName . '/Form.js');
-
-        if ($this->alreadyExists($formJsPath) && !$force) {
-            $this->error('File ' . $formJsPath . ' already exists!');
-        } else {
-            if ($this->alreadyExists($formJsPath) && $force) {
-                $this->warn('File ' . $formJsPath . ' already exists! File will be deleted.');
-                $this->files->delete($formJsPath);
-            }
-
-            $this->makeDirectory($formJsPath);
-
-            $this->files->put($formJsPath, $this->buildFormJs());
-            $this->info('Generating ' . $formJsPath . ' finished');
-        }
+        $this->generateForm($force);
+        $this->generateRightForm($force);
+        $this->generateCreate($force);
+        $this->generateEdit($force);
+        $this->generateFormJs($force);
 
         $indexJsPath = resource_path('js/admin/' . $this->modelJSName . '/index.js');
         $bootstrapJsPath = resource_path('js/admin/index.js');
@@ -174,7 +92,11 @@ class ViewForm extends ViewGenerator
 
     protected function isUsedTwoColumnsLayout(): bool
     {
-        return in_array("published_at", array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'));
+        return in_array(
+            "published_at",
+            array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
+            true,
+        );
     }
 
     protected function buildForm(): string
@@ -260,7 +182,7 @@ class ViewForm extends ViewGenerator
             'isUsedTwoColumnsLayout' => $this->isUsedTwoColumnsLayout(),
 
             'modelTitle' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn ($column) => in_array($column['name'], ['title', 'name', 'first_name', 'email']),
+                static fn ($column) => in_array($column['name'], ['title', 'name', 'first_name', 'email'], true),
             )->first(
                 null,
                 ['name' => 'id'],
@@ -291,5 +213,110 @@ class ViewForm extends ViewGenerator
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating form'],
         ];
+    }
+
+    private function generateForm(bool $force): void
+    {
+        $viewPath = resource_path('views/admin/' . $this->modelViewsDirectory . '/components/form-elements.blade.php');
+        if ($this->alreadyExists($viewPath) && !$force) {
+            $this->error('File ' . $viewPath . ' already exists!');
+        } else {
+            if ($this->alreadyExists($viewPath) && $force) {
+                $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
+                $this->files->delete($viewPath);
+            }
+
+            $this->makeDirectory($viewPath);
+
+            $this->files->put($viewPath, $this->buildForm());
+
+            $this->info('Generating ' . $viewPath . ' finished');
+        }
+    }
+
+    private function generateRightForm(bool $force): void
+    {
+        if (
+            in_array(
+                "published_at",
+                array_column($this->getVisibleColumns($this->tableName, $this->modelVariableName)->toArray(), 'name'),
+                true,
+            )
+        ) {
+            $viewPath = resource_path(
+                'views/admin/' . $this->modelViewsDirectory . '/components/form-elements-right.blade.php',
+            );
+            if ($this->alreadyExists($viewPath) && !$force) {
+                $this->error('File ' . $viewPath . ' already exists!');
+            } else {
+                if ($this->alreadyExists($viewPath) && $force) {
+                    $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
+                    $this->files->delete($viewPath);
+                }
+
+                $this->makeDirectory($viewPath);
+
+                $this->files->put($viewPath, $this->buildFormRight());
+
+                $this->info('Generating ' . $viewPath . ' finished');
+            }
+        }
+    }
+
+    private function generateCreate(bool $force): void
+    {
+        $viewPath = resource_path('views/admin/' . $this->modelViewsDirectory . '/create.blade.php');
+        if ($this->alreadyExists($viewPath) && !$force) {
+            $this->error('File ' . $viewPath . ' already exists!');
+        } else {
+            if ($this->alreadyExists($viewPath) && $force) {
+                $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
+                $this->files->delete($viewPath);
+            }
+
+            $this->makeDirectory($viewPath);
+
+            $this->files->put($viewPath, $this->buildCreate());
+
+            $this->info('Generating ' . $viewPath . ' finished');
+        }
+    }
+
+    private function generateEdit(bool $force): void
+    {
+        $viewPath = resource_path('views/admin/' . $this->modelViewsDirectory . '/edit.blade.php');
+        if ($this->alreadyExists($viewPath) && !$force) {
+            $this->error('File ' . $viewPath . ' already exists!');
+        } else {
+            if ($this->alreadyExists($viewPath) && $force) {
+                $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
+                $this->files->delete($viewPath);
+            }
+
+            $this->makeDirectory($viewPath);
+
+            $this->files->put($viewPath, $this->buildEdit());
+
+            $this->info('Generating ' . $viewPath . ' finished');
+        }
+    }
+
+    private function generateFormJs(bool $force): void
+    {
+        $formJsPath = resource_path('js/admin/' . $this->modelJSName . '/Form.js');
+
+        if ($this->alreadyExists($formJsPath) && !$force) {
+            $this->error('File ' . $formJsPath . ' already exists!');
+        } else {
+            if ($this->alreadyExists($formJsPath) && $force) {
+                $this->warn('File ' . $formJsPath . ' already exists! File will be deleted.');
+                $this->files->delete($formJsPath);
+            }
+
+            $this->makeDirectory($formJsPath);
+
+            $this->files->put($formJsPath, $this->buildFormJs());
+            $this->info('Generating ' . $formJsPath . ' finished');
+        }
     }
 }

@@ -72,8 +72,7 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
         );
     }
 
-    /** @test */
-    public function user_controller_name_can_be_outside_default_directory(): void
+    public function testUserControllerNameCanBeOutsideDefaultDirectory(): void
     {
         $filePath = base_path('app/Http/Controllers/Auth/UsersController.php');
 

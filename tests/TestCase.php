@@ -86,6 +86,7 @@ abstract class TestCase extends Orchestra
      * @param Application $app
      * @return array<class-string>
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
     protected function getPackageProviders($app): array
     {

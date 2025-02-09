@@ -36,6 +36,7 @@ class IndexRequest extends ClassGenerator
         }
     }
 
+    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
     public function generateClassNameFromTable(string $tableName): string
     {
         return 'Index' . $this->modelBaseName;

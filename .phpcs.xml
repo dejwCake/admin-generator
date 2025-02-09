@@ -29,4 +29,17 @@
             </property>
         </properties>
     </rule>
+
+    <rule ref="SlevomatCodingStandard.Files.LineLength.LineTooLong">
+        <exclude-pattern></exclude-pattern>
+        <exclude-pattern>tests/Feature/AdminUsers/AdminUserCrudGeneratorWithCustomControllerNameTest.php</exclude-pattern>
+        <exclude-pattern>tests/Feature/AdminUsers/AdminUserCrudGeneratorWithCustomModelNameTest.php</exclude-pattern>
+        <exclude-pattern>tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php</exclude-pattern>
+        <exclude-pattern>tests/Feature/Profile/DefaultProfileGeneratorTest.php</exclude-pattern>
+        <exclude-pattern>tests/Feature/Profile/ProfileGeneratorWithCustomControllerNameTest.php</exclude-pattern>
+        <exclude-pattern>tests/Feature/Users/UserCrudGeneratorWithCustomModelNameTest.php</exclude-pattern>
+        <exclude-pattern>tests/Feature/Users/DefaultUserCrudGeneratorTest.php</exclude-pattern>
+        <exclude-pattern>tests/Feature/Users/UserCrudGeneratorWithCustomControllerNameTest.php</exclude-pattern>
+        <exclude-pattern>tests/Feature/Appenders/RoutesTest.php</exclude-pattern>
+    </rule>
 </ruleset>

@@ -179,6 +179,7 @@ $factory->define(Brackets\AdminAuth\Models\AdminUser::class', File::get($factory
     public static function getCases(): iterable
     {
         yield 'without seed' => [false];
+
         //disabled for now, because it's not working properly
         //yield 'with seed' => [true];
     }

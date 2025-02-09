@@ -55,9 +55,11 @@ abstract class UserTestCase extends Orchestra
         if (env('DB_CONNECTION') === 'pgsql') {
             $app['db']->connection()->getSchemaBuilder()->table(
                 'admin_users',
+                //phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
                 static function (Blueprint $table): void {
                     DB::statement(
-                        'CREATE UNIQUE INDEX admin_users_email_null_deleted_at ON admin_users (email) WHERE deleted_at IS NULL;',
+                        'CREATE UNIQUE INDEX admin_users_email_null_deleted_at ON admin_users (email) '
+                        . 'WHERE deleted_at IS NULL;',
                     );
                 },
             );
@@ -207,6 +209,7 @@ abstract class UserTestCase extends Orchestra
      * @param Application $app
      * @return array<class-string>
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
     protected function getPackageProviders($app): array
     {

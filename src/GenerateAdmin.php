@@ -171,11 +171,7 @@ class GenerateAdmin extends Command
 
     protected function shouldGeneratePermissionsMigration(): bool
     {
-        if (class_exists('\Brackets\Craftable\CraftableServiceProvider')) {
-            return true;
-        }
-
-        return false;
+        return class_exists('\Brackets\Craftable\CraftableServiceProvider');
     }
 }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generate;
 
+use Illuminate\Support\Collection;
 use Symfony\Component\Console\Input\InputOption;
 
 class ViewIndex extends ViewGenerator
@@ -59,7 +60,8 @@ class ViewIndex extends ViewGenerator
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        if (!empty($template = $this->option('template'))) {
+        $template = $this->option('template');
+        if ($template !== null) {
             $this->view = 'templates.' . $template . '.index';
             $this->viewJs = 'templates.' . $template . '.listing-js';
         }
@@ -69,6 +71,21 @@ class ViewIndex extends ViewGenerator
         $indexJsPath = resource_path('js/admin/' . $this->modelJSName . '/index.js');
         $bootstrapJsPath = resource_path('js/admin/index.js');
 
+        $this->generateView($viewPath, $force);
+        $this->generateListingJs($listingJsPath, $force);
+
+        if ($this->appendIfNotAlreadyAppended($indexJsPath, 'import ' . / Listing';' . PHP_EOL)) {
+            $this->info('Appending Listing to ' . $indexJsPath . ' finished');
+        }
+        if (
+            $this->appendIfNotAlreadyAppended($bootstrapJsPath, 'import ' . / ' . $this->modelJSName . '';' . PHP_EOL)
+        ) {
+            $this->info('Appending ' . $this->modelJSName . '/index.js to ' . $bootstrapJsPath . ' finished');
+        }
+    }
+
+    public function generateView(string $viewPath, bool|array|string|null $force): void
+    {
         if ($this->alreadyExists($viewPath) && !$force) {
             $this->error('File ' . $viewPath . ' already exists!');
         } else {
@@ -83,8 +100,10 @@ class ViewIndex extends ViewGenerator
 
             $this->info('Generating ' . $viewPath . ' finished');
         }
+    }
 
-
+    public function generateListingJs(string $listingJsPath, bool|array|string|null $force): void
+    {
         if ($this->alreadyExists($listingJsPath) && !$force) {
             $this->error('File ' . $listingJsPath . ' already exists!');
         } else {
@@ -97,14 +116,6 @@ class ViewIndex extends ViewGenerator
 
             $this->files->put($listingJsPath, $this->buildListingJs());
             $this->info('Generating ' . $listingJsPath . ' finished');
-        }
-
-
-        if ($this->appendIfNotAlreadyAppended($indexJsPath, "import './Listing';" . PHP_EOL)) {
-            $this->info('Appending Listing to ' . $indexJsPath . ' finished');
-        }
-        if ($this->appendIfNotAlreadyAppended($bootstrapJsPath, "import './" . $this->modelJSName . "';" . PHP_EOL)) {
-            $this->info('Appending ' . $this->modelJSName . '/index.js to ' . $bootstrapJsPath . ' finished');
         }
     }
 
@@ -121,54 +132,13 @@ class ViewIndex extends ViewGenerator
             'resource' => $this->resource,
             'export' => $this->export,
             'containsPublishedAtColumn' => in_array(
-                "published_at",
+                'published_at',
                 array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
+                true,
             ),
             'withoutBulk' => $this->withoutBulk,
 
-            'columns' => $this->readColumnsFromTable(
-                $this->tableName,
-            )->reject(static fn ($column) => $column['type'] === 'text'
-                        || in_array(
-                            $column['name'],
-                            ["password", "remember_token", "slug", "created_at", "updated_at", "deleted_at"],
-                        )
-                        || ($column['type'] === 'json' && in_array(
-                            $column['name'],
-                            ["perex", "text", "body"],
-                        )))->map(
-                            static function ($col) {
-
-                                $filters = collect([]);
-                                $col['switch'] = false;
-
-                                if ($col['type'] === 'date' || $col['type'] === 'time' || $col['type'] === 'datetime') {
-                                    $filters->push($col['type']);
-                                }
-
-                                if (
-                                    $col['type'] === 'boolean'
-                                    && (
-                                    $col['name'] === 'enabled'
-                                    || $col['name'] === 'activated'
-                                    || $col['name'] === 'is_published'
-                                    )
-                                ) {
-                                    $col['switch'] = true;
-                                }
-
-                                $col['filters'] = $filters->isNotEmpty()
-
-                                    ? ' | ' . implode(
-                                        ' | ',
-                                        $filters->toArray(),
-                                    )
-
-                                    : '';
-
-                                return $col;
-                            },
-                        ),
+            'columns' => $this->getColumns(),
 //            'filters' => $this->readColumnsFromTable($tableName)->filter(function($column) {
 //                return $column['type'] == 'boolean' || $column['type'] == 'date';
 //            }),
@@ -193,5 +163,51 @@ class ViewIndex extends ViewGenerator
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
         ];
+    }
+
+    /** @return array<string, string|int> */
+    private function isSwitch(array $column): bool
+    {
+        return $column['type'] === 'boolean'
+            && (
+                $column['name'] === 'enabled'
+                || $column['name'] === 'activated'
+                || $column['name'] === 'is_published'
+            );
+    }
+
+    private function getColumns(): Collection
+    {
+        return $this->readColumnsFromTable($this->tableName)->reject(static fn ($column) => $column['type'] === 'text'
+            || in_array(
+                $column['name'],
+                ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'],
+                true,
+            )
+            || ($column['type'] === 'json' && in_array($column['name'], ['perex', 'text', 'body'], true)))->map(
+                static function ($column) {
+                    $filters = collect([]);
+                    $column['switch'] = false;
+
+                    if ($column['type'] === 'date' || $column['type'] === 'time' || $column['type'] === 'datetime') {
+                        $filters->push($column['type']);
+                    }
+
+                    if ($this->isSwitch($column)) {
+                        $column['switch'] = true;
+                    }
+
+                        $column['filters'] = $filters->isNotEmpty()
+
+                        ? ' | ' . implode(
+                            ' | ',
+                            $filters->toArray(),
+                        )
+
+                        : '';
+
+                        return $column;
+                },
+            );
     }
 }
