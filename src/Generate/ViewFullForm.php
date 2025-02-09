@@ -39,7 +39,7 @@ class ViewFullForm extends ViewGenerator {
     /**
      * Route to process form
      */
-    protected string $route;
+    protected ?string $route;
 
     protected string $formJsRelativePath;
 

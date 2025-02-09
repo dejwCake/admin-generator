@@ -10,23 +10,22 @@ trait Columns {
         $schema = app(Schema::class);
         // TODO how to process jsonb & json translatable columns? need to figure it out
 
-        $indexes = new Collection($schema->getConnection()->getDoctrineSchemaManager()->listTableIndexes($tableName));
-        return (new Collection($schema->getColumnListing($tableName)))->map(function($columnName) use ($tableName, $indexes, $schema) {
+        $indexes = new Collection($schema->getIndexes($tableName));
+        return (new Collection($schema->getColumns($tableName)))->map(function($column) use ($tableName, $indexes, $schema) {
 
             //Checked unique index
-            $columnUniqueIndexes = $indexes->filter(function($index) use ($columnName) {
-                return in_array($columnName, $index->getColumns()) && ($index->isUnique() && !$index->isPrimary());
+            $columnUniqueIndexes = $indexes->filter(function($index) use ($column) {
+                return in_array($column['name'], $index['columns'], true) && ($index['unique'] && !$index['primary']);
             });
             $columnUniqueDeleteAtCondition = $columnUniqueIndexes->filter(function($index) {
-                return $index->hasOption('where') ? $index->getOption('where') == '(deleted_at IS NULL)' : false;
+                return str_contains($index['name'], 'null_deleted_at');
             });
-
             // TODO add foreign key
 
             return [
-                'name' => $columnName,
-                'type' => $schema->getColumnType($tableName, $columnName),
-                'required' => boolval($schema->getConnection()->getDoctrineColumn($tableName, $columnName)->getNotnull()),
+                'name' => $column['name'],
+                'type' => $schema->getColumnType($tableName, $column['name']),
+                'required' => $column['nullable'] === false,
                 'unique' => $columnUniqueIndexes->count() > 0,
                 'unique_deleted_at_condition' => $columnUniqueDeleteAtCondition->count() > 0,
             ];

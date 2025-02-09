@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 trait Helpers {
 
-    public function option(?string $key = null) {
+    public function option($key = null) {
         return ($key === null || $this->hasOption($key)) ? parent::option($key) : null;
     }
 
@@ -25,7 +25,7 @@ trait Helpers {
     /**
      * Determine if the file already exists.
      */
-    protected function alreadyExists(string $path): bool
+    protected function alreadyExists(string $path): bool|string
     {
         return $this->files->exists($path);
     }
