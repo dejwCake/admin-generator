@@ -29,17 +29,18 @@ use {{ $belongsToMany['related_model'] }};
 @endif
 @if($activation)use Brackets\AdminAuth\Services\ActivationService;
 @endif
-use Brackets\AdminListing\Facades\AdminListing;
+use Brackets\AdminListing\AdminListing;
 use Exception;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Routing\Redirector;
+use Illuminate\Support\Collection;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Config;
 use Illuminate\View\View;
 @if($export)use Maatwebsite\Excel\Facades\Excel;
 @endif
@@ -51,46 +52,47 @@ class {{ $controllerBaseName }} extends Controller
 
     /**
      * Guard used for admin user
-     *
-     * {{'@'}}var string
      */
-    protected $guard = 'admin';
+    protected string $guard;
 
     /**
      * AdminUsersController constructor.
-     *
-     * {{'@'}}return void
      */
-    public function __construct()
-    {
-        $this->guard = config('admin-auth.defaults.guard');
+    public function __construct(
+        public readonly Gate $gate,
+        public readonly Config $config,
+        public readonly Redirector $redirector,
+        public readonly ViewFactory $viewFactory,
+    ) {
+        $this->guard = $this->config->get('admin-auth.defaults.guard', 'admin');
     }
 
     /**
      * Display a listing of the resource.
-     *
-     * {{'@'}}param Index{{ $modelBaseName }} $request
-     * {{'@'}}return Factory|View
      */
-    public function index(Index{{ $modelBaseName }} $request)
+    public function index(Index{{ $modelBaseName }} $request): array|View
     {
         // create and AdminListing instance for a specific model and
-        $data = AdminListing::create({{ $modelBaseName }}::class)->processRequestAndGet(
-            // pass the request with params
-            $request,
+        $data = AdminListing::create({{ $modelBaseName }}::class)
+            ->processRequestAndGet(
+                // pass the request with params
+                $request,
 
-            // set columns to query
-            ['{!! implode('\', \'', $columnsToQuery) !!}'],
+                // set columns to query
+                ['{!! implode('\', \'', $columnsToQuery) !!}'],
 
-            // set columns to searchIn
-            ['{!! implode('\', \'', $columnsToSearchIn) !!}']
-        );
+                // set columns to searchIn
+                ['{!! implode('\', \'', $columnsToSearchIn) !!}']
+            );
 
         if ($request->ajax()) {
-            return ['data' => $data, 'activation' => Config::get('admin-auth.activation_enabled')];
+            return ['data' => $data, 'activation' => $this->config->get('admin-auth.activation_enabled')];
         }
 
-        return view('admin.{{ $modelDotNotation }}.index', ['data' => $data, 'activation' => Config::get('admin-auth.activation_enabled')]);
+        return $this->viewFactory->make(
+            'admin.{{ $modelDotNotation }}.index',
+            ['data' => $data, 'activation' => $this->config->get('admin-auth.activation_enabled')],
+        );
     }
 
     /**
