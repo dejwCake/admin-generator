@@ -26,7 +26,7 @@ use {{ $belongsToMany['related_model'] }};
 @endforeach
 @endif
 @endif
-@if($activation)use Brackets\AdminAuth\Activation\Facades\Activation;
+@if($activation)use Brackets\AdminAuth\Activation\Contracts\ActivationBroker;
 @endif
 @if($activation)use Brackets\AdminAuth\Services\ActivationService;
 @endif
@@ -281,7 +281,7 @@ class {{ $controllerBaseName }} extends Controller
         }
 
         $response = $activationService->handle(${{ $modelVariableName }});
-        if ($response == Activation::ACTIVATION_LINK_SENT) {
+        if ($response == ActivationBroker::ACTIVATION_LINK_SENT) {
             if ($request->ajax()) {
                 return ['message' => __('brackets/admin-ui::admin.operation.succeeded')];
             }
