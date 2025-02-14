@@ -1,4 +1,4 @@
-@php echo "<?php";
+@php use Illuminate\Support\Str;echo "<?php";
 @endphp
 
 
@@ -322,6 +322,6 @@ class {{ $controllerBaseName }} extends Controller
      */
     public function export(): ?BinaryFileResponse
     {
-        return Excel::download(app({{ $exportBaseName }}::class), '{{ str_plural($modelVariableName) }}.xlsx');
+        return Excel::download(app({{ $exportBaseName }}::class), '{{ Str::plural($modelVariableName) }}.xlsx');
     }
 @endif}

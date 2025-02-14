@@ -1,19 +1,54 @@
 <?php
 
+namespace App\Exports;
 
+use Brackets\AdminAuth\Models\AdminUser;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
-/* Auto-generated admin routes */
-Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->group(static function () {
-    Route::prefix('admin')->namespace('App\Http\Controllers\Admin')->name('admin/')->group(static function() {
-        Route::prefix('admin-users')->name('admin-users/')->group(static function() {
-            Route::get('/',                                             'AdminUsersController@index')->name('index');
-            Route::get('/create',                                       'AdminUsersController@create')->name('create');
-            Route::post('/',                                            'AdminUsersController@store')->name('store');
-            Route::get('/{adminUser}/impersonal-login',                 'AdminUsersController@impersonalLogin')->name('impersonal-login');
-            Route::get('/{adminUser}/edit',                             'AdminUsersController@edit')->name('edit');
-            Route::post('/{adminUser}',                                 'AdminUsersController@update')->name('update');
-            Route::delete('/{adminUser}',                               'AdminUsersController@destroy')->name('destroy');
-            Route::get('/{adminUser}/resend-activation',                'AdminUsersController@resendActivationEmail')->name('resendActivationEmail');
-        });
-    });
-});
+class AdminUsersExport implements FromCollection, WithMapping, WithHeadings
+{
+    /**
+     * @return Collection
+     */
+    public function collection()
+    {
+        return AdminUser::all();
+    }
+
+    /**
+     * @return array
+     */
+    public function headings(): array
+    {
+        return [
+            trans('admin.admin-user.columns.id'),
+            trans('admin.admin-user.columns.first_name'),
+            trans('admin.admin-user.columns.last_name'),
+            trans('admin.admin-user.columns.email'),
+            trans('admin.admin-user.columns.activated'),
+            trans('admin.admin-user.columns.forbidden'),
+            trans('admin.admin-user.columns.language'),
+        ];
+    }
+
+    /**
+     * @param AdminUser $adminUser
+     * @return array
+     *
+     */
+    public function map($adminUser): array
+    {
+        return [
+            $adminUser->id,
+            $adminUser->first_name,
+            $adminUser->last_name,
+            $adminUser->email,
+            $adminUser->activated,
+            $adminUser->forbidden,
+            $adminUser->language,
+        ];
+    }
+}

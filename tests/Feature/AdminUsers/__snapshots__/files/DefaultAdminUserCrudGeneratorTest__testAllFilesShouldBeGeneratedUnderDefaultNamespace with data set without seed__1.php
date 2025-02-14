@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Exports\AdminUsersExport;
 use App\Http\Requests\Admin\AdminUser\DestroyAdminUser;
 use App\Http\Requests\Admin\AdminUser\ImpersonalLoginAdminUser;
 use App\Http\Requests\Admin\AdminUser\IndexAdminUser;
@@ -26,6 +27,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AdminUsersController extends Controller
 {
@@ -249,4 +252,12 @@ class AdminUsersController extends Controller
         return $this->redirector->back();
     }
 
+
+    /**
+     * Export entities
+     */
+    public function export(Excel $excel, AdminUsersExport $export): ?BinaryFileResponse
+    {
+        return $excel->download($export, 'adminUsers.xlsx');
+    }
 }

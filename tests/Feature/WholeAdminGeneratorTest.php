@@ -19,6 +19,7 @@ class WholeAdminGeneratorTest extends TestCase
         $storePath = base_path('app/Http/Requests/Admin/Category/StoreCategory.php');
         $updatePath = base_path('app/Http/Requests/Admin/Category/UpdateCategory.php');
         $destroyPath = base_path('app/Http/Requests/Admin/Category/DestroyCategory.php');
+        $exportPath = base_path('app/Exports/CategoriesExport.php');
         $routesPath = base_path('routes/web.php');
         $indexPath = resource_path('views/admin/category/index.blade.php');
         $listingJsPath = resource_path('js/admin/category/Listing.js');
@@ -35,6 +36,7 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertFileDoesNotExist($storePath);
         self::assertFileDoesNotExist($updatePath);
         self::assertFileDoesNotExist($destroyPath);
+        self::assertFileDoesNotExist($exportPath);
         self::assertFileDoesNotExist($indexPath);
         self::assertFileDoesNotExist($listingJsPath);
         self::assertFileDoesNotExist($elementsPath);
@@ -49,6 +51,7 @@ class WholeAdminGeneratorTest extends TestCase
 
         $this->artisan('admin:generate', [
             'table_name' => 'categories',
+            '--with-export' => true,
         ]);
 
         self::assertFileExists($controllerPath);
@@ -56,6 +59,7 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertFileExists($storePath);
         self::assertFileExists($updatePath);
         self::assertFileExists($destroyPath);
+        self::assertFileExists($exportPath);
         self::assertFileExists($indexPath);
         self::assertFileExists($listingJsPath);
         self::assertFileExists($elementsPath);
@@ -73,6 +77,7 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertMatchesFileSnapshot($storePath);
         self::assertMatchesFileSnapshot($updatePath);
         self::assertMatchesFileSnapshot($destroyPath);
+        self::assertMatchesFileSnapshot($exportPath);
         self::assertMatchesFileSnapshot($indexPath);
         self::assertMatchesFileSnapshot($listingJsPath);
         self::assertMatchesFileSnapshot($elementsPath);

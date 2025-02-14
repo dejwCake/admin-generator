@@ -8,6 +8,7 @@ return [
             'index' => 'Categories',
             'create' => 'New Category',
             'edit' => 'Edit :name',
+            'export' => 'Export',
         ],
 
         'columns' => [

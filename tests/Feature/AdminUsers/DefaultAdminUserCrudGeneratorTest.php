@@ -20,6 +20,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         $storePath = base_path('app/Http/Requests/Admin/AdminUser/StoreAdminUser.php');
         $updatePath = base_path('app/Http/Requests/Admin/AdminUser/UpdateAdminUser.php');
         $destroyPath = base_path('app/Http/Requests/Admin/AdminUser/DestroyAdminUser.php');
+        $exportPath = base_path('app/Exports/AdminUsersExport.php');
         $routesPath = base_path('routes/web.php');
         $indexPath = resource_path('views/admin/admin-user/index.blade.php');
         $listingJsPath = resource_path('js/admin/admin-user/Listing.js');
@@ -35,6 +36,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertFileDoesNotExist($storePath);
         self::assertFileDoesNotExist($updatePath);
         self::assertFileDoesNotExist($destroyPath);
+        self::assertFileDoesNotExist($exportPath);
         self::assertFileDoesNotExist($indexPath);
         self::assertFileDoesNotExist($listingJsPath);
         self::assertFileDoesNotExist($elementsPath);
@@ -45,9 +47,9 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
 
 
         if ($seed) {
-            $this->artisan('admin:generate:admin-user', ['--seed' => true]);
+            $this->artisan('admin:generate:admin-user', ['--with-export' => true, '--seed' => true]);
         } else {
-            $this->artisan('admin:generate:admin-user');
+            $this->artisan('admin:generate:admin-user', ['--with-export' => true]);
         }
 
         self::assertFileExists($controllerPath);
@@ -55,6 +57,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertFileExists($storePath);
         self::assertFileExists($updatePath);
         self::assertFileExists($destroyPath);
+        self::assertFileExists($exportPath);
         self::assertFileExists($indexPath);
         self::assertFileExists($listingJsPath);
         self::assertFileExists($elementsPath);
@@ -68,6 +71,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertMatchesFileSnapshot($storePath);
         self::assertMatchesFileSnapshot($updatePath);
         self::assertMatchesFileSnapshot($destroyPath);
+        self::assertMatchesFileSnapshot($exportPath);
         self::assertMatchesFileSnapshot($routesPath);
         self::assertMatchesFileSnapshot($indexPath);
         self::assertMatchesFileSnapshot($listingJsPath);

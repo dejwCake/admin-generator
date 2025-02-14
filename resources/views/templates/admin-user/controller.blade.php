@@ -1,4 +1,4 @@
-@php  use Illuminate\Support\Str;echo "<?php";
+@php use Illuminate\Support\Str;echo "<?php";
 @endphp
 
 declare(strict_types=1);
