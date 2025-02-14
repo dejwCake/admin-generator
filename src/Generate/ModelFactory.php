@@ -108,7 +108,7 @@ class ModelFactory extends FileAppender
             return $type;
         }
 
-        $type = match ($column['name']) {
+        return match ($column['name']) {
             'title' => '$faker->sentence',
             'email' => '$faker->email',
             'name',
@@ -119,7 +119,5 @@ class ModelFactory extends FileAppender
             'password' => 'bcrypt($faker->password)',
             default => '$faker->sentence',
         };
-
-        return $type;
     }
 }

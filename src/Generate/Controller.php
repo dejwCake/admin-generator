@@ -55,7 +55,8 @@ class Controller extends ClassGenerator
         if ($this->option('without-bulk')) {
             $this->withoutBulk = true;
         }
-        // TODO test the case, if someone passes a class_name outside Laravel's default App\Http\Controllers folder, if it's going to work
+        // TODO test the case, if someone passes a class_name outside Laravel's
+        // default App\Http\Controllers folder, if it's going to work
 
         //TODO check if exists
         //TODO make global for all generator

@@ -27,7 +27,8 @@ class GenerateUser extends Command
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $description = 'Scaffold complete admin CRUD for specified user model. This differs from admin:generate command in many additional features (password handling, roles, ...).';
+    protected $description = 'Scaffold complete admin CRUD for specified user model. 
+        This differs from admin:generate command in many additional features (password handling, roles, ...).';
 
     public function __construct(protected readonly Filesystem $files)
     {

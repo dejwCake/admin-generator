@@ -6,7 +6,6 @@ namespace Brackets\AdminGenerator\Tests\Feature\AdminUsers;
 
 use Brackets\AdminGenerator\Tests\UserTestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Facades\File;
 
 class AdminUserCrudGeneratorWithCustomControllerNameTest extends UserTestCase
 {

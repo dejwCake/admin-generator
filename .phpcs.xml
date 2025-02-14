@@ -10,11 +10,10 @@
     <file>resources/</file>
     <file>src/</file>
     <file>tests/</file>
+    <exclude-pattern>tests/**/__snapshots__/*</exclude-pattern>
 
     <!--not exactly nice, but working solution-->
-    <rule ref="/root/.composer/vendor/dejwcake/php-code-style/base.phpcs.xml">
-        <exclude-pattern>tests/**/__snapshots__/*</exclude-pattern>
-    </rule>
+    <rule ref="/root/.composer/vendor/dejwcake/php-code-style/base.phpcs.xml" />
 
     <rule ref="SlevomatCodingStandard.Complexity.Cognitive">
         <properties>
@@ -32,6 +31,11 @@
     </rule>
 
     <rule ref="SlevomatCodingStandard.Files.LineLength.LineTooLong">
+        <exclude-pattern>src/Generate/Controller.php</exclude-pattern>
+        <exclude-pattern>src/Generate/Lang.php</exclude-pattern>
+        <exclude-pattern>src/GenerateAdminProfile.php</exclude-pattern>
+        <exclude-pattern>src/GenerateAdminUser.php</exclude-pattern>
+        <exclude-pattern>src/GenerateUser.php</exclude-pattern>
         <exclude-pattern>tests/Feature/AdminUsers/AdminUserCrudGeneratorWithCustomControllerNameTest.php</exclude-pattern>
         <exclude-pattern>tests/Feature/AdminUsers/AdminUserCrudGeneratorWithCustomModelNameTest.php</exclude-pattern>
         <exclude-pattern>tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php</exclude-pattern>

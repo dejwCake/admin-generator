@@ -58,7 +58,8 @@ class Lang extends FileAppender
             $this->setBelongToManyRelation($belongsToMany);
         }
 
-        // TODO what if a file has been changed? this will append it again (because the content is not present anymore -> we should probably check only for a root key for existence)
+        // TODO what if a file has been changed? this will append it again
+        // (because the content is not present anymore -> we should probably check only for a root key for existence)
 
         // TODO name-spaced model names should be probably inserted as a sub-array in a translation file..
 

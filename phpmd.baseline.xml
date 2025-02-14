@@ -6,7 +6,20 @@
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/GenerateUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/AdminUsers/AdminUserCrudGeneratorWithCustomModelNameTest.php" method="testAllFilesShouldBeGeneratedWithCustomModel"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/Feature/AdminUsers/__snapshots__/files/AdminUserCrudGeneratorWithCustomControllerNameTest__testAdminUserControllerNameCanBeNamespaced__1.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/Feature/AdminUsers/__snapshots__/files/AdminUserCrudGeneratorWithCustomControllerNameTest__testAdminUserControllerNameCanBeOutsideDefaultDirectory__1.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/Feature/AdminUsers/__snapshots__/files/AdminUserCrudGeneratorWithCustomModelNameTest__testAllFilesShouldBeGeneratedWithCustomModel__1.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/Feature/Classes/__snapshots__/files/ControllerNameTest__testControllerNameCanBeNamespaced__1.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/Feature/Classes/__snapshots__/files/ControllerNameTest__testControllerShouldBeGeneratedUnderDefaultNamespace__1.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/Feature/Classes/__snapshots__/files/ControllerNameTest__testYouCanGenerateControllerOutsideDefaultDirectory__1.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/Feature/Classes/__snapshots__/files/ControllerNameTest__testYouCanPassAModelClassName__1.php"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/Profile/DefaultProfileGeneratorTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/Users/DefaultUserCrudGeneratorTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/Users/UserCrudGeneratorWithCustomModelNameTest.php" method="testAllFilesShouldBeGeneratedWithCustomModel"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/Feature/Users/__snapshots__/files/DefaultUserCrudGeneratorTest__testAllFilesShouldBeGeneratedUnderDefaultNamespace__1.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/Feature/Users/__snapshots__/files/UserCrudGeneratorWithCustomControllerNameTest__testUserControllerNameCanBeNamespaced__1.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/Feature/Users/__snapshots__/files/UserCrudGeneratorWithCustomControllerNameTest__testUserControllerNameCanBeOutsideDefaultDirectory__1.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/Feature/Users/__snapshots__/files/UserCrudGeneratorWithCustomModelNameTest__testAllFilesShouldBeGeneratedWithCustomModel__1.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/Feature/__snapshots__/files/WholeAdminGeneratorTest__testWholeAdminGeneratorProducesAllTheFiles__1.php"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/UserTestCase.php" method="setUpDatabase"/>
 </phpmd-baseline>

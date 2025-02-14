@@ -43,7 +43,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 @if($export)use Maatwebsite\Excel\Excel;
 @endif
 @if($export)use Symfony\Component\HttpFoundation\BinaryFileResponse;

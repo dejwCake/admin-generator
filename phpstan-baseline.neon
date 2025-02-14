@@ -13,7 +13,7 @@ parameters:
 			path: src/Generate/ClassGenerator.php
 
 		-
-			message: '#^Property Brackets\\AdminGenerator\\Generate\\ClassGenerator\:\:\$relations \(array\<string, string\>\) does not accept array\<string, array\<mixed\>\|string\>\.$#'
+			message: '#^Property Brackets\\AdminGenerator\\Generate\\ClassGenerator\:\:\$relations \(array\<string, string\>\) does not accept array\<string, Illuminate\\Support\\Collection\<\(int\|string\), array\<string, string\>\>\|string\>\.$#'
 			identifier: assign.propertyType
 			count: 1
 			path: src/Generate/ClassGenerator.php
@@ -31,7 +31,7 @@ parameters:
 			path: src/Generate/FileAppender.php
 
 		-
-			message: '#^Property Brackets\\AdminGenerator\\Generate\\FileAppender\:\:\$relations \(array\<string, string\>\) does not accept array\<string, array\<mixed\>\|string\>\.$#'
+			message: '#^Property Brackets\\AdminGenerator\\Generate\\FileAppender\:\:\$relations \(array\<string, string\>\) does not accept array\<string, Illuminate\\Support\\Collection\<\(int\|string\), array\<string, string\>\>\|string\>\.$#'
 			identifier: assign.propertyType
 			count: 1
 			path: src/Generate/FileAppender.php
@@ -61,7 +61,7 @@ parameters:
 			path: src/Generate/ViewGenerator.php
 
 		-
-			message: '#^Property Brackets\\AdminGenerator\\Generate\\ViewGenerator\:\:\$relations \(array\<string, string\>\) does not accept array\<string, array\<mixed\>\|string\>\.$#'
+			message: '#^Property Brackets\\AdminGenerator\\Generate\\ViewGenerator\:\:\$relations \(array\<string, string\>\) does not accept array\<string, Illuminate\\Support\\Collection\<\(int\|string\), array\<string, string\>\>\|string\>\.$#'
 			identifier: assign.propertyType
 			count: 1
 			path: src/Generate/ViewGenerator.php

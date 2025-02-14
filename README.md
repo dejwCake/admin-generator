@@ -30,6 +30,11 @@ To run tests use this docker environment.
   docker compose run -it --rm test vendor/bin/phpunit -d pcov.enabled=1
 ```
 
+To regenerate snapshots use
+```shell
+  docker compose run -it --rm test vendor/bin/phpunit -d pcov.enabled=1 -d --update-snapshots
+```
+
 To switch between postgresql and mariadb change in `docker-compose.yml` DB_CONNECTION environmental variable:
 ```git
 - DB_CONNECTION: pgsql
