@@ -6,7 +6,6 @@ namespace Brackets\AdminGenerator\Tests\Feature\Users;
 
 use Brackets\AdminGenerator\Tests\UserTestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Facades\File;
 
 class UserCrudGeneratorWithGenerateModelTest extends UserTestCase
 {
@@ -24,20 +23,6 @@ class UserCrudGeneratorWithGenerateModelTest extends UserTestCase
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-namespace App\Models;
-
-use Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract;
-use Brackets\AdminAuth\Activation\Traits\CanActivate;
-use Brackets\AdminAuth\Notifications\ResetPassword;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
-
-class User extends Authenticatable implements CanActivateContract
-{', File::get($filePath));
     }
 
     public function testUserModelNameShouldUseCustomNameIfRequired(): void
@@ -53,20 +38,6 @@ class User extends Authenticatable implements CanActivateContract
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-namespace App\Models\Auth;
-
-use Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract;
-use Brackets\AdminAuth\Activation\Traits\CanActivate;
-use Brackets\AdminAuth\Notifications\ResetPassword;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
-
-class User extends Authenticatable implements CanActivateContract
-{', File::get($filePath));
     }
 
     public function testUserModelNameShouldUseCustomNameOutsideDefaultFolderIfRequired(): void
@@ -82,19 +53,5 @@ class User extends Authenticatable implements CanActivateContract
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-namespace App\Auth;
-
-use Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract;
-use Brackets\AdminAuth\Activation\Traits\CanActivate;
-use Brackets\AdminAuth\Notifications\ResetPassword;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
-
-class User extends Authenticatable implements CanActivateContract
-{', File::get($filePath));
     }
 }

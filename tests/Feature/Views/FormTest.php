@@ -6,7 +6,6 @@ namespace Brackets\AdminGenerator\Tests\Feature\Views;
 
 use Brackets\AdminGenerator\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Facades\File;
 
 class FormTest extends TestCase
 {
@@ -45,15 +44,6 @@ class FormTest extends TestCase
         self::assertMatchesFileSnapshot($formJsPath);
         self::assertMatchesFileSnapshot($indexJsPath);
         self::assertMatchesFileSnapshot($bootstrapJsPath);
-        self::assertStringStartsWith('<div ', File::get($elementsPath));
-        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($createPath));
-        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($editPath));
-        self::assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
-
-Vue.component(\'category-form\', {
-    mixins: [AppForm]', File::get($formJsPath));
-        self::assertStringStartsWith('import \'./Form\'', File::get($indexJsPath));
-        self::assertStringStartsWith('import \'./category\';', File::get($bootstrapJsPath));
     }
 
     public function testViewFormShouldGetGeneratedWithCustomModel(): void
@@ -89,14 +79,5 @@ Vue.component(\'category-form\', {
         self::assertMatchesFileSnapshot($formJsPath);
         self::assertMatchesFileSnapshot($indexJsPath);
         self::assertMatchesFileSnapshot($bootstrapJsPath);
-        self::assertStringStartsWith('<div ', File::get($elementsPath));
-        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($createPath));
-        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($editPath));
-        self::assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
-
-Vue.component(\'billing-my-article-form\', {
-    mixins: [AppForm]', File::get($formJsPath));
-        self::assertStringStartsWith('import \'./Form\'', File::get($indexJsPath));
-        self::assertStringStartsWith('import \'./billing-my-article\';', File::get($bootstrapJsPath));
     }
 }

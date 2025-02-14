@@ -6,7 +6,6 @@ namespace Brackets\AdminGenerator\Tests\Feature\Appenders;
 
 use Brackets\AdminGenerator\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Facades\File;
 
 class ModelFactoryTest extends TestCase
 {
@@ -21,10 +20,6 @@ class ModelFactoryTest extends TestCase
         ]);
 
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(App\Models\Category::class', File::get($filePath));
     }
 
     public function testYouCanSpecifyAModelName(): void
@@ -37,10 +32,6 @@ $factory->define(App\Models\Category::class', File::get($filePath));
         ]);
 
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(App\Models\Billing\Cat::class', File::get($filePath));
     }
 
     public function testYouCanSpecifyAModelNameOutsideDefaultFolder(): void
@@ -53,9 +44,5 @@ $factory->define(App\Models\Billing\Cat::class', File::get($filePath));
         ]);
 
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(App\Billing\MyCat::class', File::get($filePath));
     }
 }

@@ -6,7 +6,6 @@ namespace Brackets\AdminGenerator\Tests\Feature\Classes;
 
 use Brackets\AdminGenerator\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Facades\File;
 
 class ControllerNameTest extends TestCase
 {
@@ -24,29 +23,6 @@ class ControllerNameTest extends TestCase
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-namespace App\Http\Controllers\Admin;
-
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\Category\BulkDestroyCategory;
-use App\Http\Requests\Admin\Category\DestroyCategory;
-use App\Http\Requests\Admin\Category\IndexCategory;
-use App\Http\Requests\Admin\Category\StoreCategory;
-use App\Http\Requests\Admin\Category\UpdateCategory;
-use App\Models\Category;
-use Brackets\AdminListing\Facades\AdminListing;
-use Exception;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
-
-class CategoriesController extends Controller', File::get($filePath));
     }
 
     public function testControllerNameCanBeNamespaced(): void
@@ -62,29 +38,6 @@ class CategoriesController extends Controller', File::get($filePath));
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-namespace App\Http\Controllers\Admin\Billing;
-
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\Category\BulkDestroyCategory;
-use App\Http\Requests\Admin\Category\DestroyCategory;
-use App\Http\Requests\Admin\Category\IndexCategory;
-use App\Http\Requests\Admin\Category\StoreCategory;
-use App\Http\Requests\Admin\Category\UpdateCategory;
-use App\Models\Category;
-use Brackets\AdminListing\Facades\AdminListing;
-use Exception;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
-
-class MyNameController extends Controller', File::get($filePath));
     }
 
     public function testYouCanGenerateControllerOutsideDefaultDirectory(): void
@@ -100,29 +53,6 @@ class MyNameController extends Controller', File::get($filePath));
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-namespace App\Http\Controllers\Billing;
-
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\Category\BulkDestroyCategory;
-use App\Http\Requests\Admin\Category\DestroyCategory;
-use App\Http\Requests\Admin\Category\IndexCategory;
-use App\Http\Requests\Admin\Category\StoreCategory;
-use App\Http\Requests\Admin\Category\UpdateCategory;
-use App\Models\Category;
-use Brackets\AdminListing\Facades\AdminListing;
-use Exception;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
-
-class CategoriesController extends Controller', File::get($filePath));
     }
 
     public function testYouCanPassAModelClassName(): void
@@ -139,28 +69,5 @@ class CategoriesController extends Controller', File::get($filePath));
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-namespace App\Http\Controllers\Billing;
-
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\Cat\BulkDestroyCat;
-use App\Http\Requests\Admin\Cat\DestroyCat;
-use App\Http\Requests\Admin\Cat\IndexCat;
-use App\Http\Requests\Admin\Cat\StoreCat;
-use App\Http\Requests\Admin\Cat\UpdateCat;
-use App\Billing\Cat;
-use Brackets\AdminListing\Facades\AdminListing;
-use Exception;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
-
-class CategoriesController extends Controller', File::get($filePath));
     }
 }

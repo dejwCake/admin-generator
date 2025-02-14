@@ -6,7 +6,6 @@ namespace Brackets\AdminGenerator\Tests\Feature\Appenders;
 
 use Brackets\AdminGenerator\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Facades\File;
 
 class LangTest extends TestCase
 {
@@ -21,27 +20,6 @@ class LangTest extends TestCase
         ]);
 
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-return [
-    \'category\' => [
-        \'title\' => \'Categories\',
-
-        \'actions\' => [
-            \'index\' => \'Categories\',
-            \'create\' => \'New Category\',
-            \'edit\' => \'Edit :name\',
-        ],
-
-        \'columns\' => [
-            \'id\' => \'ID\',
-            \'title\' => \'Title\',
-            
-        ],
-    ],
-
-    // Do not delete me :) I\'m used for auto-generation
-];', File::get($filePath));
     }
 
     public function testNamespacedModelLangAppend(): void
@@ -54,26 +32,5 @@ return [
         ]);
 
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-return [
-    \'billing_categ-ory\' => [
-        \'title\' => \'Categories\',
-
-        \'actions\' => [
-            \'index\' => \'Categories\',
-            \'create\' => \'New Category\',
-            \'edit\' => \'Edit :name\',
-        ],
-
-        \'columns\' => [
-            \'id\' => \'ID\',
-            \'title\' => \'Title\',
-            
-        ],
-    ],
-
-    // Do not delete me :) I\'m used for auto-generation
-];', File::get($filePath));
     }
 }

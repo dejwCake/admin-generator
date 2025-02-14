@@ -6,7 +6,6 @@ namespace Brackets\AdminGenerator\Tests\Feature\Classes;
 
 use Brackets\AdminGenerator\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Facades\File;
 
 class ModelNameTest extends TestCase
 {
@@ -24,13 +23,6 @@ class ModelNameTest extends TestCase
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class Category extends Model', File::get($filePath));
     }
 
     public function testYouCanPassCustomClassNameForTheModel(): void
@@ -46,13 +38,6 @@ class Category extends Model', File::get($filePath));
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-namespace App\Models\Billing;
-
-use Illuminate\Database\Eloquent\Model;
-
-class Category extends Model', File::get($filePath));
     }
 
     public function testClassNameCanBeOutsideDefaultFolder(): void
@@ -68,12 +53,5 @@ class Category extends Model', File::get($filePath));
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-namespace App\Billing;
-
-use Illuminate\Database\Eloquent\Model;
-
-class Category extends Model', File::get($filePath));
     }
 }

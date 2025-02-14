@@ -6,7 +6,6 @@ namespace Brackets\AdminGenerator\Tests\Feature\Profile;
 
 use Brackets\AdminGenerator\Tests\UserTestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Facades\File;
 
 class ProfileGeneratorWithCustomControllerNameTest extends UserTestCase
 {
@@ -26,38 +25,6 @@ class ProfileGeneratorWithCustomControllerNameTest extends UserTestCase
         self::assertFileExists($filePathController);
         self::assertMatchesFileSnapshot($filePathController);
         self::assertMatchesFileSnapshot($filePathRoute);
-        self::assertStringStartsWith('<?php
-
-namespace App\Http\Controllers\Admin\Auth;
-
-use App\Http\Controllers\Controller;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
-use Illuminate\View\View;
-
-class ProfileController extends Controller
-{', File::get($filePathController));
-        self::assertStringStartsWith(
-            '<?php
-
-
-
-/* Auto-generated admin routes */
-Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\'])->group(static function () {
-    Route::prefix(\'admin\')->namespace(\'App\Http\Controllers\Admin\')->name(\'admin/\')->group(static function() {
-        Route::get(\'/profile\',                                      \'Auth\ProfileController@editProfile\')->name(\'edit-profile\');
-        Route::post(\'/profile\',                                     \'Auth\ProfileController@updateProfile\')->name(\'update-profile\');
-        Route::get(\'/password\',                                     \'Auth\ProfileController@editPassword\')->name(\'edit-password\');
-        Route::post(\'/password\',                                    \'Auth\ProfileController@updatePassword\')->name(\'update-password\');
-    });
-});',
-            File::get($filePathRoute),
-        );
     }
 
     public function testProfileControllerNameCanBeOutsideDefaultDirectory(): void
@@ -72,21 +39,5 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
-        self::assertStringStartsWith('<?php
-
-namespace App\Http\Controllers\Auth;
-
-use App\Http\Controllers\Controller;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
-use Illuminate\View\View;
-
-class ProfileController extends Controller
-{', File::get($filePath));
     }
 }

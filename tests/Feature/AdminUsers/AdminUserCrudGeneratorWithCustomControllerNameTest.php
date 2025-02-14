@@ -39,33 +39,5 @@ class AdminUserCrudGeneratorWithCustomControllerNameTest extends UserTestCase
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
-//        self::assertStringStartsWith('<?php
-//
-//namespace App\Http\Controllers\Auth;
-//
-//use App\Http\Controllers\Controller;
-//use App\Http\Requests\Admin\AdminUser\DestroyAdminUser;
-//use App\Http\Requests\Admin\AdminUser\ImpersonalLoginAdminUser;
-//use App\Http\Requests\Admin\AdminUser\IndexAdminUser;
-//use App\Http\Requests\Admin\AdminUser\StoreAdminUser;
-//use App\Http\Requests\Admin\AdminUser\UpdateAdminUser;
-//use Brackets\AdminAuth\Models\AdminUser;
-//use Spatie\Permission\Models\Role;
-//use Brackets\AdminAuth\Activation\Facades\Activation;
-//use Brackets\AdminAuth\Services\ActivationService;
-//use Brackets\AdminListing\Facades\AdminListing;
-//use Exception;
-//use Illuminate\Support\Facades\Auth;
-//use Illuminate\Auth\Access\AuthorizationException;
-//use Illuminate\Contracts\Routing\ResponseFactory;
-//use Illuminate\Contracts\View\Factory;
-//use Illuminate\Http\RedirectResponse;
-//use Illuminate\Http\Request;
-//use Illuminate\Http\Response;
-//use Illuminate\Routing\Redirector;
-//use Illuminate\Support\Facades\Config;
-//use Illuminate\View\View;
-//
-//class AdminUsersController extends Controller', File::get($filePath));
     }
 }
