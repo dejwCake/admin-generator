@@ -26,15 +26,15 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         $formJsPath = resource_path('js/admin/user/Form.js');
         $factoryPath = base_path('database/factories/ModelFactory.php');
 
-        $this->assertFileDoesNotExist($controllerPath);
-        $this->assertFileDoesNotExist($storePath);
-        $this->assertFileDoesNotExist($updatePath);
-        $this->assertFileDoesNotExist($indexPath);
-        $this->assertFileDoesNotExist($indexJsPath);
-        $this->assertFileDoesNotExist($elementsPath);
-        $this->assertFileDoesNotExist($createPath);
-        $this->assertFileDoesNotExist($editPath);
-        $this->assertFileDoesNotExist($formJsPath);
+        self::assertFileDoesNotExist($controllerPath);
+        self::assertFileDoesNotExist($storePath);
+        self::assertFileDoesNotExist($updatePath);
+        self::assertFileDoesNotExist($indexPath);
+        self::assertFileDoesNotExist($indexJsPath);
+        self::assertFileDoesNotExist($elementsPath);
+        self::assertFileDoesNotExist($createPath);
+        self::assertFileDoesNotExist($editPath);
+        self::assertFileDoesNotExist($formJsPath);
 
 
         $this->artisan('admin:generate:admin-user', [
@@ -42,45 +42,57 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
             '--model-name' => 'App\\User',
         ]);
 
-        $this->assertFileExists($controllerPath);
-        $this->assertFileExists($storePath);
-        $this->assertFileExists($updatePath);
-        $this->assertFileExists($indexPath);
-        $this->assertFileExists($indexJsPath);
-        $this->assertFileExists($elementsPath);
-        $this->assertFileExists($createPath);
-        $this->assertFileExists($editPath);
-        $this->assertFileExists($formJsPath);
+        self::assertFileExists($controllerPath);
+        self::assertFileExists($storePath);
+        self::assertFileExists($updatePath);
+        self::assertFileExists($indexPath);
+        self::assertFileExists($indexJsPath);
+        self::assertFileExists($elementsPath);
+        self::assertFileExists($createPath);
+        self::assertFileExists($editPath);
+        self::assertFileExists($formJsPath);
 
-        $this->assertStringStartsWith('<?php
+        self::assertMatchesFileSnapshot($controllerPath);
+        self::assertMatchesFileSnapshot($storePath);
+        self::assertMatchesFileSnapshot($updatePath);
+        self::assertMatchesFileSnapshot($routesPath);
+        self::assertMatchesFileSnapshot($indexPath);
+        self::assertMatchesFileSnapshot($indexJsPath);
+        self::assertMatchesFileSnapshot($elementsPath);
+        self::assertMatchesFileSnapshot($createPath);
+        self::assertMatchesFileSnapshot($editPath);
+        self::assertMatchesFileSnapshot($formJsPath);
+        self::assertMatchesFileSnapshot($factoryPath);
 
-namespace App\Http\Controllers\Admin\Auth;
-
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\User\DestroyUser;
-use App\Http\Requests\Admin\User\ImpersonalLoginUser;
-use App\Http\Requests\Admin\User\IndexUser;
-use App\Http\Requests\Admin\User\StoreUser;
-use App\Http\Requests\Admin\User\UpdateUser;
-use App\User;
-use Spatie\Permission\Models\Role;
-use Brackets\AdminAuth\Activation\Facades\Activation;
-use Brackets\AdminAuth\Services\ActivationService;
-use Brackets\AdminListing\Facades\AdminListing;
-use Exception;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Config;
-use Illuminate\View\View;
-
-class UsersController extends Controller', File::get($controllerPath));
-        $this->assertStringStartsWith('<?php
+//        self::assertStringStartsWith('<?php
+//
+//namespace App\Http\Controllers\Admin\Auth;
+//
+//use App\Http\Controllers\Controller;
+//use App\Http\Requests\Admin\User\DestroyUser;
+//use App\Http\Requests\Admin\User\ImpersonalLoginUser;
+//use App\Http\Requests\Admin\User\IndexUser;
+//use App\Http\Requests\Admin\User\StoreUser;
+//use App\Http\Requests\Admin\User\UpdateUser;
+//use App\User;
+//use Spatie\Permission\Models\Role;
+//use Brackets\AdminAuth\Activation\Facades\Activation;
+//use Brackets\AdminAuth\Services\ActivationService;
+//use Brackets\AdminListing\Facades\AdminListing;
+//use Exception;
+//use Illuminate\Support\Facades\Auth;
+//use Illuminate\Auth\Access\AuthorizationException;
+//use Illuminate\Contracts\Routing\ResponseFactory;
+//use Illuminate\Contracts\View\Factory;
+//use Illuminate\Http\RedirectResponse;
+//use Illuminate\Http\Request;
+//use Illuminate\Http\Response;
+//use Illuminate\Routing\Redirector;
+//use Illuminate\Support\Facades\Config;
+//use Illuminate\View\View;
+//
+//class UsersController extends Controller', File::get($controllerPath));
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Requests\Admin\User;
 
@@ -92,7 +104,7 @@ use Illuminate\Validation\Rule;
 
 class StoreUser extends FormRequest
 {', File::get($storePath));
-        $this->assertStringStartsWith('<?php
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Requests\Admin\User;
 
@@ -104,7 +116,7 @@ use Illuminate\Validation\Rule;
 
 class UpdateUser extends FormRequest
 {', File::get($updatePath));
-        $this->assertStringStartsWith(
+        self::assertStringStartsWith(
             '<?php
 
 
@@ -126,17 +138,17 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
 });',
             File::get($routesPath),
         );
-        $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($indexPath));
-        $this->assertStringStartsWith('import AppListing from \'../app-components/Listing/AppListing\';
+        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($indexPath));
+        self::assertStringStartsWith('import AppListing from \'../app-components/Listing/AppListing\';
 
 Vue.component(\'user-listing\'', File::get($indexJsPath));
-        $this->assertStringStartsWith('<div ', File::get($elementsPath));
-        $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($createPath));
-        $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($editPath));
-        $this->assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
+        self::assertStringStartsWith('<div ', File::get($elementsPath));
+        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($createPath));
+        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($editPath));
+        self::assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
 
 Vue.component(\'user-form\'', File::get($formJsPath));
-        $this->assertStringStartsWith('<?php
+        self::assertStringStartsWith('<?php
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\User::class', File::get($factoryPath));
@@ -150,9 +162,10 @@ $factory->define(App\User::class', File::get($factoryPath));
             '--model-name' => 'Auth\\User',
         ]);
 
-        $this->assertStringStartsWith('<?php
+        self::assertStringStartsWith('<?php
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Auth\User::class', File::get($filePath));
+        self::assertMatchesFileSnapshot($filePath);
     }
 }

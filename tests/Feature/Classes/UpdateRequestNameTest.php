@@ -16,14 +16,15 @@ class UpdateRequestNameTest extends TestCase
     {
         $filePath = base_path('app/Http/Requests/Admin/Category/UpdateCategory.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:request:update', [
             'table_name' => 'categories',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Requests\Admin\Category;
 
@@ -38,15 +39,16 @@ class UpdateCategory extends FormRequest', File::get($filePath));
     {
         $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/UpdateCat.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:request:update', [
             'table_name' => 'categories',
             '--model-name' => 'Billing\\Cat',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Requests\Admin\Billing\Cat;
 

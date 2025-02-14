@@ -20,7 +20,8 @@ class LangTest extends TestCase
             'table_name' => 'categories',
         ]);
 
-        $this->assertStringStartsWith('<?php
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 return [
     \'category\' => [
@@ -52,7 +53,8 @@ return [
             '--model-name' => 'Billing\\CategOry',
         ]);
 
-        $this->assertStringStartsWith('<?php
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 return [
     \'billing_categ-ory\' => [

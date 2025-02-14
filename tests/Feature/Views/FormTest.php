@@ -21,33 +21,39 @@ class FormTest extends TestCase
         $indexJsPath = resource_path('js/admin/category/index.js');
         $bootstrapJsPath = resource_path('js/admin/index.js');
 
-        $this->assertFileDoesNotExist($elementsPath);
-        $this->assertFileDoesNotExist($createPath);
-        $this->assertFileDoesNotExist($editPath);
-        $this->assertFileDoesNotExist($formJsPath);
-        $this->assertFileDoesNotExist($indexJsPath);
-        $this->assertFileDoesNotExist($bootstrapJsPath);
+        self::assertFileDoesNotExist($elementsPath);
+        self::assertFileDoesNotExist($createPath);
+        self::assertFileDoesNotExist($editPath);
+        self::assertFileDoesNotExist($formJsPath);
+        self::assertFileDoesNotExist($indexJsPath);
+        self::assertFileDoesNotExist($bootstrapJsPath);
 
 
         $this->artisan('admin:generate:form', [
             'table_name' => 'categories',
         ]);
 
-        $this->assertFileExists($elementsPath);
-        $this->assertFileExists($createPath);
-        $this->assertFileExists($editPath);
-        $this->assertFileExists($formJsPath);
-        $this->assertFileExists($indexJsPath);
-        $this->assertFileExists($bootstrapJsPath);
-        $this->assertStringStartsWith('<div ', File::get($elementsPath));
-        $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($createPath));
-        $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($editPath));
-        $this->assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
+        self::assertFileExists($elementsPath);
+        self::assertFileExists($createPath);
+        self::assertFileExists($editPath);
+        self::assertFileExists($formJsPath);
+        self::assertFileExists($indexJsPath);
+        self::assertFileExists($bootstrapJsPath);
+        self::assertMatchesFileSnapshot($elementsPath);
+        self::assertMatchesFileSnapshot($createPath);
+        self::assertMatchesFileSnapshot($editPath);
+        self::assertMatchesFileSnapshot($formJsPath);
+        self::assertMatchesFileSnapshot($indexJsPath);
+        self::assertMatchesFileSnapshot($bootstrapJsPath);
+        self::assertStringStartsWith('<div ', File::get($elementsPath));
+        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($createPath));
+        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($editPath));
+        self::assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
 
 Vue.component(\'category-form\', {
     mixins: [AppForm]', File::get($formJsPath));
-        $this->assertStringStartsWith('import \'./Form\'', File::get($indexJsPath));
-        $this->assertStringStartsWith('import \'./category\';', File::get($bootstrapJsPath));
+        self::assertStringStartsWith('import \'./Form\'', File::get($indexJsPath));
+        self::assertStringStartsWith('import \'./category\';', File::get($bootstrapJsPath));
     }
 
     public function testViewFormShouldGetGeneratedWithCustomModel(): void
@@ -59,32 +65,38 @@ Vue.component(\'category-form\', {
         $indexJsPath = resource_path('js/admin/billing-my-article/index.js');
         $bootstrapJsPath = resource_path('js/admin/index.js');
 
-        $this->assertFileDoesNotExist($elementsPath);
-        $this->assertFileDoesNotExist($createPath);
-        $this->assertFileDoesNotExist($editPath);
-        $this->assertFileDoesNotExist($formJsPath);
-        $this->assertFileDoesNotExist($indexJsPath);
-        $this->assertFileDoesNotExist($bootstrapJsPath);
+        self::assertFileDoesNotExist($elementsPath);
+        self::assertFileDoesNotExist($createPath);
+        self::assertFileDoesNotExist($editPath);
+        self::assertFileDoesNotExist($formJsPath);
+        self::assertFileDoesNotExist($indexJsPath);
+        self::assertFileDoesNotExist($bootstrapJsPath);
 
         $this->artisan('admin:generate:form', [
             'table_name' => 'categories',
             '--model-name' => 'Billing\\MyArticle',
         ]);
 
-        $this->assertFileExists($elementsPath);
-        $this->assertFileExists($createPath);
-        $this->assertFileExists($editPath);
-        $this->assertFileExists($formJsPath);
-        $this->assertFileExists($indexJsPath);
-        $this->assertFileExists($bootstrapJsPath);
-        $this->assertStringStartsWith('<div ', File::get($elementsPath));
-        $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($createPath));
-        $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($editPath));
-        $this->assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
+        self::assertFileExists($elementsPath);
+        self::assertFileExists($createPath);
+        self::assertFileExists($editPath);
+        self::assertFileExists($formJsPath);
+        self::assertFileExists($indexJsPath);
+        self::assertFileExists($bootstrapJsPath);
+        self::assertMatchesFileSnapshot($elementsPath);
+        self::assertMatchesFileSnapshot($createPath);
+        self::assertMatchesFileSnapshot($editPath);
+        self::assertMatchesFileSnapshot($formJsPath);
+        self::assertMatchesFileSnapshot($indexJsPath);
+        self::assertMatchesFileSnapshot($bootstrapJsPath);
+        self::assertStringStartsWith('<div ', File::get($elementsPath));
+        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($createPath));
+        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($editPath));
+        self::assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
 
 Vue.component(\'billing-my-article-form\', {
     mixins: [AppForm]', File::get($formJsPath));
-        $this->assertStringStartsWith('import \'./Form\'', File::get($indexJsPath));
-        $this->assertStringStartsWith('import \'./billing-my-article\';', File::get($bootstrapJsPath));
+        self::assertStringStartsWith('import \'./Form\'', File::get($indexJsPath));
+        self::assertStringStartsWith('import \'./billing-my-article\';', File::get($bootstrapJsPath));
     }
 }

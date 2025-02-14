@@ -16,14 +16,15 @@ class StoreRequestNameTest extends TestCase
     {
         $filePath = base_path('app/Http/Requests/Admin/Category/StoreCategory.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:request:store', [
             'table_name' => 'categories',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Requests\Admin\Category;
 
@@ -38,15 +39,16 @@ class StoreCategory extends FormRequest', File::get($filePath));
     {
         $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/StoreCat.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:request:store', [
             'table_name' => 'categories',
             '--model-name' => 'Billing\\Cat',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Requests\Admin\Billing\Cat;
 
@@ -61,15 +63,16 @@ class StoreCat extends FormRequest', File::get($filePath));
     {
         $filePath = base_path('app/Http/Requests/Admin/Cat/StoreCat.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:request:store', [
             'table_name' => 'categories',
             '--model-name' => 'App\\Billing\\Cat',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Requests\Admin\Cat;
 

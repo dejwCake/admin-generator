@@ -16,14 +16,15 @@ class ControllerNameTest extends TestCase
     {
         $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:controller', [
             'table_name' => 'categories',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Controllers\Admin;
 
@@ -52,15 +53,16 @@ class CategoriesController extends Controller', File::get($filePath));
     {
         $filePath = base_path('app/Http/Controllers/Admin/Billing/MyNameController.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:controller', [
             'table_name' => 'categories',
             'class_name' => 'Billing\\MyNameController',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Controllers\Admin\Billing;
 
@@ -89,15 +91,16 @@ class MyNameController extends Controller', File::get($filePath));
     {
         $filePath = base_path('app/Http/Controllers/Billing/CategoriesController.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:controller', [
             'table_name' => 'categories',
             'class_name' => 'App\\Http\\Controllers\\Billing\\CategoriesController',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Controllers\Billing;
 
@@ -126,7 +129,7 @@ class CategoriesController extends Controller', File::get($filePath));
     {
         $filePath = base_path('app/Http/Controllers/Billing/CategoriesController.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:controller', [
             'table_name' => 'categories',
@@ -134,8 +137,9 @@ class CategoriesController extends Controller', File::get($filePath));
             '--model-name' => 'App\\Billing\\Cat',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Controllers\Billing;
 

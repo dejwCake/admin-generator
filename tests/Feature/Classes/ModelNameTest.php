@@ -16,14 +16,15 @@ class ModelNameTest extends TestCase
     {
         $filePath = base_path('app/Models/Category.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:model', [
             'table_name' => 'categories',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Models;
 
@@ -36,15 +37,16 @@ class Category extends Model', File::get($filePath));
     {
         $filePath = base_path('app/Models/Billing/Category.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:model', [
             'table_name' => 'categories',
             'class_name' => 'Billing\\Category',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Models\Billing;
 
@@ -57,15 +59,16 @@ class Category extends Model', File::get($filePath));
     {
         $filePath = base_path('app/Billing/Category.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:model', [
             'table_name' => 'categories',
             'class_name' => 'App\\Billing\\Category',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Billing;
 

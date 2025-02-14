@@ -16,14 +16,15 @@ class UserCrudGeneratorWithGenerateModelTest extends UserTestCase
     {
         $filePath = base_path('app/Models/User.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:user', [
             '--generate-model' => true,
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Models;
 
@@ -43,15 +44,16 @@ class User extends Authenticatable implements CanActivateContract
     {
         $filePath = base_path('app/Models/Auth/User.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:user', [
             '--model-name' => 'Auth\\User',
             '--generate-model' => true,
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Models\Auth;
 
@@ -71,15 +73,16 @@ class User extends Authenticatable implements CanActivateContract
     {
         $filePath = base_path('app/Auth/User.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:user', [
             '--model-name' => 'App\\Auth\\User',
             '--generate-model' => true,
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Auth;
 

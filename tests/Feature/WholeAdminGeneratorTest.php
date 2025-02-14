@@ -30,42 +30,59 @@ class WholeAdminGeneratorTest extends TestCase
         $indexJsPath = resource_path('js/admin/category/index.js');
         $langPath = resource_path('lang/en/admin.php');
 
-        $this->assertFileDoesNotExist($controllerPath);
-        $this->assertFileDoesNotExist($indexRequestPath);
-        $this->assertFileDoesNotExist($storePath);
-        $this->assertFileDoesNotExist($updatePath);
-        $this->assertFileDoesNotExist($destroyPath);
-        $this->assertFileDoesNotExist($indexPath);
-        $this->assertFileDoesNotExist($listingJsPath);
-        $this->assertFileDoesNotExist($elementsPath);
-        $this->assertFileDoesNotExist($createPath);
-        $this->assertFileDoesNotExist($editPath);
-        $this->assertFileDoesNotExist($formJsPath);
-        $this->assertFileDoesNotExist($modelPath);
-        $this->assertFileDoesNotExist($routesPath);
-        $this->assertFileDoesNotExist($factoryPath);
-        $this->assertFileDoesNotExist($indexJsPath);
-        $this->assertFileDoesNotExist($langPath);
+        self::assertFileDoesNotExist($controllerPath);
+        self::assertFileDoesNotExist($indexRequestPath);
+        self::assertFileDoesNotExist($storePath);
+        self::assertFileDoesNotExist($updatePath);
+        self::assertFileDoesNotExist($destroyPath);
+        self::assertFileDoesNotExist($indexPath);
+        self::assertFileDoesNotExist($listingJsPath);
+        self::assertFileDoesNotExist($elementsPath);
+        self::assertFileDoesNotExist($createPath);
+        self::assertFileDoesNotExist($editPath);
+        self::assertFileDoesNotExist($formJsPath);
+        self::assertFileDoesNotExist($modelPath);
+        self::assertFileDoesNotExist($routesPath);
+        self::assertFileDoesNotExist($factoryPath);
+        self::assertFileDoesNotExist($indexJsPath);
+        self::assertFileDoesNotExist($langPath);
 
         $this->artisan('admin:generate', [
             'table_name' => 'categories',
         ]);
 
-        $this->assertFileExists($controllerPath);
-        $this->assertFileExists($indexRequestPath);
-        $this->assertFileExists($storePath);
-        $this->assertFileExists($updatePath);
-        $this->assertFileExists($destroyPath);
-        $this->assertFileExists($indexPath);
-        $this->assertFileExists($listingJsPath);
-        $this->assertFileExists($elementsPath);
-        $this->assertFileExists($createPath);
-        $this->assertFileExists($editPath);
-        $this->assertFileExists($formJsPath);
-        $this->assertFileExists($modelPath);
-        $this->assertFileExists($routesPath);
-        $this->assertFileExists($factoryPath);
-        $this->assertFileExists($indexJsPath);
-        $this->assertFileExists($langPath);
+        self::assertFileExists($controllerPath);
+        self::assertFileExists($indexRequestPath);
+        self::assertFileExists($storePath);
+        self::assertFileExists($updatePath);
+        self::assertFileExists($destroyPath);
+        self::assertFileExists($indexPath);
+        self::assertFileExists($listingJsPath);
+        self::assertFileExists($elementsPath);
+        self::assertFileExists($createPath);
+        self::assertFileExists($editPath);
+        self::assertFileExists($formJsPath);
+        self::assertFileExists($modelPath);
+        self::assertFileExists($routesPath);
+        self::assertFileExists($factoryPath);
+        self::assertFileExists($indexJsPath);
+        self::assertFileExists($langPath);
+
+        self::assertMatchesFileSnapshot($controllerPath);
+        self::assertMatchesFileSnapshot($indexRequestPath);
+        self::assertMatchesFileSnapshot($storePath);
+        self::assertMatchesFileSnapshot($updatePath);
+        self::assertMatchesFileSnapshot($destroyPath);
+        self::assertMatchesFileSnapshot($indexPath);
+        self::assertMatchesFileSnapshot($listingJsPath);
+        self::assertMatchesFileSnapshot($elementsPath);
+        self::assertMatchesFileSnapshot($createPath);
+        self::assertMatchesFileSnapshot($editPath);
+        self::assertMatchesFileSnapshot($formJsPath);
+        self::assertMatchesFileSnapshot($modelPath);
+        self::assertMatchesFileSnapshot($routesPath);
+        self::assertMatchesFileSnapshot($factoryPath);
+        self::assertMatchesFileSnapshot($indexJsPath);
+        self::assertMatchesFileSnapshot($langPath);
     }
 }

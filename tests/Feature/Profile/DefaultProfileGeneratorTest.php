@@ -24,24 +24,31 @@ class DefaultProfileGeneratorTest extends UserTestCase
         $indexJsPathPassword = resource_path('js/admin/profile-edit-password/index.js');
         $bootstrapJsPath = resource_path('js/admin/index.js');
 
-        $this->assertFileDoesNotExist($filePathController);
-        $this->assertFileDoesNotExist($editPathProfile);
-        $this->assertFileDoesNotExist($formJsPathProfile);
-        $this->assertFileDoesNotExist($editPathPassword);
-        $this->assertFileDoesNotExist($formJsPathPassword);
-        $this->assertFileDoesNotExist($indexJsPathPassword);
+        self::assertFileDoesNotExist($filePathController);
+        self::assertFileDoesNotExist($editPathProfile);
+        self::assertFileDoesNotExist($formJsPathProfile);
+        self::assertFileDoesNotExist($editPathPassword);
+        self::assertFileDoesNotExist($formJsPathPassword);
+        self::assertFileDoesNotExist($indexJsPathPassword);
 
         $this->artisan('admin:generate:admin-user:profile', [
         ]);
 
-        $this->assertFileExists($filePathController);
-        $this->assertFileExists($editPathProfile);
-        $this->assertFileExists($formJsPathProfile);
-        $this->assertFileExists($editPathPassword);
-        $this->assertFileExists($formJsPathPassword);
-        $this->assertFileExists($indexJsPathPassword);
+        self::assertFileExists($filePathController);
+        self::assertFileExists($editPathProfile);
+        self::assertFileExists($formJsPathProfile);
+        self::assertFileExists($editPathPassword);
+        self::assertFileExists($formJsPathPassword);
+        self::assertFileExists($indexJsPathPassword);
 
-        $this->assertStringStartsWith('<?php
+        self::assertMatchesFileSnapshot($filePathController);
+        self::assertMatchesFileSnapshot($editPathProfile);
+        self::assertMatchesFileSnapshot($formJsPathProfile);
+        self::assertMatchesFileSnapshot($editPathPassword);
+        self::assertMatchesFileSnapshot($formJsPathPassword);
+        self::assertMatchesFileSnapshot($indexJsPathPassword);
+
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Controllers\Admin;
 
@@ -57,7 +64,7 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {', File::get($filePathController));
-        $this->assertStringStartsWith(
+        self::assertStringStartsWith(
             '<?php
 
 
@@ -73,7 +80,7 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
 });',
             File::get($filePathRoute),
         );
-        $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')
+        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')
 
 @section(\'title\', trans(\'admin.admin-user.actions.edit_profile\'))
 
@@ -84,10 +91,10 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
         <div class="card">
 
             <profile-edit-profile-form', File::get($editPathProfile));
-        $this->assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
+        self::assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
 
 Vue.component(\'profile-edit-profile-form\'', File::get($formJsPathProfile));
-        $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')
+        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')
 
 @section(\'title\', trans(\'admin.admin-user.actions.edit_password\'))
 
@@ -98,12 +105,12 @@ Vue.component(\'profile-edit-profile-form\'', File::get($formJsPathProfile));
         <div class="card">
 
             <profile-edit-password-form', File::get($editPathPassword));
-        $this->assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
+        self::assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
 
 Vue.component(\'profile-edit-password-form\'', File::get($formJsPathPassword));
-        $this->assertStringStartsWith("import './profile-edit-profile';
+        self::assertStringStartsWith("import './profile-edit-profile';
 import './profile-edit-password';", File::get($bootstrapJsPath));
 
-        $this->assertStringStartsWith("import './Form';\n", File::get($indexJsPathPassword));
+        self::assertStringStartsWith("import './Form';\n", File::get($indexJsPathPassword));
     }
 }

@@ -13,6 +13,7 @@
 
     <!--not exactly nice, but working solution-->
     <rule ref="/root/.composer/vendor/dejwcake/php-code-style/base.phpcs.xml">
+        <exclude-pattern>tests/**/__snapshots__/*</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Complexity.Cognitive">
@@ -31,7 +32,6 @@
     </rule>
 
     <rule ref="SlevomatCodingStandard.Files.LineLength.LineTooLong">
-        <exclude-pattern></exclude-pattern>
         <exclude-pattern>tests/Feature/AdminUsers/AdminUserCrudGeneratorWithCustomControllerNameTest.php</exclude-pattern>
         <exclude-pattern>tests/Feature/AdminUsers/AdminUserCrudGeneratorWithCustomModelNameTest.php</exclude-pattern>
         <exclude-pattern>tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php</exclude-pattern>

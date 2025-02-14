@@ -20,7 +20,8 @@ class ModelFactoryTest extends TestCase
             'table_name' => 'categories',
         ]);
 
-        $this->assertStringStartsWith('<?php
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Category::class', File::get($filePath));
@@ -35,7 +36,8 @@ $factory->define(App\Models\Category::class', File::get($filePath));
             '--model-name' => 'Billing\\Cat',
         ]);
 
-        $this->assertStringStartsWith('<?php
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Models\Billing\Cat::class', File::get($filePath));
@@ -50,7 +52,8 @@ $factory->define(App\Models\Billing\Cat::class', File::get($filePath));
             '--model-name' => 'App\\Billing\\MyCat',
         ]);
 
-        $this->assertStringStartsWith('<?php
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 $factory->define(App\Billing\MyCat::class', File::get($filePath));

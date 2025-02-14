@@ -17,17 +17,19 @@ class FullFormTest extends TestCase
         $formPath = resource_path('views/admin/category/form.blade.php');
         $formJsPath = resource_path('js/admin/category/Form.js');
 
-        $this->assertFileDoesNotExist($formPath);
-        $this->assertFileDoesNotExist($formJsPath);
+        self::assertFileDoesNotExist($formPath);
+        self::assertFileDoesNotExist($formJsPath);
 
         $this->artisan('admin:generate:full-form', [
             'table_name' => 'categories',
         ]);
 
-        $this->assertFileExists($formPath);
-        $this->assertFileExists($formJsPath);
-        $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($formPath));
-        $this->assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
+        self::assertFileExists($formPath);
+        self::assertFileExists($formJsPath);
+        self::assertMatchesFileSnapshot($formPath);
+        self::assertMatchesFileSnapshot($formJsPath);
+        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($formPath));
+        self::assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
 
 Vue.component(\'category-form\', {
     mixins: [AppForm]', File::get($formJsPath));
@@ -38,22 +40,24 @@ Vue.component(\'category-form\', {
         $formPath = resource_path('views/admin/profile/edit-password.blade.php');
         $formJsPath = resource_path('js/admin/profile-edit-password/Form.js');
 
-        $this->assertFileDoesNotExist($formPath);
-        $this->assertFileDoesNotExist($formJsPath);
+        self::assertFileDoesNotExist($formPath);
+        self::assertFileDoesNotExist($formJsPath);
 
         $this->artisan('admin:generate:full-form', [
             'table_name' => 'categories',
             '--file-name' => 'profile/edit-password',
         ]);
 
-        $this->assertFileExists($formPath);
-        $this->assertFileExists($formJsPath);
-        $this->assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($formPath));
-        $this->assertStringContainsString(
+        self::assertFileExists($formPath);
+        self::assertFileExists($formJsPath);
+        self::assertMatchesFileSnapshot($formPath);
+        self::assertMatchesFileSnapshot($formJsPath);
+        self::assertStringStartsWith('@extends(\'brackets/admin-ui::admin.layout.default\')', File::get($formPath));
+        self::assertStringContainsString(
             ':action="\'{{ route(\'admin/profile/edit-password\', [\'category\' => $category]) }}\'"',
             File::get($formPath),
         );
-        $this->assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
+        self::assertStringStartsWith('import AppForm from \'../app-components/Form/AppForm\';
 
 Vue.component(\'profile-edit-password-form\', {
     mixins: [AppForm]', File::get($formJsPath));

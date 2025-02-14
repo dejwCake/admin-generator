@@ -17,15 +17,16 @@ class ProfileGeneratorWithCustomModelNameTest extends UserTestCase
     {
         $filePath = base_path('app/Http/Controllers/Admin/Auth/ProfileController.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:admin-user:profile', [
             '--controller-name' => 'Auth\\ProfileController',
             '--model-name' => 'App\\User',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Controllers\Admin\Auth;
 

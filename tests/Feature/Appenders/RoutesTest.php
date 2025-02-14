@@ -20,7 +20,8 @@ class RoutesTest extends TestCase
             'table_name' => 'categories',
         ]);
 
-        $this->assertStringStartsWith(
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith(
             '<?php
 
 
@@ -53,7 +54,8 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
             '--controller-name' => 'Billing\\CategOryController',
         ]);
 
-        $this->assertStringStartsWith(
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith(
             '<?php
 
 

@@ -10,10 +10,12 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Spatie\Snapshots\MatchesSnapshots;
 
 abstract class TestCase extends Orchestra
 {
     use RefreshDatabase;
+    use MatchesSnapshots;
 
     public function setUp(): void
     {

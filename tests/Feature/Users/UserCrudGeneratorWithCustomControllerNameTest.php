@@ -17,14 +17,16 @@ class UserCrudGeneratorWithCustomControllerNameTest extends UserTestCase
         $filePathController = base_path('app/Http/Controllers/Admin/Auth/UsersController.php');
         $filePathRoutes = base_path('routes/web.php');
 
-        $this->assertFileDoesNotExist($filePathController);
+        self::assertFileDoesNotExist($filePathController);
 
         $this->artisan('admin:generate:user', [
             '--controller-name' => 'Auth\\UsersController',
         ]);
 
-        $this->assertFileExists($filePathController);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePathController);
+        self::assertMatchesFileSnapshot($filePathController);
+        self::assertMatchesFileSnapshot($filePathRoutes);
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Controllers\Admin\Auth;
 
@@ -49,7 +51,7 @@ use Illuminate\View\View;
 
 class UsersController extends Controller', File::get($filePathController));
 
-        $this->assertStringStartsWith(
+        self::assertStringStartsWith(
             '<?php
 
 
@@ -76,14 +78,15 @@ Route::middleware([\'auth:\' . config(\'admin-auth.defaults.guard\'), \'admin\']
     {
         $filePath = base_path('app/Http/Controllers/Auth/UsersController.php');
 
-        $this->assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:user', [
             '--controller-name' => 'App\\Http\\Controllers\\Auth\\UsersController',
         ]);
 
-        $this->assertFileExists($filePath);
-        $this->assertStringStartsWith('<?php
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+        self::assertStringStartsWith('<?php
 
 namespace App\Http\Controllers\Auth;
 
