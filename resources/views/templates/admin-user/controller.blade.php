@@ -16,7 +16,7 @@ namespace {{ $controllerNamespace }};
         sprintf('App\Http\Requests\Admin\%s\Index%s', $modelWithNamespaceFromDefault, $modelBaseName),
         sprintf('App\Http\Requests\Admin\%s\Store%s', $modelWithNamespaceFromDefault, $modelBaseName),
         sprintf('App\Http\Requests\Admin\%s\Update%s', $modelWithNamespaceFromDefault, $modelBaseName),
-        'Brackets\AdminListing\AdminListing',
+        'Brackets\AdminListing\Services\AdminListingService',
         'Exception',
         'Illuminate\Auth\Access\AuthorizationException',
         'Illuminate\Contracts\Auth\Access\Gate',
@@ -83,7 +83,7 @@ class {{ $controllerBaseName }} extends Controller
     public function index(Index{{ $modelBaseName }} $request): array|View
     {
         // create and AdminListing instance for a specific model and
-        $data = AdminListing::create({{ $modelBaseName }}::class)
+        $data = AdminListingService::create({{ $modelBaseName }}::class)
             ->processRequestAndGet(
                 // pass the request with params
                 $request,

@@ -13,7 +13,7 @@ use App\Http\Requests\Admin\User\UpdateUser;
 use App\User;
 use Brackets\AdminAuth\Activation\Contracts\ActivationBroker;
 use Brackets\AdminAuth\Services\ActivationService;
-use Brackets\AdminListing\AdminListing;
+use Brackets\AdminListing\Services\AdminListingService;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate;
@@ -54,7 +54,7 @@ class UsersController extends Controller
     public function index(IndexUser $request): array|View
     {
         // create and AdminListing instance for a specific model and
-        $data = AdminListing::create(User::class)
+        $data = AdminListingService::create(User::class)
             ->processRequestAndGet(
                 // pass the request with params
                 $request,

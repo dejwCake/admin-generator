@@ -12,4 +12,6 @@
     <rule ref="rulesets/controversial.xml"/>
     <rule ref="rulesets/design.xml"/>
 
+    <exclude-pattern>tests/*/__snapshots__/*.php</exclude-pattern>
+
 </ruleset>
