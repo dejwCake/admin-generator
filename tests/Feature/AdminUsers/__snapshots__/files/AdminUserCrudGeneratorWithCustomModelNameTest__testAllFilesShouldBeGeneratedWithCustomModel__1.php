@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin\Auth;
@@ -10,26 +11,25 @@ use App\Http\Requests\Admin\User\IndexUser;
 use App\Http\Requests\Admin\User\StoreUser;
 use App\Http\Requests\Admin\User\UpdateUser;
 use App\User;
-use Spatie\Permission\Models\Role;
 use Brackets\AdminAuth\Activation\Contracts\ActivationBroker;
 use Brackets\AdminAuth\Services\ActivationService;
 use Brackets\AdminListing\AdminListing;
 use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Collection;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
+use Illuminate\Support\Collection;
+use Spatie\Permission\Models\Role;
 
 class UsersController extends Controller
 {
-
     /**
      * Guard used for admin user
      */
@@ -75,7 +75,10 @@ class UsersController extends Controller
 
         return $this->viewFactory->make(
             'admin.user.index',
-            ['data' => $data, 'activation' => $this->config->get('admin-auth.activation_enabled')],
+            [
+                'data' => $data,
+                'activation' => $this->config->get('admin-auth.activation_enabled'),
+            ],
         );
     }
 

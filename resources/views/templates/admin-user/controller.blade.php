@@ -1,5 +1,6 @@
-@php use Illuminate\Support\Str;echo "<?php";
+@php use Illuminate\Support\Arr;use Illuminate\Support\Str;echo "<?php";
 @endphp
+
 
 declare(strict_types=1);
 
@@ -8,49 +9,56 @@ namespace {{ $controllerNamespace }};
     $activation = $columns->search(function ($column, $key) {
             return $column['name'] === 'activated';
         }) !== false;
+    $uses = [
+        'App\Http\Controllers\Controller',
+        sprintf('App\Http\Requests\Admin\%s\Destroy%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        sprintf('App\Http\Requests\Admin\%s\ImpersonalLogin%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        sprintf('App\Http\Requests\Admin\%s\Index%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        sprintf('App\Http\Requests\Admin\%s\Store%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        sprintf('App\Http\Requests\Admin\%s\Update%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        'Brackets\AdminListing\AdminListing',
+        'Exception',
+        'Illuminate\Auth\Access\AuthorizationException',
+        'Illuminate\Contracts\Auth\Access\Gate',
+        'Illuminate\Contracts\Auth\StatefulGuard',
+        'Illuminate\Contracts\Config\Repository as Config',
+        'Illuminate\Contracts\Routing\UrlGenerator',
+        'Illuminate\Contracts\View\Factory as ViewFactory',
+        'Illuminate\Contracts\View\View',
+        'Illuminate\Http\RedirectResponse',
+        'Illuminate\Http\Request',
+        'Illuminate\Routing\Redirector',
+        'Illuminate\Support\Collection',
+        $modelFullName,
+    ];
+    if ($export) {
+        $uses = array_merge($uses, [
+            sprintf('App\Exports\%s', $exportBaseName),
+            'Maatwebsite\Excel\Excel',
+            'Symfony\Component\HttpFoundation\BinaryFileResponse',
+        ]);
+    }
+    if ($activation) {
+        $uses = array_merge($uses, [
+            'Brackets\AdminAuth\Activation\Contracts\ActivationBroker',
+            'Brackets\AdminAuth\Services\ActivationService',
+        ]);
+    }
+
+    if (count($relations) && count($relations['belongsToMany'])) {
+        foreach ($relations['belongsToMany'] as $belongsToMany) {
+            $uses[] = $belongsToMany['related_model'];
+        }
+    }
+    $uses = Arr::sort($uses);
 @endphp
 
-use App\Http\Controllers\Controller;
-@if($export)use App\Exports\{{$exportBaseName}};
-@endif
-use App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }}\Destroy{{ $modelBaseName }};
-use App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }}\ImpersonalLogin{{ $modelBaseName }};
-use App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }}\Index{{ $modelBaseName }};
-use App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }}\Store{{ $modelBaseName }};
-use App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }}\Update{{ $modelBaseName }};
-use {{ $modelFullName }};
-@if (count($relations))
-@if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)
-use {{ $belongsToMany['related_model'] }};
+@foreach($uses as $use)
+use {{ $use }};
 @endforeach
-@endif
-@endif
-@if($activation)use Brackets\AdminAuth\Activation\Contracts\ActivationBroker;
-@endif
-@if($activation)use Brackets\AdminAuth\Services\ActivationService;
-@endif
-use Brackets\AdminListing\AdminListing;
-use Exception;
-use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Auth\StatefulGuard;
-use Illuminate\Contracts\Config\Repository as Config;
-use Illuminate\Contracts\Routing\UrlGenerator;
-use Illuminate\Contracts\View\Factory as ViewFactory;
-use Illuminate\Contracts\View\View;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Collection;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-@if($export)use Maatwebsite\Excel\Excel;
-@endif
-@if($export)use Symfony\Component\HttpFoundation\BinaryFileResponse;
-@endif
 
 class {{ $controllerBaseName }} extends Controller
 {
-
     /**
      * Guard used for admin user
      */
@@ -96,7 +104,10 @@ class {{ $controllerBaseName }} extends Controller
 
         return $this->viewFactory->make(
             'admin.{{ $modelDotNotation }}.index',
-            ['data' => $data, 'activation' => $this->config->get('admin-auth.activation_enabled')],
+            [
+                'data' => $data,
+                'activation' => $this->config->get('admin-auth.activation_enabled'),
+            ],
         );
     }
 

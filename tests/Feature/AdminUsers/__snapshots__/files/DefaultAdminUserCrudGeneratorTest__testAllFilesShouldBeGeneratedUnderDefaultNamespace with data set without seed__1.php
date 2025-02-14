@@ -1,38 +1,38 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
 use App\Exports\AdminUsersExport;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdminUser\DestroyAdminUser;
 use App\Http\Requests\Admin\AdminUser\ImpersonalLoginAdminUser;
 use App\Http\Requests\Admin\AdminUser\IndexAdminUser;
 use App\Http\Requests\Admin\AdminUser\StoreAdminUser;
 use App\Http\Requests\Admin\AdminUser\UpdateAdminUser;
-use Brackets\AdminAuth\Models\AdminUser;
-use Spatie\Permission\Models\Role;
 use Brackets\AdminAuth\Activation\Contracts\ActivationBroker;
+use Brackets\AdminAuth\Models\AdminUser;
 use Brackets\AdminAuth\Services\ActivationService;
 use Brackets\AdminListing\AdminListing;
 use Exception;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Collection;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Redirector;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Excel;
+use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AdminUsersController extends Controller
 {
-
     /**
      * Guard used for admin user
      */
@@ -78,7 +78,10 @@ class AdminUsersController extends Controller
 
         return $this->viewFactory->make(
             'admin.admin-user.index',
-            ['data' => $data, 'activation' => $this->config->get('admin-auth.activation_enabled')],
+            [
+                'data' => $data,
+                'activation' => $this->config->get('admin-auth.activation_enabled'),
+            ],
         );
     }
 
