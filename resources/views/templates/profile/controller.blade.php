@@ -1,45 +1,64 @@
-@php echo "<?php"
+@php use Illuminate\Support\Arr;echo "<?php"
 @endphp
 
 
-namespace {{ $controllerNamespace }};
+declare(strict_types=1);
 
-use App\Http\Controllers\Controller;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
-use Illuminate\View\View;
+namespace {{ $controllerNamespace }};
+@php
+    $uses = [
+        'App\Http\Controllers\Controller',
+        'Illuminate\Contracts\Hashing\Hasher',
+        'Illuminate\Contracts\Config\Repository as Config',
+        'Illuminate\Contracts\View\Factory as ViewFactory',
+        'Illuminate\Contracts\View\View',
+        'Illuminate\Http\RedirectResponse',
+        'Illuminate\Http\Request',
+        'Illuminate\Routing\Redirector',
+        'Illuminate\Validation\Rule',
+        'Illuminate\Validation\ValidationException',
+        'Symfony\Component\HttpKernel\Exception\NotFoundHttpException',
+        $modelFullName,
+    ];
+    $uses = Arr::sort($uses);
+@endphp
+
+@foreach($uses as $use)
+use {{ $use }};
+@endforeach
 
 class ProfileController extends Controller
 {
-    public ${{ $modelVariableName }};
+    public {{ $modelBaseName }} ${{ $modelVariableName }};
 
     /**
      * Guard used for admin user
-     *
-     * {{'@'}}var string
      */
-    protected $guard = 'admin';
+    protected string $guard = 'admin';
 
-    public function __construct()
-    {
+    public function __construct(
+        public readonly Config $config,
+        public readonly Hasher $hasher,
+        public readonly Redirector $redirector,
+        public readonly UrlGenerator $urlGenerator,
+        public readonly ViewFactory $viewFactory,
+    ) {
         // TODO add authorization
-        $this->guard = config('admin-auth.defaults.guard');
+        $this->guard = $this->config->get('admin-auth.defaults.guard');
     }
 
     /**
      * Get logged user before each method
      *
-     * {{'@'}}param Request $request
+     * {{'@'}}throws NotFoundHttpException
      */
-    protected function setUser($request)
+    protected function setUser(Request $request): void
     {
-        if (empty($request->user($this->guard))) {
-            abort(404, 'Admin User not found');
+        if ($request->user($this->guard) === null) {
+            throw NotFoundHttpException::fromStatusCode(
+                404,
+                __('Admin User not found'),
+            );
         }
 
         $this->{{ $modelVariableName }} = $request->user($this->guard);
@@ -47,17 +66,17 @@ class ProfileController extends Controller
 
     /**
      * Show the form for editing logged user profile.
-     *
-     * {{'@'}}param Request $request
-     * {{'@'}}return Factory|View
      */
-    public function editProfile(Request $request)
+    public function editProfile(Request $request): View
     {
         $this->setUser($request);
 
-        return view('admin.profile.edit-profile', [
-            '{{ $modelVariableName }}' => $this->{{ $modelVariableName }},
-        ]);
+        return $this->viewFactory->make(
+            'admin.profile.edit-profile',
+            [
+                '{{ $modelVariableName }}' => $this->{{ $modelVariableName }},
+            ],
+        );
     }
 @php
     $columnsProfile = $columns->reject(function($column) {
@@ -68,52 +87,50 @@ class ProfileController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * {{'@'}}param Request $request
      * {{'@'}}throws ValidationException
-     * {{'@'}}return array|RedirectResponse|Redirector
      */
-    public function updateProfile(Request $request)
+    public function updateProfile(Request $request): array|RedirectResponse
     {
         $this->setUser($request);
-        ${{ $modelVariableName }} = $this->{{ $modelVariableName }};
 
         // Validate the request
-        $this->validate($request, [
+        $request->validate([
             @foreach($columnsProfile as $column)'{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
             @endforeach
-
         ]);
 
         // Sanitize input
         $sanitized = $request->only([
             @foreach($columnsProfile as $column)'{{ $column['name'] }}',
             @endforeach
-
         ]);
 
         // Update changed values {{ $modelBaseName }}
         $this->{{ $modelVariableName }}->update($sanitized);
 
         if ($request->ajax()) {
-            return ['redirect' => url('admin/profile'), 'message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'redirect' => $this->urlGenerator->to('admin/profile'),
+                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
-        return redirect('admin/profile');
+        return $this->redirector->to('admin/profile');
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * {{'@'}}param Request $request
-     * {{'@'}}return Factory|View
      */
-    public function editPassword(Request $request)
+    public function editPassword(Request $request): View
     {
         $this->setUser($request);
 
-        return view('admin.profile.edit-password', [
-            '{{ $modelVariableName }}' => $this->{{ $modelVariableName }},
-        ]);
+        return $this->viewFactory->make(
+            'admin.profile.edit-password',
+            [
+                '{{ $modelVariableName }}' => $this->{{ $modelVariableName }},
+            ],
+        );
     }
 
 @php
@@ -125,39 +142,37 @@ class ProfileController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * {{'@'}}param Request $request
      * {{'@'}}throws ValidationException
-     * {{'@'}}return array|RedirectResponse|Redirector
      */
-    public function updatePassword(Request $request)
+    public function updatePassword(Request $request): array|RedirectResponse
     {
         $this->setUser($request);
-        ${{ $modelVariableName }} = $this->{{ $modelVariableName }};
 
         // Validate the request
-        $this->validate($request, [
+        $request->validate([
             @foreach($columnsPassword as $column)'{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
             @endforeach
-
         ]);
 
         // Sanitize input
         $sanitized = $request->only([
             @foreach($columnsPassword as $column)'{{ $column['name'] }}',
             @endforeach
-
         ]);
 
         //Modify input, set hashed password
-        $sanitized['password'] = Hash::make($sanitized['password']);
+        $sanitized['password'] = $this-hasher->make($sanitized['password']);
 
         // Update changed values {{ $modelBaseName }}
         $this->{{ $modelVariableName }}->update($sanitized);
 
         if ($request->ajax()) {
-            return ['redirect' => url('admin/password'), 'message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'redirect' => $this->urlGenerator->to('admin/password'),
+                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
-        return redirect('admin/password');
+        return $this->redirector->to('admin/password');
     }
 }

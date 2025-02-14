@@ -1,43 +1,54 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\View\Factory;
+use App\User;
+use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
-use Illuminate\View\View;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProfileController extends Controller
 {
-    public $user;
+    public User $user;
 
     /**
      * Guard used for admin user
-     *
-     * @var string
      */
-    protected $guard = 'admin';
+    protected string $guard = 'admin';
 
-    public function __construct()
-    {
+    public function __construct(
+        public readonly Config $config,
+        public readonly Hasher $hasher,
+        public readonly Redirector $redirector,
+        public readonly UrlGenerator $urlGenerator,
+        public readonly ViewFactory $viewFactory,
+    ) {
         // TODO add authorization
-        $this->guard = config('admin-auth.defaults.guard');
+        $this->guard = $this->config->get('admin-auth.defaults.guard');
     }
 
     /**
      * Get logged user before each method
      *
-     * @param Request $request
+     * @throws NotFoundHttpException
      */
-    protected function setUser($request)
+    protected function setUser(Request $request): void
     {
-        if (empty($request->user($this->guard))) {
-            abort(404, 'Admin User not found');
+        if ($request->user($this->guard) === null) {
+            throw NotFoundHttpException::fromStatusCode(
+                404,
+                __('Admin User not found'),
+            );
         }
 
         $this->user = $request->user($this->guard);
@@ -45,39 +56,35 @@ class ProfileController extends Controller
 
     /**
      * Show the form for editing logged user profile.
-     *
-     * @param Request $request
-     * @return Factory|View
      */
-    public function editProfile(Request $request)
+    public function editProfile(Request $request): View
     {
         $this->setUser($request);
 
-        return view('admin.profile.edit-profile', [
-            'user' => $this->user,
-        ]);
+        return $this->viewFactory->make(
+            'admin.profile.edit-profile',
+            [
+                'user' => $this->user,
+            ],
+        );
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
      * @throws ValidationException
-     * @return array|RedirectResponse|Redirector
      */
-    public function updateProfile(Request $request)
+    public function updateProfile(Request $request): array|RedirectResponse
     {
         $this->setUser($request);
-        $user = $this->user;
 
         // Validate the request
-        $this->validate($request, [
+        $request->validate([
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],
             'email' => ['sometimes', 'email', Rule::unique('admin_users', 'email')->ignore($this->user->getKey(), $this->user->getKeyName())->whereNull('deleted_at'), 'string'],
             'language' => ['sometimes', 'string'],
-            
-        ]);
+                    ]);
 
         // Sanitize input
         $sanitized = $request->only([
@@ -85,69 +92,69 @@ class ProfileController extends Controller
             'last_name',
             'email',
             'language',
-            
-        ]);
+                    ]);
 
         // Update changed values User
         $this->user->update($sanitized);
 
         if ($request->ajax()) {
-            return ['redirect' => url('admin/profile'), 'message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'redirect' => $this->urlGenerator->to('admin/profile'),
+                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
-        return redirect('admin/profile');
+        return $this->redirector->to('admin/profile');
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param Request $request
-     * @return Factory|View
      */
-    public function editPassword(Request $request)
+    public function editPassword(Request $request): View
     {
         $this->setUser($request);
 
-        return view('admin.profile.edit-password', [
-            'user' => $this->user,
-        ]);
+        return $this->viewFactory->make(
+            'admin.profile.edit-password',
+            [
+                'user' => $this->user,
+            ],
+        );
     }
 
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
      * @throws ValidationException
-     * @return array|RedirectResponse|Redirector
      */
-    public function updatePassword(Request $request)
+    public function updatePassword(Request $request): array|RedirectResponse
     {
         $this->setUser($request);
-        $user = $this->user;
 
         // Validate the request
-        $this->validate($request, [
+        $request->validate([
             'password' => ['sometimes', 'confirmed', 'min:7', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/', 'string'],
-            
-        ]);
+                    ]);
 
         // Sanitize input
         $sanitized = $request->only([
             'password',
-            
-        ]);
+                    ]);
 
         //Modify input, set hashed password
-        $sanitized['password'] = Hash::make($sanitized['password']);
+        $sanitized['password'] = $this-hasher->make($sanitized['password']);
 
         // Update changed values User
         $this->user->update($sanitized);
 
         if ($request->ajax()) {
-            return ['redirect' => url('admin/password'), 'message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'redirect' => $this->urlGenerator->to('admin/password'),
+                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
-        return redirect('admin/password');
+        return $this->redirector->to('admin/password');
     }
 }

@@ -1,47 +1,51 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Billing;
 
+use App\Billing\Cat;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Cat\BulkDestroyCat;
 use App\Http\Requests\Admin\Cat\DestroyCat;
 use App\Http\Requests\Admin\Cat\IndexCat;
 use App\Http\Requests\Admin\Cat\StoreCat;
 use App\Http\Requests\Admin\Cat\UpdateCat;
-use App\Billing\Cat;
-use Brackets\AdminListing\Facades\AdminListing;
+use Brackets\AdminListing\Services\AdminListingService;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\DB;
-use Illuminate\View\View;
+use Illuminate\Support\Collection;
 
 class CategoriesController extends Controller
 {
+    public function __construct(
+        public readonly Gate $gate,
+        public readonly Redirector $redirector,
+        public readonly UrlGenerator $urlGenerator,
+        public readonly ViewFactory $viewFactory,
+    ) {
+    }
 
     /**
      * Display a listing of the resource.
-     *
-     * @param IndexCat $request
-     * @return array|Factory|View
      */
-    public function index(IndexCat $request)
+    public function index(IndexCat $request): array|View
     {
-        // create and AdminListing instance for a specific model and
-        $data = AdminListing::create(Cat::class)->processRequestAndGet(
-            // pass the request with params
-            $request,
-
-            // set columns to query
-            ['id', 'title'],
-
-            // set columns to searchIn
-            ['id']
-        );
+        // create and AdminListingService instance for a specific model and
+        $data = AdminListingService::create(Cat::class)
+            ->processRequestAndGet(
+                // pass the request with params
+                $request,
+                // set columns to query
+                ['id', 'title'],
+                // set columns to searchIn
+                ['id'],
+            );
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {
@@ -52,53 +56,53 @@ class CategoriesController extends Controller
             return ['data' => $data];
         }
 
-        return view('admin.cat.index', ['data' => $data]);
+        return $this->viewFactory->make(
+            'admin.cat.index',
+            ['data' => $data],
+        );
     }
 
     /**
      * Show the form for creating a new resource.
      *
      * @throws AuthorizationException
-     * @return Factory|View
      */
-    public function create()
+    public function create(): View
     {
-        $this->authorize('admin.cat.create');
+        $this->gate->authorize('admin.cat.create');
 
-        return view('admin.cat.create');
+        return $this->viewFactory->make('admin.cat.create');
     }
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param StoreCat $request
-     * @return array|RedirectResponse|Redirector
      */
-    public function store(StoreCat $request)
+    public function store(StoreCat $request): array|RedirectResponse
     {
         // Sanitize input
         $sanitized = $request->getSanitized();
 
         // Store the Cat
-        $cat = Cat::create($sanitized);
+        Cat::create($sanitized);
 
         if ($request->ajax()) {
-            return ['redirect' => url('admin/cats'), 'message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'redirect' => $this->urlGenerator->to('admin/cats'),
+                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
-        return redirect('admin/cats');
+        return $this->redirector->to('admin/cats');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param Cat $cat
      * @throws AuthorizationException
-     * @return void
      */
-    public function show(Cat $cat)
+    public function show(Cat $cat): void
     {
-        $this->authorize('admin.cat.show', $cat);
+        $this->gate->authorize('admin.cat.show', $cat);
 
         // TODO your code goes here
     }
@@ -106,28 +110,24 @@ class CategoriesController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param Cat $cat
      * @throws AuthorizationException
-     * @return Factory|View
      */
-    public function edit(Cat $cat)
+    public function edit(Cat $cat): View
     {
-        $this->authorize('admin.cat.edit', $cat);
+        $this->gate->authorize('admin.cat.edit', $cat);
 
-
-        return view('admin.cat.edit', [
-            'cat' => $cat,
-        ]);
+        return $this->viewFactory->make(
+            'admin.cat.edit',
+            [
+                'cat' => $cat,
+            ],
+        );
     }
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param UpdateCat $request
-     * @param Cat $cat
-     * @return array|RedirectResponse|Redirector
      */
-    public function update(UpdateCat $request, Cat $cat)
+    public function update(UpdateCat $request, Cat $cat): array|RedirectResponse
     {
         // Sanitize input
         $sanitized = $request->getSanitized();
@@ -137,52 +137,52 @@ class CategoriesController extends Controller
 
         if ($request->ajax()) {
             return [
-                'redirect' => url('admin/cats'),
-                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+                'redirect' => $this->urlGenerator->to('admin/cats'),
+                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
-        return redirect('admin/cats');
+        return $this->redirector->to('admin/cats');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param DestroyCat $request
-     * @param Cat $cat
      * @throws Exception
-     * @return ResponseFactory|RedirectResponse|Response
      */
-    public function destroy(DestroyCat $request, Cat $cat)
+    public function destroy(DestroyCat $request, Cat $cat): array|RedirectResponse
     {
         $cat->delete();
 
         if ($request->ajax()) {
-            return response(['message' => trans('brackets/admin-ui::admin.operation.succeeded')]);
+            return ['message' => __('brackets/admin-ui::admin.operation.succeeded')];
         }
 
-        return redirect()->back();
+        return $this->redirector->back();
     }
 
     /**
      * Remove the specified resources from storage.
      *
-     * @param BulkDestroyCat $request
      * @throws Exception
-     * @return Response|bool
      */
-    public function bulkDestroy(BulkDestroyCat $request) : Response
+    public function bulkDestroy(BulkDestroyCat $request, DatabaseManager $databaseManager): array|RedirectResponse
     {
-        DB::transaction(static function () use ($request) {
-            collect($request->data['ids'])
+        $databaseManager->transaction(static function () use ($request, $databaseManager) {
+            (new Collection($request->data['ids']))
                 ->chunk(1000)
                 ->each(static function ($bulkChunk) {
-                    Cat::whereIn('id', $bulkChunk)->delete();
+                    Cat::whereIn('id', $bulkChunk)
+                        ->delete();
 
                     // TODO your code goes here
                 });
         });
 
-        return response(['message' => trans('brackets/admin-ui::admin.operation.succeeded')]);
+        if ($request->ajax()) {
+            return ['message' => __('brackets/admin-ui::admin.operation.succeeded')];
+        }
+
+        return $this->redirector->back();
     }
 }

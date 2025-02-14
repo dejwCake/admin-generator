@@ -1,54 +1,29 @@
 <?php
 
-namespace App\Exports;
+namespace App\Http\Requests\Admin\AdminUser;
 
-use Brackets\AdminAuth\Models\AdminUser;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
-class AdminUsersExport implements FromCollection, WithMapping, WithHeadings
+class ImpersonalLoginAdminUser extends FormRequest
 {
     /**
-     * @return Collection
-     */
-    public function collection()
-    {
-        return AdminUser::all();
-    }
-
-    /**
-     * @return array
-     */
-    public function headings(): array
-    {
-        return [
-            trans('admin.admin-user.columns.id'),
-            trans('admin.admin-user.columns.first_name'),
-            trans('admin.admin-user.columns.last_name'),
-            trans('admin.admin-user.columns.email'),
-            trans('admin.admin-user.columns.activated'),
-            trans('admin.admin-user.columns.forbidden'),
-            trans('admin.admin-user.columns.language'),
-        ];
-    }
-
-    /**
-     * @param AdminUser $adminUser
-     * @return array
+     * Determine if the user is authorized to make this request.
      *
+     * @return bool
      */
-    public function map($adminUser): array
+    public function authorize(): bool
     {
-        return [
-            $adminUser->id,
-            $adminUser->first_name,
-            $adminUser->last_name,
-            $adminUser->email,
-            $adminUser->activated,
-            $adminUser->forbidden,
-            $adminUser->language,
-        ];
+        return Gate::allows('admin.admin-user.impersonal-login', $this->adminUser);
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    public function rules(): array
+    {
+        return [];
     }
 }

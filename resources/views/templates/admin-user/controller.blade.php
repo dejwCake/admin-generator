@@ -11,11 +11,6 @@ namespace {{ $controllerNamespace }};
         }) !== false;
     $uses = [
         'App\Http\Controllers\Controller',
-        sprintf('App\Http\Requests\Admin\%s\Destroy%s', $modelWithNamespaceFromDefault, $modelBaseName),
-        sprintf('App\Http\Requests\Admin\%s\ImpersonalLogin%s', $modelWithNamespaceFromDefault, $modelBaseName),
-        sprintf('App\Http\Requests\Admin\%s\Index%s', $modelWithNamespaceFromDefault, $modelBaseName),
-        sprintf('App\Http\Requests\Admin\%s\Store%s', $modelWithNamespaceFromDefault, $modelBaseName),
-        sprintf('App\Http\Requests\Admin\%s\Update%s', $modelWithNamespaceFromDefault, $modelBaseName),
         'Brackets\AdminListing\Services\AdminListingService',
         'Exception',
         'Illuminate\Auth\Access\AuthorizationException',
@@ -29,6 +24,12 @@ namespace {{ $controllerNamespace }};
         'Illuminate\Http\Request',
         'Illuminate\Routing\Redirector',
         'Illuminate\Support\Collection',
+        'Symfony\Component\HttpKernel\Exception\HttpException',
+        sprintf('App\Http\Requests\Admin\%s\Destroy%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        sprintf('App\Http\Requests\Admin\%s\ImpersonalLogin%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        sprintf('App\Http\Requests\Admin\%s\Index%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        sprintf('App\Http\Requests\Admin\%s\Store%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        sprintf('App\Http\Requests\Admin\%s\Update%s', $modelWithNamespaceFromDefault, $modelBaseName),
         $modelFullName,
     ];
     if ($export) {
@@ -45,8 +46,10 @@ namespace {{ $controllerNamespace }};
         ]);
     }
 
-    if (count($relations) && count($relations['belongsToMany'])) {
-        foreach ($relations['belongsToMany'] as $belongsToMany) {
+    $belongsToManyRelations = [];
+    if (count($relations) > 0 && count($relations['belongsToMany']) > 0) {
+        $belongsToManyRelations = $relations['belongsToMany'];
+        foreach ($belongsToManyRelations as $belongsToMany) {
             $uses[] = $belongsToMany['related_model'];
         }
     }
@@ -64,15 +67,12 @@ class {{ $controllerBaseName }} extends Controller
      */
     protected string $guard;
 
-    /**
-     * AdminUsersController constructor.
-     */
     public function __construct(
-        public readonly Gate $gate,
         public readonly Config $config,
+        public readonly Gate $gate,
         public readonly Redirector $redirector,
-        public readonly ViewFactory $viewFactory,
         public readonly UrlGenerator $urlGenerator,
+        public readonly ViewFactory $viewFactory,
     ) {
         $this->guard = $this->config->get('admin-auth.defaults.guard', 'admin');
     }
@@ -82,17 +82,15 @@ class {{ $controllerBaseName }} extends Controller
      */
     public function index(Index{{ $modelBaseName }} $request): array|View
     {
-        // create and AdminListing instance for a specific model and
+        // create and AdminListingService instance for a specific model and
         $data = AdminListingService::create({{ $modelBaseName }}::class)
             ->processRequestAndGet(
                 // pass the request with params
                 $request,
-
                 // set columns to query
                 ['{!! implode('\', \'', $columnsToQuery) !!}'],
-
                 // set columns to searchIn
-                ['{!! implode('\', \'', $columnsToSearchIn) !!}']
+                ['{!! implode('\', \'', $columnsToSearchIn) !!}'],
             );
 
         if ($request->ajax()) {
@@ -120,25 +118,19 @@ class {{ $controllerBaseName }} extends Controller
     {
         $this->gate->authorize('admin.{{ $modelDotNotation }}.create');
 
-@if (count($relations))
         return $this->viewFactory->make(
             'admin.{{ $modelDotNotation }}.create',
             [
                 'activation' => $this->config->get('admin-auth.activation_enabled'),
-@if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)
+@foreach($belongsToManyRelations as $belongsToMany)
 @if($belongsToMany['related_table'] === 'roles')
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::where('guard_name', $this->guard)->get(),
 @else
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
 @endif
 @endforeach
-@endif
             ],
         );
-@else
-        return $this->viewFactory->make('admin.{{ $modelDotNotation }}.create');
-@endif
     }
 
     /**
@@ -150,17 +142,17 @@ class {{ $controllerBaseName }} extends Controller
         $sanitized = $request->getModifiedData();
 
         // Store the {{ $modelBaseName }}
+@if (count($belongsToManyRelations) > 0)
+@foreach($belongsToManyRelations as $belongsToMany)
         ${{ $modelVariableName }} = {{ $modelBaseName }}::create($sanitized);
 
-@if (count($relations))
-@if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)
         // But we do have a {{ $belongsToMany['related_table'] }}, so we need to attach the {{ $belongsToMany['related_table'] }} to the {{ $modelVariableName }}
         ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync((new Collection($request->input('{{ $belongsToMany['related_table'] }}', [])))->map->id->toArray());
 @endforeach
+@else
+        {{ $modelBaseName }}::create($sanitized);
+@endif
 
-@endif
-@endif
         if ($request->ajax()) {
             return [
                 'redirect' => $this->urlGenerator->to('admin/{{ $resource }}'),
@@ -176,7 +168,7 @@ class {{ $controllerBaseName }} extends Controller
      *
      * {{'@'}}throws AuthorizationException
      */
-    public function show({{ $modelBaseName }} ${{ $modelVariableName }})
+    public function show({{ $modelBaseName }} ${{ $modelVariableName }}): void
     {
         $this->gate->authorize('admin.{{ $modelDotNotation }}.show', ${{ $modelVariableName }});
 
@@ -192,30 +184,24 @@ class {{ $controllerBaseName }} extends Controller
     {
         $this->gate->authorize('admin.{{ $modelDotNotation }}.edit', ${{ $modelVariableName }});
 
-@if (count($relations))
-@if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)
+@if (count($belongsToManyRelations) > 0)
+@foreach($belongsToManyRelations as $belongsToMany)
         ${{ $modelVariableName }}->load('{{ $belongsToMany['related_table'] }}');
 @endforeach
 
-@endif
 @endif
         return $this->viewFactory->make(
             'admin.{{ $modelDotNotation }}.edit',
             [
                 '{{ $modelVariableName }}' => ${{ $modelVariableName }},
                 'activation' => $this->config->get('admin-auth.activation_enabled'),
-@if (count($relations))
-@if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)
+@foreach($belongsToManyRelations as $belongsToMany)
 @if($belongsToMany['related_table'] === 'roles')
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::where('guard_name', $this->guard)->get(),
 @else
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
 @endif
 @endforeach
-@endif
-@endif
             ],
         );
     }
@@ -231,17 +217,15 @@ class {{ $controllerBaseName }} extends Controller
         // Update changed values {{ $modelBaseName }}
         ${{ $modelVariableName }}->update($sanitized);
 
-@if (count($relations))
-@if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)
+@if (count($belongsToManyRelations) > 0)
+@foreach($belongsToManyRelations as $belongsToMany)
         // But we do have a {{ $belongsToMany['related_table'] }}, so we need to attach the {{ $belongsToMany['related_table'] }} to the {{ $modelVariableName }}
         if ($request->input('{{ $belongsToMany['related_table'] }}')) {
             ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync((new Collection($request->input('{{ $belongsToMany['related_table'] }}', [])))->map->id->toArray());
         }
 @endforeach
-@endif
-@endif
 
+@endif
         if ($request->ajax()) {
             return [
                 'redirect' => $this->urlGenerator->to('admin/{{ $resource }}'),
@@ -267,8 +251,8 @@ class {{ $controllerBaseName }} extends Controller
 
         return $this->redirector->back();
     }
-
 @if($activation)
+
     /**
      * Resend activation e-mail
      *
@@ -322,7 +306,6 @@ class {{ $controllerBaseName }} extends Controller
 
         return $this->redirector->back();
     }
-
 @if($export)
 
     /**

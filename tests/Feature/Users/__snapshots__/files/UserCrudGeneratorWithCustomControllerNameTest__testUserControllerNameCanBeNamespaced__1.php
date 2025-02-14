@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
@@ -8,73 +10,84 @@ use App\Http\Requests\Admin\User\IndexUser;
 use App\Http\Requests\Admin\User\StoreUser;
 use App\Http\Requests\Admin\User\UpdateUser;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
-use Brackets\AdminListing\Facades\AdminListing;
+use Brackets\AdminListing\Services\AdminListingService;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Contracts\View\Factory as ViewFactory;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Config;
-use Illuminate\View\View;
+use Illuminate\Support\Collection;
+use Spatie\Permission\Models\Role;
 
 class UsersController extends Controller
 {
+    public function __construct(
+        public readonly Config $config,
+        public readonly Gate $gate,
+        public readonly Redirector $redirector,
+        public readonly UrlGenerator $urlGenerator,
+        public readonly ViewFactory $viewFactory,
+    ) {
+    }
 
     /**
      * Display a listing of the resource.
-     *
-     * @param  IndexUser $request
-     * @return array|Factory|View
      */
-    public function index(IndexUser $request)
+    public function index(IndexUser $request): array|View
     {
-        // create and AdminListing instance for a specific model and
-        $data = AdminListing::create(User::class)->processRequestAndGet(
-            // pass the request with params
-            $request,
-
-            // set columns to query
-            ['id', 'name', 'email'],
-
-            // set columns to searchIn
-            ['id']
-        );
+        // create and AdminListingService instance for a specific model and
+        $data = AdminListingService::create(User::class)
+            ->processRequestAndGet(
+                // pass the request with params
+                $request,
+                // set columns to query
+                ['id', 'name', 'email'],
+                // set columns to searchIn
+                ['id'],
+            );
 
         if ($request->ajax()) {
-            return ['data' => $data, 'activation' => Config::get('admin-auth.activation_enabled')];
+            return [
+                'data' => $data,
+                'activation' => $this->config->get('admin-auth.activation_enabled'),
+            ];
         }
 
-        return view('admin.user.index', ['data' => $data, 'activation' => Config::get('admin-auth.activation_enabled')]);
-
+        return $this->viewFactory->make(
+            'admin.user.index',
+            [
+                'data' => $data,
+                'activation' => $this->config->get('admin-auth.activation_enabled'),
+            ],
+        );
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return Factory|View
      * @throws AuthorizationException
      */
-    public function create()
+    public function create(): View
     {
-        $this->authorize('admin.user.create');
+        $this->gate->authorize('admin.user.create');
 
-        return view('admin.user.create',[
-            'activation' => Config::get('admin-auth.activation_enabled'),
-            'roles' => Role::all(),
-        ]);
+        return $this->viewFactory->make(
+            'admin.user.create',
+            [
+                'activation' => Config::get('admin-auth.activation_enabled'),
+                'roles' => Role::all(),
+            ],
+        );
     }
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param  StoreUser $request
-     * @return array|RedirectResponse|Redirector
      */
-    public function store(StoreUser $request)
+    public function store(StoreUser $request): array|RedirectResponse
     {
         // Sanitize input
         $sanitized = $request->getModifiedData();
@@ -83,25 +96,26 @@ class UsersController extends Controller
         $user = User::create($sanitized);
 
         // But we do have a roles, so we need to attach the roles to the user
-        $user->roles()->sync(collect($request->input('roles', []))->map->id->toArray());
+        $user->roles()->sync((new Collection($request->input('roles', [])))->map->id->toArray());
 
         if ($request->ajax()) {
-            return ['redirect' => url('admin/users'), 'message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'redirect' => $this->urlGenerator->to('admin/users'),
+                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
-        return redirect('admin/users');
+        return $this->redirector->to('admin/users');
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  User $user
-     * @return void
      * @throws AuthorizationException
      */
-    public function show(User $user)
+    public function show(User $user): void
     {
-        $this->authorize('admin.user.show', $user);
+        $this->gate->authorize('admin.user.show', $user);
 
         // TODO your code goes here
     }
@@ -109,31 +123,28 @@ class UsersController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  User $user
-     * @return Factory|View
      * @throws AuthorizationException
      */
-    public function edit(User $user)
+    public function edit(User $user): View
     {
-        $this->authorize('admin.user.edit', $user);
+        $this->gate->authorize('admin.user.edit', $user);
 
         $user->load('roles');
 
-        return view('admin.user.edit', [
-            'user' => $user,
-            'activation' => Config::get('admin-auth.activation_enabled'),
-            'roles' => Role::all(),
-        ]);
+        return $this->viewFactory->make(
+            'admin.user.edit',
+            [
+                'user' => $user,
+                'activation' => $this->config->get('admin-auth.activation_enabled'),
+                'roles' => Role::all(),
+            ],
+        );
     }
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  UpdateUser $request
-     * @param  User $user
-     * @return array|RedirectResponse|Redirector
      */
-    public function update(UpdateUser $request, User $user)
+    public function update(UpdateUser $request, User $user): array|RedirectResponse
     {
         // Sanitize input
         $sanitized = $request->getModifiedData();
@@ -143,33 +154,33 @@ class UsersController extends Controller
 
         // But we do have a roles, so we need to attach the roles to the user
         if($request->input('roles')) {
-            $user->roles()->sync(collect($request->input('roles', []))->map->id->toArray());
+            $user->roles()->sync((new Collection($request->input('roles', [])))->map->id->toArray());
         }
 
         if ($request->ajax()) {
-            return ['redirect' => url('admin/users'), 'message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'redirect' => $this->urlGenerator->to('admin/users'),
+                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
-        return redirect('admin/users');
+        return $this->redirector->to('admin/users');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  DestroyUser $request
-     * @param  User $user
-     * @return ResponseFactory|RedirectResponse|Response
      * @throws Exception
      */
-    public function destroy(DestroyUser $request, User $user)
+    public function destroy(DestroyUser $request, User $user): array|RedirectResponse
     {
         $user->delete();
 
         if ($request->ajax()) {
-            return response(['message' => trans('brackets/admin-ui::admin.operation.succeeded')]);
+            return ['message' => __('brackets/admin-ui::admin.operation.succeeded')];
         }
 
-        return redirect()->back();
+        return $this->redirector->back();
     }
 
-    }
+}

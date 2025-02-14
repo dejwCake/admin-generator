@@ -1,144 +1,163 @@
-@php echo "<?php";
+@php use Illuminate\Support\Arr;echo "<?php";
 @endphp
 
+
+declare(strict_types=1);
 
 namespace {{ $controllerNamespace }};
 @php
     $activation = $columns->search(function ($column, $key) {
             return $column['name'] === 'activated';
         }) !== false;
+    $uses = [
+        'App\Http\Controllers\Controller',
+        'Brackets\AdminListing\Services\AdminListingService',
+        'Exception',
+        'Illuminate\Auth\Access\AuthorizationException',
+        'Illuminate\Contracts\Config\Repository as Config',
+        'Illuminate\Contracts\View\Factory as ViewFactory',
+        'Illuminate\Contracts\View\View',
+        'Illuminate\Http\RedirectResponse',
+        'Illuminate\Http\Request',
+        'Illuminate\Http\Response',
+        'Illuminate\Routing\Redirector',
+        'Illuminate\Support\Collection',
+        sprintf('App\Http\Requests\Admin\%s\Destroy%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        sprintf('App\Http\Requests\Admin\%s\Index%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        sprintf('App\Http\Requests\Admin\%s\Store%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        sprintf('App\Http\Requests\Admin\%s\Update%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        $modelFullName,
+    ];
+    if ($export) {
+        $uses = array_merge($uses, [
+            sprintf('App\Exports\%s', $exportBaseName),
+            'Maatwebsite\Excel\Excel',
+            'Symfony\Component\HttpFoundation\BinaryFileResponse',
+        ]);
+    }
+    if ($activation) {
+        $uses = array_merge($uses, [
+            'Brackets\AdminAuth\Activation\Contracts\ActivationBroker',
+            'Brackets\AdminAuth\Services\ActivationService',
+        ]);
+    }
+
+    $belongsToManyRelations = [];
+    if (count($relations) > 0 && count($relations['belongsToMany']) > 0) {
+        $belongsToManyRelations = $relations['belongsToMany'];
+        foreach ($belongsToManyRelations as $belongsToMany) {
+            $uses[] = $belongsToMany['related_model'];
+        }
+    }
+    $uses = Arr::sort($uses);
 @endphp
 
-@if($export)use App\Exports\{{$exportBaseName}};
-@endif
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }}\Destroy{{ $modelBaseName }};
-use App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }}\Index{{ $modelBaseName }};
-use App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }}\Store{{ $modelBaseName }};
-use App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }}\Update{{ $modelBaseName }};
-use {{ $modelFullName }};
-@if (count($relations))
-@if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)
-use {{ $belongsToMany['related_model'] }};
+@foreach($uses as $use)
+use {{ $use }};
 @endforeach
-@endif
-@endif
-@if($activation)use Brackets\AdminAuth\Activation\Facades\Activation;
-@endif
-@if($activation)use Brackets\AdminAuth\Services\ActivationService;
-@endif
-use Brackets\AdminListing\Facades\AdminListing;
-use Exception;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Routing\Redirector;
-use Illuminate\Support\Facades\Config;
-use Illuminate\View\View;
-@if($export)use Maatwebsite\Excel\Facades\Excel;
-@endif
-@if($export)use Symfony\Component\HttpFoundation\BinaryFileResponse;
-@endif
 
 class {{ $controllerBaseName }} extends Controller
 {
+    public function __construct(
+        public readonly Config $config,
+        public readonly Gate $gate,
+        public readonly Redirector $redirector,
+        public readonly UrlGenerator $urlGenerator,
+        public readonly ViewFactory $viewFactory,
+    ) {
+    }
 
     /**
      * Display a listing of the resource.
-     *
-     * {{'@'}}param  Index{{ $modelBaseName }} $request
-     * {{'@'}}return array|Factory|View
      */
-    public function index(Index{{ $modelBaseName }} $request)
+    public function index(Index{{ $modelBaseName }} $request): array|View
     {
-        // create and AdminListing instance for a specific model and
-        $data = AdminListing::create({{ $modelBaseName }}::class)->processRequestAndGet(
-            // pass the request with params
-            $request,
-
-            // set columns to query
-            ['{!! implode('\', \'', $columnsToQuery) !!}'],
-
-            // set columns to searchIn
-            ['{!! implode('\', \'', $columnsToSearchIn) !!}']
-        );
+        // create and AdminListingService instance for a specific model and
+        $data = AdminListingService::create({{ $modelBaseName }}::class)
+            ->processRequestAndGet(
+                // pass the request with params
+                $request,
+                // set columns to query
+                ['{!! implode('\', \'', $columnsToQuery) !!}'],
+                // set columns to searchIn
+                ['{!! implode('\', \'', $columnsToSearchIn) !!}'],
+            );
 
         if ($request->ajax()) {
-            return ['data' => $data, 'activation' => Config::get('admin-auth.activation_enabled')];
+            return [
+                'data' => $data,
+                'activation' => $this->config->get('admin-auth.activation_enabled'),
+            ];
         }
 
-        return view('admin.{{ $modelDotNotation }}.index', ['data' => $data, 'activation' => Config::get('admin-auth.activation_enabled')]);
-
+        return $this->viewFactory->make(
+            'admin.{{ $modelDotNotation }}.index',
+            [
+                'data' => $data,
+                'activation' => $this->config->get('admin-auth.activation_enabled'),
+            ],
+        );
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * {{'@'}}return Factory|View
      * {{'@'}}throws AuthorizationException
      */
-    public function create()
+    public function create(): View
     {
-        $this->authorize('admin.{{ $modelDotNotation }}.create');
+        $this->gate->authorize('admin.{{ $modelDotNotation }}.create');
 
-@if (count($relations))
-        return view('admin.{{ $modelDotNotation }}.create',[
-            'activation' => Config::get('admin-auth.activation_enabled'),
-@if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)
-            '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
+        return $this->viewFactory->make(
+            'admin.{{ $modelDotNotation }}.create',
+            [
+                'activation' => Config::get('admin-auth.activation_enabled'),
+@foreach($belongsToManyRelations as $belongsToMany)
+                '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
 @endforeach
-@endif
-        ]);
-@else
-        return view('admin.{{ $modelDotNotation }}.create');
-@endif
+            ],
+        );
     }
 
     /**
      * Store a newly created resource in storage.
-     *
-     * {{'@'}}param  Store{{ $modelBaseName }} $request
-     * {{'@'}}return array|RedirectResponse|Redirector
      */
-    public function store(Store{{ $modelBaseName }} $request)
+    public function store(Store{{ $modelBaseName }} $request): array|RedirectResponse
     {
         // Sanitize input
         $sanitized = $request->getModifiedData();
 
         // Store the {{ $modelBaseName }}
+@if (count($belongsToManyRelations) > 0)
+@foreach($belongsToManyRelations as $belongsToMany)
         ${{ $modelVariableName }} = {{ $modelBaseName }}::create($sanitized);
 
-@if (count($relations))
-@if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)
         // But we do have a {{ $belongsToMany['related_table'] }}, so we need to attach the {{ $belongsToMany['related_table'] }} to the {{ $modelVariableName }}
-        ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync(collect($request->input('{{ $belongsToMany['related_table'] }}', []))->map->id->toArray());
+        ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync((new Collection($request->input('{{ $belongsToMany['related_table'] }}', [])))->map->id->toArray());
 @endforeach
 
-@endif
+@else
+        {{ $modelBaseName }}::create($sanitized);
+
 @endif
         if ($request->ajax()) {
-            return ['redirect' => url('admin/{{ $resource }}'), 'message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'redirect' => $this->urlGenerator->to('admin/{{ $resource }}'),
+                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
-        return redirect('admin/{{ $resource }}');
+        return $this->redirector->to('admin/{{ $resource }}');
     }
 
     /**
      * Display the specified resource.
      *
-     * {{'@'}}param  {{ $modelBaseName }} ${{ $modelVariableName }}
-     * {{'@'}}return void
      * {{'@'}}throws AuthorizationException
      */
-    public function show({{ $modelBaseName }} ${{ $modelVariableName }})
+    public function show({{ $modelBaseName }} ${{ $modelVariableName }}): void
     {
-        $this->authorize('admin.{{ $modelDotNotation }}.show', ${{ $modelVariableName }});
+        $this->gate->authorize('admin.{{ $modelDotNotation }}.show', ${{ $modelVariableName }});
 
         // TODO your code goes here
     }
@@ -146,43 +165,34 @@ class {{ $controllerBaseName }} extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * {{'@'}}param  {{ $modelBaseName }} ${{ $modelVariableName }}
-     * {{'@'}}return Factory|View
      * {{'@'}}throws AuthorizationException
      */
-    public function edit({{ $modelBaseName }} ${{ $modelVariableName }})
+    public function edit({{ $modelBaseName }} ${{ $modelVariableName }}): View
     {
-        $this->authorize('admin.{{ $modelDotNotation }}.edit', ${{ $modelVariableName }});
+        $this->gate->authorize('admin.{{ $modelDotNotation }}.edit', ${{ $modelVariableName }});
 
-@if (count($relations))
-@if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)
+@if (count($belongsToManyRelations) > 0)
+@foreach($belongsToManyRelations as $belongsToMany)
         ${{ $modelVariableName }}->load('{{ $belongsToMany['related_table'] }}');
 @endforeach
 
 @endif
-@endif
-        return view('admin.{{ $modelDotNotation }}.edit', [
-            '{{ $modelVariableName }}' => ${{ $modelVariableName }},
-            'activation' => Config::get('admin-auth.activation_enabled'),
-@if (count($relations))
-@if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)
-            '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
+        return $this->viewFactory->make(
+            'admin.{{ $modelDotNotation }}.edit',
+            [
+                '{{ $modelVariableName }}' => ${{ $modelVariableName }},
+                'activation' => $this->config->get('admin-auth.activation_enabled'),
+@foreach($belongsToManyRelations as $belongsToMany)
+                '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
 @endforeach
-@endif
-@endif
-        ]);
+            ],
+        );
     }
 
     /**
      * Update the specified resource in storage.
-     *
-     * {{'@'}}param  Update{{ $modelBaseName }} $request
-     * {{'@'}}param  {{ $modelBaseName }} ${{ $modelVariableName }}
-     * {{'@'}}return array|RedirectResponse|Redirector
      */
-    public function update(Update{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }})
+    public function update(Update{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}): array|RedirectResponse
     {
         // Sanitize input
         $sanitized = $request->getModifiedData();
@@ -190,86 +200,89 @@ class {{ $controllerBaseName }} extends Controller
         // Update changed values {{ $modelBaseName }}
         ${{ $modelVariableName }}->update($sanitized);
 
-@if (count($relations))
-@if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)
+@if (count($belongsToManyRelations) > 0)
+@foreach($belongsToManyRelations as $belongsToMany)
         // But we do have a {{ $belongsToMany['related_table'] }}, so we need to attach the {{ $belongsToMany['related_table'] }} to the {{ $modelVariableName }}
         if($request->input('{{ $belongsToMany['related_table'] }}')) {
-            ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync(collect($request->input('{{ $belongsToMany['related_table'] }}', []))->map->id->toArray());
+            ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync((new Collection($request->input('{{ $belongsToMany['related_table'] }}', [])))->map->id->toArray());
         }
 @endforeach
 @endif
-@endif
 
         if ($request->ajax()) {
-            return ['redirect' => url('admin/{{ $resource }}'), 'message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'redirect' => $this->urlGenerator->to('admin/{{ $resource }}'),
+                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
-        return redirect('admin/{{ $resource }}');
+        return $this->redirector->to('admin/{{ $resource }}');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * {{'@'}}param  Destroy{{ $modelBaseName }} $request
-     * {{'@'}}param  {{ $modelBaseName }} ${{ $modelVariableName }}
-     * {{'@'}}return ResponseFactory|RedirectResponse|Response
      * {{'@'}}throws Exception
      */
-    public function destroy(Destroy{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }})
+    public function destroy(Destroy{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}): array|RedirectResponse
     {
         ${{ $modelVariableName }}->delete();
 
         if ($request->ajax()) {
-            return response(['message' => trans('brackets/admin-ui::admin.operation.succeeded')]);
+            return ['message' => __('brackets/admin-ui::admin.operation.succeeded')];
         }
 
-        return redirect()->back();
+        return $this->redirector->back();
     }
 
-    @if($activation)/**
-    * Resend activation e-mail
-    *
-    * {{'@'}}param Request $request
-    * {{'@'}}param {{ $modelBaseName }} ${{ $modelVariableName }}
-    * {{'@'}}return array|RedirectResponse
-    */
-    public function resendActivationEmail(Request $request, ActivationService $activationService, {{ $modelBaseName }} ${{ $modelVariableName }})
-    {
-        if(Config::get('admin-auth.activation_enabled')) {
-
-            $response = $activationService->handle(${{ $modelVariableName }});
-            if($response == Activation::ACTIVATION_LINK_SENT) {
-                if ($request->ajax()) {
-                    return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
-                }
-
-                return redirect()->back();
-            } else {
-                if ($request->ajax()) {
-                    abort(409, trans('brackets/admin-ui::admin.operation.failed'));
-                }
-
-                return redirect()->back();
-            }
-        } else {
+@if($activation)
+    /**
+     * Resend activation e-mail
+     *
+     * {{'@'}}throws HttpException
+     */
+    public function resendActivationEmail(
+        Request $request,
+        ActivationService $activationService,
+        {{ $modelBaseName }} ${{ $modelVariableName }},
+    ): array|RedirectResponse {
+        if(!$this->config->get('admin-auth.activation_enabled')) { {
             if ($request->ajax()) {
-                abort(400, trans('brackets/admin-ui::admin.operation.not_allowed'));
+                throw HttpException::fromStatusCode(
+                    400,
+                    __('brackets/admin-ui::admin.operation.not_allowed'),
+                );
             }
 
-            return redirect()->back();
+            return $this->redirector->back();
         }
+
+        $response = $activationService->handle(${{ $modelVariableName }});
+        if($response == ActivationBroker::ACTIVATION_LINK_SENT) {
+            if ($request->ajax()) {
+                return ['message' => __('brackets/admin-ui::admin.operation.succeeded')];
+            }
+
+            return $this->redirector->back();
+        }
+
+        if ($request->ajax()) {
+            throw HttpException::fromStatusCode(
+                409,
+                __('brackets/admin-ui::admin.operation.failed'),
+            );
+        }
+
+        return $this->redirector->back();
     }
 @endif
 @if($export)
 
     /**
      * Export entities
-     *
-     * {{'@'}}return BinaryFileResponse|null
      */
-    public function export(): ?BinaryFileResponse
+    public function export(Excel $excel, {{ $exportBaseName }} $export): ?BinaryFileResponse
     {
-        return Excel::download(app({{ $exportBaseName }}::class), '{{ str_plural($modelVariableName) }}.xlsx');
+        return $excel->download($export, '{{ Str::plural($modelVariableName) }}.xlsx');
     }
 @endif}

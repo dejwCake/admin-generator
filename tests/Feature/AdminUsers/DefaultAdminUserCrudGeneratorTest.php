@@ -20,6 +20,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         $storePath = base_path('app/Http/Requests/Admin/AdminUser/StoreAdminUser.php');
         $updatePath = base_path('app/Http/Requests/Admin/AdminUser/UpdateAdminUser.php');
         $destroyPath = base_path('app/Http/Requests/Admin/AdminUser/DestroyAdminUser.php');
+        $impersonalLoginPath = base_path('app/Http/Requests/Admin/AdminUser/ImpersonalLoginAdminUser.php');
         $exportPath = base_path('app/Exports/AdminUsersExport.php');
         $routesPath = base_path('routes/web.php');
         $indexPath = resource_path('views/admin/admin-user/index.blade.php');
@@ -36,6 +37,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertFileDoesNotExist($storePath);
         self::assertFileDoesNotExist($updatePath);
         self::assertFileDoesNotExist($destroyPath);
+        self::assertFileDoesNotExist($impersonalLoginPath);
         self::assertFileDoesNotExist($exportPath);
         self::assertFileDoesNotExist($indexPath);
         self::assertFileDoesNotExist($listingJsPath);
@@ -57,6 +59,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertFileExists($storePath);
         self::assertFileExists($updatePath);
         self::assertFileExists($destroyPath);
+        self::assertFileExists($impersonalLoginPath);
         self::assertFileExists($exportPath);
         self::assertFileExists($indexPath);
         self::assertFileExists($listingJsPath);
@@ -71,6 +74,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertMatchesFileSnapshot($storePath);
         self::assertMatchesFileSnapshot($updatePath);
         self::assertMatchesFileSnapshot($destroyPath);
+        self::assertMatchesFileSnapshot($impersonalLoginPath);
         self::assertMatchesFileSnapshot($exportPath);
         self::assertMatchesFileSnapshot($routesPath);
         self::assertMatchesFileSnapshot($indexPath);

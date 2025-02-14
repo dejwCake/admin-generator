@@ -27,6 +27,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UsersController extends Controller
 {
@@ -35,15 +36,12 @@ class UsersController extends Controller
      */
     protected string $guard;
 
-    /**
-     * AdminUsersController constructor.
-     */
     public function __construct(
-        public readonly Gate $gate,
         public readonly Config $config,
+        public readonly Gate $gate,
         public readonly Redirector $redirector,
-        public readonly ViewFactory $viewFactory,
         public readonly UrlGenerator $urlGenerator,
+        public readonly ViewFactory $viewFactory,
     ) {
         $this->guard = $this->config->get('admin-auth.defaults.guard', 'admin');
     }
@@ -53,17 +51,15 @@ class UsersController extends Controller
      */
     public function index(IndexUser $request): array|View
     {
-        // create and AdminListing instance for a specific model and
+        // create and AdminListingService instance for a specific model and
         $data = AdminListingService::create(User::class)
             ->processRequestAndGet(
                 // pass the request with params
                 $request,
-
                 // set columns to query
                 ['id', 'first_name', 'last_name', 'email', 'activated', 'forbidden', 'language'],
-
                 // set columns to searchIn
-                ['id']
+                ['id'],
             );
 
         if ($request->ajax()) {
@@ -129,7 +125,7 @@ class UsersController extends Controller
      *
      * @throws AuthorizationException
      */
-    public function show(User $user)
+    public function show(User $user): void
     {
         $this->gate->authorize('admin.user.show', $user);
 
@@ -251,5 +247,4 @@ class UsersController extends Controller
 
         return $this->redirector->back();
     }
-
 }
