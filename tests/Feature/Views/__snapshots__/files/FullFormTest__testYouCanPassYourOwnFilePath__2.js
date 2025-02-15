@@ -6,9 +6,7 @@ Vue.component('profile-edit-password-form', {
         return {
             form: {
                 title:  '' ,
-                
             }
         }
     }
-
 });

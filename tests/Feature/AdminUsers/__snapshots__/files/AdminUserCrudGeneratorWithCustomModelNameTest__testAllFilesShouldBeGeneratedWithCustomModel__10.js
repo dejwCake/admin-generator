@@ -12,7 +12,6 @@ Vue.component('user-form', {
                 activated:  '' ,
                 forbidden:  '' ,
                 language:  '' ,
-                
             }
         }
     }

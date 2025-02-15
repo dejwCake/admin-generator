@@ -8,7 +8,6 @@ Vue.component('user-form', {
                 name:  '' ,
                 email:  '' ,
                 password:  '' ,
-                
             }
         }
     }

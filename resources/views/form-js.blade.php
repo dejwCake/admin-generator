@@ -5,11 +5,10 @@ Vue.component('{{ $modelJSName }}-form', {
     data: function() {
         return {
             form: {
-                @foreach($columns as $column){{ $column['name'].':' }} @if($column['type'] == 'json') {{ 'this.getLocalizedFormDefaults()' }} @elseif($column['type'] == 'boolean') {!! "false" !!} @else {!! "''" !!} @endif,
-                @endforeach
-
+@foreach($columns as $column)
+                {{ $column['name'].':' }} @if($column['type'] == 'json') {{ 'this.getLocalizedFormDefaults()' }} @elseif($column['type'] == 'boolean') {!! "false" !!} @else {!! "''" !!} @endif,
+@endforeach
             }
         }
     }
-
 });

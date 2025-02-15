@@ -6,9 +6,7 @@ Vue.component('category-form', {
         return {
             form: {
                 title:  '' ,
-                
             }
         }
     }
-
 });

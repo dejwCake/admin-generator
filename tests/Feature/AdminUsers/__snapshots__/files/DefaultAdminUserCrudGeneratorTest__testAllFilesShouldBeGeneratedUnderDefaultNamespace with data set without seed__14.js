@@ -12,7 +12,6 @@ Vue.component('admin-user-form', {
                 activated:  '' ,
                 forbidden:  '' ,
                 language:  '' ,
-                
             }
         }
     }

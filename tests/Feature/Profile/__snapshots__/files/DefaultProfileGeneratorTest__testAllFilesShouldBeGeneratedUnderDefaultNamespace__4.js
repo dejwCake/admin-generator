@@ -12,7 +12,7 @@ Vue.component('profile-edit-profile-form', {
                 activated:  '' ,
                 forbidden:  '' ,
                 language:  '' ,
-                
+
             },
             mediaCollections: ['avatar']
         }

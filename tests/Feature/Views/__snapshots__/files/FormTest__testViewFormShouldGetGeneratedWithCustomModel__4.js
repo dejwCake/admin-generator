@@ -6,9 +6,7 @@ Vue.component('billing-my-article-form', {
         return {
             form: {
                 title:  '' ,
-                
             }
         }
     }
-
 });
