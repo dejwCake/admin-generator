@@ -14,7 +14,7 @@ class AdminUserCrudGeneratorWithCustomControllerNameTest extends UserTestCase
     public function testAdminUserControllerNameCanBeNamespaced(): void
     {
         $filePathController = base_path('app/Http/Controllers/Admin/Auth/AdminUsersController.php');
-        $filePathRoutes = base_path('routes/web.php');
+        $filePathRoutes = base_path('routes/admin.php');
 
         self::assertFileDoesNotExist($filePathController);
 

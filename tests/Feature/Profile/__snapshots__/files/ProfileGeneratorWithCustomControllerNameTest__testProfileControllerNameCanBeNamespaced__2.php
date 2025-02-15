@@ -1,13 +1,20 @@
 <?php
 
+declare(strict_types=1);
 
+use Illuminate\Support\Facades\Route;
 
 /* Auto-generated admin routes */
-Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->group(static function () {
-    Route::prefix('admin')->namespace('App\Http\Controllers\Admin')->name('admin/')->group(static function() {
-        Route::get('/profile',                                      'Auth\ProfileController@editProfile')->name('edit-profile');
-        Route::post('/profile',                                     'Auth\ProfileController@updateProfile')->name('update-profile');
-        Route::get('/password',                                     'Auth\ProfileController@editPassword')->name('edit-password');
-        Route::post('/password',                                    'Auth\ProfileController@updatePassword')->name('update-password');
+Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
+    ->prefix('admin')
+    ->name('admin/')
+    ->group(static function (): void {
+        Route::get('/profile', [\App\Http\Controllers\Admin\Auth\ProfileController::class, 'editProfile'])
+            ->name('edit-profile');
+        Route::post('/profile', [\App\Http\Controllers\Admin\Auth\ProfileController::class, 'updateProfile'])
+            ->name('update-profile');
+        Route::get('/password', [\App\Http\Controllers\Admin\Auth\ProfileController::class, 'editPassword'])
+            ->name('edit-password');
+        Route::post('/password', [\App\Http\Controllers\Admin\Auth\ProfileController::class, 'updatePassword'])
+            ->name('update-password');
     });
-});

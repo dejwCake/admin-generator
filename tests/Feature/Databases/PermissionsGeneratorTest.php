@@ -6,9 +6,6 @@ namespace Brackets\AdminGenerator\Tests\Feature\Databases;
 
 use Brackets\AdminGenerator\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\File;
-use SplFileInfo;
 
 class PermissionsGeneratorTest extends TestCase
 {

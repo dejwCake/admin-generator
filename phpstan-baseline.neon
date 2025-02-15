@@ -79,9 +79,21 @@ parameters:
 			path: src/GenerateUser.php
 
 		-
+			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: tests/TestCase.php
+
+		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 8
+			path: tests/TestCase.php
+
+		-
+			message: '#^Instanceof between Symfony\\Component\\Finder\\SplFileInfo and SplFileInfo will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
 			path: tests/TestCase.php
 
 		-

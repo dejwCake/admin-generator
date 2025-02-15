@@ -22,7 +22,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         $destroyPath = base_path('app/Http/Requests/Admin/AdminUser/DestroyAdminUser.php');
         $impersonalLoginPath = base_path('app/Http/Requests/Admin/AdminUser/ImpersonalLoginAdminUser.php');
         $exportPath = base_path('app/Exports/AdminUsersExport.php');
-        $routesPath = base_path('routes/web.php');
+        $routesPath = base_path('routes/admin.php');
         $indexPath = resource_path('views/admin/admin-user/index.blade.php');
         $listingJsPath = resource_path('js/admin/admin-user/Listing.js');
         $indexJsPath = resource_path('js/admin/admin-user/index.js');

@@ -110,9 +110,7 @@ abstract class TestCase extends Orchestra
     protected function getPermissionMigrationPath(string $fileName): ?string
     {
         $file = (new Collection(File::files(database_path('migrations'))))
-            ->filter(static function (SplFileInfo $file) use ($fileName) {
-                return str_contains($file->getFilename(), $fileName);
-            })
+            ->filter(static fn (SplFileInfo $file) => str_contains($file->getFilename(), $fileName))
             ->first();
         if ($file === null) {
             return null;

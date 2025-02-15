@@ -39,7 +39,7 @@ abstract class FileAppender extends Command
      * Append content to file only if if the content is not present in the file
      *
      * @param string $defaultContent content that will be used to populated with newly created file
-     * (in case it does not already exists)
+     * (in case it does not already exist)
      */
     protected function appendIfNotAlreadyAppended(
         string $path,
@@ -49,13 +49,16 @@ abstract class FileAppender extends Command
         if (!$this->files->exists($path)) {
             $this->makeDirectory($path);
             $this->files->put($path, $defaultContent . $content);
-        } else if (!$this->alreadyAppended($path, $content)) {
+
+            return true;
+        }
+        if (!$this->alreadyAppended($path, $content)) {
             $this->files->append($path, $content);
-        } else {
-            return false;
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -79,9 +82,9 @@ abstract class FileAppender extends Command
             $this->files->put($path, str_replace($search, $replace, $this->files->get($path)));
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

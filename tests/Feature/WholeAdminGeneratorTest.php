@@ -6,9 +6,6 @@ namespace Brackets\AdminGenerator\Tests\Feature;
 
 use Brackets\AdminGenerator\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\File;
-use SplFileInfo;
 
 class WholeAdminGeneratorTest extends TestCase
 {
@@ -24,7 +21,7 @@ class WholeAdminGeneratorTest extends TestCase
         $destroyPath = base_path('app/Http/Requests/Admin/Category/DestroyCategory.php');
         $bulkDestroyPath = base_path('app/Http/Requests/Admin/Category/BulkDestroyCategory.php');
         $exportPath = base_path('app/Exports/CategoriesExport.php');
-        $routesPath = base_path('routes/web.php');
+        $routesPath = base_path('routes/admin.php');
         $indexPath = resource_path('views/admin/category/index.blade.php');
         $listingJsPath = resource_path('js/admin/category/Listing.js');
         $elementsPath = resource_path('views/admin/category/components/form-elements.blade.php');

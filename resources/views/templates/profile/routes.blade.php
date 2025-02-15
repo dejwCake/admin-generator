@@ -1,10 +1,15 @@
 
 /* Auto-generated admin routes */
-Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->group(static function () {
-    Route::prefix('admin')->namespace('App\Http\Controllers\Admin')->name('admin/')->group(static function() {
-        {!! str_pad("Route::get('/profile',", 60) !!}'{{ $controllerPartiallyFullName }}@editProfile')->name('edit-profile');
-        {!! str_pad("Route::post('/profile',", 60) !!}'{{ $controllerPartiallyFullName }}@updateProfile')->name('update-profile');
-        {!! str_pad("Route::get('/password',", 60) !!}'{{ $controllerPartiallyFullName }}@editPassword')->name('edit-password');
-        {!! str_pad("Route::post('/password',", 60) !!}'{{ $controllerPartiallyFullName }}@updatePassword')->name('update-password');
+Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
+    ->prefix('admin')
+    ->name('admin/')
+    ->group(static function (): void {
+        Route::get('/profile', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'editProfile'])
+            ->name('edit-profile');
+        Route::post('/profile', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'updateProfile'])
+            ->name('update-profile');
+        Route::get('/password', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'editPassword'])
+            ->name('edit-password');
+        Route::post('/password', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'updatePassword'])
+            ->name('update-password');
     });
-});

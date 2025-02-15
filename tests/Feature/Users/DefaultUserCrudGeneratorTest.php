@@ -18,7 +18,7 @@ class DefaultUserCrudGeneratorTest extends UserTestCase
         $storePath = base_path('app/Http/Requests/Admin/User/StoreUser.php');
         $updatePath = base_path('app/Http/Requests/Admin/User/UpdateUser.php');
         $destroyPath = base_path('app/Http/Requests/Admin/User/DestroyUser.php');
-        $routesPath = base_path('routes/web.php');
+        $routesPath = base_path('routes/admin.php');
         $indexPath = resource_path('views/admin/user/index.blade.php');
         $listingJsPath = resource_path('js/admin/user/Listing.js');
         $indexJsPath = resource_path('js/admin/user/index.js');

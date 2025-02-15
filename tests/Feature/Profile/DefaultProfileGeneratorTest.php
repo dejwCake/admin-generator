@@ -15,7 +15,7 @@ class DefaultProfileGeneratorTest extends UserTestCase
     public function testAllFilesShouldBeGeneratedUnderDefaultNamespace(): void
     {
         $filePathController = base_path('app/Http/Controllers/Admin/ProfileController.php');
-        $filePathRoute = base_path('routes/web.php');
+        $filePathRoute = base_path('routes/admin.php');
         $editPathProfile = resource_path('views/admin/profile/edit-profile.blade.php');
         $formJsPathProfile = resource_path('js/admin/profile-edit-profile/Form.js');
         $editPathPassword = resource_path('views/admin/profile/edit-password.blade.php');

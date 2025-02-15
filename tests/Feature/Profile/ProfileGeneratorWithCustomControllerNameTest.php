@@ -14,7 +14,7 @@ class ProfileGeneratorWithCustomControllerNameTest extends UserTestCase
     public function testProfileControllerNameCanBeNamespaced(): void
     {
         $filePathController = base_path('app/Http/Controllers/Admin/Auth/ProfileController.php');
-        $filePathRoute = base_path('routes/web.php');
+        $filePathRoute = base_path('routes/admin.php');
 
         self::assertFileDoesNotExist($filePathController);
 

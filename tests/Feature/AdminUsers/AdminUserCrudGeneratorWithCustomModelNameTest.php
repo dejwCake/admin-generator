@@ -16,7 +16,7 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         $controllerPath = base_path('app/Http/Controllers/Admin/Auth/UsersController.php');
         $storePath = base_path('app/Http/Requests/Admin/User/StoreUser.php');
         $updatePath = base_path('app/Http/Requests/Admin/User/UpdateUser.php');
-        $routesPath = base_path('routes/web.php');
+        $routesPath = base_path('routes/admin.php');
         $indexPath = resource_path('views/admin/user/index.blade.php');
         $indexJsPath = resource_path('js/admin/user/Listing.js');
         $elementsPath = resource_path('views/admin/user/components/form-elements.blade.php');
