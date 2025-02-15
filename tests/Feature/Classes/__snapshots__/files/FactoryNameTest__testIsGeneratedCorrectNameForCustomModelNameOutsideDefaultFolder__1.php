@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Billing\Cat;
+use App\Billing\MyCat;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class CatFactory extends Factory
+class MyCatFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
@@ -15,7 +15,7 @@ class CatFactory extends Factory
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $model = Cat::class;
+    protected $model = MyCat::class;
 
     /**
      * Define the model's default state.

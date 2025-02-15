@@ -1,19 +1,50 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
-$factory->define(Brackets\AdminAuth\Models\AdminUser::class, function (Faker\Generator $faker) {
-    return [
-        'first_name' => $faker->firstName,
-        'last_name' => $faker->lastName,
-        'email' => $faker->email,
-        'password' => bcrypt($faker->password),
-        'remember_token' => null,
-        'activated' => true,
-        'forbidden' => $faker->boolean(),
-        'language' => 'en',
-        'deleted_at' => null,
-        'created_at' => $faker->sentence,
-        'updated_at' => $faker->sentence,
-        
-    ];
-});
+declare(strict_types=1);
+
+namespace Database\Factories;
+
+use Brackets\AdminAuth\Models\AdminUser;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class AdminUserFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected $model = AdminUser::class;
+
+    /**
+     * Define the model's default state.
+     */
+    public function definition(): array
+    {
+        return [
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName,
+            'email' => $this->faker->email,
+            'password' => bcrypt($this->faker->password),
+            'remember_token' => null,
+            'activated' => true,
+            'forbidden' => $this->faker->boolean(),
+            'language' => 'en',
+            'deleted_at' => null,
+            'created_at' => $this->faker->sentence,
+            'updated_at' => $this->faker->sentence,
+        ];
+    }
+
+    /**
+     * Indicate that the model's email address should be unverified.
+     */
+    public function notActivated(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => [
+            'activated' => false,
+        ]);
+    }
+}

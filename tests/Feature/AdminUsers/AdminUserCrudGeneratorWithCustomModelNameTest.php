@@ -23,7 +23,7 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         $createPath = resource_path('views/admin/user/create.blade.php');
         $editPath = resource_path('views/admin/user/edit.blade.php');
         $formJsPath = resource_path('js/admin/user/Form.js');
-        $factoryPath = base_path('database/factories/CategoryFactory.php');
+        $factoryPath = base_path('database/factories/UserFactory.php');
 
         self::assertFileDoesNotExist($controllerPath);
         self::assertFileDoesNotExist($storePath);
@@ -66,7 +66,7 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
 
     public function testAdminUserFactoryGeneratorShouldGenerateEverythingWithCustomModelName(): void
     {
-        $filePath = base_path('database/factories/CategoryFactory.php');
+        $filePath = base_path('database/factories/UserFactory.php');
 
         $this->artisan('admin:generate:admin-user', [
             '--model-name' => 'Auth\\User',
