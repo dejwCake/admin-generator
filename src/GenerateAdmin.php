@@ -40,6 +40,7 @@ class GenerateAdmin extends Command
         $exportOption = $this->option('with-export');
         $withoutBulkOptions = $this->option('without-bulk');
         $force = $this->option('force');
+        $forcePermissions = $this->option('force-permissions');
 
         $this->call('admin:generate:model', [
             'table_name' => $tableNameArgument,
@@ -129,7 +130,7 @@ class GenerateAdmin extends Command
             ]);
         }
 
-        if ($this->shouldGeneratePermissionsMigration()) {
+        if ($forcePermissions || $this->shouldGeneratePermissionsMigration()) {
             $this->call('admin:generate:permissions', [
                 'table_name' => $tableNameArgument,
                 '--model-name' => $modelOption,
@@ -166,6 +167,7 @@ class GenerateAdmin extends Command
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating admin'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+            ['force-permissions', 'fp', InputOption::VALUE_NONE, 'Force permission will generate permission migration'],
         ];
     }
 

@@ -78,6 +78,10 @@ class Permissions extends ClassGenerator
      */
     protected function alreadyExists(string $path): bool|string
     {
+        if (!$this->files->exists(database_path('migrations'))){
+            return false;
+        }
+
         foreach ($this->files->files(database_path('migrations')) as $file) {
             if (str_contains($file->getFilename(), $path)) {
                 return $file->getPathname();

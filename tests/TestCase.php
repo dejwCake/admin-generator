@@ -8,9 +8,11 @@ use Brackets\AdminGenerator\AdminGeneratorServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\Snapshots\MatchesSnapshots;
+use SplFileInfo;
 
 abstract class TestCase extends Orchestra
 {
@@ -103,5 +105,20 @@ abstract class TestCase extends Orchestra
             File::deleteDirectory($directory);
         }
         File::makeDirectory($directory);
+    }
+
+    protected function getPermissionMigrationPath(string $fileName): ?string
+    {
+        $file = (new Collection(File::files(database_path('migrations'))))
+            ->filter(static function (SplFileInfo $file) use ($fileName) {
+                return str_contains($file->getFilename(), $fileName);
+            })
+            ->first();
+        if ($file === null) {
+            return null;
+        }
+        assert($file instanceof SplFileInfo);
+
+        return $file->getPathname();
     }
 }
