@@ -15,14 +15,14 @@ class DefaultUserCrudGeneratorTest extends UserTestCase
     {
         $controllerPath = base_path('app/Http/Controllers/Admin/UsersController.php');
         $indexRequestPath = base_path('app/Http/Requests/Admin/User/IndexUser.php');
-        $storePath = base_path('app/Http/Requests/Admin/User/StoreUser.php');
-        $updatePath = base_path('app/Http/Requests/Admin/User/UpdateUser.php');
-        $destroyPath = base_path('app/Http/Requests/Admin/User/DestroyUser.php');
+        $storeRequestPath = base_path('app/Http/Requests/Admin/User/StoreUser.php');
+        $updateRequestPath = base_path('app/Http/Requests/Admin/User/UpdateUser.php');
+        $destroyRequestPath = base_path('app/Http/Requests/Admin/User/DestroyUser.php');
         $routesPath = base_path('routes/admin.php');
         $indexPath = resource_path('views/admin/user/index.blade.php');
         $listingJsPath = resource_path('js/admin/user/Listing.js');
         $indexJsPath = resource_path('js/admin/user/index.js');
-        $elementsPath = resource_path('views/admin/user/components/form-elements.blade.php');
+        $formPath = resource_path('views/admin/user/components/form-elements.blade.php');
         $createPath = resource_path('views/admin/user/create.blade.php');
         $editPath = resource_path('views/admin/user/edit.blade.php');
         $formJsPath = resource_path('js/admin/user/Form.js');
@@ -30,12 +30,12 @@ class DefaultUserCrudGeneratorTest extends UserTestCase
 
         self::assertFileDoesNotExist($controllerPath);
         self::assertFileDoesNotExist($indexRequestPath);
-        self::assertFileDoesNotExist($storePath);
-        self::assertFileDoesNotExist($updatePath);
-        self::assertFileDoesNotExist($destroyPath);
+        self::assertFileDoesNotExist($storeRequestPath);
+        self::assertFileDoesNotExist($updateRequestPath);
+        self::assertFileDoesNotExist($destroyRequestPath);
         self::assertFileDoesNotExist($indexPath);
         self::assertFileDoesNotExist($listingJsPath);
-        self::assertFileDoesNotExist($elementsPath);
+        self::assertFileDoesNotExist($formPath);
         self::assertFileDoesNotExist($createPath);
         self::assertFileDoesNotExist($editPath);
         self::assertFileDoesNotExist($formJsPath);
@@ -45,12 +45,12 @@ class DefaultUserCrudGeneratorTest extends UserTestCase
 
         self::assertFileExists($controllerPath);
         self::assertFileExists($indexRequestPath);
-        self::assertFileExists($storePath);
-        self::assertFileExists($updatePath);
-        self::assertFileExists($destroyPath);
+        self::assertFileExists($storeRequestPath);
+        self::assertFileExists($updateRequestPath);
+        self::assertFileExists($destroyRequestPath);
         self::assertFileExists($indexPath);
         self::assertFileExists($listingJsPath);
-        self::assertFileExists($elementsPath);
+        self::assertFileExists($formPath);
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
         self::assertFileExists($formJsPath);
@@ -58,13 +58,13 @@ class DefaultUserCrudGeneratorTest extends UserTestCase
 
         self::assertMatchesFileSnapshot($controllerPath);
         self::assertMatchesFileSnapshot($indexRequestPath);
-        self::assertMatchesFileSnapshot($storePath);
-        self::assertMatchesFileSnapshot($updatePath);
-        self::assertMatchesFileSnapshot($destroyPath);
+        self::assertMatchesFileSnapshot($storeRequestPath);
+        self::assertMatchesFileSnapshot($updateRequestPath);
+        self::assertMatchesFileSnapshot($destroyRequestPath);
         self::assertMatchesFileSnapshot($routesPath);
         self::assertMatchesFileSnapshot($indexPath);
         self::assertMatchesFileSnapshot($listingJsPath);
-        self::assertMatchesFileSnapshot($elementsPath);
+        self::assertMatchesFileSnapshot($formPath);
         self::assertMatchesFileSnapshot($createPath);
         self::assertMatchesFileSnapshot($editPath);
         self::assertMatchesFileSnapshot($formJsPath);

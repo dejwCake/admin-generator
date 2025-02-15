@@ -29,6 +29,7 @@ trait Names
     protected string $titleSingular;
     protected string $titlePlural;
 
+    protected string $controllerFullName;
     protected string $controllerWithNamespaceFromDefault;
 
     public function valueWithoutId(string $string): string
@@ -98,13 +99,13 @@ trait Names
             $controllerName = $controllerGenerator->generateClassNameFromTable($this->tableName);
         }
 
-        $controllerFullName = $controllerGenerator->qualifyClass($controllerName);
+        $this->controllerFullName = $controllerGenerator->qualifyClass($controllerName);
         $this->controllerWithNamespaceFromDefault =
             !Str::startsWith(
-                $controllerFullName,
+                $this->controllerFullName,
                 $startsWith = trim($controllerGenerator->rootNamespace(), '\\') . '\Http\\Controllers\\Admin\\',
             )
-         ? $controllerFullName : Str::replaceFirst($startsWith, '', $controllerFullName);
+         ? $this->controllerFullName : Str::replaceFirst($startsWith, '', $this->controllerFullName);
 
         if ($modelWithFullNamespace !== null) {
             $this->modelFullName = $modelWithFullNamespace;

@@ -1,43 +1,34 @@
-@extends('brackets/admin-ui::admin.layout.default')
+<?php
 
-@section('title', __('admin.user.actions.create'))
+declare(strict_types=1);
 
-@section('body')
+use Illuminate\Support\Facades\Route;
 
-    <div class="container-xl">
-
-        <div class="card">
-
-            <user-form
-                :action="'{{ $action }}'"
-                :activation="!!'{{ $activation }}'"
-                inline-template>
-
-                <form class="form-horizontal form-create" method="post" @submit.prevent="onSubmit" :action="action">
-
-                    <div class="card-header">
-                        <i class="fa fa-plus"></i> {{ __('admin.user.actions.create') }}
-                    </div>
-
-                    <div class="card-body">
-
-                        @include('admin.user.components.form-elements')
-
-                    </div>
-
-                    <div class="card-footer">
-	                    <button type="submit" class="btn btn-primary" :disabled="submiting">
-		                    <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-download'"></i>
-                            {{ __('brackets/admin-ui::admin.btn.save') }}
-	                    </button>
-                    </div>
-
-                </form>
-
-            </user-form>
-
-        </div>
-
-    </div>
-
-@endsection
+/* Auto-generated admin routes */
+Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
+    ->prefix('admin')
+    ->name('admin/')
+    ->group(static function (): void {
+        Route::prefix('users')
+            ->name('users/')
+            ->group(static function(): void {
+                Route::get('/', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'index'])
+                    ->name('index');
+                Route::get('/create', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'create'])
+                    ->name('create');
+                Route::post('/', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'store'])
+                    ->name('store');
+                Route::get('/user/impersonal-login', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'impersonalLogin'])
+                    ->name('impersonal-login');
+                Route::get('/user/edit', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'edit'])
+                    ->name('edit');
+                Route::post('/user', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'update'])
+                    ->name('update');
+                Route::delete('/user', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'destroy'])
+                    ->name('destroy');
+                Route::get('/export', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'export'])
+                    ->name('export');
+                Route::get('/user/resend-activation', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'resendActivationEmail'])
+                    ->name('resend-activation-email');
+            });
+    });

@@ -4,12 +4,12 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
     ->prefix('admin')
     ->name('admin/')
     ->group(static function (): void {
-        Route::get('/profile', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'editProfile'])
+        Route::get('/profile', [\{{ $controllerFullName }}::class, 'editProfile'])
             ->name('edit-profile');
-        Route::post('/profile', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'updateProfile'])
+        Route::post('/profile', [\{{ $controllerFullName }}::class, 'updateProfile'])
             ->name('update-profile');
-        Route::get('/password', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'editPassword'])
+        Route::get('/password', [\{{ $controllerFullName }}::class, 'editPassword'])
             ->name('edit-password');
-        Route::post('/password', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'updatePassword'])
+        Route::post('/password', [\{{ $controllerFullName }}::class, 'updatePassword'])
             ->name('update-password');
     });

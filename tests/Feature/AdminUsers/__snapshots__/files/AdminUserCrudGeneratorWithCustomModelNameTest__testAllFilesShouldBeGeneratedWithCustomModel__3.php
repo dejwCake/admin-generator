@@ -10,14 +10,14 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateUser extends FormRequest
+class StoreUser extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(Gate $gate)
+    public function authorize(Gate $gate): bool
     {
-        return $gate->allows('admin.user.edit', $this->user);
+        return $gate->allows('admin.user.create');
     }
 
     /**
@@ -28,12 +28,12 @@ class UpdateUser extends FormRequest
         $rules = [
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],
-            'email' => ['sometimes', 'email', Rule::unique('admin_users', 'email')->ignore($this->user->getKey(), $this->user->getKeyName())->whereNull('deleted_at'), 'string'],
-            'password' => ['sometimes', 'confirmed', 'min:7', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/', 'string'],
-            'forbidden' => ['sometimes', 'boolean'],
-            'language' => ['sometimes', 'string'],
+            'email' => ['required', 'email', Rule::unique('admin_users', 'email')->whereNull('deleted_at'), 'string'],
+            'password' => ['required', 'confirmed', 'min:7', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/', 'string'],
+            'forbidden' => ['required', 'boolean'],
+            'language' => ['required', 'string'],
 
-            'roles' => ['sometimes', 'array'],
+            'roles' => ['array'],
         ];
 
         if ($config->get('admin-auth.activation_enabled')) {
@@ -53,9 +53,6 @@ class UpdateUser extends FormRequest
         $data = $this->validated();
         if (!$config->get('admin-auth.activation_enabled')) {
             $data['activated'] = true;
-        }
-        if (array_key_exists('password', $data) && empty($data['password'])) {
-            unset($data['password']);
         }
         if (!empty($data['password'])) {
             $hasher = app(Hasher::class);

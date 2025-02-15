@@ -7,23 +7,23 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
         Route::prefix('{{ $resource }}')
             ->name('{{ $resource }}/')
             ->group(static function(): void {
-                Route::get('/', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'index'])
+                Route::get('/', [\{{ $controllerFullName }}::class, 'index'])
                     ->name('index');
-                Route::get('/create', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'create'])
+                Route::get('/create', [\{{ $controllerFullName }}::class, 'create'])
                     ->name('create');
-                Route::post('/', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'store'])
+                Route::post('/', [\{{ $controllerFullName }}::class, 'store'])
                     ->name('store');
-                Route::get('/{{{ $modelVariableName }}}/edit', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'edit'])
+                Route::get('/{{{ $modelVariableName }}}/edit', [\{{ $controllerFullName }}::class, 'edit'])
                     ->name('edit');
-                Route::post('/{{{ $modelVariableName }}}', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'update'])
+                Route::post('/{{{ $modelVariableName }}}', [\{{ $controllerFullName }}::class, 'update'])
                     ->name('update');
-                Route::delete('/{{{ $modelVariableName }}}', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'destroy'])
+                Route::delete('/{{{ $modelVariableName }}}', [\{{ $controllerFullName }}::class, 'destroy'])
                     ->name('destroy');
 @if($export)
-                Route::get('/export', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'export'])
+                Route::get('/export', [\{{ $controllerFullName }}::class, 'export'])
                     ->name('export');
 @endif
-                Route::get('/{{{ $modelVariableName }}}/resend-activation', [\App\Http\Controllers\Admin\{{ $controllerPartiallyFullName }}::class, 'resendActivationEmail'])
+                Route::get('/{{{ $modelVariableName }}}/resend-activation', [\{{ $controllerFullName }}::class, 'resendActivationEmail'])
                     ->name('resend-activation-email');
             });
     });

@@ -23,21 +23,25 @@ class AdminUserCrudGeneratorWithCustomControllerNameTest extends UserTestCase
         ]);
 
         self::assertFileExists($filePathController);
+
         self::assertMatchesFileSnapshot($filePathController);
         self::assertMatchesFileSnapshot($filePathRoutes);
     }
 
     public function testAdminUserControllerNameCanBeOutsideDefaultDirectory(): void
     {
-        $filePath = base_path('app/Http/Controllers/Auth/AdminUsersController.php');
+        $filePathController = base_path('app/Http/Controllers/Auth/AdminUsersController.php');
+        $filePathRoutes = base_path('routes/admin.php');
 
-        self::assertFileDoesNotExist($filePath);
+        self::assertFileDoesNotExist($filePathController);
 
         $this->artisan('admin:generate:admin-user', [
             '--controller-name' => 'App\\Http\\Controllers\\Auth\\AdminUsersController',
         ]);
 
-        self::assertFileExists($filePath);
-        self::assertMatchesFileSnapshot($filePath);
+        self::assertFileExists($filePathController);
+
+        self::assertMatchesFileSnapshot($filePathController);
+        self::assertMatchesFileSnapshot($filePathRoutes);
     }
 }

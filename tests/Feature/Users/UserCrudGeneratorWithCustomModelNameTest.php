@@ -14,23 +14,23 @@ class UserCrudGeneratorWithCustomModelNameTest extends UserTestCase
     public function testAllFilesShouldBeGeneratedWithCustomModel(): void
     {
         $controllerPath = base_path('app/Http/Controllers/Admin/Auth/UsersController.php');
-        $storePath = base_path('app/Http/Requests/Admin/User/StoreUser.php');
-        $updatePath = base_path('app/Http/Requests/Admin/User/UpdateUser.php');
+        $storeRequestPath = base_path('app/Http/Requests/Admin/User/StoreUser.php');
+        $updateRequestPath = base_path('app/Http/Requests/Admin/User/UpdateUser.php');
         $routesPath = base_path('routes/admin.php');
         $indexPath = resource_path('views/admin/user/index.blade.php');
         $indexJsPath = resource_path('js/admin/user/Listing.js');
-        $elementsPath = resource_path('views/admin/user/components/form-elements.blade.php');
+        $formPath = resource_path('views/admin/user/components/form-elements.blade.php');
         $createPath = resource_path('views/admin/user/create.blade.php');
         $editPath = resource_path('views/admin/user/edit.blade.php');
         $formJsPath = resource_path('js/admin/user/Form.js');
         $factoryPath = base_path('database/factories/UserFactory.php');
 
         self::assertFileDoesNotExist($controllerPath);
-        self::assertFileDoesNotExist($storePath);
-        self::assertFileDoesNotExist($updatePath);
+        self::assertFileDoesNotExist($storeRequestPath);
+        self::assertFileDoesNotExist($updateRequestPath);
         self::assertFileDoesNotExist($indexPath);
         self::assertFileDoesNotExist($indexJsPath);
-        self::assertFileDoesNotExist($elementsPath);
+        self::assertFileDoesNotExist($formPath);
         self::assertFileDoesNotExist($createPath);
         self::assertFileDoesNotExist($editPath);
         self::assertFileDoesNotExist($formJsPath);
@@ -42,21 +42,21 @@ class UserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         ]);
 
         self::assertFileExists($controllerPath);
-        self::assertFileExists($storePath);
-        self::assertFileExists($updatePath);
+        self::assertFileExists($storeRequestPath);
+        self::assertFileExists($updateRequestPath);
         self::assertFileExists($indexPath);
         self::assertFileExists($indexJsPath);
-        self::assertFileExists($elementsPath);
+        self::assertFileExists($formPath);
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
         self::assertFileExists($formJsPath);
         self::assertMatchesFileSnapshot($controllerPath);
-        self::assertMatchesFileSnapshot($storePath);
-        self::assertMatchesFileSnapshot($updatePath);
+        self::assertMatchesFileSnapshot($storeRequestPath);
+        self::assertMatchesFileSnapshot($updateRequestPath);
         self::assertMatchesFileSnapshot($routesPath);
         self::assertMatchesFileSnapshot($indexPath);
         self::assertMatchesFileSnapshot($indexJsPath);
-        self::assertMatchesFileSnapshot($elementsPath);
+        self::assertMatchesFileSnapshot($formPath);
         self::assertMatchesFileSnapshot($createPath);
         self::assertMatchesFileSnapshot($editPath);
         self::assertMatchesFileSnapshot($formJsPath);

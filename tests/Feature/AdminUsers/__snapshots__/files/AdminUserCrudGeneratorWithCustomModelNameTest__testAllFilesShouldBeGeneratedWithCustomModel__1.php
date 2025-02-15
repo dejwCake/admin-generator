@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Admin\Auth;
 
+use App\Exports\AdminUsersExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\User\DestroyUser;
 use App\Http\Requests\Admin\User\ImpersonalLoginUser;
@@ -26,7 +27,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Excel;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UsersController extends Controller
@@ -75,6 +78,7 @@ class UsersController extends Controller
                 'data' => $data,
                 'url' => $this->urlGenerator->route('admin/users/index'),
                 'createUrl' => $this->urlGenerator->route('admin/users/create'),
+                'exportUrl' => $this->urlGenerator->route('admin/users/export'),
                 'activation' => $this->config->get('admin-auth.activation_enabled'),
             ],
         );
@@ -250,5 +254,13 @@ class UsersController extends Controller
         $statefulGuard->login($user);
 
         return $this->redirector->back();
+    }
+
+    /**
+     * Export entities
+     */
+    public function export(Excel $excel, AdminUsersExport $export): ?BinaryFileResponse
+    {
+        return $excel->download($export, 'users.xlsx');
     }
 }
