@@ -35,8 +35,8 @@
                                 <div v-if="errors.has('password_confirmation')" class="form-control-feedback form-text" v-cloak>@{{ errors.first('password_confirmation') }}</div>
                             </div>
                         </div>
-                        
-                        
+
+
                     </div>
 
                     <div class="card-footer">
