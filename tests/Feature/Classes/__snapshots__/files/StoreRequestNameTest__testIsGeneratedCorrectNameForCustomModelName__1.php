@@ -1,41 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Admin\Billing\Cat;
 
+use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class StoreCat extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
-    public function authorize(): bool
+    public function authorize(Gate $gate): bool
     {
-        return Gate::allows('admin.billing.cat.create');
+        return $gate->allows('admin.billing.cat.create');
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
         return [
             'title' => ['required', 'string'],
-            
         ];
     }
 
     /**
-    * Modify input data
-    *
-    * @return array
-    */
+     * Modify input data
+     */
     public function getSanitized(): array
     {
         $sanitized = $this->validated();
