@@ -65,7 +65,7 @@ class Lang extends FileAppender
 
         if (
             $this->replaceIfNotPresent(
-                resource_path('lang/' . $locale . '/admin.php'),
+                lang_path($locale . '/admin.php'),
                 "// Do not delete me :) I'm used for auto-generation" . PHP_EOL,
                 $this->buildClass() . PHP_EOL,
                 "<?php" . PHP_EOL . PHP_EOL . "return [" . PHP_EOL . "    // Do not delete me :) I'm used for auto-generation" . PHP_EOL . "];",

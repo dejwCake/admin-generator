@@ -13,7 +13,6 @@ return [
         'columns' => [
             'id' => 'ID',
             'title' => 'Title',
-            
         ],
     ],
 

@@ -14,19 +14,18 @@
 
         'columns' => [
             'id' => "ID",
-            @foreach($columns as $col)'{{ $col['name'] }}' => "{{ ucfirst(str_replace('_', ' ', $col['name'])) }}",
-@if($col['name'] == 'password')            '{{ $col['name'] }}_repeat' => "{{ ucfirst(str_replace('_', ' ', $col['name'])) }} Confirmation",
+@foreach($columns as $col)
+            '{{ $col['name'] }}' => "{{ ucfirst(str_replace('_', ' ', $col['name'])) }}",
+@if($col['name'] == 'password')
+            '{{ $col['name'] }}_repeat' => "{{ ucfirst(str_replace('_', ' ', $col['name'])) }} Confirmation",
 @endif
-            @endforeach
-@if (count($relations))
-    @if (count($relations['belongsToMany']))
-
+@endforeach
+@if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
             //Belongs to many relations
-            @foreach($relations['belongsToMany'] as $belongsToMany)'{{ lcfirst($belongsToMany['related_model_name_plural']) }}' => "{{ ucfirst(str_replace('_', ' ', $belongsToMany['related_model_name_plural'])) }}",
-            @endforeach
-    @endif
+@foreach($relations['belongsToMany'] as $belongsToMany)
+            '{{ lcfirst($belongsToMany['related_model_name_plural']) }}' => "{{ ucfirst(str_replace('_', ' ', $belongsToMany['related_model_name_plural'])) }}",
+@endforeach
 @endif
-
         ],
     ],
 

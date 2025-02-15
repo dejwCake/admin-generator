@@ -30,7 +30,7 @@ class WholeAdminGeneratorTest extends TestCase
         $formJsPath = resource_path('js/admin/category/Form.js');
         $factoryPath = base_path('database/factories/ModelFactory.php');
         $indexJsPath = resource_path('js/admin/category/index.js');
-        $langPath = resource_path('lang/en/admin.php');
+        $langPath = lang_path('en/admin.php');
 
         self::assertFileDoesNotExist($controllerPath);
         self::assertFileDoesNotExist($indexRequestPath);
