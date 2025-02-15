@@ -1,6 +1,6 @@
 @extends('brackets/admin-ui::admin.layout.default')
 
-@section('title', trans('admin.user.actions.create'))
+@section('title', __('admin.user.actions.create'))
 
 @section('body')
 
@@ -9,15 +9,14 @@
         <div class="card">
 
             <user-form
-                :action="'{{ url('admin/users') }}'"
+                :action="'{{ $action }}'"
                 :activation="!!'{{ $activation }}'"
-                
                 inline-template>
 
                 <form class="form-horizontal form-create" method="post" @submit.prevent="onSubmit" :action="action">
 
                     <div class="card-header">
-                        <i class="fa fa-plus"></i> {{ trans('admin.user.actions.create') }}
+                        <i class="fa fa-plus"></i> {{ __('admin.user.actions.create') }}
                     </div>
 
                     <div class="card-body">
@@ -29,7 +28,7 @@
                     <div class="card-footer">
 	                    <button type="submit" class="btn btn-primary" :disabled="submiting">
 		                    <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-download'"></i>
-                            {{ trans('brackets/admin-ui::admin.btn.save') }}
+                            {{ __('brackets/admin-ui::admin.btn.save') }}
 	                    </button>
                     </div>
 

@@ -111,6 +111,7 @@ class {{ $controllerBaseName }} extends Controller
         return $this->viewFactory->make(
             'admin.{{ $modelDotNotation }}.create',
             [
+                'action' => $this->urlGenerator->to('admin/{{ $resource }}'),
                 'activation' => Config::get('admin-auth.activation_enabled'),
 @foreach($belongsToManyRelations as $belongsToMany)
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),

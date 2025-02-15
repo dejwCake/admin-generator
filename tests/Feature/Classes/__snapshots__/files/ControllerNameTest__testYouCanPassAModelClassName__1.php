@@ -71,7 +71,12 @@ class CategoriesController extends Controller
     {
         $this->gate->authorize('admin.cat.create');
 
-        return $this->viewFactory->make('admin.cat.create');
+        return $this->viewFactory->make(
+            'admin.cat.create',
+            [
+                'action' => $this->urlGenerator->to('admin/cats'),
+            ],
+        );
     }
 
     /**

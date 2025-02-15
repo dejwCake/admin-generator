@@ -124,18 +124,15 @@ class {{ $controllerBaseName }} extends Controller
     {
         $this->gate->authorize('admin.{{ $modelDotNotation }}.create');
 
-@if (count($belongsToManyRelations) > 0)
         return $this->viewFactory->make(
             'admin.{{ $modelDotNotation }}.create',
             [
+                'action' => $this->urlGenerator->to('admin/{{ $resource }}'),
 @foreach($belongsToManyRelations as $belongsToMany)
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
 @endforeach
             ],
         );
-@else
-        return $this->viewFactory->make('admin.{{ $modelDotNotation }}.create');
-@endif
     }
 
     /**

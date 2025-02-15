@@ -71,7 +71,12 @@ class MyNameController extends Controller
     {
         $this->gate->authorize('admin.category.create');
 
-        return $this->viewFactory->make('admin.category.create');
+        return $this->viewFactory->make(
+            'admin.category.create',
+            [
+                'action' => $this->urlGenerator->to('admin/categories'),
+            ],
+        );
     }
 
     /**

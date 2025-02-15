@@ -93,6 +93,7 @@ class AdminUsersController extends Controller
         return $this->viewFactory->make(
             'admin.admin-user.create',
             [
+                'action' => $this->urlGenerator->to('admin/admin-users'),
                 'activation' => $this->config->get('admin-auth.activation_enabled'),
                 'roles' => Role::where('guard_name', $this->guard)->get(),
             ],

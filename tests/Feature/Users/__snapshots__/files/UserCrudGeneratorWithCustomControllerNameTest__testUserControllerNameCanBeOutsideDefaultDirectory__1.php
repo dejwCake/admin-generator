@@ -78,6 +78,7 @@ class UsersController extends Controller
         return $this->viewFactory->make(
             'admin.user.create',
             [
+                'action' => $this->urlGenerator->to('admin/users'),
                 'activation' => Config::get('admin-auth.activation_enabled'),
                 'roles' => Role::all(),
             ],
