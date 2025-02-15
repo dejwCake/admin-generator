@@ -19,6 +19,7 @@ class WholeAdminGeneratorTest extends TestCase
         $storePath = base_path('app/Http/Requests/Admin/Category/StoreCategory.php');
         $updatePath = base_path('app/Http/Requests/Admin/Category/UpdateCategory.php');
         $destroyPath = base_path('app/Http/Requests/Admin/Category/DestroyCategory.php');
+        $bulkDestroyPath = base_path('app/Http/Requests/Admin/Category/BulkDestroyCategory.php');
         $exportPath = base_path('app/Exports/CategoriesExport.php');
         $routesPath = base_path('routes/web.php');
         $indexPath = resource_path('views/admin/category/index.blade.php');
@@ -36,6 +37,7 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertFileDoesNotExist($storePath);
         self::assertFileDoesNotExist($updatePath);
         self::assertFileDoesNotExist($destroyPath);
+        self::assertFileDoesNotExist($bulkDestroyPath);
         self::assertFileDoesNotExist($exportPath);
         self::assertFileDoesNotExist($indexPath);
         self::assertFileDoesNotExist($listingJsPath);
@@ -59,6 +61,7 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertFileExists($storePath);
         self::assertFileExists($updatePath);
         self::assertFileExists($destroyPath);
+        self::assertFileExists($bulkDestroyPath);
         self::assertFileExists($exportPath);
         self::assertFileExists($indexPath);
         self::assertFileExists($listingJsPath);
@@ -77,6 +80,7 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertMatchesFileSnapshot($storePath);
         self::assertMatchesFileSnapshot($updatePath);
         self::assertMatchesFileSnapshot($destroyPath);
+        self::assertMatchesFileSnapshot($bulkDestroyPath);
         self::assertMatchesFileSnapshot($exportPath);
         self::assertMatchesFileSnapshot($indexPath);
         self::assertMatchesFileSnapshot($listingJsPath);

@@ -2,27 +2,25 @@
 @endphp
 
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Contracts\Auth\Access\Gate;
 
 class BulkDestroy{{ $modelBaseName }} extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * {{'@'}}return bool
      */
-    public function authorize(): bool
+    public function authorize(Gate $gate): bool
     {
-        return Gate::allows('admin.{{ $modelDotNotation }}.bulk-delete');
+        return $gate->allows('admin.{{ $modelDotNotation }}.bulk-delete');
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * {{'@'}}return array
      */
     public function rules(): array
     {

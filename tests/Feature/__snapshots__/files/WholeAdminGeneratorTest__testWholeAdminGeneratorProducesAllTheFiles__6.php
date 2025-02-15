@@ -1,44 +1,29 @@
 <?php
 
-namespace App\Exports;
+declare(strict_types=1);
 
-use App\Models\Category;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+namespace App\Http\Requests\Admin\Category;
 
-class CategoriesExport implements FromCollection, WithMapping, WithHeadings
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Auth\Access\Gate;
+
+class BulkDestroyCategory extends FormRequest
 {
     /**
-     * @return Collection
+     * Determine if the user is authorized to make this request.
      */
-    public function collection()
+    public function authorize(Gate $gate): bool
     {
-        return Category::all();
+        return $gate->allows('admin.category.bulk-delete');
     }
 
     /**
-     * @return array
+     * Get the validation rules that apply to the request.
      */
-    public function headings(): array
+    public function rules(): array
     {
         return [
-            trans('admin.category.columns.id'),
-            trans('admin.category.columns.title'),
-        ];
-    }
-
-    /**
-     * @param Category $category
-     * @return array
-     *
-     */
-    public function map($category): array
-    {
-        return [
-            $category->id,
-            $category->title,
+            'ids.*' => 'integer'
         ];
     }
 }

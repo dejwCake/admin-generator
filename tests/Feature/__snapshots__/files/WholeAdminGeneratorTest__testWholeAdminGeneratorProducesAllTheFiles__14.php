@@ -1,19 +1,31 @@
 <?php
 
+declare(strict_types=1);
 
+namespace App\Models;
 
-/* Auto-generated admin routes */
-Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])->group(static function () {
-    Route::prefix('admin')->namespace('App\Http\Controllers\Admin')->name('admin/')->group(static function() {
-        Route::prefix('categories')->name('categories/')->group(static function() {
-            Route::get('/',                                             'CategoriesController@index')->name('index');
-            Route::get('/create',                                       'CategoriesController@create')->name('create');
-            Route::post('/',                                            'CategoriesController@store')->name('store');
-            Route::get('/{category}/edit',                              'CategoriesController@edit')->name('edit');
-            Route::post('/bulk-destroy',                                'CategoriesController@bulkDestroy')->name('bulk-destroy');
-            Route::post('/{category}',                                  'CategoriesController@update')->name('update');
-            Route::delete('/{category}',                                'CategoriesController@destroy')->name('destroy');
-            Route::get('/export',                                       'CategoriesController@export')->name('export');
-        });
-    });
-});
+use Illuminate\Database\Eloquent\Model;
+
+class Category extends Model
+{
+    /**
+     * @var array<int, string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected $fillable = [
+        'title',
+    ];
+
+    /**
+     * @var array<int, string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected $appends = ['resource_url'];
+
+    public $timestamps = false;
+
+    public function getResourceUrlAttribute(): string {
+        return url('/admin/categories/' . $this->getKey());
+    }
+
+}
