@@ -156,7 +156,8 @@ trait Columns
      */
     protected function getFrontendRulesByRequire(array $column, Collection $frontendRules): Collection
     {
-        if ($column['required']
+        if (
+            $column['required']
             && $column['type'] !== 'boolean'
             && $column['type'] !== 'bool'
             && $column['name'] !== 'password'

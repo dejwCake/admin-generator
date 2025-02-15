@@ -57,6 +57,14 @@ class ModelFactory extends ClassGenerator
         return $this->modelBaseName . 'Factory';
     }
 
+    /**
+     * Get the root namespace for the class.
+     */
+    public function rootNamespace(): string
+    {
+        return 'Database';
+    }
+
     protected function buildClass(): string
     {
         return view(
@@ -92,14 +100,7 @@ class ModelFactory extends ClassGenerator
         ];
     }
 
-    /**
-     * Get the root namespace for the class.
-     */
-    public function rootNamespace(): string
-    {
-        return 'Database';
-    }
-
+    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
     protected function getDefaultNamespace(string $rootNamespace): string
     {
         return 'Database\Factories';

@@ -69,6 +69,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertFileExists($editPath);
         self::assertFileExists($formJsPath);
         self::assertFileExists($indexJsPath);
+        self::assertFileExists($langPath);
 
         self::assertMatchesFileSnapshot($controllerPath);
         self::assertMatchesFileSnapshot($indexRequestPath);
@@ -86,6 +87,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertMatchesFileSnapshot($formJsPath);
         self::assertMatchesFileSnapshot($indexJsPath);
         self::assertMatchesFileSnapshot($factoryPath);
+        self::assertMatchesFileSnapshot($langPath);
 
         if ($seed) {
             self::assertDatabaseCount('admin_users', 20);
