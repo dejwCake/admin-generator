@@ -111,7 +111,14 @@ class {{ $controllerBaseName }} extends Controller
 
         return $this->viewFactory->make(
             'admin.{{ $modelDotNotation }}.index',
-            ['data' => $data],
+            [
+                'data' => $data,
+                'url' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
+                'createUrl' => $this->urlGenerator->route('admin/{{ $resource }}/create'),
+@if($export)
+                'exportUrl' => $this->urlGenerator->route('admin/{{ $resource }}/export'),
+@endif
+            ],
         );
     }
 

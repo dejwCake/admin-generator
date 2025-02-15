@@ -73,6 +73,8 @@ class UsersController extends Controller
             'admin.user.index',
             [
                 'data' => $data,
+                'url' => $this->urlGenerator->route('admin/users/index'),
+                'createUrl' => $this->urlGenerator->route('admin/users/create'),
                 'activation' => $this->config->get('admin-auth.activation_enabled'),
             ],
         );

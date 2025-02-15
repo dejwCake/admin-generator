@@ -58,7 +58,11 @@ class CategoriesController extends Controller
 
         return $this->viewFactory->make(
             'admin.cat.index',
-            ['data' => $data],
+            [
+                'data' => $data,
+                'url' => $this->urlGenerator->route('admin/cats/index'),
+                'createUrl' => $this->urlGenerator->route('admin/cats/create'),
+            ],
         );
     }
 

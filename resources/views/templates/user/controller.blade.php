@@ -94,6 +94,11 @@ class {{ $controllerBaseName }} extends Controller
             'admin.{{ $modelDotNotation }}.index',
             [
                 'data' => $data,
+                'url' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
+                'createUrl' => $this->urlGenerator->route('admin/{{ $resource }}/create'),
+@if($export)
+                'exportUrl' => $this->urlGenerator->route('admin/{{ $resource }}/export'),
+@endif
                 'activation' => $this->config->get('admin-auth.activation_enabled'),
             ],
         );

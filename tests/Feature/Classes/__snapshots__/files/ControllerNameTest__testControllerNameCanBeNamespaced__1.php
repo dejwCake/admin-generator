@@ -58,7 +58,11 @@ class MyNameController extends Controller
 
         return $this->viewFactory->make(
             'admin.category.index',
-            ['data' => $data],
+            [
+                'data' => $data,
+                'url' => $this->urlGenerator->route('admin/categories/index'),
+                'createUrl' => $this->urlGenerator->route('admin/categories/create'),
+            ],
         );
     }
 
