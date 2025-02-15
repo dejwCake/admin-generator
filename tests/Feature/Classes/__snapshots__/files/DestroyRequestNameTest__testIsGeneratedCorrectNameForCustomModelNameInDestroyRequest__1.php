@@ -1,26 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Admin\Billing\Cat;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Contracts\Auth\Access\Gate;
 
+/**
+ * @property Cat $cat
+ */
 class DestroyCat extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
-    public function authorize(): bool
+    public function authorize(Gate $gate): bool
     {
-        return Gate::allows('admin.billing.cat.delete', $this->cat);
+        return $gate->allows('admin.billing.cat.delete', $this->cat);
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {

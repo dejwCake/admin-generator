@@ -1,26 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Admin\AdminUser;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Contracts\Auth\Access\Gate;
 
+/**
+ * @property AdminUser $adminUser
+ */
 class DestroyAdminUser extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
-    public function authorize(): bool
+    public function authorize(Gate $gate): bool
     {
-        return Gate::allows('admin.admin-user.delete', $this->adminUser);
+        return $gate->allows('admin.admin-user.delete', $this->adminUser);
     }
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
