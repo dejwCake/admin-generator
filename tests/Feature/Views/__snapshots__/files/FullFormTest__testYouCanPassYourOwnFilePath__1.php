@@ -1,6 +1,6 @@
 @extends('brackets/admin-ui::admin.layout.default')
 
-@section('title', trans('admin.category.actions.edit', ['name' => $category->title]))
+@section('title', __('admin.category.actions.edit', ['name' => $category->title]))
 
 @section('body')
 
@@ -9,15 +9,15 @@
         <div class="card">
 
             <profile-edit-password-form
-            :action="'{{ route('admin/profile/edit-password', ['category' => $category]) }}'"
-            :data="{{ $category->toJson() }}"
-            v-cloak
-            inline-template>
-            
+                :action="'{{ route('admin/profile/edit-password', ['category' => $category]) }}'"
+                :data="{{ $category->toJson() }}"
+                v-cloak
+                inline-template>
+
                 <form class="form-horizontal" method="post" @submit.prevent="onSubmit" :action="action">
 
                     <div class="card-header">
-                        <i class="fa fa-plus"></i> {{ trans('admin.category.actions.edit', ['name' => $category->title]) }}
+                        <i class="fa fa-plus"></i> {{ __('admin.category.actions.edit', ['name' => $category->title]) }}
                     </div>
 
                     <div class="card-body">
@@ -37,7 +37,7 @@
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary">
                             <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-download'"></i>
-                            {{ trans('brackets/admin-ui::admin.btn.save') }}
+                            {{ __('brackets/admin-ui::admin.btn.save') }}
                         </button>
                     </div>
 
