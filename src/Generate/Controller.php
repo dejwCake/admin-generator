@@ -142,7 +142,7 @@ class Controller extends ClassGenerator
             )->pluck('name')
             ->toArray(),
             //            'filters' => $this->readColumnsFromTable($tableName)->filter(function($column) {
-            //                return $column['type'] == 'boolean' || $column['type'] == 'date';
+            //                return $column['type'] == 'boolean' || $column['type'] == 'bool' || $column['type'] == 'date';
             //            }),
             // validation in store/update
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),

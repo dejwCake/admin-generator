@@ -69,7 +69,11 @@
                                             @{{ item.email }}
                                     </td>
                                     <td v-if="activation">
-                                            @{{ item.activated }}
+
+                                        <label class="switch switch-3d switch-success">
+                                            <input type="checkbox" class="switch-input" v-model="collection[index].activated" @change="toggleSwitch(item.resource_url, 'activated', collection[index])">
+                                            <span class="switch-slider"></span>
+                                        </label>
                                     </td>
                                     <td >
 

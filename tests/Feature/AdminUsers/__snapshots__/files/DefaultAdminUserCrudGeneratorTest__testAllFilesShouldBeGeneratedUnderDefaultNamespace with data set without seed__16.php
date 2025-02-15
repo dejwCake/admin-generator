@@ -9,7 +9,7 @@ $factory->define(Brackets\AdminAuth\Models\AdminUser::class, function (Faker\Gen
         'password' => bcrypt($faker->password),
         'remember_token' => null,
         'activated' => true,
-        'forbidden' => $faker->sentence,
+        'forbidden' => $faker->boolean(),
         'language' => 'en',
         'deleted_at' => null,
         'created_at' => $faker->sentence,

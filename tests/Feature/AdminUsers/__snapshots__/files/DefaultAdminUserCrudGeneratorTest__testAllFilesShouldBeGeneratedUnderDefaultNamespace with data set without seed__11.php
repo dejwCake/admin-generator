@@ -38,18 +38,24 @@
     </div>
 </div>
 
-<div class="form-group row align-items-center" :class="{'has-danger': errors.has('activated'), 'has-success': fields.activated && fields.activated.valid }">
-    <label for="activated" class="col-form-label text-md-right" :class="isFormLocalized ? 'col-md-4' : 'col-md-3'">{{ __('admin.admin-user.columns.activated') }}</label>
-    <div :class="isFormLocalized ? 'col-md-4' : 'col-md-9 col-xl-7'">
-        <input type="text" v-model="form.activated" v-validate="'required'" @input="validate($event)" class="form-control" :class="{'form-control-danger': errors.has('activated'), 'form-control-success': fields.activated && fields.activated.valid}" id="activated" name="activated" placeholder="{{ __('admin.admin-user.columns.activated') }}">
+<div class="form-group row" :class="{'has-danger': errors.has('activated'), 'has-success': fields.activated && fields.activated.valid }">
+    <div class="ml-md-auto" :class="isFormLocalized ? 'col-md-8' : 'col-md-9'">
+        <input class="form-check-input" id="activated" type="checkbox" v-model="form.activated" v-validate="''" data-vv-name="activated"  name="activated_fake_element">
+        <label class="form-check-label" for="activated">
+            {{ __('admin.admin-user.columns.activated') }}
+        </label>
+        <input type="hidden" name="activated" :value="form.activated">
         <div v-if="errors.has('activated')" class="form-control-feedback form-text" v-cloak>@{{ errors.first('activated') }}</div>
     </div>
 </div>
 
-<div class="form-group row align-items-center" :class="{'has-danger': errors.has('forbidden'), 'has-success': fields.forbidden && fields.forbidden.valid }">
-    <label for="forbidden" class="col-form-label text-md-right" :class="isFormLocalized ? 'col-md-4' : 'col-md-3'">{{ __('admin.admin-user.columns.forbidden') }}</label>
-    <div :class="isFormLocalized ? 'col-md-4' : 'col-md-9 col-xl-7'">
-        <input type="text" v-model="form.forbidden" v-validate="'required'" @input="validate($event)" class="form-control" :class="{'form-control-danger': errors.has('forbidden'), 'form-control-success': fields.forbidden && fields.forbidden.valid}" id="forbidden" name="forbidden" placeholder="{{ __('admin.admin-user.columns.forbidden') }}">
+<div class="form-group row" :class="{'has-danger': errors.has('forbidden'), 'has-success': fields.forbidden && fields.forbidden.valid }">
+    <div class="ml-md-auto" :class="isFormLocalized ? 'col-md-8' : 'col-md-9'">
+        <input class="form-check-input" id="forbidden" type="checkbox" v-model="form.forbidden" v-validate="''" data-vv-name="forbidden"  name="forbidden_fake_element">
+        <label class="form-check-label" for="forbidden">
+            {{ __('admin.admin-user.columns.forbidden') }}
+        </label>
+        <input type="hidden" name="forbidden" :value="form.forbidden">
         <div v-if="errors.has('forbidden')" class="form-control-feedback form-text" v-cloak>@{{ errors.first('forbidden') }}</div>
     </div>
 </div>

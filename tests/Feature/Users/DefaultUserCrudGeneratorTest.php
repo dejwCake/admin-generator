@@ -55,6 +55,7 @@ class DefaultUserCrudGeneratorTest extends UserTestCase
         self::assertFileExists($editPath);
         self::assertFileExists($formJsPath);
         self::assertFileExists($indexJsPath);
+
         self::assertMatchesFileSnapshot($controllerPath);
         self::assertMatchesFileSnapshot($indexRequestPath);
         self::assertMatchesFileSnapshot($storePath);

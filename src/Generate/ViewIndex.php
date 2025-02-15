@@ -138,7 +138,7 @@ class ViewIndex extends ViewGenerator
 
             'columns' => $this->getColumns(),
 //            'filters' => $this->readColumnsFromTable($tableName)->filter(function($column) {
-//                return $column['type'] == 'boolean' || $column['type'] == 'date';
+//                return $column['type'] == 'boolean' || $column['type'] == 'bool' || $column['type'] == 'date';
 //            }),
         ])->render();
     }
@@ -166,7 +166,7 @@ class ViewIndex extends ViewGenerator
     /** @param array<string, string|int> $column */
     private function isSwitch(array $column): bool
     {
-        return $column['type'] === 'boolean'
+        return ($column['type'] === 'boolean' || $column['type'] === 'bool')
             && (
                 $column['name'] === 'enabled'
                 || $column['name'] === 'activated'

@@ -96,6 +96,7 @@ class ModelFactory extends FileAppender
             'time' => '$faker->time()',
             'datetime' => '$faker->dateTime',
             'text' => '$faker->text()',
+            'bool',
             'boolean' => '$faker->boolean()',
             'integer',
             'numeric',

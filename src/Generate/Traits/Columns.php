@@ -156,7 +156,11 @@ trait Columns
      */
     protected function getFrontendRulesByRequire(array $column, Collection $frontendRules): Collection
     {
-        if ($column['required'] && $column['type'] !== 'boolean' && $column['name'] !== 'password') {
+        if ($column['required']
+            && $column['type'] !== 'boolean'
+            && $column['type'] !== 'bool'
+            && $column['name'] !== 'password'
+        ) {
             $frontendRules->push('required');
         }
 
@@ -316,15 +320,16 @@ trait Columns
             'date' => '\'date\'',
             'time' => '\'date_format:H:i:s\'',
             'integer',
+            'tinyInteger',
             'smallInteger',
             'mediumInteger',
             'bigInteger',
             'unsignedInteger',
+            'unsignedTinyInteger',
             'unsignedSmallInteger',
             'unsignedMediumInteger',
             'unsignedBigInteger' => '\'integer\'',
-            'tinyInteger',
-            'unsignedTinyInteger',
+            'bool',
             'boolean' => '\'boolean\'',
             'float',
             'decimal' => '\'numeric\'',
@@ -341,15 +346,16 @@ trait Columns
             'date' => '\'date\'',
             'time' => '\'date_format:H:i:s\'',
             'integer',
+            'tinyInteger',
             'smallInteger',
             'mediumInteger',
             'bigInteger',
             'unsignedInteger',
+            'unsignedTinyInteger',
             'unsignedSmallInteger',
             'unsignedMediumInteger',
             'unsignedBigInteger' => '\'integer\'',
-            'tinyInteger',
-            'unsignedTinyInteger',
+            'bool',
             'boolean' => '\'boolean\'',
             'float',
             'decimal' => '\'numeric\'',
@@ -366,15 +372,16 @@ trait Columns
             'date' => 'date_format:yyyy-MM-dd HH:mm:ss',
             'time' => 'date_format:HH:mm:ss',
             'integer',
+            'tinyInteger',
             'smallInteger',
             'mediumInteger',
             'bigInteger',
             'unsignedInteger',
+            'unsignedTinyInteger',
             'unsignedSmallInteger',
             'unsignedMediumInteger',
             'unsignedBigInteger' => 'integer',
-            'tinyInteger',
-            'unsignedTinyInteger',
+            'bool',
             'boolean' => '',
             'float',
                 // FIXME?? I'm not sure about this one
