@@ -65,6 +65,7 @@ class ProfileController extends Controller
             'admin.profile.edit-profile',
             [
                 'adminUser' => $this->adminUser,
+                'action' => $this->urlGenerator->route('admin/update-profile'),
             ],
         );
     }
@@ -118,6 +119,7 @@ class ProfileController extends Controller
             'admin.profile.edit-password',
             [
                 'adminUser' => $this->adminUser,
+                'action' => $this->urlGenerator->route('admin/update-password'),
             ],
         );
     }

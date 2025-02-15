@@ -1,6 +1,6 @@
 @extends('brackets/admin-ui::admin.layout.default')
 
-@section('title', trans('admin.admin-user.actions.edit_password'))
+@section('title', __(('admin.admin-user.actions.edit_password'))
 
 @section('body')
 
@@ -9,14 +9,14 @@
         <div class="card">
 
             <profile-edit-password-form
-                :action="'{{ url('admin/password') }}'"
+                :action="'{{ $action }}'"
                 :data="{{ $adminUser->toJson() }}"
                 inline-template>
 
                 <form class="form-horizontal form-edit" method="post" @submit.prevent="onSubmit" :action="action">
 
                     <div class="card-header">
-                        <i class="fa fa-pencil"></i> {{ trans('admin.admin-user.actions.edit_password') }}
+                        <i class="fa fa-pencil"></i> {{ __(('admin.admin-user.actions.edit_password') }}
                     </div>
 
                     <div class="card-body">
@@ -42,7 +42,7 @@
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary" :disabled="submiting">
                             <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-download'"></i>
-                            {{ trans('brackets/admin-ui::admin.btn.save') }}
+                            {{ __(('brackets/admin-ui::admin.btn.save') }}
                         </button>
                     </div>
 

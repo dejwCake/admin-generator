@@ -217,6 +217,7 @@ class {{ $controllerBaseName }} extends Controller
             'admin.{{ $modelDotNotation }}.edit',
             [
                 '{{ $modelVariableName }}' => ${{ $modelVariableName }},
+                'action' => $this->urlGenerator->route('admin/{{ $resource }}/update', [${{ $modelVariableName }}]),
 @foreach($belongsToManyRelations as $belongsToMany)
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
 @endforeach

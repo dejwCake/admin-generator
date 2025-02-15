@@ -125,6 +125,7 @@ class MyNameController extends Controller
             'admin.category.edit',
             [
                 'category' => $category,
+                'action' => $this->urlGenerator->route('admin/categories/update', [$category]),
             ],
         );
     }

@@ -125,6 +125,7 @@ class CategoriesController extends Controller
             'admin.cat.edit',
             [
                 'cat' => $cat,
+                'action' => $this->urlGenerator->route('admin/cats/update', [$cat]),
             ],
         );
     }

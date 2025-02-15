@@ -1,6 +1,6 @@
 {{'@'}}extends('brackets/admin-ui::admin.layout.default')
 
-{{'@'}}section('title', trans('admin.{{ $modelLangFormat }}.actions.edit', ['name' => ${{ $modelVariableName }}->{{$modelTitle}}]))
+{{'@'}}section('title', __('admin.{{ $modelLangFormat }}.actions.edit', ['name' => ${{ $modelVariableName }}->{{$modelTitle}}]))
 
 {{'@'}}section('body')
 
@@ -9,19 +9,21 @@
         <div class="card">
 @endif
 
-            @if($hasTranslatable)<{{ $modelJSName }}-form
-                :action="'{{'{{'}} ${{ $modelVariableName }}->resource_url }}'"
+@if($hasTranslatable)
+            <{{ $modelJSName }}-form
+                :action="'{{'{{'}} $action }}'"
                 :data="{{'{{'}} ${{ $modelVariableName }}->toJsonAllLocales() }}"
                 :locales="@{{ json_encode($locales) }}"
                 :send-empty-locales="false"
                 v-cloak
                 inline-template>
-            @else<{{ $modelJSName }}-form
-                :action="'{{'{{'}} ${{ $modelVariableName }}->resource_url }}'"
+@else
+            <{{ $modelJSName }}-form
+                :action="'{{'{{'}} $action }}'"
                 :data="{{'{{'}} ${{ $modelVariableName }}->toJson() }}"
                 v-cloak
                 inline-template>
-            @endif
+@endif
 
                 <form class="form-horizontal form-edit" method="post" {{'@'}}submit.prevent="onSubmit" :action="action" novalidate>
 
@@ -30,7 +32,7 @@
                         <div class="col">
                             <div class="card">
                                 <div class="card-header">
-                                    <i class="fa fa-pencil"></i> {{'{{'}} trans('admin.{{ $modelLangFormat }}.actions.edit', ['name' => ${{ $modelVariableName }}->{{$modelTitle}}]) }}
+                                    <i class="fa fa-pencil"></i> {{'{{'}} __('admin.{{ $modelLangFormat }}.actions.edit', ['name' => ${{ $modelVariableName }}->{{$modelTitle}}]) }}
                                 </div>
                                 <div class="card-body">
                                     {{'@'}}include('admin.{{ $modelDotNotation }}.components.form-elements')
@@ -42,44 +44,45 @@
                             {{'@'}}include('admin.{{ $modelDotNotation }}.components.form-elements-right', ['showHistory' => true])
                         </div>
                     </div>
-                    @else
+@else
 
                     <div class="card-header">
-                        <i class="fa fa-pencil"></i> {{'{{'}} trans('admin.{{ $modelLangFormat }}.actions.edit', ['name' => ${{ $modelVariableName }}->{{$modelTitle}}]) }}
+                        <i class="fa fa-pencil"></i> {{'{{'}} __('admin.{{ $modelLangFormat }}.actions.edit', ['name' => ${{ $modelVariableName }}->{{$modelTitle}}]) }}
                     </div>
 
                     <div class="card-body">
                         {{'@'}}include('admin.{{ $modelDotNotation }}.components.form-elements')
                     </div>
-                    @endif
+@endif
 
-                    @if($isUsedTwoColumnsLayout)<button type="submit" class="btn btn-primary fixed-cta-button button-save" :disabled="submiting">
+@if($isUsedTwoColumnsLayout)
+                    <button type="submit" class="btn btn-primary fixed-cta-button button-save" :disabled="submiting">
                         <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-save'"></i>
-                        @{{ trans('brackets/admin-ui::admin.btn.save') }}
+                        @{{ __('brackets/admin-ui::admin.btn.save') }}
                     </button>
 
                     <button type="submit" style="display: none" class="btn btn-success fixed-cta-button button-saved" :disabled="submiting" :class="">
                         <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-check'"></i>
-                        <span>@{{ trans('brackets/admin-ui::admin.btn.saved') }}</span>
+                        <span>@{{ __('brackets/admin-ui::admin.btn.saved') }}</span>
                     </button>
-                     @else
+@else
 
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary" :disabled="submiting">
                             <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-download'"></i>
-                            @{{ trans('brackets/admin-ui::admin.btn.save') }}
+                            @{{ __('brackets/admin-ui::admin.btn.save') }}
                         </button>
                     </div>
-                    @endif
+@endif
 
                 </form>
 
-        </{{ $modelJSName }}-form>
+            </{{ $modelJSName }}-form>
 
-    @if(!$isUsedTwoColumnsLayout)
+@if(!$isUsedTwoColumnsLayout)
+        </div>
+@endif
+
     </div>
-    @endif
-
-</div>
 
 {{'@'}}endsection

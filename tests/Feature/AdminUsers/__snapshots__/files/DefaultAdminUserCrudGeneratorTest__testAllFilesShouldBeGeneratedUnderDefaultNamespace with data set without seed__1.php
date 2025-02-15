@@ -151,6 +151,7 @@ class AdminUsersController extends Controller
             'admin.admin-user.edit',
             [
                 'adminUser' => $adminUser,
+                'action' => $this->urlGenerator->route('admin/admin-users/update', [$adminUser]),
                 'activation' => $this->config->get('admin-auth.activation_enabled'),
                 'roles' => Role::where('guard_name', $this->guard)->get(),
             ],

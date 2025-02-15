@@ -136,6 +136,7 @@ class UsersController extends Controller
             'admin.user.edit',
             [
                 'user' => $user,
+                'action' => $this->urlGenerator->route('admin/users/update', [$user]),
                 'activation' => $this->config->get('admin-auth.activation_enabled'),
                 'roles' => Role::all(),
             ],

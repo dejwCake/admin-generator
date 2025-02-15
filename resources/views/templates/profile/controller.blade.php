@@ -75,6 +75,7 @@ class ProfileController extends Controller
             'admin.profile.edit-profile',
             [
                 '{{ $modelVariableName }}' => $this->{{ $modelVariableName }},
+                'action' => $this->urlGenerator->route('admin/update-profile'),
             ],
         );
     }
@@ -129,6 +130,7 @@ class ProfileController extends Controller
             'admin.profile.edit-password',
             [
                 '{{ $modelVariableName }}' => $this->{{ $modelVariableName }},
+                'action' => $this->urlGenerator->route('admin/update-password'),
             ],
         );
     }
