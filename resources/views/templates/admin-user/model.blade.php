@@ -1,5 +1,10 @@
-@php echo "<?php"
-@endphp namespace {{ $modelNameSpace }};
+@php use Illuminate\Support\Arr;echo "<?php"
+@endphp
+
+
+declare(strict_types=1);
+
+namespace {{ $modelNameSpace }};
 @php
     $hasRoles = false;
     if(count($relations) && count($relations['belongsToMany'])) {
@@ -10,108 +15,160 @@
             return $belongsToMany['related_table'] == 'roles';
         });
     }
+    $uses = [
+        'Brackets\AdminAuth\Activation\Traits\CanActivate',
+        'Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract',
+        'Brackets\AdminAuth\Notifications\ResetPassword',
+        'Illuminate\Foundation\Auth\User as Authenticatable',
+        'Illuminate\Notifications\Notifiable',
+    ];
+    if ($hasSoftDelete) {
+        $uses = array_merge($uses, [
+            'Illuminate\Database\Eloquent\SoftDeletes',
+        ]);
+    }
+    if ($hasRoles) {
+        $uses = array_merge($uses, [
+            'Spatie\Permission\Traits\HasRoles',
+        ]);
+    }
+    if ($translatable->count() > 0) {
+        $uses = array_merge($uses, [
+            'Brackets\Translatable\Traits\HasTranslations',
+        ]);
+    }
+    if (count($dates) > 0) {
+        $uses = array_merge($uses, [
+            'Carbon\CarbonInterface',
+        ]);
+    }
+    if (isset($relations['belongsToMany']) && count($relations['belongsToMany'])) {
+        $uses[] = 'Illuminate\Database\Eloquent\Relations\BelongsToMany';
+    }
+    $uses = Arr::sort($uses);
 @endphp
 
-use Brackets\AdminAuth\Activation\Traits\CanActivate;
-use Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract;
-use Brackets\AdminAuth\Notifications\ResetPassword;
-@if($hasSoftDelete)use Illuminate\Database\Eloquent\SoftDeletes;
-@endif
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-@if($hasRoles)use Spatie\Permission\Traits\HasRoles;
-@endif
-@if($translatable->count() > 0)use Brackets\Translatable\Traits\HasTranslations;
-@endif
+@foreach($uses as $use)
+use {{ $use }};
+@endforeach
 
 class {{ $modelBaseName }} extends Authenticatable implements CanActivateContract
 {
-    use Notifiable;
-    use CanActivate;
-    @if($hasSoftDelete)use SoftDeletes;
-    @endif
-@if($hasRoles)use HasRoles;
+@php
+    $traitUses = [
+        'Notifiable',
+        'CanActivate',
+    ];
+    if($hasSoftDelete) {
+        $traitUses[] = 'SoftDeletes';
+    }
+    if($hasRoles) {
+        $traitUses[] = 'HasRoles';
+    }
+    if($translatable->count() > 0) {
+        $traitUses[] = 'HasTranslations';
+    }
+    $traitUses = Arr::sort($traitUses);
+@endphp
+@if(count($traitUses) > 0)
+@foreach($traitUses as $traitUse)
+    use {{ $traitUse }};
+@endforeach
+
 @endif
-@if($translatable->count() > 0)use HasTranslations;
+@if ($tableName !== null)
+    protected $table = '{{ $tableName }}';
+
 @endif
-
-    @if (!is_null($tableName))protected $table = '{{ $tableName }}';
-    @endif
-
-    @if ($fillable)protected $fillable = [
-    @foreach($fillable as $f)
-    '{{ $f }}',
-    @endforeach
-
+@if (count($fillable) > 0)
+    /**
+     * @var array<int, string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected $fillable = [
+@foreach($fillable as $fillableField)
+        '{{ $fillableField }}',
+@endforeach
     ];
-    @endif
 
-    @if ($hidden)protected $hidden = [
-    @foreach($hidden as $h)
-    '{{ $h }}',
-    @endforeach
-
+@endif
+@if (count($hidden) > 0)
+    /**
+     * @var array<int, string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected $hidden = [
+@foreach($hidden as $hiddenField)
+        '{{ $hiddenField }}',
+@endforeach
     ];
-    @endif
 
-    @if ($dates)protected $dates = [
-    @foreach($dates as $date)
-    '{{ $date }}',
-    @endforeach
-
-    ];
-    @endif
-
-    @if ($translatable->count() > 0)// these attributes are translatable
+@endif
+@if ($translatable->count() > 0)
+    /**
+     * these attributes are translatable
+     *
+     * @var array<int, string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
     public $translatable = [
-    @foreach($translatable as $translatableField)
-    '{{ $translatableField }}',
-    @endforeach
-
+@foreach($translatable as $translatableField)
+        '{{ $translatableField }}',
+@endforeach
     ];
-    @endif
 
-    @if (!$timestamps)public $timestamps = false;
-    @endif
+@endif
+    /**
+     * @var array<int, string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected $appends = [
+        'full_name',
+        'resource_url',
+    ];
 
-    protected $appends = ['full_name', 'resource_url'];
+@if (!$timestamps)
+    public $timestamps = false;
 
-    /* ************************ ACCESSOR ************************* */
-
-    public function getResourceUrlAttribute() {
-        return url('/admin/{{$resource}}/'.$this->getKey());
+@endif
+    public function getResourceUrlAttribute(): string {
+        return url('/admin/{{$resource}}/' . $this->getKey());
     }
 
-    public function getFullNameAttribute() {
-        return $this->first_name." ".$this->last_name;
+    public function getFullNameAttribute(): string {
+        return $this->first_name . ' ' . $this->last_name;
     }
 
     /**
      * Send the password reset notification.
      *
-     * {{'@'}}param string $token
-     * {{'@'}}return void
+     * @param string $token
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
-    public function sendPasswordResetNotification($token)
+    public function sendPasswordResetNotification($token): void
     {
-        $this->notify(app( ResetPassword::class, ['token' => $token]));
+        $this->notify(app(ResetPassword::class, ['token' => $token]));
     }
 
-    @if (count($relations))/* ************************ RELATIONS ************************ */
-
-    @if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)/**
-    * Relation to {{ $belongsToMany['related_model_name_plural'] }}
-    *
-    * {{'@'}}return BelongsToMany
-    */
-    public function {{ $belongsToMany['related_table'] }}() {
+@if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
+@foreach($relations['belongsToMany'] as $belongsToMany)
+    public function {{ $belongsToMany['related_table'] }}(): BelongsTo {
         return $this->belongsToMany({{ $belongsToMany['related_model_class'] }}, '{{ $belongsToMany['relation_table'] }}', '{{ $belongsToMany['foreign_key'] }}', '{{ $belongsToMany['related_key'] }}');
     }
 
 @endforeach
-    @endif
-    @endif
-
+@endif
+@if (count($dates) > 0)
+    /**
+     * @return array<string>
+     */
+    protected function casts(): array
+    {
+        return [
+@foreach($dates as $date)
+            '{{ $date }}' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
+@endforeach
+        ];
+    }
+@endif
 }

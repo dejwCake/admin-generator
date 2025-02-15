@@ -1,28 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models\Billing;
 
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
+    /**
+     * @var array<int, string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
     protected $fillable = [
         'title',
-    
     ];
-    
-    
-    protected $dates = [
-    
-    ];
-    public $timestamps = false;
-    
+
+    /**
+     * @var array<int, string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
     protected $appends = ['resource_url'];
 
-    /* ************************ ACCESSOR ************************* */
+    public $timestamps = false;
 
-    public function getResourceUrlAttribute()
-    {
-        return url('/admin/billing-categories/'.$this->getKey());
+    public function getResourceUrlAttribute(): string {
+        return url('/admin/billing-categories/' . $this->getKey());
     }
+
 }

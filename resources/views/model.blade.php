@@ -1,6 +1,8 @@
-@php echo "<?php"
+@php use Illuminate\Support\Arr;echo "<?php"
 @endphp
 
+
+declare(strict_types=1);
 
 namespace {{ $modelNameSpace }};
 @php
@@ -13,97 +15,153 @@ namespace {{ $modelNameSpace }};
             return $belongsToMany['related_table'] == 'roles';
         });
     }
+    $uses = [
+        'Illuminate\Database\Eloquent\Model',
+    ];
+    if ($hasSoftDelete) {
+        $uses = array_merge($uses, [
+            'Illuminate\Database\Eloquent\SoftDeletes',
+        ]);
+    }
+    if ($hasRoles) {
+        $uses = array_merge($uses, [
+            'Spatie\Permission\Traits\HasRoles',
+        ]);
+    }
+    if ($translatable->count() > 0) {
+        $uses = array_merge($uses, [
+            'Brackets\Translatable\Traits\HasTranslations',
+        ]);
+    }
+    if ($fillable) {
+        foreach ($fillable as $fillableColumn) {
+            if ($fillableColumn === "created_by_admin_user_id") {
+                $uses[] = 'Brackets\Craftable\Traits\CreatedByAdminUserTrait';
+            } elseif ($fillableColumn === "updated_by_admin_user_id") {
+                $uses[] = 'Brackets\Craftable\Traits\UpdatedByAdminUserTrait';
+            }
+        }
+    }
+    if (count($dates) > 0) {
+        $uses = array_merge($uses, [
+            'Carbon\CarbonInterface',
+        ]);
+    }
+    if (isset($relations['belongsToMany']) && count($relations['belongsToMany'])) {
+        $uses[] = 'Illuminate\Database\Eloquent\Relations\BelongsToMany';
+    }
+    $uses = Arr::sort($uses);
 @endphp
 
-use Illuminate\Database\Eloquent\Model;
-@if($fillable)@foreach($fillable as $fillableColumn)
-@if($fillableColumn === "created_by_admin_user_id")use Brackets\Craftable\Traits\CreatedByAdminUserTrait;
-@elseif($fillableColumn === "updated_by_admin_user_id")use Brackets\Craftable\Traits\UpdatedByAdminUserTrait;
-@endif
+@foreach($uses as $use)
+use {{ $use }};
 @endforeach
-@endif
-@if($hasSoftDelete)use Illuminate\Database\Eloquent\SoftDeletes;
-@endif
-@if (isset($relations['belongsToMany']) && count($relations['belongsToMany']))
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-@endif
-@if($hasRoles)use Spatie\Permission\Traits\HasRoles;
-@endif
-@if($translatable->count() > 0)use Brackets\Translatable\Traits\HasTranslations;
-@endif
 
 class {{ $modelBaseName }} extends Model
 {
-@if($hasSoftDelete)
-    use SoftDeletes;
-@endif
-@if($hasRoles)use HasRoles;
-@endif
-@if($translatable->count() > 0)use HasTranslations;
-@endif
-@if($fillable)@foreach($fillable as $fillableColumn)
-@if($fillableColumn === "created_by_admin_user_id")use CreatedByAdminUserTrait;
-@elseif($fillableColumn === "updated_by_admin_user_id")    use UpdatedByAdminUserTrait;
-@endif
+@php
+    $traitUses = [];
+    if($hasSoftDelete) {
+        $traitUses[] = 'SoftDeletes';
+    }
+    if($hasRoles) {
+        $traitUses[] = 'HasRoles';
+    }
+    if($translatable->count() > 0) {
+        $traitUses[] = 'HasTranslations';
+    }
+    if ($fillable) {
+        foreach ($fillable as $fillableColumn) {
+            if ($fillableColumn === "created_by_admin_user_id") {
+                $traitUses[] = 'CreatedByAdminUserTrait';
+            } elseif ($fillableColumn === "updated_by_admin_user_id") {
+                $traitUses[] = 'UpdatedByAdminUserTrait';
+            }
+        }
+    }
+    $traitUses = Arr::sort($traitUses);
+@endphp
+@if(count($traitUses) > 0)
+@foreach($traitUses as $traitUse)
+    use {{ $traitUse }};
 @endforeach
+
 @endif
-    @if (!is_null($tableName))protected $table = '{{ $tableName }}';
+@if ($tableName !== null)
+    protected $table = '{{ $tableName }}';
 
-    @endif
-@if ($fillable)protected $fillable = [
-    @foreach($fillable as $f)
-    '{{ $f }}',
-    @endforeach
-
+@endif
+@if (count($fillable) > 0)
+    /**
+     * @var array<int, string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected $fillable = [
+@foreach($fillable as $fillableField)
+        '{{ $fillableField }}',
+@endforeach
     ];
-    @endif
 
-    @if ($hidden && count($hidden) > 0)protected $hidden = [
-    @foreach($hidden as $h)
-    '{{ $h }}',
-    @endforeach
-
+@endif
+@if (count($hidden) > 0)
+    /**
+     * @var array<int, string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
+    protected $hidden = [
+@foreach($hidden as $hiddenField)
+        '{{ $hiddenField }}',
+@endforeach
     ];
-    @endif
 
-    @if ($dates)protected $dates = [
-    @foreach($dates as $date)
-    '{{ $date }}',
-    @endforeach
-
-    ];
-    @endif
-@if ($translatable->count() > 0)// these attributes are translatable
+@endif
+@if ($translatable->count() > 0)
+    /**
+     * these attributes are translatable
+     *
+     * @var array<int, string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
     public $translatable = [
-    @foreach($translatable as $translatableField)
-    '{{ $translatableField }}',
-    @endforeach
-
+@foreach($translatable as $translatableField)
+        '{{ $translatableField }}',
+@endforeach
     ];
-    @endif
-@if (!$timestamps)public $timestamps = false;
-    @endif
 
+@endif
+    /**
+     * @var array<int, string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
     protected $appends = ['resource_url'];
 
-    /* ************************ ACCESSOR ************************* */
+@if (!$timestamps)
+    public $timestamps = false;
 
-    public function getResourceUrlAttribute()
-    {
-        return url('/admin/{{$resource}}/'.$this->getKey());
+@endif
+    public function getResourceUrlAttribute(): string {
+        return url('/admin/{{$resource}}/' . $this->getKey());
     }
-@if (count($relations))
 
-    /* ************************ RELATIONS ************************ */
-@if (count($relations['belongsToMany']))
-@foreach($relations['belongsToMany'] as $belongsToMany)/**
-    * Relation to {{ $belongsToMany['related_model_name_plural'] }}
-    *
-    * {{'@'}}return BelongsToMany
-    */
-    public function {{ $belongsToMany['related_table'] }}() {
+@if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
+@foreach($relations['belongsToMany'] as $belongsToMany)
+    public function {{ $belongsToMany['related_table'] }}(): BelongsTo {
         return $this->belongsToMany({{ $belongsToMany['related_model_class'] }}, '{{ $belongsToMany['relation_table'] }}', '{{ $belongsToMany['foreign_key'] }}', '{{ $belongsToMany['related_key'] }}');
     }
+
 @endforeach
 @endif
-@endif}
+@if (count($dates) > 0)
+    /**
+     * @return array<string>
+     */
+    protected function casts(): array
+    {
+        return [
+@foreach($dates as $date)
+            '{{ $date }}' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
+@endforeach
+        ];
+    }
+@endif
+}
