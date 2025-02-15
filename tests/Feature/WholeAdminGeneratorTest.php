@@ -28,7 +28,7 @@ class WholeAdminGeneratorTest extends TestCase
         $createPath = resource_path('views/admin/category/create.blade.php');
         $editPath = resource_path('views/admin/category/edit.blade.php');
         $formJsPath = resource_path('js/admin/category/Form.js');
-        $factoryPath = base_path('database/factories/ModelFactory.php');
+        $factoryPath = base_path('database/factories/CategoryFactory.php');
         $indexJsPath = resource_path('js/admin/category/index.js');
         $langPath = lang_path('en/admin.php');
         $permissionMigrationFile = 'fill_permissions_for_category.php';

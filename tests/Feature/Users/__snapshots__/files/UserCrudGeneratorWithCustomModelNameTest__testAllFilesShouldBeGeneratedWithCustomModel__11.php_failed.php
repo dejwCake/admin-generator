@@ -1,15 +1,13 @@
-@php echo "<?php"
-@endphp
-
+<?php
 
 declare(strict_types=1);
 
-namespace {{ $namespace }};
+namespace Database\Factories;
 
-use {{ $modelFullName }};
+use App\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class {{ $modelBaseName }}Factory extends Factory
+class UserFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
@@ -17,7 +15,7 @@ class {{ $modelBaseName }}Factory extends Factory
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $model = {{ $modelBaseName }}::class;
+    protected $model = User::class;
 
     /**
      * Define the model's default state.
@@ -25,15 +23,12 @@ class {{ $modelBaseName }}Factory extends Factory
     public function definition(): array
     {
         return [
-@foreach($columns as $col)
-@if($col['name'] == 'activated')
-            '{{ $col['name'] }}' => true,
-@elseif($col['name'] == 'language')
-            '{{ $col['name'] }}' => 'en',
-@else
-            '{{ $col['name'] }}' => {!! $col['faker'] !!},
-@endif
-@endforeach
+            'name' => $this->faker->firstName,
+            'email' => $this->faker->email,
+            'password' => bcrypt($this->faker->password),
+            'remember_token' => null,
+            'created_at' => $this->faker->sentence,
+            'updated_at' => $this->faker->sentence,
         ];
     }
 

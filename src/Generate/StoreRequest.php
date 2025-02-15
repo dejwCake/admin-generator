@@ -59,19 +59,22 @@ class StoreRequest extends ClassGenerator
 
     protected function buildClass(): string
     {
-        return view('brackets/admin-generator::' . $this->view, [
-            'modelBaseName' => $this->modelBaseName,
-            'modelDotNotation' => $this->modelDotNotation,
-            'modelWithNamespaceFromDefault' => $this->modelWithNamespaceFromDefault,
-            'tableName' => $this->tableName,
+        return view(
+            'brackets/admin-generator::' . $this->view,
+            [
+                'modelBaseName' => $this->modelBaseName,
+                'modelDotNotation' => $this->modelDotNotation,
+                'modelWithNamespaceFromDefault' => $this->modelWithNamespaceFromDefault,
+                'tableName' => $this->tableName,
 
-            // validation in store/update
-            'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
-            'translatable' => $this->readColumnsFromTable($this->tableName)
-                ->filter(static fn (array $column): bool => $column['type'] === 'json')
-                ->pluck('name'),
-            'relations' => $this->relations,
-        ])->render();
+                // validation in store/update
+                'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
+                'translatable' => $this->readColumnsFromTable($this->tableName)
+                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->pluck('name'),
+                'relations' => $this->relations,
+            ],
+        )->render();
     }
 
     /** @return array<array<string|int>> */

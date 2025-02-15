@@ -6,7 +6,7 @@ namespace Brackets\AdminGenerator\Generate;
 
 use Symfony\Component\Console\Input\InputOption;
 
-class ModelFactory extends FileAppender
+class ModelFactory extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
@@ -22,7 +22,7 @@ class ModelFactory extends FileAppender
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $description = 'Append a new factory';
+    protected $description = 'Generate a new factory class';
 
     /**
      * Path for view
@@ -31,6 +31,8 @@ class ModelFactory extends FileAppender
 
     public function handle(): void
     {
+        $force = $this->option('force');
+
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
@@ -39,8 +41,8 @@ class ModelFactory extends FileAppender
             $this->view = 'templates.' . $template . '.factory';
         }
 
-        if ($this->appendIfNotAlreadyAppended(base_path('database/factories/ModelFactory.php'), $this->buildClass())) {
-            $this->info('Appending ' . $this->modelBaseName . ' model to ModelFactory finished');
+        if ($this->generateClass($force)) {
+            $this->info('Generating ' . $this->classFullName . ' finished');
         }
 
         if ($this->option('seed')) {
@@ -49,22 +51,33 @@ class ModelFactory extends FileAppender
         }
     }
 
+    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
+    public function generateClassNameFromTable(string $tableName): string
+    {
+        return $this->modelBaseName . 'Factory';
+    }
+
     protected function buildClass(): string
     {
-        return view('brackets/admin-generator::' . $this->view, [
-            'modelFullName' => $this->modelFullName,
+        return view(
+            'brackets/admin-generator::' . $this->view,
+            [
+                'modelFullName' => $this->modelFullName,
+                'modelBaseName' => $this->modelBaseName,
+                'namespace' => $this->classNamespace,
 
-            'columns' => $this->readColumnsFromTable($this->tableName)
-                // we skip primary key
-                ->filter(static fn (array $column): bool => $column['name'] !== 'id')
-                ->map(fn (array $column): array => [
-                        'name' => $column['name'],
-                        'faker' => $this->getType($column),
-                    ]),
-            'translatable' => $this->readColumnsFromTable($this->tableName)
-                ->filter(static fn (array $column): bool => $column['type'] === 'json')
-                ->pluck('name'),
-        ])->render();
+                'columns' => $this->readColumnsFromTable($this->tableName)
+                    // we skip primary key
+                    ->filter(static fn (array $column): bool => $column['name'] !== 'id')
+                    ->map(fn (array $column): array => [
+                            'name' => $column['name'],
+                            'faker' => $this->getType($column),
+                        ]),
+                'translatable' => $this->readColumnsFromTable($this->tableName)
+                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->pluck('name'),
+            ],
+        )->render();
     }
 
     /** @return array<array<string|int>> */
@@ -75,7 +88,21 @@ class ModelFactory extends FileAppender
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['seed', 's', InputOption::VALUE_OPTIONAL, 'Seeds the table with fake data'],
             ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating factory'],
         ];
+    }
+
+    /**
+     * Get the root namespace for the class.
+     */
+    public function rootNamespace(): string
+    {
+        return 'Database';
+    }
+
+    protected function getDefaultNamespace(string $rootNamespace): string
+    {
+        return 'Database\Factories';
     }
 
     /**
@@ -92,16 +119,16 @@ class ModelFactory extends FileAppender
         }
 
         $type = match ($column['type']) {
-            'date' => '$faker->date()',
-            'time' => '$faker->time()',
-            'datetime' => '$faker->dateTime',
-            'text' => '$faker->text()',
+            'date' => '$this->faker->date()',
+            'time' => '$this->faker->time()',
+            'datetime' => '$this->faker->dateTime',
+            'text' => '$this->faker->text()',
             'bool',
-            'boolean' => '$faker->boolean()',
+            'boolean' => '$this->faker->boolean()',
             'integer',
             'numeric',
-            'decimal' => '$faker->randomNumber(5)',
-            'float' => '$faker->randomFloat',
+            'decimal' => '$this->faker->randomNumber(5)',
+            'float' => '$this->faker->randomFloat(2)',
             default => null,
         };
 
@@ -110,15 +137,14 @@ class ModelFactory extends FileAppender
         }
 
         return match ($column['name']) {
-            'title' => '$faker->sentence',
-            'email' => '$faker->email',
+            'email' => '$this->faker->email',
             'name',
-            'first_name' => '$faker->firstName',
+            'first_name' => '$this->faker->firstName',
             'surname',
-            'last_name' => '$faker->lastName',
-            'slug' => '$faker->unique()->slug',
-            'password' => 'bcrypt($faker->password)',
-            default => '$faker->sentence',
+            'last_name' => '$this->faker->lastName',
+            'slug' => '$this->faker->unique()->slug',
+            'password' => 'bcrypt($this->faker->password)',
+            default => '$this->faker->sentence',
         };
     }
 }

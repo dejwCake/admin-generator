@@ -30,7 +30,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         $createPath = resource_path('views/admin/admin-user/create.blade.php');
         $editPath = resource_path('views/admin/admin-user/edit.blade.php');
         $formJsPath = resource_path('js/admin/admin-user/Form.js');
-        $factoryPath = base_path('database/factories/ModelFactory.php');
+        $factoryPath = base_path('database/factories/CategoryFactory.php');
 
         self::assertFileDoesNotExist($controllerPath);
         self::assertFileDoesNotExist($indexRequestPath);
