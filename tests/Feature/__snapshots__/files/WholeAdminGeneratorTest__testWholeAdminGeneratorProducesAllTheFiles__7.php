@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exports;
 
 use App\Models\Category;
@@ -12,27 +14,23 @@ class CategoriesExport implements FromCollection, WithMapping, WithHeadings
 {
     /**
      * @return Collection
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      */
     public function collection()
     {
         return Category::all();
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return [
-            trans('admin.category.columns.id'),
-            trans('admin.category.columns.title'),
+            __('admin.category.columns.id'),
+            __('admin.category.columns.title'),
         ];
     }
 
     /**
      * @param Category $category
-     * @return array
-     *
      */
     public function map($category): array
     {

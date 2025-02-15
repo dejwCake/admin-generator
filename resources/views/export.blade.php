@@ -2,6 +2,8 @@
 @endphp
 
 
+declare(strict_types=1);
+
 namespace {{ $exportNamespace }};
 
 use {{ $modelFullName }};
@@ -14,28 +16,24 @@ class {{ $classBaseName }} implements FromCollection, WithMapping, WithHeadings
 {
     /**
      * {{'@'}}return Collection
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      */
     public function collection()
     {
         return {{$modelBaseName}}::all();
     }
 
-    /**
-     * {{'@'}}return array
-     */
     public function headings(): array
     {
         return [
 @foreach($columnsToExport as $column)
-            trans('admin.{{ $modelLangFormat }}.columns.{{ $column }}'),
+            __('admin.{{ $modelLangFormat }}.columns.{{ $column }}'),
 @endforeach
         ];
     }
 
     /**
      * {{'@'}}param {{$modelBaseName}} ${{ $modelVariableName }}
-     * {{'@'}}return array
-     *
      */
     public function map(${{ $modelVariableName }}): array
     {

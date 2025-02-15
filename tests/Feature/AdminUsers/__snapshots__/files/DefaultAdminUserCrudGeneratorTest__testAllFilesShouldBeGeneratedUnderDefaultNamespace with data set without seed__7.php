@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exports;
 
 use Brackets\AdminAuth\Models\AdminUser;
@@ -12,32 +14,28 @@ class AdminUsersExport implements FromCollection, WithMapping, WithHeadings
 {
     /**
      * @return Collection
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      */
     public function collection()
     {
         return AdminUser::all();
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return [
-            trans('admin.admin-user.columns.id'),
-            trans('admin.admin-user.columns.first_name'),
-            trans('admin.admin-user.columns.last_name'),
-            trans('admin.admin-user.columns.email'),
-            trans('admin.admin-user.columns.activated'),
-            trans('admin.admin-user.columns.forbidden'),
-            trans('admin.admin-user.columns.language'),
+            __('admin.admin-user.columns.id'),
+            __('admin.admin-user.columns.first_name'),
+            __('admin.admin-user.columns.last_name'),
+            __('admin.admin-user.columns.email'),
+            __('admin.admin-user.columns.activated'),
+            __('admin.admin-user.columns.forbidden'),
+            __('admin.admin-user.columns.language'),
         ];
     }
 
     /**
      * @param AdminUser $adminUser
-     * @return array
-     *
      */
     public function map($adminUser): array
     {
