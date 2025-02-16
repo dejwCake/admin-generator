@@ -30,12 +30,12 @@ use {{ $use }};
 
 class ProfileController extends Controller
 {
-    public {{ $modelBaseName }} ${{ $modelVariableName }};
-
     /**
      * Guard used for admin user
      */
-    protected string $guard = 'admin';
+    private string $guard;
+
+    private {{ $modelBaseName }} ${{ $modelVariableName }};
 
     public function __construct(
         public readonly Config $config,
@@ -45,24 +45,7 @@ class ProfileController extends Controller
         public readonly ViewFactory $viewFactory,
     ) {
         // TODO add authorization
-        $this->guard = $this->config->get('admin-auth.defaults.guard');
-    }
-
-    /**
-     * Get logged user before each method
-     *
-     * {{'@'}}throws NotFoundHttpException
-     */
-    protected function setUser(Request $request): void
-    {
-        if ($request->user($this->guard) === null) {
-            throw NotFoundHttpException::fromStatusCode(
-                404,
-                trans('Admin User not found'),
-            );
-        }
-
-        $this->{{ $modelVariableName }} = $request->user($this->guard);
+        $this->guard = $this->config->get('admin-auth.defaults.guard', 'admin');
     }
 
     /**
@@ -143,7 +126,6 @@ class ProfileController extends Controller
         return !in_array($column['name'], ['password']);
     });
 @endphp
-
     /**
      * Update the specified resource in storage.
      *
@@ -181,5 +163,22 @@ class ProfileController extends Controller
         }
 
         return $this->redirector->to('admin/password');
+    }
+
+    /**
+     * Get logged user before each method
+     *
+     * {{'@'}}throws NotFoundHttpException
+     */
+    private function setUser(Request $request): void
+    {
+        if ($request->user($this->guard) === null) {
+            throw NotFoundHttpException::fromStatusCode(
+                404,
+                trans('Admin User not found'),
+            );
+        }
+
+        $this->{{ $modelVariableName }} = $request->user($this->guard);
     }
 }
