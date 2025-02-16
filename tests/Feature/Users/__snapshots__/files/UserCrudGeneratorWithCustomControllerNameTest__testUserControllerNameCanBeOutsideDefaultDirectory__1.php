@@ -13,12 +13,12 @@ use App\Models\User;
 use Brackets\AdminListing\Services\AdminListingService;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role;
@@ -186,5 +186,4 @@ class UsersController extends Controller
 
         return $this->redirector->back();
     }
-
 }

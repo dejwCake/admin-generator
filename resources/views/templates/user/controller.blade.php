@@ -14,12 +14,12 @@ namespace {{ $controllerNamespace }};
         'Brackets\AdminListing\Services\AdminListingService',
         'Exception',
         'Illuminate\Auth\Access\AuthorizationException',
+        'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Contracts\Config\Repository as Config',
+        'Illuminate\Contracts\Routing\UrlGenerator',
         'Illuminate\Contracts\View\Factory as ViewFactory',
         'Illuminate\Contracts\View\View',
         'Illuminate\Http\RedirectResponse',
-        'Illuminate\Http\Request',
-        'Illuminate\Http\Response',
         'Illuminate\Routing\Redirector',
         'Illuminate\Support\Collection',
         sprintf('App\Http\Requests\Admin\%s\Destroy%s', $modelWithNamespaceFromDefault, $modelBaseName),
@@ -39,6 +39,7 @@ namespace {{ $controllerNamespace }};
         $uses = array_merge($uses, [
             'Brackets\AdminAuth\Activation\Contracts\ActivationBroker',
             'Brackets\AdminAuth\Services\ActivationService',
+            'Illuminate\Http\Request',
         ]);
     }
 
@@ -241,8 +242,8 @@ class {{ $controllerBaseName }} extends Controller
 
         return $this->redirector->back();
     }
-
 @if($activation)
+
     /**
      * Resend activation e-mail
      *

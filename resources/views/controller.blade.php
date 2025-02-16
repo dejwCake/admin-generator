@@ -11,6 +11,8 @@ namespace {{ $controllerNamespace }};
         'Brackets\AdminListing\Services\AdminListingService',
         'Exception',
         'Illuminate\Auth\Access\AuthorizationException',
+        'Illuminate\Contracts\Auth\Access\Gate',
+        'Illuminate\Contracts\Routing\UrlGenerator',
         'Illuminate\Contracts\View\Factory as ViewFactory',
         'Illuminate\Contracts\View\View',
         'Illuminate\Http\RedirectResponse',
@@ -150,14 +152,14 @@ class {{ $controllerBaseName }} extends Controller
         // Sanitize input
         $sanitized = $request->getSanitized();
 @if(in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery))
-    @if(in_array('created_by_admin_user_id', $columnsToQuery) && in_array('updated_by_admin_user_id', $columnsToQuery))
-    $sanitized['created_by_admin_user_id'] = $request->user()->id;
-        $sanitized['updated_by_admin_user_id'] = $request->user()->id;
-    @elseif(in_array('created_by_admin_user_id', $columnsToQuery))
+@if(in_array('created_by_admin_user_id', $columnsToQuery) && in_array('updated_by_admin_user_id', $columnsToQuery))
         $sanitized['created_by_admin_user_id'] = $request->user()->id;
-    @elseif(in_array('updated_by_admin_user_id', $columnsToQuery))
         $sanitized['updated_by_admin_user_id'] = $request->user()->id;
-    @endif
+@elseif(in_array('created_by_admin_user_id', $columnsToQuery))
+        $sanitized['created_by_admin_user_id'] = $request->user()->id;
+@elseif(in_array('updated_by_admin_user_id', $columnsToQuery))
+        $sanitized['updated_by_admin_user_id'] = $request->user()->id;
+@endif
 @endif()
 
         // Store the {{ $modelBaseName }}
@@ -205,13 +207,13 @@ class {{ $controllerBaseName }} extends Controller
         $this->gate->authorize('admin.{{ $modelDotNotation }}.edit', ${{ $modelVariableName }});
 
 @if(in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery))
-    @if(in_array('created_by_admin_user_id', $columnsToQuery) && in_array('updated_by_admin_user_id', $columnsToQuery))
-    ${{ $modelVariableName }}->load(['createdByAdminUser', 'updatedByAdminUser']);
-    @elseif(in_array('created_by_admin_user_id', $columnsToQuery))
-    ${{ $modelVariableName }}->load('createdByAdminUser');
-    @elseif(in_array('updated_by_admin_user_id', $columnsToQuery))
-    ${{ $modelVariableName }}->load('updatedByAdminUser');
-    @endif
+@if(in_array('created_by_admin_user_id', $columnsToQuery) && in_array('updated_by_admin_user_id', $columnsToQuery))
+        ${{ $modelVariableName }}->load(['createdByAdminUser', 'updatedByAdminUser']);
+@elseif(in_array('created_by_admin_user_id', $columnsToQuery))
+        ${{ $modelVariableName }}->load('createdByAdminUser');
+@elseif(in_array('updated_by_admin_user_id', $columnsToQuery))
+        ${{ $modelVariableName }}->load('updatedByAdminUser');
+@endif
 
 @endif
 @if (count($belongsToManyRelations) > 0)
@@ -284,7 +286,8 @@ class {{ $controllerBaseName }} extends Controller
         return $this->redirector->back();
     }
 
-    @if(!$withoutBulk)/**
+@if(!$withoutBulk)
+    /**
      * Remove the specified resources from storage.
      *
      * {{'@'}}throws Exception

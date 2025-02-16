@@ -11,6 +11,7 @@ namespace {{ $controllerNamespace }};
         'Brackets\AdminAuth\Models\AdminUser',
         'Illuminate\Contracts\Hashing\Hasher',
         'Illuminate\Contracts\Config\Repository as Config',
+        'Illuminate\Contracts\Routing\UrlGenerator',
         'Illuminate\Contracts\View\Factory as ViewFactory',
         'Illuminate\Contracts\View\View',
         'Illuminate\Http\RedirectResponse',
@@ -96,14 +97,16 @@ class ProfileController extends Controller
 
         // Validate the request
         $request->validate([
-            @foreach($columnsProfile as $column)'{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
-            @endforeach
+@foreach($columnsProfile as $column)
+            '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
+@endforeach
         ]);
 
         // Sanitize input
         $sanitized = $request->only([
-            @foreach($columnsProfile as $column)'{{ $column['name'] }}',
-            @endforeach
+@foreach($columnsProfile as $column)
+            '{{ $column['name'] }}',
+@endforeach
         ]);
 
         // Update changed values {{ $modelBaseName }}
@@ -152,14 +155,16 @@ class ProfileController extends Controller
 
         // Validate the request
         $request->validate([
-            @foreach($columnsPassword as $column)'{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
-            @endforeach
+@foreach($columnsPassword as $column)
+            '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
+@endforeach
         ]);
 
         // Sanitize input
         $sanitized = $request->only([
-            @foreach($columnsPassword as $column)'{{ $column['name'] }}',
-            @endforeach
+@foreach($columnsPassword as $column)
+            '{{ $column['name'] }}',
+@endforeach
         ]);
 
         //Modify input, set hashed password

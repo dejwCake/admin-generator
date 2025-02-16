@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Brackets\AdminAuth\Models\AdminUser;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -85,7 +86,7 @@ class ProfileController extends Controller
             'last_name' => ['nullable', 'string'],
             'email' => ['sometimes', 'email', Rule::unique('admin_users', 'email')->ignore($this->adminUser->getKey(), $this->adminUser->getKeyName())->whereNull('deleted_at'), 'string'],
             'language' => ['sometimes', 'string'],
-                    ]);
+        ]);
 
         // Sanitize input
         $sanitized = $request->only([
@@ -93,7 +94,7 @@ class ProfileController extends Controller
             'last_name',
             'email',
             'language',
-                    ]);
+        ]);
 
         // Update changed values AdminUser
         $this->adminUser->update($sanitized);
@@ -137,12 +138,12 @@ class ProfileController extends Controller
         // Validate the request
         $request->validate([
             'password' => ['sometimes', 'confirmed', 'min:7', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/', 'string'],
-                    ]);
+        ]);
 
         // Sanitize input
         $sanitized = $request->only([
             'password',
-                    ]);
+        ]);
 
         //Modify input, set hashed password
         $sanitized['password'] = $this-hasher->make($sanitized['password']);
