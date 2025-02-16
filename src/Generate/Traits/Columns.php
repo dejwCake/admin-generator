@@ -160,8 +160,7 @@ trait Columns
     {
         if (
             $column['required']
-            && $column['type'] !== 'boolean'
-            && $column['type'] !== 'bool'
+            && $column['majorType'] !== 'bool'
             && $column['name'] !== 'password'
         ) {
             $frontendRules->push('required');
