@@ -106,9 +106,9 @@ class ViewForm extends ViewGenerator
             'modelLangFormat' => $this->modelLangFormat,
 
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)
-                ->sortBy(static fn (array $column): bool => !($column['type'] === 'json')),
+                ->sortBy(static fn (array $column): bool => !($column['majorType'] === 'json')),
             'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
                     ->count() > 0,
             'wysiwygTextColumnNames' => ['text', 'body', 'description'],
             'relations' => $this->relations,
@@ -126,9 +126,9 @@ class ViewForm extends ViewGenerator
             'modelVariableName' => $this->modelVariableName,
 
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)
-                ->sortBy(static fn (array $column): bool => !($column['type'] === 'json')),
+                ->sortBy(static fn (array $column): bool => !($column['majorType'] === 'json')),
             'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
                     ->count() > 0,
             'translatableTextarea' => ['perex', 'text', 'body'],
             'relations' => $this->relations,
@@ -151,7 +151,7 @@ class ViewForm extends ViewGenerator
 
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
             'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
                     ->count() > 0,
         ])->render();
     }
@@ -178,7 +178,7 @@ class ViewForm extends ViewGenerator
                 ))->first(null, ['name' => 'id'])['name'],
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
             'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
                     ->count() > 0,
         ])->render();
     }

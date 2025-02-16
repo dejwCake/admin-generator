@@ -7,6 +7,7 @@ namespace App\Auth;
 use Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract;
 use Brackets\AdminAuth\Activation\Traits\CanActivate;
 use Brackets\AdminAuth\Notifications\ResetPassword;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -66,4 +67,14 @@ class User extends Authenticatable implements CanActivateContract
         $this->notify(app(ResetPassword::class, ['token' => $token]));
     }
 
+    /**
+     * @return array<string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'created_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
+            'updated_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
+        ];
+    }
 }

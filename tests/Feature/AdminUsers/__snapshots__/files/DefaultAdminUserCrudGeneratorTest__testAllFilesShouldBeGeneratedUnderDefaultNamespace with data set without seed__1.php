@@ -62,7 +62,7 @@ class AdminUsersController extends Controller
                 // set columns to query
                 ['id', 'first_name', 'last_name', 'email', 'activated', 'forbidden', 'language'],
                 // set columns to searchIn
-                ['id'],
+                ['id', 'first_name', 'last_name', 'email', 'language'],
             );
 
         if ($request->ajax()) {
@@ -225,7 +225,7 @@ class AdminUsersController extends Controller
         }
 
         $response = $activationService->handle($adminUser);
-        if ($response == ActivationBroker::ACTIVATION_LINK_SENT) {
+        if ($response === ActivationBroker::ACTIVATION_LINK_SENT) {
             if ($request->ajax()) {
                 return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
             }

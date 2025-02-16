@@ -49,7 +49,7 @@ class IndexRequest extends ClassGenerator
 
             'columnsToQuery' => $this->readColumnsFromTable($this->tableName)->filter(
                 static fn (array $column): bool => !(
-                    $column['type'] === 'text'
+                    $column['majorType'] === 'text'
                     || in_array(
                         $column['name'],
                         ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'],

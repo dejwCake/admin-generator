@@ -70,7 +70,7 @@ class StoreRequest extends ClassGenerator
                 // validation in store/update
                 'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
                 'translatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
                     ->pluck('name'),
                 'relations' => $this->relations,
             ],

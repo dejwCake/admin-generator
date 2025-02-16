@@ -47,7 +47,7 @@
                             <thead>
                                 <tr>
 @foreach($columns as $col)
-                                    <th is='sortable' :column="'{{ $col['name'] }}'"@if($col['name'] == 'activated') v-if="activation"@endif>{{'{{'}} trans('admin.{{ $modelLangFormat }}.columns.{{ $col['name'] }}') }}</th>
+                                    <th is='sortable' :column="'{{ $col['name'] }}'"@if($col['name'] === 'activated') v-if="activation"@endif>{{'{{'}} trans('admin.{{ $modelLangFormat }}.columns.{{ $col['name'] }}') }}</th>
 @endforeach
 
                                     <th></th>
@@ -56,14 +56,14 @@
                             <tbody>
                                 <tr v-for="(item, index) in collection">
 @foreach($columns as $col)
-                                    <td @if($col['name'] == 'activated')v-if="activation"@endif>
+                                    <td @if($col['name'] === 'activated')v-if="activation"@endif>
 @if($col['switch'])
 
                                         <label class="switch switch-3d switch-success">
                                             <input type="checkbox" class="switch-input" v-model="collection[index].{{ $col['name'] }}" @change="toggleSwitch(item.resource_url, '{{ $col['name'] }}', collection[index])">
                                             <span class="switch-slider"></span>
                                         </label>
-@elseif($col['name'] == 'forbidden')
+@elseif($col['name'] === 'forbidden')
 
                                         <label class="switch switch-3d switch-danger">
                                             <input type="checkbox" class="switch-input" v-model="collection[index].{{ $col['name'] }}" @change="toggleSwitch(item.resource_url, '{{ $col['name'] }}', collection[index])">

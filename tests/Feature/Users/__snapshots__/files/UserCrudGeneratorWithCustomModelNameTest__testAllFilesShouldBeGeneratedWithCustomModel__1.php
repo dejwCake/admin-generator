@@ -47,7 +47,7 @@ class UsersController extends Controller
                 // set columns to query
                 ['id', 'name', 'email'],
                 // set columns to searchIn
-                ['id'],
+                ['id', 'name', 'email'],
             );
 
         if ($request->ajax()) {
@@ -81,7 +81,7 @@ class UsersController extends Controller
             'admin.user.create',
             [
                 'action' => $this->urlGenerator->to('admin/users'),
-                'activation' => Config::get('admin-auth.activation_enabled'),
+                'activation' => $this->config->get('admin-auth.activation_enabled'),
                 'roles' => Role::all(),
             ],
         );

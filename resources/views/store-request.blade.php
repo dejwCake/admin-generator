@@ -82,7 +82,7 @@ class Store{{ $modelBaseName }} extends FormRequest
     {
         return [
 @foreach($columns as $column)
-@if(!($column['name'] == "updated_by_admin_user_id" || $column['name'] == "created_by_admin_user_id" ))
+@if(!($column['name'] === "updated_by_admin_user_id" || $column['name'] === "created_by_admin_user_id" ))
             '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverStoreRules']) !!}],
 @endif
 @endforeach

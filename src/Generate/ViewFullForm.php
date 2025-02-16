@@ -126,11 +126,12 @@ class ViewFullForm extends ViewGenerator
                 ))
                 ->first(null, ['name' => 'id'])['name'],
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)
-                ->sortByDesc(static fn (array $column): bool => $column['type'] === 'json'),
+                ->sortByDesc(static fn (array $column): bool => $column['majorType'] === 'json'),
             'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
                     ->count() > 0,
             'translatableTextarea' => ['perex', 'text'],
+            'wysiwygTextColumnNames' => ['text', 'body', 'description'],
             'relations' => $this->relations,
         ])->render();
     }

@@ -9,8 +9,8 @@ Vue.component('profile-edit-profile-form', {
                 last_name:  '' ,
                 email:  '' ,
                 password:  '' ,
-                activated:  '' ,
-                forbidden:  '' ,
+                activated:  false ,
+                forbidden:  false ,
                 language:  '' ,
 
             },

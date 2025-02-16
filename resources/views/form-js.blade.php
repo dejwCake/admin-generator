@@ -6,7 +6,7 @@ Vue.component('{{ $modelJSName }}-form', {
         return {
             form: {
 @foreach($columns as $column)
-                {{ $column['name'].':' }} @if($column['type'] == 'json') {{ 'this.getLocalizedFormDefaults()' }} @elseif($column['type'] == 'boolean') {!! "false" !!} @else {!! "''" !!} @endif,
+                {{ $column['name'].':' }} @if($column['majorType'] === 'json') {{ 'this.getLocalizedFormDefaults()' }} @elseif($column['majorType'] === 'bool') {!! "false" !!} @else {!! "''" !!} @endif,
 @endforeach
             }
         }

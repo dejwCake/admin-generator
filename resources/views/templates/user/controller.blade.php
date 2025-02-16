@@ -117,7 +117,7 @@ class {{ $controllerBaseName }} extends Controller
             'admin.{{ $modelDotNotation }}.create',
             [
                 'action' => $this->urlGenerator->to('admin/{{ $resource }}'),
-                'activation' => Config::get('admin-auth.activation_enabled'),
+                'activation' => $this->config->get('admin-auth.activation_enabled'),
 @foreach($belongsToManyRelations as $belongsToMany)
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
 @endforeach
@@ -265,7 +265,7 @@ class {{ $controllerBaseName }} extends Controller
         }
 
         $response = $activationService->handle(${{ $modelVariableName }});
-        if($response == ActivationBroker::ACTIVATION_LINK_SENT) {
+        if($response === ActivationBroker::ACTIVATION_LINK_SENT) {
             if ($request->ajax()) {
                 return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
             }

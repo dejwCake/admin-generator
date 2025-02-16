@@ -9,10 +9,10 @@ namespace {{ $modelNameSpace }};
     $hasRoles = false;
     if(count($relations) && count($relations['belongsToMany'])) {
         $hasRoles = $relations['belongsToMany']->filter(function($belongsToMany) {
-            return $belongsToMany['related_table'] == 'roles';
+            return $belongsToMany['related_table'] === 'roles';
         })->count() > 0;
         $relations['belongsToMany'] = $relations['belongsToMany']->reject(function($belongsToMany) {
-            return $belongsToMany['related_table'] == 'roles';
+            return $belongsToMany['related_table'] === 'roles';
         });
     }
     $uses = [

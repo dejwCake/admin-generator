@@ -136,13 +136,13 @@ class Controller extends ClassGenerator
             'columnsToQuery' => $this->getColumnsToQuery(),
             'columnsToSearchIn' => $this->readColumnsFromTable($this->tableName)->filter(
                 static fn (array $column): bool => (
-                    in_array($column['type'], ['json', 'text', 'string'], true)
+                    in_array($column['majorType'], ['json', 'text', 'string'], true)
                     || $column['name'] === 'id')
                     && !in_array($column['name'], ['password', 'remember_token'], true),
             )->pluck('name')
             ->toArray(),
             //            'filters' => $this->readColumnsFromTable($tableName)->filter(function($column) {
-            //                return $column['type'] == 'boolean' || $column['type'] == 'bool' || $column['type'] == 'date';
+            //                return in_array($column['majorType'], ['bool', 'date'], true);
             //            }),
             // validation in store/update
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
@@ -190,7 +190,7 @@ class Controller extends ClassGenerator
                     $haystack = ['password', 'remember_token', 'slug', 'created_at', 'deleted_at'];
                 }
 
-                return !($column['type'] === 'text' || in_array($column['name'], $haystack, true,));
+                return !($column['majorType'] === 'text' || in_array($column['name'], $haystack, true,));
             })->pluck('name')->toArray();
     }
 }

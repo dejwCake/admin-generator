@@ -47,7 +47,7 @@ class CategoriesController extends Controller
                 // set columns to query
                 ['id', 'title'],
                 // set columns to searchIn
-                ['id'],
+                ['id', 'title'],
             );
 
         if ($request->ajax()) {

@@ -138,7 +138,7 @@ class ViewIndex extends ViewGenerator
 
             'columns' => $this->getColumns(),
 //            'filters' => $this->readColumnsFromTable($tableName)->filter(function($column) {
-//                return $column['type'] == 'boolean' || $column['type'] == 'bool' || $column['type'] == 'date';
+//                return in_array($column['majorType'], ['bool', 'date'], true);
 //            }),
         ])->render();
     }
@@ -166,7 +166,7 @@ class ViewIndex extends ViewGenerator
     /** @param array<string, string|int> $column */
     private function isSwitch(array $column): bool
     {
-        return ($column['type'] === 'boolean' || $column['type'] === 'bool')
+        return ($column['majorType'] === 'bool')
             && (
                 $column['name'] === 'enabled'
                 || $column['name'] === 'activated'
@@ -177,35 +177,33 @@ class ViewIndex extends ViewGenerator
     private function getColumns(): Collection
     {
         return $this->readColumnsFromTable($this->tableName)
-            ->reject(static fn (array $column): bool => $column['type'] === 'text'
+            ->reject(static fn (array $column): bool => $column['majorType'] === 'text'
             || in_array(
                 $column['name'],
                 ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'],
                 true,
             )
-            || ($column['type'] === 'json' && in_array(
+            || ($column['majorType'] === 'json' && in_array(
                 $column['name'],
                 ['perex', 'text', 'body'],
                 true,
-            )))->map(
-                function (array $column): array {
-                        $filters = new Collection([]);
-                        $column['switch'] = false;
+            )))->map(function (array $column): array {
+                $filters = new Collection([]);
+                $column['switch'] = false;
 
-                    if (in_array($column['type'], ['date', 'time', 'datetime'], true)) {
-                        $filters->push($column['type']);
-                    }
+                if (in_array($column['majorType'], ['date', 'time', 'datetime'], true)) {
+                    $filters->push($column['majorType']);
+                }
 
-                    if ($this->isSwitch($column)) {
-                        $column['switch'] = true;
-                    }
+                if ($this->isSwitch($column)) {
+                    $column['switch'] = true;
+                }
 
-                        $column['filters'] = $filters->isNotEmpty()
-                            ? ' | ' . implode(' | ', $filters->toArray())
-                            : '';
+                $column['filters'] = $filters->isNotEmpty()
+                    ? ' | ' . implode(' | ', $filters->toArray())
+                    : '';
 
-                        return $column;
-                },
-            );
+                return $column;
+            });
     }
 }

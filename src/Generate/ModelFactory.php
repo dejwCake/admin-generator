@@ -82,7 +82,7 @@ class ModelFactory extends ClassGenerator
                             'faker' => $this->getType($column),
                         ]),
                 'translatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['type'] === 'json')
+                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
                     ->pluck('name'),
             ],
         )->render();

@@ -84,7 +84,7 @@ class Update{{ $modelBaseName }} extends FormRequest
     {
 @php
     $columns = (new Collection($columns))->reject(function($column) {
-        return $column['name'] == 'activated';
+        return $column['name'] === 'activated';
     })->toArray();
 @endphp
         $rules = [

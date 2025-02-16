@@ -72,7 +72,7 @@ class Model extends ClassGenerator
                 : null,
 
             'dates' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn (array $column): bool => $column['type'] === 'datetime' || $column['type'] === 'date',
+                static fn (array $column): bool => in_array($column['majorType'], ['datetime', 'date'], true),
             )->pluck('name'),
             'fillable' => $this->readColumnsFromTable($this->tableName)->filter(
                 static fn (array $column): bool => !in_array(
@@ -85,7 +85,7 @@ class Model extends ClassGenerator
                 static fn (array $column): bool => in_array($column['name'], ['password', 'remember_token'], true),
             )->pluck('name'),
             'translatable' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn (array $column): bool => $column['type'] === 'json',
+                static fn (array $column): bool => $column['majorType'] === 'json',
             )->pluck('name'),
             'timestamps' => $this->readColumnsFromTable($this->tableName)->filter(
                 static fn (array $column): bool => in_array($column['name'], ['created_at', 'updated_at'], true),

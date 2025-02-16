@@ -17,7 +17,7 @@
             'last_login_at' => 'Last login',
 @foreach($columns as $col)
             '{{ $col['name'] }}' => '{{ ucfirst(str_replace('_', ' ', $col['name'])) }}',
-@if($col['name'] == 'password')
+@if($col['name'] === 'password')
             '{{ $col['name'] }}_repeat' => '{{ ucfirst(str_replace('_', ' ', $col['name'])) }} Confirmation',
 @endif
 @endforeach

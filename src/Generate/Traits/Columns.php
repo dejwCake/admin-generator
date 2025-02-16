@@ -20,7 +20,7 @@ trait Columns
         return (new Collection(
             $schema->getColumns($tableName),
         ))->map(
-            static function (array $column) use ($indexes): array {
+            function (array $column) use ($indexes): array {
                 //Checked unique index
                 $columnUniqueIndexes = $indexes->filter(static fn (array $index): bool
                 => in_array($column['name'], $index['columns'], true) && ($index['unique'] && !$index['primary']));
@@ -32,15 +32,16 @@ trait Columns
                 return [
                     'name' => $column['name'],
                     'type' => $column['type_name'],
+                    'majorType' => $this->getMajorTypeFromType($column['type_name']),
                     'required' => $column['nullable'] === false,
                     'unique' => $columnUniqueIndexes->count() > 0,
-                    'unique_deleted_at_condition' => $columnUniqueDeleteAtCondition->count() > 0,
+                    'uniqueDeletedAtCondition' => $columnUniqueDeleteAtCondition->count() > 0,
                 ];
             },
         );
     }
 
-    /** @return Collection<string, string|array<string>> */
+    /** @return Collection<string|int, array<string, string|array<string>>> */
     protected function getVisibleColumns(string $tableName, string $modelVariableName): Collection
     {
         $columns = $this->readColumnsFromTable($tableName);
@@ -56,6 +57,7 @@ trait Columns
         ))->map(fn (array $column): array => [
                 'name' => $column['name'],
                 'type' => $column['type'],
+                'majorType' => $column['majorType'],
                 'serverStoreRules' => $this->getServerStoreRules($column, $tableName, $hasSoftDelete)->toArray(),
                 'serverUpdateRules' => $this->getServerUpdateRules(
                     $column,
@@ -229,7 +231,7 @@ trait Columns
 
         if ($column['unique'] || $column['name'] === 'slug') {
             $storeRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '\')';
-            if ($hasSoftDelete && $column['unique_deleted_at_condition']) {
+            if ($hasSoftDelete && $column['uniqueDeletedAtCondition']) {
                 $storeRule .= '->whereNull(\'deleted_at\')';
             }
             $serverStoreRules->push($storeRule);
@@ -255,7 +257,7 @@ trait Columns
         if ($column['unique'] || $column['name'] === 'slug') {
             $updateRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '\')->ignore($this->'
                 . $modelVariableName . '->getKey(), $this->' . $modelVariableName . '->getKeyName())';
-            if ($hasSoftDelete && $column['unique_deleted_at_condition']) {
+            if ($hasSoftDelete && $column['uniqueDeletedAtCondition']) {
                 $updateRule .= '->whereNull(\'deleted_at\')';
             }
             $serverUpdateRules->push($updateRule);
@@ -279,7 +281,7 @@ trait Columns
 
         if ($column['unique'] || $column['name'] === 'slug') {
             $storeRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '->\'.$locale)';
-            if ($hasSoftDelete && $column['unique_deleted_at_condition']) {
+            if ($hasSoftDelete && $column['uniqueDeletedAtCondition']) {
                 $storeRule .= '->whereNull(\'deleted_at\')';
             }
             $serverStoreRules->push($storeRule);
@@ -305,7 +307,7 @@ trait Columns
         if ($column['unique'] || $column['name'] === 'slug') {
             $updateRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '->\'.$locale)->ignore($this->'
                 . $modelVariableName . '->getKey(), $this->' . $modelVariableName . '->getKeyName())';
-            if ($hasSoftDelete && $column['unique_deleted_at_condition']) {
+            if ($hasSoftDelete && $column['uniqueDeletedAtCondition']) {
                 $updateRule .= '->whereNull(\'deleted_at\')';
             }
             $serverUpdateRules->push($updateRule);
@@ -379,13 +381,28 @@ trait Columns
 
     private function getRuleFromType(string $type): string
     {
+        $majorType = $this->getMajorTypeFromType($type);
+
+        return match ($majorType) {
+            'datetime',
+            'date' => '\'date\'',
+            'time' => '\'date_format:H:i:s\'',
+            'integer' => '\'integer\'',
+            'float' => '\'numeric\'',
+            'bool' => '\'boolean\'',
+            default => '\'string\'',
+        };
+    }
+
+    private function getMajorTypeFromType(string $type): string
+    {
         return match ($type) {
             'datetime',
             'timestamp',
-            'timestamptz',
-            'date' => '\'date\'',
+            'timestamptz' => 'datetime',
+            'date' => 'date',
             'timetz',
-            'time' => '\'date_format:H:i:s\'',
+            'time' => 'time',
             'int2',
             'smallint',
             'smallinteger',
@@ -404,7 +421,7 @@ trait Columns
             'bigint',
             'biginteger',
             'unsignedbigint',
-            'unsignedbiginteger' => '\'integer\'',
+            'unsignedbiginteger' => 'integer',
             'decimal',
             'dec',
             'number',
@@ -413,15 +430,25 @@ trait Columns
             'float8',
             'double',
             'real',
-            'float4' => '\'numeric\'',
+            'float4' => 'float',
             'bit',
             'int1',
             'tinyint',
             'tinyinteger',
             'unsignedtinyinteger',
             'bool',
-            'boolean' => '\'boolean\'',
-            default => '\'string\'',
+            'boolean' => 'bool',
+            'json',
+            'jsonb' => 'json',
+            'char',
+            'enum',
+            'inet4',
+            'inet6',
+            'tinytext',
+            'varchar',
+            'uuid',
+            'string' => 'string',
+            default => 'text',
         };
     }
 }

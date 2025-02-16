@@ -82,19 +82,19 @@ class {{ $controllerBaseName }} extends Controller
                 // set columns to searchIn
                 ['{!! implode('\', \'', $columnsToSearchIn) !!}'],
 @if(in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery))
-    @if(in_array('created_by_admin_user_id', $columnsToQuery) && in_array('updated_by_admin_user_id', $columnsToQuery))
-            function ($query) use ($request) {
+@if(in_array('created_by_admin_user_id', $columnsToQuery) && in_array('updated_by_admin_user_id', $columnsToQuery))
+                function ($query) use ($request) {
                     $query->with(['createdByAdminUser', 'updatedByAdminUser']);
                 },
-    @elseif(in_array('created_by_admin_user_id', $columnsToQuery))
-            function ($query) use ($request) {
+@elseif(in_array('created_by_admin_user_id', $columnsToQuery))
+                function ($query) use ($request) {
                     $query->with(['createdByAdminUser']);
                 },
-    @elseif(in_array('updated_by_admin_user_id', $columnsToQuery))
-            function ($query) use ($request) {
+@elseif(in_array('updated_by_admin_user_id', $columnsToQuery))
+                function ($query) use ($request) {
                     $query->with(['updatedByAdminUser']);
                 },
-    @endif
+@endif
 @endif()
             );
 

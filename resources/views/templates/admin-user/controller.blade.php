@@ -282,7 +282,7 @@ class {{ $controllerBaseName }} extends Controller
         }
 
         $response = $activationService->handle(${{ $modelVariableName }});
-        if ($response == ActivationBroker::ACTIVATION_LINK_SENT) {
+        if ($response === ActivationBroker::ACTIVATION_LINK_SENT) {
             if ($request->ajax()) {
                 return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
             }
