@@ -157,6 +157,21 @@ class GenerateUser extends Command
             ]);
         }
 
+        if ($this->shouldGeneratePermissionsMigration()) {
+            $this->call('admin:generate:permissions', [
+                'table_name' => $tableNameArgument,
+                '--model-name' => $modelOption,
+                '--force' => $force,
+            ]);
+
+            if (
+                $this->option('no-interaction')
+                || $this->confirm('Do you want to attach generated permissions to the default role now?', true)
+            ) {
+                $this->call('migrate');
+            }
+        }
+
         if ($this->option('seed')) {
             $this->info('Seeding testing data');
             $modelOption::factory()->count(20)->create();
@@ -184,5 +199,10 @@ class GenerateUser extends Command
             ['seed', 's', InputOption::VALUE_NONE, 'Seeds table with fake data'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
         ];
+    }
+
+    protected function shouldGeneratePermissionsMigration(): bool
+    {
+        return class_exists('\Brackets\Craftable\CraftableServiceProvider');
     }
 }
