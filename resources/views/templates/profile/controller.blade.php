@@ -168,7 +168,7 @@ class ProfileController extends Controller
         ]);
 
         //Modify input, set hashed password
-        $sanitized['password'] = $this-hasher->make($sanitized['password']);
+        $sanitized['password'] = $this->hasher->make($sanitized['password']);
 
         // Update changed values {{ $modelBaseName }}
         $this->{{ $modelVariableName }}->update($sanitized);
