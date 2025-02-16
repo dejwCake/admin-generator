@@ -34,6 +34,7 @@ class {{ $classBaseName }} implements FromCollection, WithMapping, WithHeadings
 
     /**
      * {{'@'}}param {{$modelBaseName}} ${{ $modelVariableName }}
+     * {{'@'}}phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     public function map(${{ $modelVariableName }}): array
     {

@@ -31,6 +31,7 @@ class CategoriesExport implements FromCollection, WithMapping, WithHeadings
 
     /**
      * @param Category $category
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     public function map($category): array
     {

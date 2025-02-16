@@ -36,6 +36,7 @@ class AdminUsersExport implements FromCollection, WithMapping, WithHeadings
 
     /**
      * @param AdminUser $adminUser
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     public function map($adminUser): array
     {
