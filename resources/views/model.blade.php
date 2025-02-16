@@ -16,6 +16,7 @@ namespace {{ $modelNameSpace }};
         });
     }
     $uses = [
+        'Illuminate\Database\Eloquent\Factories\HasFactory',
         'Illuminate\Database\Eloquent\Model',
     ];
     if ($hasSoftDelete) {
@@ -60,7 +61,9 @@ use {{ $use }};
 class {{ $modelBaseName }} extends Model
 {
 @php
-    $traitUses = [];
+    $traitUses = [
+        'HasFactory'
+    ];
     if($hasSoftDelete) {
         $traitUses[] = 'SoftDeletes';
     }

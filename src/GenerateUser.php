@@ -147,6 +147,7 @@ class GenerateUser extends Command
             'table_name' => $tableNameArgument,
             '--model-name' => $modelOption,
             '--template' => 'user',
+            '--force' => $force,
         ]);
 
         if ($exportOption) {

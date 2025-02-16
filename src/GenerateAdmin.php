@@ -51,6 +51,7 @@ class GenerateAdmin extends Command
         $this->call('admin:generate:factory', [
             'table_name' => $tableNameArgument,
             '--model-name' => $modelOption,
+            '--force' => $force,
             '--seed' => $this->option('seed'),
         ]);
 

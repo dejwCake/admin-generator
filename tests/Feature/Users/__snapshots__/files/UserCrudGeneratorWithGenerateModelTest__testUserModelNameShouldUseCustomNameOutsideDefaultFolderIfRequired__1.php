@@ -7,6 +7,7 @@ namespace App\Auth;
 use Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract;
 use Brackets\AdminAuth\Activation\Traits\CanActivate;
 use Brackets\AdminAuth\Notifications\ResetPassword;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -14,6 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements CanActivateContract
 {
     use CanActivate;
+    use HasFactory;
     use HasRoles;
     use Notifiable;
 

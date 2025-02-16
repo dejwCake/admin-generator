@@ -145,6 +145,7 @@ class GenerateAdminUser extends Command
             '--model-name' => $modelOption,
             '--template' => 'admin-user',
             '--model-with-full-namespace' => $modelWithFullNamespace,
+            '--force' => $force,
         ]);
 
         if ($exportOption) {

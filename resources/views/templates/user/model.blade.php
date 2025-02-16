@@ -19,6 +19,7 @@ namespace {{ $modelNameSpace }};
         'Brackets\AdminAuth\Activation\Traits\CanActivate',
         'Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract',
         'Brackets\AdminAuth\Notifications\ResetPassword',
+        'Illuminate\Database\Eloquent\Factories\HasFactory',
         'Illuminate\Foundation\Auth\User as Authenticatable',
         'Illuminate\Notifications\Notifiable',
     ];
@@ -56,8 +57,9 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
 {
 @php
     $traitUses = [
-        'Notifiable',
         'CanActivate',
+        'HasFactory',
+        'Notifiable',
     ];
     if($hasSoftDelete) {
         $traitUses[] = 'SoftDeletes';
