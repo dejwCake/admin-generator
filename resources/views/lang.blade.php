@@ -17,6 +17,9 @@
             'id' => 'ID',
 @foreach($columns as $col)
             '{{ $col['name'] }}' => '{{ $col['defaultTranslation'] }}',
+@if($col['name'] === 'password')
+            '{{ $col['name'] }}_repeat' => '{{ ucfirst(str_replace('_', ' ', $col['name'])) }} Confirmation',
+@endif
 @endforeach
 @if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
             //Belongs to many relations
