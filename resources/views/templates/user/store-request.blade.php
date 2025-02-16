@@ -118,7 +118,7 @@ class Store{{ $modelBaseName }} extends FormRequest
         if (!$config->get('admin-auth.activation_enabled')) {
             $data['activated'] = true;
         }
-        if (!empty($data['password'])) {
+        if (isset($data['password'])) {
             $hasher = app(Hasher::class);
             assert($hasher instanceof Hasher);
             $data['password'] = $hasher->make($data['password']);
