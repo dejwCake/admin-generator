@@ -20,7 +20,7 @@ trait Columns
         return (new Collection(
             $schema->getColumns($tableName),
         ))->map(
-            static function (array $column) use ($tableName, $indexes, $schema): array {
+            static function (array $column) use ($indexes): array {
                 //Checked unique index
                 $columnUniqueIndexes = $indexes->filter(static fn (array $index): bool
                 => in_array($column['name'], $index['columns'], true) && ($index['unique'] && !$index['primary']));
@@ -31,7 +31,7 @@ trait Columns
 
                 return [
                     'name' => $column['name'],
-                    'type' => $schema->getColumnType($tableName, $column['name']),
+                    'type' => $column['type_name'],
                     'required' => $column['nullable'] === false,
                     'unique' => $columnUniqueIndexes->count() > 0,
                     'unique_deleted_at_condition' => $columnUniqueDeleteAtCondition->count() > 0,
@@ -223,7 +223,7 @@ trait Columns
         bool $hasSoftDelete,
         Collection $serverStoreRules,
     ): Collection {
-        if ($column['type'] === 'json') {
+        if (in_array($column['type'], ['json', 'jsonb'], true)) {
             return $serverStoreRules;
         }
 
@@ -248,7 +248,7 @@ trait Columns
         bool $hasSoftDelete,
         Collection $serverUpdateRules,
     ): Collection {
-        if ($column['type'] === 'json') {
+        if (in_array($column['type'], ['json', 'jsonb'], true)) {
             return $serverUpdateRules;
         }
 
@@ -273,7 +273,7 @@ trait Columns
         bool $hasSoftDelete,
         Collection $serverStoreRules,
     ): Collection {
-        if ($column['type'] !== 'json') {
+        if (!in_array($column['type'], ['json', 'jsonb'], true)) {
             return $serverStoreRules;
         }
 
@@ -298,7 +298,7 @@ trait Columns
         bool $hasSoftDelete,
         Collection $serverUpdateRules,
     ): Collection {
-        if ($column['type'] !== 'json') {
+        if (!in_array($column['type'], ['json', 'jsonb'], true)) {
             return $serverUpdateRules;
         }
 
@@ -316,77 +316,57 @@ trait Columns
 
     protected function getServerStoreRulesByType(string $type, Collection $serverStoreRules): Collection
     {
-        $rule = match ($type) {
-            'datetime',
-            'date' => '\'date\'',
-            'time' => '\'date_format:H:i:s\'',
-            'integer',
-            'smallInteger',
-            'mediumInteger',
-            'bigInteger',
-            'unsignedInteger',
-            'unsignedSmallInteger',
-            'unsignedMediumInteger',
-            'unsignedBigInteger' => '\'integer\'',
-            'tinyInteger',
-            'unsignedTinyInteger',
-            'bool',
-            'boolean' => '\'boolean\'',
-            'float',
-            'decimal' => '\'numeric\'',
-            default => '\'string\'',
-        };
-
-        return $serverStoreRules->push($rule);
+        return $serverStoreRules->push($this->getRuleFromType($type));
     }
 
     protected function getServerUpdateRulesByType(string $type, Collection $serverUpdateRules): Collection
     {
-        $rule = match ($type) {
-            'datetime',
-            'date' => '\'date\'',
-            'time' => '\'date_format:H:i:s\'',
-            'integer',
-            'smallInteger',
-            'mediumInteger',
-            'bigInteger',
-            'unsignedInteger',
-            'unsignedSmallInteger',
-            'unsignedMediumInteger',
-            'unsignedBigInteger' => '\'integer\'',
-            'tinyInteger',
-            'unsignedTinyInteger',
-            'bool',
-            'boolean' => '\'boolean\'',
-            'float',
-            'decimal' => '\'numeric\'',
-            default => '\'string\'',
-        };
-
-        return $serverUpdateRules->push($rule);
+        return $serverUpdateRules->push($this->getRuleFromType($type));
     }
 
     protected function getFrontendRulesByType(string $type, Collection $frontendRules): Collection
     {
         $rule = match ($type) {
             'datetime',
+            'timestamp',
+            'timestamptz',
             'date' => 'date_format:yyyy-MM-dd HH:mm:ss',
+            'timetz',
             'time' => 'date_format:HH:mm:ss',
+            'int2',
+            'smallint',
+            'smallinteger',
+            'unsignedsmallint',
+            'unsignedsmallinteger',
+            'int3',
+            'mediumint',
+            'mediuminteger',
+            'unsignedmediumint',
+            'unsignedmediuminteger',
+            'int4',
+            'int',
             'integer',
-            'smallInteger',
-            'mediumInteger',
-            'bigInteger',
-            'unsignedTinyInteger',
-            'unsignedSmallInteger',
-            'unsignedMediumInteger',
-            'unsignedBigInteger' => 'integer',
-            'tinyInteger',
-            'unsignedInteger',
+            'unsignedinteger',
+            'int8',
+            'bigint',
+            'biginteger',
+            'unsignedbigint',
+            'unsignedbiginteger' => 'integer',
+            'decimal',
+            'dec',
+            'number',
+            'numeric',
+            'float',
+            'float8',
+            'double',
+            'real',
+            'float4' => 'decimal',
+            'int1',
+            'tinyint',
+            'tinyinteger',
+            'unsignedtinyinteger',
             'bool',
             'boolean' => '',
-            'float',
-                // FIXME?? I'm not sure about this one
-            'decimal' => 'decimal',
             default => null,
         };
 
@@ -395,5 +375,53 @@ trait Columns
         }
 
         return $frontendRules;
+    }
+
+    private function getRuleFromType(string $type): string
+    {
+        return match ($type) {
+            'datetime',
+            'timestamp',
+            'timestamptz',
+            'date' => '\'date\'',
+            'timetz',
+            'time' => '\'date_format:H:i:s\'',
+            'int2',
+            'smallint',
+            'smallinteger',
+            'unsignedsmallint',
+            'unsignedsmallinteger',
+            'int3',
+            'mediumint',
+            'mediuminteger',
+            'unsignedmediumint',
+            'unsignedmediuminteger',
+            'int4',
+            'int',
+            'integer',
+            'unsignedinteger',
+            'int8',
+            'bigint',
+            'biginteger',
+            'unsignedbigint',
+            'unsignedbiginteger' => '\'integer\'',
+            'decimal',
+            'dec',
+            'number',
+            'numeric',
+            'float',
+            'float8',
+            'double',
+            'real',
+            'float4' => '\'numeric\'',
+            'bit',
+            'int1',
+            'tinyint',
+            'tinyinteger',
+            'unsignedtinyinteger',
+            'bool',
+            'boolean' => '\'boolean\'',
+            default => '\'string\'',
+        };
     }
 }
