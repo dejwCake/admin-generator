@@ -55,6 +55,7 @@ class GenerateAdminUser extends Command
                 $this->files->delete(app_path('Exports/AdminUsersExport.php'));
             }
             $this->files->delete(app_path('Http/Controllers/Admin/AdminUsersController.php'));
+            $this->files->delete(database_path('Factories/AdminUserFactory.php'));
             $this->files->deleteDirectory(app_path('Http/Requests/Admin/AdminUser'));
             $this->files->deleteDirectory(resource_path('js/admin/admin-user'));
             $this->files->deleteDirectory(resource_path('views/admin/admin-user'));

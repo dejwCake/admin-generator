@@ -158,11 +158,7 @@ trait Columns
      */
     protected function getFrontendRulesByRequire(array $column, Collection $frontendRules): Collection
     {
-        if (
-            $column['required']
-            && $column['majorType'] !== 'bool'
-            && $column['name'] !== 'password'
-        ) {
+        if ($column['required'] && $column['majorType'] !== 'bool' && $column['name'] !== 'password') {
             $frontendRules->push('required');
         }
 
