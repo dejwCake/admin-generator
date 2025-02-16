@@ -8,6 +8,7 @@ namespace {{ $controllerNamespace }};
 @php
     $uses = [
         'App\Http\Controllers\Controller',
+        'Brackets\AdminAuth\Models\AdminUser',
         'Illuminate\Contracts\Hashing\Hasher',
         'Illuminate\Contracts\Config\Repository as Config',
         'Illuminate\Contracts\View\Factory as ViewFactory',
@@ -18,7 +19,6 @@ namespace {{ $controllerNamespace }};
         'Illuminate\Validation\Rule',
         'Illuminate\Validation\ValidationException',
         'Symfony\Component\HttpKernel\Exception\NotFoundHttpException',
-        $modelFullName,
     ];
     $uses = Arr::sort($uses);
 @endphp
