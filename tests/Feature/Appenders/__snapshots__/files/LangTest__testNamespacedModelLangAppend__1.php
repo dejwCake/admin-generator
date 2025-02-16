@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'billing_categ-ory' => [
         'title' => 'Categories',
