@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Requests\Admin\User;
 
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -23,7 +22,7 @@ class StoreUser extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      */
-    public function rules(Config $config): array
+    public function rules(): array
     {
         $rules = [
             'name' => ['required', 'string'],
@@ -33,10 +32,6 @@ class StoreUser extends FormRequest
             'roles' => ['array'],
         ];
 
-        if ($config->get('admin-auth.activation_enabled')) {
-            $rules['activated'] = ['required', 'boolean'];
-        }
-
         return $rules;
     }
 
@@ -45,12 +40,7 @@ class StoreUser extends FormRequest
      */
     public function getModifiedData(): array
     {
-        $config = app(Config::class);
-        assert($config instanceof Config);
         $data = $this->validated();
-        if (!$config->get('admin-auth.activation_enabled')) {
-            $data['activated'] = true;
-        }
         if (isset($data['password'])) {
             $hasher = app(Hasher::class);
             assert($hasher instanceof Hasher);

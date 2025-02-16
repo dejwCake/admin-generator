@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Requests\Admin\User;
 
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -23,7 +22,7 @@ class UpdateUser extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      */
-    public function rules(Config $config): array
+    public function rules(): array
     {
         $rules = [
             'name' => ['sometimes', 'string'],
@@ -34,10 +33,6 @@ class UpdateUser extends FormRequest
             'roles' => ['sometimes', 'array'],
         ];
 
-        if($config->get('admin-auth.activation_enabled')) {
-            $rules['activated'] = ['required', 'boolean'];
-        }
-
         return $rules;
     }
 
@@ -46,12 +41,7 @@ class UpdateUser extends FormRequest
      */
     public function getModifiedData(): array
     {
-        $config = app(Config::class);
-        assert($config instanceof Config);
         $data = $this->validated();
-        if (!$config->get('admin-auth.activation_enabled')) {
-            $data['activated'] = true;
-        }
         if (array_key_exists('password', $data) && ($data['password'] === '' || $data['password'] === null)) {
             unset($data['password']);
         }
