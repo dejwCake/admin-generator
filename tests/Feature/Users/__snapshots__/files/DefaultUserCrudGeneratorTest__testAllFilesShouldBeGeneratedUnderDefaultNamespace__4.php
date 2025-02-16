@@ -15,7 +15,7 @@ class UpdateUser extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(Gate $gate)
+    public function authorize(Gate $gate): bool
     {
         return $gate->allows('admin.user.edit', $this->user);
     }
@@ -27,7 +27,8 @@ class UpdateUser extends FormRequest
     {
         $rules = [
             'name' => ['sometimes', 'string'],
-            'email' => ['sometimes', 'email', Rule::unique('users', 'email')->ignore($this->user->getKey(), $this->user->getKeyName()), 'string'],
+            'email' => ['sometimes', 'email', Rule::unique('users', 'email')
+                ->ignore($this->user->getKey(), $this->user->getKeyName()), 'string'],
             'password' => ['sometimes', 'confirmed', 'min:7', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/', 'string'],
 
             'roles' => ['sometimes', 'array'],
@@ -51,10 +52,10 @@ class UpdateUser extends FormRequest
         if (!$config->get('admin-auth.activation_enabled')) {
             $data['activated'] = true;
         }
-        if (array_key_exists('password', $data) && empty($data['password'])) {
+        if (array_key_exists('password', $data) && ($data['password'] === '' || $data['password'] === null)) {
             unset($data['password']);
         }
-        if (!empty($data['password'])) {
+        if (isset($data['password'])) {
             $hasher = app(Hasher::class);
             assert($hasher instanceof Hasher);
             $data['password'] = $hasher->make($data['password']);

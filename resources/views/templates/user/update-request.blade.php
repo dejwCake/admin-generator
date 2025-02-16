@@ -41,7 +41,7 @@ class Update{{ $modelBaseName }} extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(Gate $gate)
+    public function authorize(Gate $gate): bool
     {
         return $gate->allows('admin.{{ $modelDotNotation }}.edit', $this->{{ $modelVariableName }});
     }
@@ -118,10 +118,10 @@ class Update{{ $modelBaseName }} extends FormRequest
         if (!$config->get('admin-auth.activation_enabled')) {
             $data['activated'] = true;
         }
-        if (array_key_exists('password', $data) && empty($data['password'])) {
+        if (array_key_exists('password', $data) && ($data['password'] === '' || $data['password'] === null)) {
             unset($data['password']);
         }
-        if (!empty($data['password'])) {
+        if (isset($data['password'])) {
             $hasher = app(Hasher::class);
             assert($hasher instanceof Hasher);
             $data['password'] = $hasher->make($data['password']);

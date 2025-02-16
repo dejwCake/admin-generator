@@ -84,7 +84,9 @@ class ProfileController extends Controller
         $request->validate([
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],
-            'email' => ['sometimes', 'email', Rule::unique('admin_users', 'email')->ignore($this->adminUser->getKey(), $this->adminUser->getKeyName())->whereNull('deleted_at'), 'string'],
+            'email' => ['sometimes', 'email', Rule::unique('admin_users', 'email')
+                ->ignore($this->adminUser->getKey(), $this->adminUser->getKeyName())
+                ->whereNull('deleted_at'), 'string'],
             'language' => ['sometimes', 'string'],
         ]);
 

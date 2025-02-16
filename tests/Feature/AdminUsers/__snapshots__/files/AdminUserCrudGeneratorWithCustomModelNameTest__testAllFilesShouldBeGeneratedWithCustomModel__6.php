@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\User;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @property User $user
