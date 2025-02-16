@@ -71,6 +71,7 @@ class Lang extends FileAppender
                 "<?php" . PHP_EOL . PHP_EOL . "return [" . PHP_EOL . "    // Do not delete me :) I'm used for auto-generation" . PHP_EOL . "];",
             )
         ) {
+            $this->call('cache:clear');
             $this->info('Appending translations finished');
         }
     }
