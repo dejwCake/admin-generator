@@ -47,7 +47,7 @@ class ProfileController extends Controller
         if ($request->user($this->guard) === null) {
             throw NotFoundHttpException::fromStatusCode(
                 404,
-                __('Admin User not found'),
+                trans('Admin User not found'),
             );
         }
 
@@ -101,7 +101,7 @@ class ProfileController extends Controller
         if ($request->ajax()) {
             return [
                 'redirect' => $this->urlGenerator->to('admin/profile'),
-                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
@@ -153,7 +153,7 @@ class ProfileController extends Controller
         if ($request->ajax()) {
             return [
                 'redirect' => $this->urlGenerator->to('admin/password'),
-                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 

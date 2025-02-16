@@ -162,7 +162,7 @@ class {{ $controllerBaseName }} extends Controller
         if ($request->ajax()) {
             return [
                 'redirect' => $this->urlGenerator->to('admin/{{ $resource }}'),
-                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
@@ -236,7 +236,7 @@ class {{ $controllerBaseName }} extends Controller
         if ($request->ajax()) {
             return [
                 'redirect' => $this->urlGenerator->to('admin/{{ $resource }}'),
-                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
@@ -253,7 +253,7 @@ class {{ $controllerBaseName }} extends Controller
         ${{ $modelVariableName }}->delete();
 
         if ($request->ajax()) {
-            return ['message' => __('brackets/admin-ui::admin.operation.succeeded')];
+            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
         }
 
         return $this->redirector->back();
@@ -274,7 +274,7 @@ class {{ $controllerBaseName }} extends Controller
             if ($request->ajax()) {
                 throw HttpException::fromStatusCode(
                     400,
-                    __('brackets/admin-ui::admin.operation.not_allowed'),
+                    trans('brackets/admin-ui::admin.operation.not_allowed'),
                 );
             }
 
@@ -284,7 +284,7 @@ class {{ $controllerBaseName }} extends Controller
         $response = $activationService->handle(${{ $modelVariableName }});
         if ($response == ActivationBroker::ACTIVATION_LINK_SENT) {
             if ($request->ajax()) {
-                return ['message' => __('brackets/admin-ui::admin.operation.succeeded')];
+                return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
             }
 
             return $this->redirector->back();
@@ -293,7 +293,7 @@ class {{ $controllerBaseName }} extends Controller
         if ($request->ajax()) {
             throw HttpException::fromStatusCode(
                 409,
-                __('brackets/admin-ui::admin.operation.failed'),
+                trans('brackets/admin-ui::admin.operation.failed'),
             );
         }
 

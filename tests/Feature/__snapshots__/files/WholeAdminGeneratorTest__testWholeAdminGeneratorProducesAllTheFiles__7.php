@@ -24,8 +24,8 @@ class CategoriesExport implements FromCollection, WithMapping, WithHeadings
     public function headings(): array
     {
         return [
-            __('admin.category.columns.id'),
-            __('admin.category.columns.title'),
+            trans('admin.category.columns.id'),
+            trans('admin.category.columns.title'),
         ];
     }
 

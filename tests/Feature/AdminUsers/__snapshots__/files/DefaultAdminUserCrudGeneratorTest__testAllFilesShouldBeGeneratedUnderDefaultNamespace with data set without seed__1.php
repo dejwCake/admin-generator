@@ -120,7 +120,7 @@ class AdminUsersController extends Controller
         if ($request->ajax()) {
             return [
                 'redirect' => $this->urlGenerator->to('admin/admin-users'),
-                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
@@ -180,7 +180,7 @@ class AdminUsersController extends Controller
         if ($request->ajax()) {
             return [
                 'redirect' => $this->urlGenerator->to('admin/admin-users'),
-                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
@@ -197,7 +197,7 @@ class AdminUsersController extends Controller
         $adminUser->delete();
 
         if ($request->ajax()) {
-            return ['message' => __('brackets/admin-ui::admin.operation.succeeded')];
+            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
         }
 
         return $this->redirector->back();
@@ -217,7 +217,7 @@ class AdminUsersController extends Controller
             if ($request->ajax()) {
                 throw HttpException::fromStatusCode(
                     400,
-                    __('brackets/admin-ui::admin.operation.not_allowed'),
+                    trans('brackets/admin-ui::admin.operation.not_allowed'),
                 );
             }
 
@@ -227,7 +227,7 @@ class AdminUsersController extends Controller
         $response = $activationService->handle($adminUser);
         if ($response == ActivationBroker::ACTIVATION_LINK_SENT) {
             if ($request->ajax()) {
-                return ['message' => __('brackets/admin-ui::admin.operation.succeeded')];
+                return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
             }
 
             return $this->redirector->back();
@@ -236,7 +236,7 @@ class AdminUsersController extends Controller
         if ($request->ajax()) {
             throw HttpException::fromStatusCode(
                 409,
-                __('brackets/admin-ui::admin.operation.failed'),
+                trans('brackets/admin-ui::admin.operation.failed'),
             );
         }
 

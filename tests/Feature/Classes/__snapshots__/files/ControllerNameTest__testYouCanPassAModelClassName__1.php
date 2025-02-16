@@ -97,7 +97,7 @@ class CategoriesController extends Controller
         if ($request->ajax()) {
             return [
                 'redirect' => $this->urlGenerator->to('admin/cats'),
-                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
@@ -148,7 +148,7 @@ class CategoriesController extends Controller
         if ($request->ajax()) {
             return [
                 'redirect' => $this->urlGenerator->to('admin/cats'),
-                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
@@ -165,7 +165,7 @@ class CategoriesController extends Controller
         $cat->delete();
 
         if ($request->ajax()) {
-            return ['message' => __('brackets/admin-ui::admin.operation.succeeded')];
+            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
         }
 
         return $this->redirector->back();
@@ -190,7 +190,7 @@ class CategoriesController extends Controller
         });
 
         if ($request->ajax()) {
-            return ['message' => __('brackets/admin-ui::admin.operation.succeeded')];
+            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
         }
 
         return $this->redirector->back();

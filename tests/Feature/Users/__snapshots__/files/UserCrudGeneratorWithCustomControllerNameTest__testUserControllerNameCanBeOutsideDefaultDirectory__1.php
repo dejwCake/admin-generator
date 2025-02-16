@@ -104,7 +104,7 @@ class UsersController extends Controller
         if ($request->ajax()) {
             return [
                 'redirect' => $this->urlGenerator->to('admin/users'),
-                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
@@ -164,7 +164,7 @@ class UsersController extends Controller
         if ($request->ajax()) {
             return [
                 'redirect' => $this->urlGenerator->to('admin/users'),
-                'message' => __('brackets/admin-ui::admin.operation.succeeded'),
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
@@ -181,7 +181,7 @@ class UsersController extends Controller
         $user->delete();
 
         if ($request->ajax()) {
-            return ['message' => __('brackets/admin-ui::admin.operation.succeeded')];
+            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
         }
 
         return $this->redirector->back();

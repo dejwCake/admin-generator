@@ -1,6 +1,6 @@
 @extends('brackets/admin-ui::admin.layout.default')
 
-@section('title', __('admin.billing_my-article.actions.edit', ['name' => $myArticle->title]))
+@section('title', trans('admin.billing_my-article.actions.edit', ['name' => $myArticle->title]))
 
 @section('body')
 
@@ -17,7 +17,7 @@
 
 
                     <div class="card-header">
-                        <i class="fa fa-pencil"></i> {{ __('admin.billing_my-article.actions.edit', ['name' => $myArticle->title]) }}
+                        <i class="fa fa-pencil"></i> {{ trans('admin.billing_my-article.actions.edit', ['name' => $myArticle->title]) }}
                     </div>
 
                     <div class="card-body">
@@ -28,7 +28,7 @@
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary" :disabled="submiting">
                             <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-download'"></i>
-                            {{ __('brackets/admin-ui::admin.btn.save') }}
+                            {{ trans('brackets/admin-ui::admin.btn.save') }}
                         </button>
                     </div>
 
