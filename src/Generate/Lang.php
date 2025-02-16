@@ -69,7 +69,6 @@ class Lang extends FileAppender
                 "// Do not delete me :) I'm used for auto-generation" . PHP_EOL,
                 $this->buildClass() . PHP_EOL,
                 "<?php" . PHP_EOL . PHP_EOL . "declare(strict_types=1);" . PHP_EOL . PHP_EOL . "return [" . PHP_EOL . "    // Do not delete me :) I'm used for auto-generation" . PHP_EOL . "];". PHP_EOL,
-                $this->modelLangFormat,
             )
         ) {
             $this->call('cache:clear');
