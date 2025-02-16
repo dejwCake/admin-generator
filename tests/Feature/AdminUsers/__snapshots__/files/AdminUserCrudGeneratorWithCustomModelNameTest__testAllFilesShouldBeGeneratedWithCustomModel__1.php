@@ -245,6 +245,7 @@ class UsersController extends Controller
 
     /**
      * Impersonal login as admin user
+     *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
     public function impersonalLogin(
