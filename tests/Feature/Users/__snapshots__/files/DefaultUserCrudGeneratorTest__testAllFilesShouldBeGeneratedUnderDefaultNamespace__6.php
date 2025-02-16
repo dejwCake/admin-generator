@@ -18,13 +18,13 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
                     ->name('create');
                 Route::post('/', [\App\Http\Controllers\Admin\UsersController::class, 'store'])
                     ->name('store');
-                Route::get('/user/edit', [\App\Http\Controllers\Admin\UsersController::class, 'edit'])
+                Route::get('/{user}/edit', [\App\Http\Controllers\Admin\UsersController::class, 'edit'])
                     ->name('edit');
-                Route::post('/user', [\App\Http\Controllers\Admin\UsersController::class, 'update'])
+                Route::post('/{user}', [\App\Http\Controllers\Admin\UsersController::class, 'update'])
                     ->name('update');
-                Route::delete('/user', [\App\Http\Controllers\Admin\UsersController::class, 'destroy'])
+                Route::delete('/{user}', [\App\Http\Controllers\Admin\UsersController::class, 'destroy'])
                     ->name('destroy');
-                Route::get('/user/resend-activation', [\App\Http\Controllers\Admin\UsersController::class, 'resendActivationEmail'])
+                Route::get('/{user}/resend-activation', [\App\Http\Controllers\Admin\UsersController::class, 'resendActivationEmail'])
                     ->name('resend-activation-email');
             });
     });

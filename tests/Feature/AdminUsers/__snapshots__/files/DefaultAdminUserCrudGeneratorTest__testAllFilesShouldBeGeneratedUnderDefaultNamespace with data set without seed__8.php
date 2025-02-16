@@ -18,17 +18,17 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
                     ->name('create');
                 Route::post('/', [\App\Http\Controllers\Admin\AdminUsersController::class, 'store'])
                     ->name('store');
-                Route::get('/adminUser/impersonal-login', [\App\Http\Controllers\Admin\AdminUsersController::class, 'impersonalLogin'])
+                Route::get('/{adminUser}/impersonal-login', [\App\Http\Controllers\Admin\AdminUsersController::class, 'impersonalLogin'])
                     ->name('impersonal-login');
-                Route::get('/adminUser/edit', [\App\Http\Controllers\Admin\AdminUsersController::class, 'edit'])
+                Route::get('/{adminUser}/edit', [\App\Http\Controllers\Admin\AdminUsersController::class, 'edit'])
                     ->name('edit');
-                Route::post('/adminUser', [\App\Http\Controllers\Admin\AdminUsersController::class, 'update'])
+                Route::post('/{adminUser}', [\App\Http\Controllers\Admin\AdminUsersController::class, 'update'])
                     ->name('update');
-                Route::delete('/adminUser', [\App\Http\Controllers\Admin\AdminUsersController::class, 'destroy'])
+                Route::delete('/{adminUser}', [\App\Http\Controllers\Admin\AdminUsersController::class, 'destroy'])
                     ->name('destroy');
                 Route::get('/export', [\App\Http\Controllers\Admin\AdminUsersController::class, 'export'])
                     ->name('export');
-                Route::get('/adminUser/resend-activation', [\App\Http\Controllers\Admin\AdminUsersController::class, 'resendActivationEmail'])
+                Route::get('/{adminUser}/resend-activation', [\App\Http\Controllers\Admin\AdminUsersController::class, 'resendActivationEmail'])
                     ->name('resend-activation-email');
             });
     });

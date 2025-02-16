@@ -13,19 +13,19 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
                     ->name('create');
                 Route::post('/', [\{{ $controllerFullName }}::class, 'store'])
                     ->name('store');
-                Route::get('/{{{ $modelVariableName }}}/impersonal-login', [\{{ $controllerFullName }}::class, 'impersonalLogin'])
+                Route::get('/{{ '{' }}{{ $modelVariableName }}}/impersonal-login', [\{{ $controllerFullName }}::class, 'impersonalLogin'])
                     ->name('impersonal-login');
-                Route::get('/{{{ $modelVariableName }}}/edit', [\{{ $controllerFullName }}::class, 'edit'])
+                Route::get('/{{ '{' }}{{ $modelVariableName }}}/edit', [\{{ $controllerFullName }}::class, 'edit'])
                     ->name('edit');
-                Route::post('/{{{ $modelVariableName }}}', [\{{ $controllerFullName }}::class, 'update'])
+                Route::post('/{{ '{' }}{{ $modelVariableName }}}', [\{{ $controllerFullName }}::class, 'update'])
                     ->name('update');
-                Route::delete('/{{{ $modelVariableName }}}', [\{{ $controllerFullName }}::class, 'destroy'])
+                Route::delete('/{{ '{' }}{{ $modelVariableName }}}', [\{{ $controllerFullName }}::class, 'destroy'])
                     ->name('destroy');
 @if($export)
                 Route::get('/export', [\{{ $controllerFullName }}::class, 'export'])
                     ->name('export');
 @endif
-                Route::get('/{{{ $modelVariableName }}}/resend-activation', [\{{ $controllerFullName }}::class, 'resendActivationEmail'])
+                Route::get('/{{ '{' }}{{ $modelVariableName }}}/resend-activation', [\{{ $controllerFullName }}::class, 'resendActivationEmail'])
                     ->name('resend-activation-email');
             });
     });

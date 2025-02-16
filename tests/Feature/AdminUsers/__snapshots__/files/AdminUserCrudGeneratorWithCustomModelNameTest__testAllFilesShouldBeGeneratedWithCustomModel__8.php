@@ -18,17 +18,17 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
                     ->name('create');
                 Route::post('/', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'store'])
                     ->name('store');
-                Route::get('/user/impersonal-login', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'impersonalLogin'])
+                Route::get('/{user}/impersonal-login', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'impersonalLogin'])
                     ->name('impersonal-login');
-                Route::get('/user/edit', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'edit'])
+                Route::get('/{user}/edit', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'edit'])
                     ->name('edit');
-                Route::post('/user', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'update'])
+                Route::post('/{user}', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'update'])
                     ->name('update');
-                Route::delete('/user', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'destroy'])
+                Route::delete('/{user}', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'destroy'])
                     ->name('destroy');
                 Route::get('/export', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'export'])
                     ->name('export');
-                Route::get('/user/resend-activation', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'resendActivationEmail'])
+                Route::get('/{user}/resend-activation', [\App\Http\Controllers\Admin\Auth\UsersController::class, 'resendActivationEmail'])
                     ->name('resend-activation-email');
             });
     });
