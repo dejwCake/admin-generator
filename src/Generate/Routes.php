@@ -64,6 +64,7 @@ class Routes extends FileAppender
                 '<?php' . PHP_EOL . PHP_EOL
                 . 'declare(strict_types=1);' . PHP_EOL . PHP_EOL
                 . 'use Illuminate\Support\Facades\Route;',
+                $this->controllerFullName,
             )
         ) {
             $this->info('Appending routes finished');

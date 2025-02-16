@@ -45,6 +45,7 @@ abstract class FileAppender extends Command
         string $path,
         string $content,
         string $defaultContent = '<?php' . PHP_EOL . PHP_EOL,
+        ?string $checkForAppendedContent = null,
     ): bool {
         if (!$this->files->exists($path)) {
             $this->makeDirectory($path);
@@ -52,13 +53,15 @@ abstract class FileAppender extends Command
 
             return true;
         }
-        if (!$this->alreadyAppended($path, $content)) {
-            $this->files->append($path, $content);
-
-            return true;
+        if ($checkForAppendedContent !== null && $this->alreadyAppended($path, $checkForAppendedContent)) {
+            return false;
         }
+        if ($this->alreadyAppended($path, $content)) {
+            return false;
+        }
+        $this->files->append($path, $content);
 
-        return false;
+        return true;
     }
 
     /**
@@ -72,19 +75,22 @@ abstract class FileAppender extends Command
         string $search,
         string $replace,
         string $defaultContent = '<?php' . PHP_EOL . PHP_EOL,
+        ?string $checkForAppendedContent = null,
     ): bool {
         if (!$this->files->exists($path)) {
             $this->makeDirectory($path);
             $this->files->put($path, $defaultContent);
         }
-
-        if (!$this->alreadyAppended($path, $replace)) {
-            $this->files->put($path, str_replace($search, $replace, $this->files->get($path)));
-
-            return true;
+        if ($checkForAppendedContent !== null && $this->alreadyAppended($path, $checkForAppendedContent)) {
+            return false;
         }
+        if ($this->alreadyAppended($path, $replace)) {
+            return false;
+        }
+        $this->files->put($path, str_replace($search, $replace, $this->files->get($path)));
 
-        return false;
+        return true;
+
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
