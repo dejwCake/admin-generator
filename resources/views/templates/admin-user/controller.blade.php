@@ -303,6 +303,8 @@ class {{ $controllerBaseName }} extends Controller
 
     /**
      * Impersonal login as admin user
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
     public function impersonalLogin(
         ImpersonalLogin{{ $modelBaseName }} $request,
