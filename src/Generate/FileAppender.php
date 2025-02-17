@@ -90,7 +90,6 @@ abstract class FileAppender extends Command
         $this->files->put($path, str_replace($search, $replace, $this->files->get($path)));
 
         return true;
-
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

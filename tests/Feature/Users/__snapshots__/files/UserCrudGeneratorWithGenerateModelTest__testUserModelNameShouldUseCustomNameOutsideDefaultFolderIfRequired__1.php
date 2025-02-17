@@ -8,12 +8,13 @@ use Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract;
 use Brackets\AdminAuth\Activation\Traits\CanActivate;
 use Brackets\AdminAuth\Notifications\ResetPassword;
 use Carbon\CarbonInterface;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements CanActivateContract
+class User extends Authenticatable implements CanActivateContract, MustVerifyEmail
 {
     use CanActivate;
     use HasFactory;
@@ -21,7 +22,10 @@ class User extends Authenticatable implements CanActivateContract
     use Notifiable;
 
     /**
+     * The attributes that are mass assignable.
+     *
      * @var array<int, string>
+     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $fillable = [
@@ -31,7 +35,10 @@ class User extends Authenticatable implements CanActivateContract
     ];
 
     /**
+     * Get the attributes that should be cast.
+     *
      * @var array<int, string>
+     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $hidden = [

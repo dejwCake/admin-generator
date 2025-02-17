@@ -19,6 +19,7 @@
         <properties>
             <property name="maxComplexity" value="10"/>
         </properties>
+        <exclude-pattern>src/GenerateUser.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">

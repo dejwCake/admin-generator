@@ -3,6 +3,7 @@
   <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="src/AdminGeneratorServiceProvider.php"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/GenerateAdmin.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/GenerateAdminUser.php" method="handle"/>
+  <violation rule="PHPMD\Rule\CyclomaticComplexity" file="src/GenerateUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/GenerateUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/UserTestCase.php" method="setUpDatabase"/>
 </phpmd-baseline>

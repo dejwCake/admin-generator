@@ -19,6 +19,7 @@ namespace {{ $modelNameSpace }};
         'Brackets\AdminAuth\Activation\Traits\CanActivate',
         'Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract',
         'Brackets\AdminAuth\Notifications\ResetPassword',
+        'Illuminate\Contracts\Auth\MustVerifyEmail',
         'Illuminate\Database\Eloquent\Factories\HasFactory',
         'Illuminate\Foundation\Auth\User as Authenticatable',
         'Illuminate\Notifications\Notifiable',
@@ -53,7 +54,7 @@ namespace {{ $modelNameSpace }};
 use {{ $use }};
 @endforeach
 
-class {{ $modelBaseName }} extends Authenticatable implements CanActivateContract
+class {{ $modelBaseName }} extends Authenticatable implements CanActivateContract, MustVerifyEmail
 {
 @php
     $traitUses = [
@@ -76,15 +77,18 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
 @foreach($traitUses as $traitUse)
     use {{ $traitUse }};
 @endforeach
-
 @endif
 @if ($tableName !== null)
-    protected $table = '{{ $tableName }}';
 
+    protected $table = '{{ $tableName }}';
 @endif
 @if (count($fillable) > 0)
+
     /**
+     * The attributes that are mass assignable.
+     *
      * @var array<int, string>
+     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $fillable = [
@@ -92,11 +96,14 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
         '{{ $fillableField }}',
 @endforeach
     ];
-
 @endif
 @if (count($hidden) > 0)
+
     /**
+     * Get the attributes that should be cast.
+     *
      * @var array<int, string>
+     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $hidden = [
@@ -104,13 +111,14 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
         '{{ $hiddenField }}',
 @endforeach
     ];
-
 @endif
 @if ($translatable->count() > 0)
+
     /**
-     * these attributes are translatable
+     * These attributes are translatable
      *
      * @var array<int, string>
+     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     public $translatable = [
@@ -118,8 +126,8 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
         '{{ $translatableField }}',
 @endforeach
     ];
-
 @endif
+
     /**
      * @var array<int, string>
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
@@ -128,11 +136,11 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
         'full_name',
         'resource_url',
     ];
-
 @if (!$timestamps)
-    public $timestamps = false;
 
+    public $timestamps = false;
 @endif
+
     public function getResourceUrlAttribute(): string {
         return url('/admin/{{$resource}}/' . $this->getKey());
     }
@@ -151,16 +159,16 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
     {
         $this->notify(app(ResetPassword::class, ['token' => $token]));
     }
-
 @if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
+
 @foreach($relations['belongsToMany'] as $belongsToMany)
     public function {{ $belongsToMany['related_table'] }}(): BelongsTo {
         return $this->belongsToMany({{ $belongsToMany['related_model_class'] }}, '{{ $belongsToMany['relation_table'] }}', '{{ $belongsToMany['foreign_key'] }}', '{{ $belongsToMany['related_key'] }}');
     }
-
 @endforeach
 @endif
 @if (count($dates) > 0)
+
     /**
      * @return array<string>
      */
