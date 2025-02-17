@@ -15,14 +15,10 @@ return new class extends Migration
     private Cache $cache;
     private string $guardName;
 
-    /**
-     * @var array<array<string, string|CarbonImmutable>>
-     */
+    /** @var array<array<string, string|CarbonImmutable>> */
     private array $permissions;
 
-    /**
-     * @var array<array<string, string>>
-     */
+    /** @var array<array<string, string>> */
     private array $roles;
 
     public function __construct()
@@ -79,7 +75,7 @@ return new class extends Migration
             ],
         );
 
-        DB::transaction(function () use ($tableNames) {
+        DB::transaction(function () use ($tableNames): void {
             foreach ($this->permissions as $permission) {
                 $permissionItem = DB::table($tableNames['permissions'])
                     ->where([
@@ -144,13 +140,13 @@ return new class extends Migration
                 'role_has_permissions' => 'role_has_permissions',
             ],
         );
-        
-        DB::transaction(function () use ($tableNames) {
+
+        DB::transaction(function () use ($tableNames): void {
             foreach ($this->permissions as $permission) {
                 $permissionItem = DB::table($tableNames['permissions'])
                     ->where([
                         'name' => $permission['name'],
-                        'guard_name' => $permission['guard_name']
+                        'guard_name' => $permission['guard_name'],
                     ])->first();
                 if ($permissionItem !== null) {
                     DB::table($tableNames['permissions'])
