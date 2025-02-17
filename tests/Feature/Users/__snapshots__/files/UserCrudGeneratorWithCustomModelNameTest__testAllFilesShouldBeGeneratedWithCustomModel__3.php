@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\User;
 
+use App\User;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property User $user
+ */
 class UpdateUser extends FormRequest
 {
     /**
@@ -24,7 +28,7 @@ class UpdateUser extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'name' => ['sometimes', 'string'],
             'email' => ['sometimes', 'email', Rule::unique('users', 'email')
                 ->ignore($this->user->getKey(), $this->user->getKeyName()), 'string'],
@@ -32,8 +36,6 @@ class UpdateUser extends FormRequest
 
             'roles' => ['sometimes', 'array'],
         ];
-
-        return $rules;
     }
 
     /**

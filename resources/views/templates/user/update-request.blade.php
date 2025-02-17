@@ -21,6 +21,7 @@ namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
         'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Contracts\Hashing\Hasher',
         'Illuminate\Validation\Rule',
+        $modelFullName,
     ];
     if ($hasActivatedColumn) {
         $uses[] = 'Illuminate\Contracts\Config\Repository as Config';
@@ -37,6 +38,9 @@ namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
 use {{ $use }};
 @endforeach
 
+/**
+ * @property {{ $modelBaseName }} ${{ $modelVariableName }}
+ */
 @if($translatable->count() > 0)
 class Update{{ $modelBaseName }} extends TranslatableFormRequest
 @else
@@ -96,7 +100,11 @@ class Update{{ $modelBaseName }} extends FormRequest
         return $column['name'] === 'activated';
     })->toArray();
 @endphp
+@if($hasActivatedColumn)
         $rules = [
+@else
+        return [
+@endif
 @foreach($columns as $column)
             '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
 @endforeach
@@ -112,9 +120,9 @@ class Update{{ $modelBaseName }} extends FormRequest
         if($config->get('admin-auth.activation_enabled')) {
             $rules['activated'] = ['required', 'boolean'];
         }
-@endif
 
         return $rules;
+@endif
     }
 @endif
 

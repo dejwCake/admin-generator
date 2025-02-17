@@ -211,7 +211,7 @@ class {{ $controllerBaseName }} extends Controller
 @if (count($belongsToManyRelations) > 0)
 @foreach($belongsToManyRelations as $belongsToMany)
         // But we do have a {{ $belongsToMany['related_table'] }}, so we need to attach the {{ $belongsToMany['related_table'] }} to the {{ $modelVariableName }}
-        if($request->input('{{ $belongsToMany['related_table'] }}')) {
+        if ($request->input('{{ $belongsToMany['related_table'] }}')) {
             ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync((new Collection($request->input('{{ $belongsToMany['related_table'] }}', [])))->map->id->toArray());
         }
 @endforeach
@@ -254,7 +254,7 @@ class {{ $controllerBaseName }} extends Controller
         ActivationService $activationService,
         {{ $modelBaseName }} ${{ $modelVariableName }},
     ): array|RedirectResponse {
-        if(!$this->config->get('admin-auth.activation_enabled')) { {
+        if (!$this->config->get('admin-auth.activation_enabled')) {
             if ($request->ajax()) {
                 throw HttpException::fromStatusCode(
                     400,
@@ -266,7 +266,7 @@ class {{ $controllerBaseName }} extends Controller
         }
 
         $response = $activationService->handle(${{ $modelVariableName }});
-        if($response === ActivationBroker::ACTIVATION_LINK_SENT) {
+        if ($response === ActivationBroker::ACTIVATION_LINK_SENT) {
             if ($request->ajax()) {
                 return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
             }

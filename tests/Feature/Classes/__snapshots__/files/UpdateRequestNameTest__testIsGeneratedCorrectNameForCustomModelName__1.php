@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\Billing\Cat;
 
+use App\Models\Billing\Cat;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property Cat $cat
+ */
 class UpdateCat extends FormRequest
 {
     /**

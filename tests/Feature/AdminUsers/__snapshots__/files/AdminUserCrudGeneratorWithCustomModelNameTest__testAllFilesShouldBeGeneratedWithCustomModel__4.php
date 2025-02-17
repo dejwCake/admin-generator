@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\User;
 
+use App\User;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+/**
+ * @property User $user
+ */
 class UpdateUser extends FormRequest
 {
     /**

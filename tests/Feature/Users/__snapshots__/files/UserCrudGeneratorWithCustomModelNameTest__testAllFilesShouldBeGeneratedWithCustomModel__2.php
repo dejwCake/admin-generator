@@ -24,15 +24,13 @@ class StoreUser extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
+        return [
             'name' => ['required', 'string'],
             'email' => ['required', 'email', Rule::unique('users', 'email'), 'string'],
             'password' => ['required', 'confirmed', 'min:7', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/', 'string'],
 
             'roles' => ['array'],
         ];
-
-        return $rules;
     }
 
     /**

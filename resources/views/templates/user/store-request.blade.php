@@ -96,7 +96,11 @@ class Store{{ $modelBaseName }} extends FormRequest
         return $column['name'] === 'activated';
     })->toArray();
 @endphp
+@if($hasActivatedColumn)
         $rules = [
+@else
+        return [
+@endif
 @foreach($columns as $column)
             '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverStoreRules']) !!}],
 @endforeach
@@ -112,9 +116,9 @@ class Store{{ $modelBaseName }} extends FormRequest
         if ($config->get('admin-auth.activation_enabled')) {
             $rules['activated'] = ['required', 'boolean'];
         }
-@endif
 
         return $rules;
+@endif
     }
 @endif
 

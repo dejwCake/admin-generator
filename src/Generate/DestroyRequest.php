@@ -46,6 +46,7 @@ class DestroyRequest extends ClassGenerator
             'modelDotNotation' => $this->modelDotNotation,
             'modelWithNamespaceFromDefault' => $this->modelWithNamespaceFromDefault,
             'modelVariableName' => $this->modelVariableName,
+            'modelFullName' => $this->modelFullName,
         ])->render();
     }
 

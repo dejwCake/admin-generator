@@ -157,7 +157,7 @@ class UsersController extends Controller
         $user->update($sanitized);
 
         // But we do have a roles, so we need to attach the roles to the user
-        if($request->input('roles')) {
+        if ($request->input('roles')) {
             $user->roles()->sync((new Collection($request->input('roles', [])))->map->id->toArray());
         }
 

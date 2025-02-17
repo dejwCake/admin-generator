@@ -17,6 +17,7 @@ namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
     $uses = [
         'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Validation\Rule',
+        $modelFullName,
     ];
     if ($translatable->count() > 0) {
         $uses[] = 'Brackets\Translatable\TranslatableFormRequest';
@@ -33,6 +34,9 @@ namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
 use {{ $use }};
 @endforeach
 
+/**
+ * @property {{ $modelBaseName }} ${{ $modelVariableName }}
+ */
 @if($translatable->count() > 0)
 class Update{{ $modelBaseName }} extends TranslatableFormRequest
 @else
