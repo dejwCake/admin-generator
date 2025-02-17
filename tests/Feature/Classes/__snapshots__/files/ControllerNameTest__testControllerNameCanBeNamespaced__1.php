@@ -52,9 +52,10 @@ class MyNameController extends Controller
         if ($request->ajax()) {
             if ($request->has('bulk')) {
                 return [
-                    'bulkItems' => $data->pluck('id')
+                    'bulkItems' => $data->pluck('id'),
                 ];
             }
+
             return ['data' => $data];
         }
 

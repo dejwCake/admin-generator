@@ -142,7 +142,8 @@ class {{ $modelBaseName }} extends Model
     public $timestamps = false;
 @endif
 
-    public function getResourceUrlAttribute(): string {
+    public function getResourceUrlAttribute(): string
+    {
         return url('/admin/{{$resource}}/' . $this->getKey());
     }
 @if (count($relations) > 0 && count($relations['belongsToMany']) > 0)

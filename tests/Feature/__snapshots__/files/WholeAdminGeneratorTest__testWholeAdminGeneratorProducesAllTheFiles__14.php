@@ -27,7 +27,8 @@ class Category extends Model
 
     public $timestamps = false;
 
-    public function getResourceUrlAttribute(): string {
+    public function getResourceUrlAttribute(): string
+    {
         return url('/admin/categories/' . $this->getKey());
     }
 }

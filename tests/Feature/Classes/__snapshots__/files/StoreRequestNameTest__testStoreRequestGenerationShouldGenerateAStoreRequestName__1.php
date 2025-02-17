@@ -33,6 +33,7 @@ class StoreCategory extends FormRequest
      */
     public function getSanitized(): array
     {
+        //phpcs:ignore SlevomatCodingStandard.Variables.UselessVariable.UselessVariable
         $sanitized = $this->validated();
 
         //Add your code for manipulation with request data here

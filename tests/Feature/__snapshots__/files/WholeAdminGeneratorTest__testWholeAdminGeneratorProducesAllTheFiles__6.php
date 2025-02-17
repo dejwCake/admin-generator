@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\Category;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Http\FormRequest;
 
 class BulkDestroyCategory extends FormRequest
 {
@@ -23,7 +23,7 @@ class BulkDestroyCategory extends FormRequest
     public function rules(): array
     {
         return [
-            'ids.*' => 'integer'
+            'ids.*' => 'integer',
         ];
     }
 }

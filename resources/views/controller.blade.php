@@ -104,10 +104,11 @@ class {{ $controllerBaseName }} extends Controller
 @if(!$withoutBulk)
             if ($request->has('bulk')) {
                 return [
-                    'bulkItems' => $data->pluck('id')
+                    'bulkItems' => $data->pluck('id'),
                 ];
             }
 @endif
+
             return ['data' => $data];
         }
 
@@ -295,10 +296,10 @@ class {{ $controllerBaseName }} extends Controller
     public function bulkDestroy(BulkDestroy{{ $modelBaseName }} $request, DatabaseManager $databaseManager): array|RedirectResponse
     {
 @if($hasSoftDelete)
-        $databaseManager->transaction(static function () use ($request, $databaseManager) {
+        $databaseManager->transaction(static function () use ($request, $databaseManager): void {
             (new Collection($request->data['ids']))
                 ->chunk(1000)
-                ->each(static function ($bulkChunk) use ($databaseManager) {
+                ->each(static function ($bulkChunk) use ($databaseManager): void {
                     $databaseManager->table('{{ Str::plural($modelVariableName) }}')
                         ->whereIn('id', $bulkChunk)
                         ->update([

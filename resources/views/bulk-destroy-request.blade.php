@@ -6,8 +6,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Http\FormRequest;
 
 class BulkDestroy{{ $modelBaseName }} extends FormRequest
 {
@@ -25,7 +25,7 @@ class BulkDestroy{{ $modelBaseName }} extends FormRequest
     public function rules(): array
     {
         return [
-            'ids.*' => 'integer'
+            'ids.*' => 'integer',
         ];
     }
 }
