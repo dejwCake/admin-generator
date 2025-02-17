@@ -82,6 +82,7 @@ class User extends Authenticatable implements CanActivateContract, MustVerifyEma
         return [
             'created_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'updated_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
+            'password' => 'hashed',
         ];
     }
 }

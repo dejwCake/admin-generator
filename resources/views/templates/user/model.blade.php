@@ -178,6 +178,7 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
 @foreach($dates as $date)
             '{{ $date }}' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
 @endforeach
+            'password' => 'hashed',
         ];
     }
 @endif
