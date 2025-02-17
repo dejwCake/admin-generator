@@ -14,18 +14,12 @@ namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
             return in_array($column['name'], $translatable->toArray());
         });
     }
-    $hasActivatedColumn = (new Collection($columns))->filter(function($column) {
-        return $column['name'] === 'activated';
-    })->count() > 0;
     $uses = [
         'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Contracts\Hashing\Hasher',
         'Illuminate\Validation\Rule',
         $modelFullName,
     ];
-    if ($hasActivatedColumn) {
-        $uses[] = 'Illuminate\Contracts\Config\Repository as Config';
-    }
     if ($translatable->count() > 0) {
         $uses[] = 'Brackets\Translatable\TranslatableFormRequest';
     } else {
@@ -89,22 +83,9 @@ class Update{{ $modelBaseName }} extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      */
-@if($hasActivatedColumn)
-    public function rules(Config $config): array
-@else
     public function rules(): array
-@endif
     {
-@php
-    $columns = (new Collection($columns))->reject(function($column) {
-        return $column['name'] === 'activated';
-    })->toArray();
-@endphp
-@if($hasActivatedColumn)
-        $rules = [
-@else
         return [
-@endif
 @foreach($columns as $column)
             '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
 @endforeach
@@ -115,14 +96,6 @@ class Update{{ $modelBaseName }} extends FormRequest
 @endforeach
 @endif
         ];
-@if($hasActivatedColumn)
-
-        if($config->get('admin-auth.activation_enabled')) {
-            $rules['activated'] = ['required', 'boolean'];
-        }
-
-        return $rules;
-@endif
     }
 @endif
 
@@ -132,13 +105,6 @@ class Update{{ $modelBaseName }} extends FormRequest
     public function getModifiedData(): array
     {
         $data = $this->validated();
-@if($hasActivatedColumn)
-        $config = app(Config::class);
-        assert($config instanceof Config);
-        if (!$config->get('admin-auth.activation_enabled')) {
-            $data['activated'] = true;
-        }
-@endif
         if (array_key_exists('password', $data) && ($data['password'] === '' || $data['password'] === null)) {
             unset($data['password']);
         }

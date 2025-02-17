@@ -25,10 +25,11 @@ class UserFactory extends Factory
         return [
             'name' => $this->faker->firstName,
             'email' => $this->faker->email,
+            'email_verified_at' => $this->faker->dateTime,
             'password' => bcrypt($this->faker->password),
             'remember_token' => null,
-            'created_at' => $this->faker->sentence,
-            'updated_at' => $this->faker->sentence,
+            'created_at' => $this->faker->dateTime,
+            'updated_at' => $this->faker->dateTime,
         ];
     }
 

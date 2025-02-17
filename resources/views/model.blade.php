@@ -97,7 +97,6 @@ class {{ $modelBaseName }} extends Model
 
     /**
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $fillable = [
@@ -110,7 +109,6 @@ class {{ $modelBaseName }} extends Model
 
     /**
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $hidden = [
@@ -125,7 +123,6 @@ class {{ $modelBaseName }} extends Model
      * these attributes are translatable
      *
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     public $translatable = [
@@ -137,7 +134,6 @@ class {{ $modelBaseName }} extends Model
 
     /**
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $appends = ['resource_url'];

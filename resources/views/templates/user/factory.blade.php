@@ -26,9 +26,7 @@ class {{ $modelBaseName }}Factory extends Factory
     {
         return [
 @foreach($columns as $col)
-@if($col['name'] === 'activated')
-            '{{ $col['name'] }}' => true,
-@elseif($col['name'] === 'language')
+@if($col['name'] === 'language')
             '{{ $col['name'] }}' => 'en',
 @else
             '{{ $col['name'] }}' => {!! $col['faker'] !!},

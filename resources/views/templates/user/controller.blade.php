@@ -6,8 +6,8 @@ declare(strict_types=1);
 
 namespace {{ $controllerNamespace }};
 @php
-    $activation = $columns->search(function ($column, $key) {
-            return $column['name'] === 'activated';
+    $mustVerifyEmail = $columns->search(function ($column, $key) {
+            return $column['name'] === 'email_verified_at';
         }) !== false;
     $uses = [
         'App\Http\Controllers\Controller',
@@ -35,11 +35,11 @@ namespace {{ $controllerNamespace }};
             'Symfony\Component\HttpFoundation\BinaryFileResponse',
         ]);
     }
-    if ($activation) {
+    if ($mustVerifyEmail) {
         $uses = array_merge($uses, [
-            'Brackets\AdminAuth\Activation\Contracts\ActivationBroker',
-            'Brackets\AdminAuth\Services\ActivationService',
+            'Illuminate\Contracts\Auth\MustVerifyEmail',
             'Illuminate\Http\Request',
+            'Symfony\Component\HttpKernel\Exception\HttpException',
         ]);
     }
 
@@ -87,7 +87,6 @@ class {{ $controllerBaseName }} extends Controller
         if ($request->ajax()) {
             return [
                 'data' => $data,
-                'activation' => $this->config->get('admin-auth.activation_enabled'),
             ];
         }
 
@@ -100,7 +99,6 @@ class {{ $controllerBaseName }} extends Controller
 @if($export)
                 'exportUrl' => $this->urlGenerator->route('admin/{{ $resource }}/export'),
 @endif
-                'activation' => $this->config->get('admin-auth.activation_enabled'),
             ],
         );
     }
@@ -118,7 +116,6 @@ class {{ $controllerBaseName }} extends Controller
             'admin.{{ $modelDotNotation }}.create',
             [
                 'action' => $this->urlGenerator->to('admin/{{ $resource }}'),
-                'activation' => $this->config->get('admin-auth.activation_enabled'),
 @foreach($belongsToManyRelations as $belongsToMany)
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
 @endforeach
@@ -189,7 +186,6 @@ class {{ $controllerBaseName }} extends Controller
             [
                 '{{ $modelVariableName }}' => ${{ $modelVariableName }},
                 'action' => $this->urlGenerator->route('admin/{{ $resource }}/update', [${{ $modelVariableName }}]),
-                'activation' => $this->config->get('admin-auth.activation_enabled'),
 @foreach($belongsToManyRelations as $belongsToMany)
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
 @endforeach
@@ -242,19 +238,14 @@ class {{ $controllerBaseName }} extends Controller
 
         return $this->redirector->back();
     }
-@if($activation)
+@if($mustVerifyEmail)
 
     /**
-     * Resend activation e-mail
-     *
-     * {{'@'}}throws HttpException
+     * Resend verify e-mail
      */
-    public function resendActivationEmail(
-        Request $request,
-        ActivationService $activationService,
-        {{ $modelBaseName }} ${{ $modelVariableName }},
-    ): array|RedirectResponse {
-        if (!$this->config->get('admin-auth.activation_enabled')) {
+    public function resendVerifyEmail(Request $request, User $user): array|RedirectResponse
+    {
+        if (!(${{ $modelVariableName }} instanceof MustVerifyEmail) || ${{ $modelVariableName }}->hasVerifiedEmail()) {
             if ($request->ajax()) {
                 throw HttpException::fromStatusCode(
                     400,
@@ -265,20 +256,9 @@ class {{ $controllerBaseName }} extends Controller
             return $this->redirector->back();
         }
 
-        $response = $activationService->handle(${{ $modelVariableName }});
-        if ($response === ActivationBroker::ACTIVATION_LINK_SENT) {
-            if ($request->ajax()) {
-                return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
-            }
-
-            return $this->redirector->back();
-        }
-
+        ${{ $modelVariableName }}->sendEmailVerificationNotification();
         if ($request->ajax()) {
-            throw HttpException::fromStatusCode(
-                409,
-                trans('brackets/admin-ui::admin.operation.failed'),
-            );
+            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
         }
 
         return $this->redirector->back();

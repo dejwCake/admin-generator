@@ -6,7 +6,6 @@
 
     <{{ $modelJSName }}-listing
         :data="{{'{{'}} $data->toJson() }}"
-        :activation="!!'@{{ $activation }}'"
         :url="'{{'{{'}} $url }}'"
         inline-template>
 
@@ -47,7 +46,7 @@
                             <thead>
                                 <tr>
 @foreach($columns as $col)
-                                    <th is='sortable' :column="'{{ $col['name'] }}'"@if($col['name'] === 'activated') v-if="activation"@endif>{{'{{'}} trans('admin.{{ $modelLangFormat }}.columns.{{ $col['name'] }}') }}</th>
+                                    <th is='sortable' :column="'{{ $col['name'] }}'">{{'{{'}} trans('admin.{{ $modelLangFormat }}.columns.{{ $col['name'] }}') }}</th>
 @endforeach
 
                                     <th></th>
@@ -56,7 +55,7 @@
                             <tbody>
                                 <tr v-for="(item, index) in collection">
 @foreach($columns as $col)
-                                    <td @if($col['name'] === 'activated')v-if="activation"@endif>
+                                    <td>
 @if($col['switch'])
 
                                         <label class="switch switch-3d switch-success">
@@ -78,7 +77,7 @@
                                     <td>
                                         <div class="row no-gutters">
                                             <div class="col-auto">
-                                                <button class="btn btn-sm btn-warning" v-show="!item.activated" @click="resendActivation(item.resource_url + '/resend-activation')" title="Resend activation" role="button"><i class="fa fa-envelope-o"></i></button>
+                                                <button class="btn btn-sm btn-warning" v-show="!item.email_verified_at" @click="resendVerifyEmail(item.resource_url + '/resend-verify-email')" title="Resend verify email" role="button"><i class="fa fa-envelope-o"></i></button>
                                             </div>
                                             <div class="col-auto">
                                                 <a class="btn btn-sm btn-spinner btn-info" :href="item.resource_url + '/edit'" title="@{{ trans('brackets/admin-ui::admin.btn.edit') }}" role="button"><i class="fa fa-edit"></i></a>

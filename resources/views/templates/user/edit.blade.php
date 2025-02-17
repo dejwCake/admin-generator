@@ -12,7 +12,6 @@
             <{{ $modelJSName }}-form
                 :action="'{{'{{'}} $action }}'"
                 :data="{{'{{'}} ${{ $modelVariableName }}->toJsonAllLocales() }}"
-                :activation="!!'@{{ $activation }}'"
                 :locales="@{{ json_encode($locales) }}"
                 :send-empty-locales="false"
                 inline-template>
@@ -20,7 +19,6 @@
             <{{ $modelJSName }}-form
                 :action="'{{'{{'}} $action }}'"
                 :data="{{'{{'}} ${{ $modelVariableName }}->toJson() }}"
-                :activation="!!'@{{ $activation }}'"
                 inline-template>
 @endif
 

@@ -85,7 +85,6 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
 
     /**
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $fillable = [
@@ -98,7 +97,6 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
 
     /**
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $hidden = [
@@ -113,7 +111,6 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
      * these attributes are translatable
      *
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     public $translatable = [
@@ -125,7 +122,6 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
 
     /**
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $appends = [
@@ -137,11 +133,13 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
     public $timestamps = false;
 @endif
 
-    public function getResourceUrlAttribute(): string {
+    public function getResourceUrlAttribute(): string
+    {
         return url('/admin/{{$resource}}/' . $this->getKey());
     }
 
-    public function getFullNameAttribute(): string {
+    public function getFullNameAttribute(): string
+    {
         return $this->first_name . ' ' . $this->last_name;
     }
 
@@ -149,7 +147,6 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
      * Send the password reset notification.
      *
      * @param string $token
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     public function sendPasswordResetNotification($token): void

@@ -3,7 +3,7 @@ import AppListing from '../app-components/Listing/AppListing';
 Vue.component('{{ $modelJSName }}-listing', {
     mixins: [AppListing],
     methods: {
-        resendActivation(url) {
+        resendVerifyEmail(url) {
             axios.get(url).then(
                 response => {
                     if(response.data.message) {
@@ -19,11 +19,5 @@ Vue.component('{{ $modelJSName }}-listing', {
                 }
             );
         }
-    },
-    props: {
-        'activation': {
-            type: Boolean,
-            required: true
-        },
     }
 });

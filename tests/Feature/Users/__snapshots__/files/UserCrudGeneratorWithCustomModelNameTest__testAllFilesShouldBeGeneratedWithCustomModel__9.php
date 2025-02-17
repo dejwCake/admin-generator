@@ -11,7 +11,6 @@
             <user-form
                 :action="'{{ $action }}'"
                 :data="{{ $user->toJson() }}"
-                :activation="!!'{{ $activation }}'"
                 inline-template>
 
                 <form class="form-horizontal form-edit" method="post" @submit.prevent="onSubmit" :action="action">

@@ -16,8 +16,6 @@ namespace {{ $modelNameSpace }};
         });
     }
     $uses = [
-        'Brackets\AdminAuth\Activation\Traits\CanActivate',
-        'Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract',
         'Brackets\AdminAuth\Notifications\ResetPassword',
         'Illuminate\Contracts\Auth\MustVerifyEmail',
         'Illuminate\Database\Eloquent\Factories\HasFactory',
@@ -54,11 +52,10 @@ namespace {{ $modelNameSpace }};
 use {{ $use }};
 @endforeach
 
-class {{ $modelBaseName }} extends Authenticatable implements CanActivateContract, MustVerifyEmail
+class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEmail
 {
 @php
     $traitUses = [
-        'CanActivate',
         'HasFactory',
         'Notifiable',
     ];
@@ -88,7 +85,6 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $fillable = [
@@ -103,7 +99,6 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
      * Get the attributes that should be cast.
      *
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $hidden = [
@@ -118,7 +113,6 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
      * These attributes are translatable
      *
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     public $translatable = [
@@ -133,7 +127,6 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $appends = [
-        'full_name',
         'resource_url',
     ];
 @if (!$timestamps)
@@ -141,12 +134,9 @@ class {{ $modelBaseName }} extends Authenticatable implements CanActivateContrac
     public $timestamps = false;
 @endif
 
-    public function getResourceUrlAttribute(): string {
+    public function getResourceUrlAttribute(): string
+    {
         return url('/admin/{{$resource}}/' . $this->getKey());
-    }
-
-    public function getFullNameAttribute(): string {
-        return $this->first_name . ' ' . $this->last_name;
     }
 
     /**

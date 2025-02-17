@@ -14,14 +14,17 @@ use Brackets\AdminListing\Services\AdminListingService;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UsersController extends Controller
 {
@@ -45,7 +48,7 @@ class UsersController extends Controller
                 // pass the request with params
                 $request,
                 // set columns to query
-                ['id', 'name', 'email'],
+                ['id', 'name', 'email', 'email_verified_at'],
                 // set columns to searchIn
                 ['id', 'name', 'email'],
             );
@@ -53,7 +56,6 @@ class UsersController extends Controller
         if ($request->ajax()) {
             return [
                 'data' => $data,
-                'activation' => $this->config->get('admin-auth.activation_enabled'),
             ];
         }
 
@@ -63,7 +65,6 @@ class UsersController extends Controller
                 'data' => $data,
                 'url' => $this->urlGenerator->route('admin/users/index'),
                 'createUrl' => $this->urlGenerator->route('admin/users/create'),
-                'activation' => $this->config->get('admin-auth.activation_enabled'),
             ],
         );
     }
@@ -81,7 +82,6 @@ class UsersController extends Controller
             'admin.user.create',
             [
                 'action' => $this->urlGenerator->to('admin/users'),
-                'activation' => $this->config->get('admin-auth.activation_enabled'),
                 'roles' => Role::all(),
             ],
         );
@@ -139,7 +139,6 @@ class UsersController extends Controller
             [
                 'user' => $user,
                 'action' => $this->urlGenerator->route('admin/users/update', [$user]),
-                'activation' => $this->config->get('admin-auth.activation_enabled'),
                 'roles' => Role::all(),
             ],
         );
@@ -180,6 +179,30 @@ class UsersController extends Controller
     {
         $user->delete();
 
+        if ($request->ajax()) {
+            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+        }
+
+        return $this->redirector->back();
+    }
+
+    /**
+     * Resend verify e-mail
+     */
+    public function resendVerifyEmail(Request $request, User $user): array|RedirectResponse
+    {
+        if (!($user instanceof MustVerifyEmail) || $user->hasVerifiedEmail()) {
+            if ($request->ajax()) {
+                throw HttpException::fromStatusCode(
+                    400,
+                    trans('brackets/admin-ui::admin.operation.not_allowed'),
+                );
+            }
+
+            return $this->redirector->back();
+        }
+
+        $user->sendEmailVerificationNotification();
         if ($request->ajax()) {
             return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
         }

@@ -7,6 +7,7 @@ Vue.component('user-form', {
             form: {
                 name:  '' ,
                 email:  '' ,
+                email_verified_at:  '' ,
                 password:  '' ,
             }
         }

@@ -28,9 +28,10 @@ abstract class UserTestCase extends Orchestra
     protected function setUpDatabase(Application $app): void
     {
         $app['db']->connection()->getSchemaBuilder()->create('users', static function (Blueprint $table): void {
-            $table->increments('id');
+            $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

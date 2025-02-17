@@ -119,25 +119,7 @@ class ModelFactory extends ClassGenerator
             return 'null';
         }
 
-        $type = match ($column['type']) {
-            'date' => '$this->faker->date()',
-            'time' => '$this->faker->time()',
-            'datetime' => '$this->faker->dateTime',
-            'text' => '$this->faker->text()',
-            'bool',
-            'boolean' => '$this->faker->boolean()',
-            'integer',
-            'numeric',
-            'decimal' => '$this->faker->randomNumber(5)',
-            'float' => '$this->faker->randomFloat(2)',
-            default => null,
-        };
-
-        if ($type !== null) {
-            return $type;
-        }
-
-        return match ($column['name']) {
+        $type = match ($column['name']) {
             'email' => '$this->faker->email',
             'name',
             'first_name' => '$this->faker->firstName',
@@ -145,6 +127,21 @@ class ModelFactory extends ClassGenerator
             'last_name' => '$this->faker->lastName',
             'slug' => '$this->faker->unique()->slug',
             'password' => 'bcrypt($this->faker->password)',
+            default => null,
+        };
+
+        if ($type !== null) {
+            return $type;
+        }
+
+        return match ($column['majorType']) {
+            'date' => '$this->faker->date()',
+            'time' => '$this->faker->time()',
+            'datetime' => '$this->faker->dateTime',
+            'text' => '$this->faker->text()',
+            'bool' => '$this->faker->boolean()',
+            'integer' => '$this->faker->randomNumber(5)',
+            'float' => '$this->faker->randomFloat(2)',
             default => '$this->faker->sentence',
         };
     }

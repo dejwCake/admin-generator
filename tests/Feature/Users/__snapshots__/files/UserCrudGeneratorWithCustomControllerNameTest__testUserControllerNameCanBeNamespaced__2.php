@@ -37,8 +37,8 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
                     [\App\Http\Controllers\Admin\Auth\UsersController::class, 'destroy'],
                 )->name('destroy');
                 Route::get(
-                    '/{user}/resend-activation',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'resendActivationEmail'],
-                )->name('resend-activation-email');
+                    '/{user}/resend-verify-email',
+                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'resendVerifyEmail'],
+                )->name('resend-verify-email');
             });
     });

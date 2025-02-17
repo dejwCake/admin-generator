@@ -10,7 +10,6 @@
 
             <{{ $modelJSName }}-form
                 :action="'{{'{{'}} $action }}'"
-                :activation="!!'@{{ $activation }}'"
 @if($hasTranslatable)
                 :locales="@{{ json_encode($locales) }}"
                 :send-empty-locales="false"

@@ -38,8 +38,8 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
                 )->name('export');
 @endif
                 Route::get(
-                    '/{{ '{' }}{{ $modelVariableName }}}/resend-activation',
-                    [\{{ $controllerFullName }}::class, 'resendActivationEmail'],
-                )->name('resend-activation-email');
+                    '/{{ '{' }}{{ $modelVariableName }}}/resend-verify-email',
+                    [\{{ $controllerFullName }}::class, 'resendVerifyEmail'],
+                )->name('resend-verify-email');
             });
     });

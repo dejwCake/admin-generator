@@ -10,7 +10,6 @@
 
             <user-form
                 :action="'{{ $action }}'"
-                :activation="!!'{{ $activation }}'"
                 inline-template>
 
                 <form class="form-horizontal form-create" method="post" @submit.prevent="onSubmit" :action="action">

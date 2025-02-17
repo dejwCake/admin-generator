@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models\Auth;
 
-use Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract;
-use Brackets\AdminAuth\Activation\Traits\CanActivate;
 use Brackets\AdminAuth\Notifications\ResetPassword;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -14,9 +12,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements CanActivateContract, MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail
 {
-    use CanActivate;
     use HasFactory;
     use HasRoles;
     use Notifiable;
@@ -25,12 +22,12 @@ class User extends Authenticatable implements CanActivateContract, MustVerifyEma
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $fillable = [
         'name',
         'email',
+        'email_verified_at',
         'password',
     ];
 
@@ -38,7 +35,6 @@ class User extends Authenticatable implements CanActivateContract, MustVerifyEma
      * Get the attributes that should be cast.
      *
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $hidden = [
@@ -51,16 +47,12 @@ class User extends Authenticatable implements CanActivateContract, MustVerifyEma
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $appends = [
-        'full_name',
         'resource_url',
     ];
 
-    public function getResourceUrlAttribute(): string {
+    public function getResourceUrlAttribute(): string
+    {
         return url('/admin/auth-users/' . $this->getKey());
-    }
-
-    public function getFullNameAttribute(): string {
-        return $this->first_name . ' ' . $this->last_name;
     }
 
     /**
@@ -80,6 +72,7 @@ class User extends Authenticatable implements CanActivateContract, MustVerifyEma
     protected function casts(): array
     {
         return [
+            'email_verified_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'created_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'updated_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'password' => 'hashed',

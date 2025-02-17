@@ -32,8 +32,8 @@ class AdminUserFactory extends Factory
             'forbidden' => $this->faker->boolean(),
             'language' => 'en',
             'deleted_at' => null,
-            'created_at' => $this->faker->sentence,
-            'updated_at' => $this->faker->sentence,
+            'created_at' => $this->faker->dateTime,
+            'updated_at' => $this->faker->dateTime,
         ];
     }
 

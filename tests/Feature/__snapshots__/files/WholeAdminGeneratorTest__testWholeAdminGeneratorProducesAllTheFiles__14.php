@@ -13,7 +13,6 @@ class Category extends Model
 
     /**
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $fillable = [
@@ -22,7 +21,6 @@ class Category extends Model
 
     /**
      * @var array<int, string>
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $appends = ['resource_url'];

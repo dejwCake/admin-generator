@@ -6,7 +6,6 @@
 
     <user-listing
         :data="{{ $data->toJson() }}"
-        :activation="!!'{{ $activation }}'"
         :url="'{{ $url }}'"
         inline-template>
 
@@ -46,26 +45,30 @@
                                     <th is='sortable' :column="'id'">{{ trans('admin.user.columns.id') }}</th>
                                     <th is='sortable' :column="'name'">{{ trans('admin.user.columns.name') }}</th>
                                     <th is='sortable' :column="'email'">{{ trans('admin.user.columns.email') }}</th>
+                                    <th is='sortable' :column="'email_verified_at'">{{ trans('admin.user.columns.email_verified_at') }}</th>
 
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="(item, index) in collection">
-                                    <td >
+                                    <td>
                                         @{{ item.id }}
                                     </td>
-                                    <td >
+                                    <td>
                                         @{{ item.name }}
                                     </td>
-                                    <td >
+                                    <td>
                                         @{{ item.email }}
+                                    </td>
+                                    <td>
+                                        @{{ item.email_verified_at | datetime }}
                                     </td>
 
                                     <td>
                                         <div class="row no-gutters">
                                             <div class="col-auto">
-                                                <button class="btn btn-sm btn-warning" v-show="!item.activated" @click="resendActivation(item.resource_url + '/resend-activation')" title="Resend activation" role="button"><i class="fa fa-envelope-o"></i></button>
+                                                <button class="btn btn-sm btn-warning" v-show="!item.email_verified_at" @click="resendVerifyEmail(item.resource_url + '/resend-verify-email')" title="Resend verify email" role="button"><i class="fa fa-envelope-o"></i></button>
                                             </div>
                                             <div class="col-auto">
                                                 <a class="btn btn-sm btn-spinner btn-info" :href="item.resource_url + '/edit'" title="{{ trans('brackets/admin-ui::admin.btn.edit') }}" role="button"><i class="fa fa-edit"></i></a>
