@@ -60,10 +60,10 @@ class Routes extends FileAppender
         if (
             $this->appendIfNotAlreadyAppended(
                 base_path('routes/admin.php'),
-                PHP_EOL . PHP_EOL . $this->buildClass(),
+                PHP_EOL . $this->buildClass() . PHP_EOL,
                 '<?php' . PHP_EOL . PHP_EOL
                 . 'declare(strict_types=1);' . PHP_EOL . PHP_EOL
-                . 'use Illuminate\Support\Facades\Route;',
+                . 'use Illuminate\Support\Facades\Route;' . PHP_EOL,
             )
         ) {
             $this->info('Appending routes finished');
