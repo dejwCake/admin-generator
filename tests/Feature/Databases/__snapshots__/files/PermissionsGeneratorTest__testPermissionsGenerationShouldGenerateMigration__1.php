@@ -38,14 +38,12 @@ return new class extends Migration
         ]);
 
         //Add New permissions
-        $this->permissions = $permissions->map(function (string $permission) {
-            return [
+        $this->permissions = $permissions->map(fn (string $permission) => [
                 'name' => $permission,
                 'guard_name' => $this->guardName,
                 'created_at' => CarbonImmutable::now(),
                 'updated_at' => CarbonImmutable::now(),
-            ];
-        })->toArray();
+            ])->toArray();
 
         //Role should already exist
         $this->roles = [
