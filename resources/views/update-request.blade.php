@@ -67,6 +67,10 @@ class Update{{ $modelBaseName }} extends FormRequest
             '{{ $belongsToMany['related_table'] }}' => [{!! implode(', ', ['\'sometimes\'', '\'array\'']) !!}],
 @endforeach
 @endif
+@if($containsPublishedAtColumn)
+            'publish_now' => ['nullable', 'boolean'],
+            'unpublish_now' => ['nullable', 'boolean'],
+@endif
         ];
     }
 
