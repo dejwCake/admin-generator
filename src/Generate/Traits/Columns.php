@@ -324,47 +324,15 @@ trait Columns
 
     protected function getFrontendRulesByType(string $type, Collection $frontendRules): Collection
     {
-        $rule = match ($type) {
+        $majorType = $this->getMajorTypeFromType($type);
+
+        $rule = match ($majorType) {
             'datetime',
-            'timestamp',
-            'timestamptz',
             'date' => 'date_format:yyyy-MM-dd HH:mm:ss',
-            'timetz',
             'time' => 'date_format:HH:mm:ss',
-            'int2',
-            'smallint',
-            'smallinteger',
-            'unsignedsmallint',
-            'unsignedsmallinteger',
-            'int3',
-            'mediumint',
-            'mediuminteger',
-            'unsignedmediumint',
-            'unsignedmediuminteger',
-            'int4',
-            'int',
-            'integer',
-            'unsignedinteger',
-            'int8',
-            'bigint',
-            'biginteger',
-            'unsignedbigint',
-            'unsignedbiginteger' => 'integer',
-            'decimal',
-            'dec',
-            'number',
-            'numeric',
-            'float',
-            'float8',
-            'double',
-            'real',
-            'float4' => 'decimal',
-            'int1',
-            'tinyint',
-            'tinyinteger',
-            'unsignedtinyinteger',
-            'bool',
-            'boolean' => '',
+            'integer' => 'integer',
+            'float' => 'decimal',
+            'bool' => '',
             default => null,
         };
 
