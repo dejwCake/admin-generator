@@ -67,8 +67,10 @@ class Store{{ $modelBaseName }} extends FormRequest
 
     /**
      * Get the validation rules that apply to the requests translatable fields.
+     *
+     * {{'@'}}phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    public function translatableRules($locale): array
+    public function translatableRules(string $locale): array
     {
         return [
 @foreach($translatableColumns as $column)

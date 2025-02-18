@@ -115,7 +115,7 @@ class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    public $translatable = [
+    protected $translatable = [
 @foreach($translatable as $translatableField)
         '{{ $translatableField }}',
 @endforeach

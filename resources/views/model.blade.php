@@ -120,12 +120,12 @@ class {{ $modelBaseName }} extends Model
 @if ($translatable->count() > 0)
 
     /**
-     * these attributes are translatable
+     * These attributes are translatable
      *
      * @var array<int, string>
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    public $translatable = [
+    protected $translatable = [
 @foreach($translatable as $translatableField)
         '{{ $translatableField }}',
 @endforeach

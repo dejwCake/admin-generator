@@ -50,7 +50,7 @@ namespace {{ $controllerNamespace }};
 
     }
     if (in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery)) {
-        $uses[] = 'Illuminate\Auth\SessionGuard';
+        $uses[] = 'Illuminate\Database\Eloquent\Builder';
     }
     $uses = Arr::sort($uses);
 @endphp
@@ -85,15 +85,15 @@ class {{ $controllerBaseName }} extends Controller
                 ['{!! implode('\', \'', $columnsToSearchIn) !!}'],
 @if(in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery))
 @if(in_array('created_by_admin_user_id', $columnsToQuery) && in_array('updated_by_admin_user_id', $columnsToQuery))
-                function ($query) use ($request) {
+                static function (Builder $query): void {
                     $query->with(['createdByAdminUser', 'updatedByAdminUser']);
                 },
 @elseif(in_array('created_by_admin_user_id', $columnsToQuery))
-                function ($query) use ($request) {
+                static function (Builder $query): void {
                     $query->with(['createdByAdminUser']);
                 },
 @elseif(in_array('updated_by_admin_user_id', $columnsToQuery))
-                function ($query) use ($request) {
+                static function (Builder $query): void {
                     $query->with(['updatedByAdminUser']);
                 },
 @endif
