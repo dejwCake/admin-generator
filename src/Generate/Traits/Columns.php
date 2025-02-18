@@ -402,6 +402,7 @@ trait Columns
             'unsignedtinyinteger',
             'bool',
             'boolean' => 'bool',
+            'longtext',
             'json',
             'jsonb' => 'json',
             'char',
