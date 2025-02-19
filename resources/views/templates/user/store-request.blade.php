@@ -20,7 +20,7 @@ namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
         'Illuminate\Validation\Rule',
     ];
     if ($translatable->count() > 0) {
-        $uses[] = 'Brackets\Translatable\TranslatableFormRequest';
+        $uses[] = 'Brackets\Translatable\Http\Requests\TranslatableFormRequest';
     } else {
         $uses[] = 'Illuminate\Foundation\Http\FormRequest';
     }
