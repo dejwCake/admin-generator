@@ -11,7 +11,7 @@ class DestroyRequestNameTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function testDestroyRequestGenerationShouldGenerateAnUpdateRequestName(): void
+    public function testDestroyRequestGeneratorShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Category/DestroyCategory.php');
 
@@ -25,7 +25,37 @@ class DestroyRequestNameTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testIsGeneratedCorrectNameForCustomModelNameInDestroyRequest(): void
+    public function testDestroyRequestGeneratorWithClassNameShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Http/Requests/Admin/Category/DestroyDog.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:request:destroy', [
+            'table_name' => 'categories',
+            'class_name' => 'DestroyDog',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
+
+    public function testDestroyRequestGeneratorWithClassNameFullShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Http/Requests/Billing/DestroyDog.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:request:destroy', [
+            'table_name' => 'categories',
+            'class_name' => 'App\\Http\\Requests\\Billing\\DestroyDog',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
+
+    public function testDestroyRequestGeneratorWithModelNameShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/DestroyCat.php');
 

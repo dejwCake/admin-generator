@@ -4,7 +4,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
+namespace {{ $classNamespace }};
 @php
     $uses = [
         'Illuminate\Contracts\Auth\Access\Gate',
@@ -21,7 +21,7 @@ use {{ $use }};
 /**
  * @property {{ $modelBaseName }} ${{ $modelVariableName }}
  */
-class Destroy{{ $modelBaseName }} extends FormRequest
+class {{ $classBaseName }} extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
