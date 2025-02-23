@@ -11,7 +11,7 @@ class FactoryTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function testFactoryGenerationShouldGenerateAFactoryName(): void
+    public function testFactoryGeneratorShouldGenerateClass(): void
     {
         $filePath = base_path('database/factories/CategoryFactory.php');
 
@@ -25,7 +25,7 @@ class FactoryTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testIsGeneratedCorrectNameForCustomModelName(): void
+    public function testFactoryGeneratorWithModelNameShouldGenerateClass(): void
     {
         $filePath = base_path('database/factories/CatFactory.php');
 
@@ -40,15 +40,31 @@ class FactoryTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testIsGeneratedCorrectNameForCustomModelNameOutsideDefaultFolder(): void
+    public function testModelGeneratorWithModelWithFullNamespaceShouldGenerateClass(): void
     {
-        $filePath = base_path('database/factories/MyCatFactory.php');
+        $filePath = base_path('database/factories/CategoryFactory.php');
 
         self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:factory', [
             'table_name' => 'categories',
-            '--model-name' => 'App\\Billing\\MyCat',
+            '--model-with-full-namespace' => 'App\\Billing\\Category',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
+
+    public function testFactoryGeneratorWithSeedShouldGenerateClass(): void
+    {
+        $this->markTestSkipped('This test is skipped as we do not generate model');
+        $filePath = base_path('database/factories/CategoryFactory.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:factory', [
+            'table_name' => 'categories',
+            '--seed' => true,
         ]);
 
         self::assertFileExists($filePath);

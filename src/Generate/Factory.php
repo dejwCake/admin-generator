@@ -6,7 +6,7 @@ namespace Brackets\AdminGenerator\Generate;
 
 use Symfony\Component\Console\Input\InputOption;
 
-class ModelFactory extends ClassGenerator
+class Factory extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
