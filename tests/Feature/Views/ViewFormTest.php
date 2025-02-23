@@ -35,14 +35,14 @@ class ViewFormTest extends TestCase
         ]);
 
         self::assertFileExists($formPath);
-//        self::assertFileExists($formRightPath);
+        self::assertFileExists($formRightPath);
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
         self::assertFileExists($formJsPath);
         self::assertFileExists($indexJsPath);
         self::assertFileExists($bootstrapJsPath);
         self::assertMatchesFileSnapshot($formPath);
-//        self::assertMatchesFileSnapshot($formRightPath);
+        self::assertMatchesFileSnapshot($formRightPath);
         self::assertMatchesFileSnapshot($createPath);
         self::assertMatchesFileSnapshot($editPath);
         self::assertMatchesFileSnapshot($formJsPath);
@@ -53,7 +53,7 @@ class ViewFormTest extends TestCase
     public function testViewFormGeneratorWithModelNameShouldGenerateViews(): void
     {
         $formPath = resource_path('views/admin/billing/categ-ory/components/form-elements.blade.php');
-        $formRightPath = resource_path('views/admin/category/components/form-elements-right.blade.php');
+        $formRightPath = resource_path('views/admin/billing/categ-ory/components/form-elements-right.blade.php');
         $createPath = resource_path('views/admin/billing/categ-ory/create.blade.php');
         $editPath = resource_path('views/admin/billing/categ-ory/edit.blade.php');
         $formJsPath = resource_path('js/admin/billing-categ-ory/Form.js');
@@ -74,14 +74,14 @@ class ViewFormTest extends TestCase
         ]);
 
         self::assertFileExists($formPath);
-//        self::assertFileExists($formRightPath);
+        self::assertFileExists($formRightPath);
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
         self::assertFileExists($formJsPath);
         self::assertFileExists($indexJsPath);
         self::assertFileExists($bootstrapJsPath);
         self::assertMatchesFileSnapshot($formPath);
-//        self::assertMatchesFileSnapshot($formRightPath);
+        self::assertMatchesFileSnapshot($formRightPath);
         self::assertMatchesFileSnapshot($createPath);
         self::assertMatchesFileSnapshot($editPath);
         self::assertMatchesFileSnapshot($formJsPath);
@@ -113,14 +113,14 @@ class ViewFormTest extends TestCase
         ]);
 
         self::assertFileExists($formPath);
-//        self::assertFileExists($formRightPath);
+        self::assertFileExists($formRightPath);
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
         self::assertFileExists($formJsPath);
         self::assertFileExists($indexJsPath);
         self::assertFileExists($bootstrapJsPath);
         self::assertMatchesFileSnapshot($formPath);
-//        self::assertMatchesFileSnapshot($formRightPath);
+        self::assertMatchesFileSnapshot($formRightPath);
         self::assertMatchesFileSnapshot($createPath);
         self::assertMatchesFileSnapshot($editPath);
         self::assertMatchesFileSnapshot($formJsPath);
@@ -153,14 +153,14 @@ class ViewFormTest extends TestCase
         ]);
 
         self::assertFileExists($formPath);
-//        self::assertFileExists($formRightPath);
+        self::assertFileExists($formRightPath);
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
         self::assertFileExists($formJsPath);
         self::assertFileExists($indexJsPath);
         self::assertFileExists($bootstrapJsPath);
         self::assertMatchesFileSnapshot($formPath);
-//        self::assertMatchesFileSnapshot($formRightPath);
+        self::assertMatchesFileSnapshot($formRightPath);
         self::assertMatchesFileSnapshot($createPath);
         self::assertMatchesFileSnapshot($editPath);
         self::assertMatchesFileSnapshot($formJsPath);

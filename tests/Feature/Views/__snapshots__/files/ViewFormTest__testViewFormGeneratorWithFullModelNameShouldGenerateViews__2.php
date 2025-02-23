@@ -1,51 +1,44 @@
-@extends('brackets/admin-ui::admin.layout.default')
+<div class="card">
+    <div class="card-header">
+        <i class="fa fa-check"></i>{{ trans('brackets/admin-ui::admin.forms.publish') }}
+    </div>
+    <div class="card-block">
 
-@section('title', trans('admin.categ-ory.actions.create'))
+        <div class="form-group row align-items-center" :class="{'has-danger': errors.has('published_at'), 'has-success': fields.published_at && fields.published_at.valid }">
+            <label for="published_at" class="col-form-label text-md-right" :class="isFormLocalized ? 'col-md-2' : 'col-md-4'">{{ trans('admin.categ-ory.columns.published_at') }}</label>
+            <div :class="isFormLocalized ? 'col-md-4' : 'col-md-9 col-xl-8'">
+                <div class="input-group input-group--custom">
+                    <div class="input-group-addon"><i class="fa fa-calendar"></i></div>
+                    <datetime v-model="form.published_at" :config="datetimePickerConfig" v-validate="'date_format:yyyy-MM-dd HH:mm:ss'" class="flatpickr" :class="{'form-control-danger': errors.has('published_at'), 'form-control-success': fields.published_at && fields.published_at.valid}" id="published_at" name="published_at" placeholder="brackets/admin-ui::admin.forms.select_date_and_time"></datetime>
+                </div>
+                <div v-if="errors.has('published_at')" class="form-control-feedback form-text" v-cloak>@{{errors.first('published_at') }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+@if(isset($showHistory))
+<div class="card">
+    <div class="card-header">
+        <i class="fa fa-history"></i> {{ trans('brackets/admin-ui::admin.forms.history') }}
+    </div>
+    <div class="card-body">
 
-@section('body')
-
-    <div class="container-xl">
-
-            <categ-ory-form
-                :action="'{{ $action }}'"
-                :locales="{{ json_encode($locales) }}"
-                :send-empty-locales="false"
-                v-cloak
-                inline-template>
-
-                <form class="form-horizontal form-create" method="post" @submit.prevent="onSubmit" :action="action" novalidate>
-
-                    <div class="row">
-                        <div class="col">
-                            <div class="card">
-                                <div class="card-header">
-                                    <i class="fa fa-plus"></i> {{ trans('admin.categ-ory.actions.create') }}
-                                </div>
-                                <div class="card-body">
-                                    @include('admin.categ-ory.components.form-elements')
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-12 col-lg-12 col-xl-5 col-xxl-4">
-                            @include('admin.categ-ory.components.form-elements-right')
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary fixed-cta-button button-save" :disabled="submiting">
-                        <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-save'"></i>
-                        {{ trans('brackets/admin-ui::admin.btn.save') }}
-                    </button>
-                    <button type="submit" style="display: none" class="btn btn-success fixed-cta-button button-saved" :disabled="submiting" :class="">
-                        <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-check'"></i>
-                        <span>{{ trans('brackets/admin-ui::admin.btn.saved') }}</span>
-                    </button>
-
-                </form>
-
-            </categ-ory-form>
-
+        <div class="form-group row align-items-center">
+            <label for="author_id" class="col-form-label text-right col-md-4 col-lg-3">{{ trans('brackets/admin-ui::admin.forms.created_by') }} :</label>
+            <user-detail-tooltip :user="form.created_by_admin_user" :edit="true" :datetime="form.created_at" v-if="form.created_by_admin_user">
+                <p>{{ trans('brackets/admin-ui::admin.forms.created_on') }} @{{ form.created_at  }}</p>
+            </user-detail-tooltip>
         </div>
 
+        <div class="form-group row align-items-center">
+            <label for="author_id" class="col-form-label text-right col-md-4 col-lg-3">{{ trans('brackets/admin-ui::admin.forms.updated_by') }} :</label>
+            <user-detail-tooltip :user="form.updated_by_admin_user" :edit="true" :datetime="form.updated_at" v-if="form.updated_by_admin_user">
+                <p>{{ trans('brackets/admin-ui::admin.forms.updated_on') }} @{{ form.updated_at }}</p>
+            </user-detail-tooltip>
+        </div>
 
-@endsection
+    </div>
+</div>
+@endif
+
+
