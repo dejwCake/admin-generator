@@ -11,7 +11,7 @@ class ControllerNameTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function testControllerShouldBeGeneratedUnderDefaultNamespace(): void
+    public function testControllerGeneratorShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
 
@@ -25,7 +25,7 @@ class ControllerNameTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testControllerNameCanBeNamespaced(): void
+    public function testControllerGeneratorWithClassNameShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Controllers/Admin/Billing/MyNameController.php');
 
@@ -40,7 +40,7 @@ class ControllerNameTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testYouCanGenerateControllerOutsideDefaultDirectory(): void
+    public function testControllerGeneratorWithFullClassNameShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Controllers/Billing/CategoriesController.php');
 
@@ -55,16 +55,75 @@ class ControllerNameTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testYouCanPassAModelClassName(): void
+    public function testControllerGeneratorWithModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Controllers/Billing/CategoriesController.php');
+        $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
 
         self::assertFileDoesNotExist($filePath);
 
         $this->artisan('admin:generate:controller', [
             'table_name' => 'categories',
-            'class_name' => 'App\\Http\\Controllers\\Billing\\CategoriesController',
             '--model-name' => 'App\\Billing\\Cat',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
+
+    public function testControllerGeneratorWithBelongsToManyShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:controller', [
+            'table_name' => 'categories',
+            '--belongs-to-many' => 'posts',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
+
+    public function testControllerGeneratorWithModelWithFullNamespaceShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:controller', [
+            'table_name' => 'categories',
+            '--model-with-full-namespace' => 'App\\Billing\\Category',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
+
+    public function testControllerGeneratorWithExportShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:controller', [
+            'table_name' => 'categories',
+            '--with-export' => true,
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
+
+    public function testControllerGeneratorWithoutBulkShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:controller', [
+            'table_name' => 'categories',
+            '--without-bulk' => true,
         ]);
 
         self::assertFileExists($filePath);

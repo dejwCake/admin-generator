@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Billing;
+namespace App\Http\Controllers\Admin;
 
 use App\Billing\Cat;
 use App\Http\Controllers\Controller;

@@ -32,6 +32,13 @@ abstract class TestCase extends Orchestra
             $table->increments('id');
             $table->string('title');
         });
+
+        $app['db']->connection()->getSchemaBuilder()->create('posts', static function (Blueprint $table): void {
+            $table->increments('id');
+            $table->unsignedInteger('category_id')->nullable();
+            $table->foreign('category_id')->references('id')->on('categories');
+            $table->string('title');
+        });
     }
 
     /**
