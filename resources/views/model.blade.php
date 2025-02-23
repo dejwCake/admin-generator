@@ -149,7 +149,7 @@ class {{ $modelBaseName }} extends Model
 @if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
 
 @foreach($relations['belongsToMany'] as $belongsToMany)
-    public function {{ $belongsToMany['related_table'] }}(): BelongsTo {
+    public function {{ $belongsToMany['related_table'] }}(): BelongsToMany {
         return $this->belongsToMany({{ $belongsToMany['related_model_class'] }}, '{{ $belongsToMany['relation_table'] }}', '{{ $belongsToMany['foreign_key'] }}', '{{ $belongsToMany['related_key'] }}');
     }
 @endforeach

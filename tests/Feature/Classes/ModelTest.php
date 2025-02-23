@@ -11,7 +11,7 @@ class ModelTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function testModelNameShouldAutoGenerateFromTableName(): void
+    public function testModelGeneratorShouldGenerateClass(): void
     {
         $filePath = base_path('app/Models/Category.php');
 
@@ -25,7 +25,7 @@ class ModelTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testYouCanPassCustomClassNameForTheModel(): void
+    public function testModelGeneratorWithClassNameShouldGenerateClass(): void
     {
         $filePath = base_path('app/Models/Billing/Category.php');
 
@@ -40,7 +40,7 @@ class ModelTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testClassNameCanBeOutsideDefaultFolder(): void
+    public function testModelGeneratorWithFullClassNameShouldGenerateClass(): void
     {
         $filePath = base_path('app/Billing/Category.php');
 
@@ -49,6 +49,21 @@ class ModelTest extends TestCase
         $this->artisan('admin:generate:model', [
             'table_name' => 'categories',
             'class_name' => 'App\\Billing\\Category',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
+
+    public function testModelGeneratorWithBelongsToManyShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Models/Category.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:model', [
+            'table_name' => 'categories',
+            '--belongs-to-many' => 'posts',
         ]);
 
         self::assertFileExists($filePath);
