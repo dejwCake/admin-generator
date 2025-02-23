@@ -1,10 +1,10 @@
 @extends('brackets/admin-ui::admin.layout.default')
 
-@section('title', trans('admin.billing_my-article.actions.index'))
+@section('title', trans('admin.billing_categ-ory.actions.index'))
 
 @section('body')
 
-    <billing-my-article-listing
+    <billing-categ-ory-listing
         :data="{{ $data->toJson() }}"
         :url="'{{ $url }}'"
         inline-template>
@@ -13,8 +13,8 @@
             <div class="col">
                 <div class="card">
                     <div class="card-header">
-                        <i class="fa fa-align-justify"></i> {{ trans('admin.billing_my-article.actions.index') }}
-                        <a class="btn btn-primary btn-spinner btn-sm pull-right m-b-0" href="{{ $createUrl }}" role="button"><i class="fa fa-plus"></i>&nbsp; {{ trans('admin.billing_my-article.actions.create') }}</a>
+                        <i class="fa fa-align-justify"></i> {{ trans('admin.billing_categ-ory.actions.index') }}
+                        <a class="btn btn-primary btn-spinner btn-sm pull-right m-b-0" href="{{ $createUrl }}" role="button"><i class="fa fa-plus"></i>&nbsp; {{ trans('admin.billing_categ-ory.actions.create') }}</a>
                     </div>
                     <div class="card-body" v-cloak>
                         <div class="card-block">
@@ -49,18 +49,18 @@
                                             </label>
                                         </th>
 
-                                        <th is='sortable' :column="'id'">{{ trans('admin.billing_my-article.columns.id') }}</th>
-                                        <th is='sortable' :column="'title'">{{ trans('admin.billing_my-article.columns.title') }}</th>
+                                        <th is='sortable' :column="'id'">{{ trans('admin.billing_categ-ory.columns.id') }}</th>
+                                        <th is='sortable' :column="'title'">{{ trans('admin.billing_categ-ory.columns.title') }}</th>
 
                                         <th></th>
                                     </tr>
                                     <tr v-show="(clickedBulkItemsCount > 0) || isClickedAll">
                                         <td class="bg-bulk-info d-table-cell text-center" colspan="4">
-                                            <span class="align-middle font-weight-light text-dark">{{ trans('brackets/admin-ui::admin.listing.selected_items') }} @{{ clickedBulkItemsCount }}.  <a href="#" class="text-primary" @click="onBulkItemsClickedAll('/admin/billing-my-articles')" v-if="(clickedBulkItemsCount < pagination.state.total)"> <i class="fa" :class="bulkCheckingAllLoader ? 'fa-spinner' : ''"></i> {{ trans('brackets/admin-ui::admin.listing.check_all_items') }} @{{ pagination.state.total }}</a> <span class="text-primary">|</span> <a
+                                            <span class="align-middle font-weight-light text-dark">{{ trans('brackets/admin-ui::admin.listing.selected_items') }} @{{ clickedBulkItemsCount }}.  <a href="#" class="text-primary" @click="onBulkItemsClickedAll('/admin/billing-categ-ories')" v-if="(clickedBulkItemsCount < pagination.state.total)"> <i class="fa" :class="bulkCheckingAllLoader ? 'fa-spinner' : ''"></i> {{ trans('brackets/admin-ui::admin.listing.check_all_items') }} @{{ pagination.state.total }}</a> <span class="text-primary">|</span> <a
                                                         href="#" class="text-primary" @click="onBulkItemsClickedAllUncheck()">{{ trans('brackets/admin-ui::admin.listing.uncheck_all_items') }}</a>  </span>
 
                                             <span class="pull-right pr-2">
-                                                <button class="btn btn-sm btn-danger pr-3 pl-3" @click="bulkDelete('/admin/billing-my-articles/bulk-destroy')">{{ trans('brackets/admin-ui::admin.btn.delete') }}</button>
+                                                <button class="btn btn-sm btn-danger pr-3 pl-3" @click="bulkDelete('/admin/billing-categ-ories/bulk-destroy')">{{ trans('brackets/admin-ui::admin.btn.delete') }}</button>
                                             </span>
 
                                         </td>
@@ -104,13 +104,13 @@
                                 <i class="icon-magnifier"></i>
                                 <h3>{{ trans('brackets/admin-ui::admin.index.no_items') }}</h3>
                                 <p>{{ trans('brackets/admin-ui::admin.index.try_changing_items') }}</p>
-                                <a class="btn btn-primary btn-spinner" href="{{ $createUrl }}" role="button"><i class="fa fa-plus"></i>&nbsp; {{ trans('admin.billing_my-article.actions.create') }}</a>
+                                <a class="btn btn-primary btn-spinner" href="{{ $createUrl }}" role="button"><i class="fa fa-plus"></i>&nbsp; {{ trans('admin.billing_categ-ory.actions.create') }}</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </billing-my-article-listing>
+    </billing-categ-ory-listing>
 
 @endsection

@@ -1,6 +1,6 @@
 import AppForm from '../app-components/Form/AppForm';
 
-Vue.component('my-article-form', {
+Vue.component('categ-ory-form', {
     mixins: [AppForm],
     data: function() {
         return {

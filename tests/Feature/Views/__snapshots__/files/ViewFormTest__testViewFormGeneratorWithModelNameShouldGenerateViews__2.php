@@ -1,13 +1,13 @@
 @extends('brackets/admin-ui::admin.layout.default')
 
-@section('title', trans('admin.billing_my-article.actions.create'))
+@section('title', trans('admin.billing_categ-ory.actions.create'))
 
 @section('body')
 
     <div class="container-xl">
         <div class="card">
 
-            <billing-my-article-form
+            <billing-categ-ory-form
                 :action="'{{ $action }}'"
                 v-cloak
                 inline-template>
@@ -15,11 +15,11 @@
                 <form class="form-horizontal form-create" method="post" @submit.prevent="onSubmit" :action="action" novalidate>
 
                     <div class="card-header">
-                        <i class="fa fa-plus"></i> {{ trans('admin.billing_my-article.actions.create') }}
+                        <i class="fa fa-plus"></i> {{ trans('admin.billing_categ-ory.actions.create') }}
                     </div>
 
                     <div class="card-body">
-                        @include('admin.billing.my-article.components.form-elements')
+                        @include('admin.billing.categ-ory.components.form-elements')
                     </div>
 
                     <div class="card-footer">
@@ -31,7 +31,7 @@
 
                 </form>
 
-            </billing-my-article-form>
+            </billing-categ-ory-form>
 
         </div>
 

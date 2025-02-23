@@ -52,12 +52,12 @@ class ViewFormTest extends TestCase
 
     public function testViewFormGeneratorWithModelNameShouldGenerateViews(): void
     {
-        $formPath = resource_path('views/admin/billing/my-article/components/form-elements.blade.php');
+        $formPath = resource_path('views/admin/billing/categ-ory/components/form-elements.blade.php');
         $formRightPath = resource_path('views/admin/category/components/form-elements-right.blade.php');
-        $createPath = resource_path('views/admin/billing/my-article/create.blade.php');
-        $editPath = resource_path('views/admin/billing/my-article/edit.blade.php');
-        $formJsPath = resource_path('js/admin/billing-my-article/Form.js');
-        $indexJsPath = resource_path('js/admin/billing-my-article/index.js');
+        $createPath = resource_path('views/admin/billing/categ-ory/create.blade.php');
+        $editPath = resource_path('views/admin/billing/categ-ory/edit.blade.php');
+        $formJsPath = resource_path('js/admin/billing-categ-ory/Form.js');
+        $indexJsPath = resource_path('js/admin/billing-categ-ory/index.js');
         $bootstrapJsPath = resource_path('js/admin/index.js');
 
         self::assertFileDoesNotExist($formPath);
@@ -70,7 +70,7 @@ class ViewFormTest extends TestCase
 
         $this->artisan('admin:generate:form', [
             'table_name' => 'categories',
-            '--model-name' => 'Billing\\MyArticle',
+            '--model-name' => 'Billing\\CategOry',
         ]);
 
         self::assertFileExists($formPath);
@@ -91,12 +91,12 @@ class ViewFormTest extends TestCase
 
     public function testViewFormGeneratorWithFullModelNameShouldGenerateViews(): void
     {
-        $formPath = resource_path('views/admin/my-article/components/form-elements.blade.php');
-        $formRightPath = resource_path('views/admin/my-article/components/form-elements-right.blade.php');
-        $createPath = resource_path('views/admin/my-article/create.blade.php');
-        $editPath = resource_path('views/admin/my-article/edit.blade.php');
-        $formJsPath = resource_path('js/admin/my-article/Form.js');
-        $indexJsPath = resource_path('js/admin/my-article/index.js');
+        $formPath = resource_path('views/admin/categ-ory/components/form-elements.blade.php');
+        $formRightPath = resource_path('views/admin/categ-ory/components/form-elements-right.blade.php');
+        $createPath = resource_path('views/admin/categ-ory/create.blade.php');
+        $editPath = resource_path('views/admin/categ-ory/edit.blade.php');
+        $formJsPath = resource_path('js/admin/categ-ory/Form.js');
+        $indexJsPath = resource_path('js/admin/categ-ory/index.js');
         $bootstrapJsPath = resource_path('js/admin/index.js');
 
         self::assertFileDoesNotExist($formPath);
@@ -109,7 +109,7 @@ class ViewFormTest extends TestCase
 
         $this->artisan('admin:generate:form', [
             'table_name' => 'categories',
-            '--model-name' => 'App\\Billing\\MyArticle',
+            '--model-name' => 'App\\Billing\\CategOry',
         ]);
 
         self::assertFileExists($formPath);

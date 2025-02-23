@@ -1,6 +1,6 @@
 import AppForm from '../app-components/Form/AppForm';
 
-Vue.component('billing-my-article-form', {
+Vue.component('billing-categ-ory-form', {
     mixins: [AppForm],
     data: function() {
         return {
