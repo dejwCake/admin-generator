@@ -41,10 +41,11 @@ class ImpersonalLoginRequest extends ClassGenerator
 
     protected function buildClass(): string
     {
-        return view('brackets/admin-generator::templates.admin-user.impersonal-login-request', [
+        return view('brackets/admin-generator::impersonal-login-request', [
+            'classBaseName' => $this->classBaseName,
+            'classNamespace' => $this->classNamespace,
             'modelBaseName' => $this->modelBaseName,
             'modelDotNotation' => $this->modelDotNotation,
-            'modelWithNamespaceFromDefault' => $this->modelWithNamespaceFromDefault,
             'modelVariableName' => $this->modelVariableName,
         ])->render();
     }
