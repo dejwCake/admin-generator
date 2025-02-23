@@ -5,7 +5,6 @@
 {{'@'}}section('body')
 
     <div class="container-xl">
-
 @if(!$isUsedTwoColumnsLayout)
         <div class="card">
 @endif
@@ -76,7 +75,6 @@
 
 @if(!$isUsedTwoColumnsLayout)
     </div>
-
 @endif
 
 {{'@'}}endsection

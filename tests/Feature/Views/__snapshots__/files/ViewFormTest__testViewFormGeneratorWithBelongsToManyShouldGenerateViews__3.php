@@ -37,7 +37,6 @@
             </category-form>
 
         </div>
-
     </div>
 
 @endsection

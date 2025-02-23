@@ -82,7 +82,6 @@
 @if(!$isUsedTwoColumnsLayout)
         </div>
 @endif
-
     </div>
 
 {{'@'}}endsection

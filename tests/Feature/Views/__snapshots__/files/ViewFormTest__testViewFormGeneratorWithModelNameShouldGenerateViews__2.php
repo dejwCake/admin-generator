@@ -1,29 +1,26 @@
 @extends('brackets/admin-ui::admin.layout.default')
 
-@section('title', trans('admin.category.actions.edit', ['name' => $category->title]))
+@section('title', trans('admin.billing_my-article.actions.create'))
 
 @section('body')
 
     <div class="container-xl">
         <div class="card">
 
-            <category-form
+            <billing-my-article-form
                 :action="'{{ $action }}'"
-                :data="{{ $category->toJson() }}"
                 v-cloak
                 inline-template>
 
-                <form class="form-horizontal form-edit" method="post" @submit.prevent="onSubmit" :action="action" novalidate>
-
+                <form class="form-horizontal form-create" method="post" @submit.prevent="onSubmit" :action="action" novalidate>
 
                     <div class="card-header">
-                        <i class="fa fa-pencil"></i> {{ trans('admin.category.actions.edit', ['name' => $category->title]) }}
+                        <i class="fa fa-plus"></i> {{ trans('admin.billing_my-article.actions.create') }}
                     </div>
 
                     <div class="card-body">
-                        @include('admin.category.components.form-elements')
+                        @include('admin.billing.my-article.components.form-elements')
                     </div>
-
 
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary" :disabled="submiting">
@@ -34,9 +31,10 @@
 
                 </form>
 
-            </category-form>
+            </billing-my-article-form>
 
         </div>
+
     </div>
 
 @endsection

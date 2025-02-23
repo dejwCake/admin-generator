@@ -1,15 +1,15 @@
 @extends('brackets/admin-ui::admin.layout.default')
 
-@section('title', trans('admin.category.actions.edit', ['name' => $category->title]))
+@section('title', trans('admin.my-article.actions.edit', ['name' => $myArticle->title]))
 
 @section('body')
 
     <div class="container-xl">
         <div class="card">
 
-            <category-form
+            <my-article-form
                 :action="'{{ $action }}'"
-                :data="{{ $category->toJson() }}"
+                :data="{{ $myArticle->toJson() }}"
                 v-cloak
                 inline-template>
 
@@ -17,11 +17,11 @@
 
 
                     <div class="card-header">
-                        <i class="fa fa-pencil"></i> {{ trans('admin.category.actions.edit', ['name' => $category->title]) }}
+                        <i class="fa fa-pencil"></i> {{ trans('admin.my-article.actions.edit', ['name' => $myArticle->title]) }}
                     </div>
 
                     <div class="card-body">
-                        @include('admin.category.components.form-elements')
+                        @include('admin.my-article.components.form-elements')
                     </div>
 
 
@@ -34,7 +34,7 @@
 
                 </form>
 
-            </category-form>
+            </my-article-form>
 
         </div>
     </div>
