@@ -28,13 +28,13 @@ return new class extends Migration
         $this->guardName = $this->config->get('admin-auth.defaults.guard');
 
         $permissions = new Collection([
-            'admin.category',
-            'admin.category.index',
-            'admin.category.create',
-            'admin.category.show',
-            'admin.category.edit',
-            'admin.category.delete',
-            'admin.category.bulk-delete',
+            'admin.cat',
+            'admin.cat.index',
+            'admin.cat.create',
+            'admin.cat.show',
+            'admin.cat.edit',
+            'admin.cat.delete',
+            'admin.cat.bulk-delete',
         ]);
 
         //Add New permissions

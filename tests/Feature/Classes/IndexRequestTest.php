@@ -39,4 +39,19 @@ class IndexRequestTest extends TestCase
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
     }
+
+    public function testIndexRequestGeneratorWithFullModelNameShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Http/Requests/Admin/Cat/IndexCat.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:request:index', [
+            'table_name' => 'categories',
+            '--model-name' => 'App\\Billing\\Cat',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
 }

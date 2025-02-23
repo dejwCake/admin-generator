@@ -11,7 +11,7 @@ class UpdateRequestTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function testUpdateRequestGenerationShouldGenerateAnUpdateRequestName(): void
+    public function testUpdateRequestGeneratorShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Category/UpdateCategory.php');
 
@@ -25,7 +25,7 @@ class UpdateRequestTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testIsGeneratedCorrectNameForCustomModelName(): void
+    public function testUpdateRequestGeneratorWithModelNameShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/UpdateCat.php');
 
@@ -34,6 +34,21 @@ class UpdateRequestTest extends TestCase
         $this->artisan('admin:generate:request:update', [
             'table_name' => 'categories',
             '--model-name' => 'Billing\\Cat',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
+
+    public function testUpdateRequestGeneratorWithFullModelNameShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Http/Requests/Admin/Cat/UpdateCat.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:request:update', [
+            'table_name' => 'categories',
+            '--model-name' => 'App\\Billing\\Cat',
         ]);
 
         self::assertFileExists($filePath);

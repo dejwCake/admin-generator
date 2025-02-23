@@ -39,4 +39,19 @@ class BulkDestroyRequestTest extends TestCase
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
     }
+
+    public function testBulkDestroyRequestGeneratorWithFullModelNameShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Http/Requests/Admin/Cat/BulkDestroyCat.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:request:bulk-destroy', [
+            'table_name' => 'categories',
+            '--model-name' => 'App\\Billing\\Cat',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
 }

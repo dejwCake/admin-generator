@@ -40,6 +40,21 @@ class PermissionsTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
+    public function testPermissionsGeneratorWithFullModelNameShouldGenerateClass(): void
+    {
+        $permissionMigrationFile = 'fill_permissions_for_cat.php';
+
+        $this->artisan('admin:generate:permissions', [
+            'table_name' => 'categories',
+            '--model-name' => 'App\\Billing\\Cat',
+        ]);
+
+        $filePath = $this->getPermissionMigrationPath($permissionMigrationFile);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
+
     public function testPermissionsGeneratorWithoutBulkShouldGenerateClass(): void
     {
         $permissionMigrationFile = 'fill_permissions_for_category.php';

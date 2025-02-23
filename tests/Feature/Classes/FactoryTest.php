@@ -40,6 +40,21 @@ class FactoryTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
+    public function testFactoryGeneratorWithFullModelNameShouldGenerateClass(): void
+    {
+        $filePath = base_path('database/factories/CatFactory.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:factory', [
+            'table_name' => 'categories',
+            '--model-name' => 'App\\Billing\\Cat',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
+
     public function testModelGeneratorWithModelWithFullNamespaceShouldGenerateClass(): void
     {
         $filePath = base_path('database/factories/CategoryFactory.php');

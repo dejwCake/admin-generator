@@ -11,7 +11,7 @@ class StoreRequestTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function testStoreRequestGenerationShouldGenerateAStoreRequestName(): void
+    public function testStoreRequestGeneratorShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Category/StoreCategory.php');
 
@@ -25,7 +25,7 @@ class StoreRequestTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testIsGeneratedCorrectNameForCustomModelName(): void
+    public function testStoreRequestGeneratorWithModelNameShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/StoreCat.php');
 
@@ -40,7 +40,7 @@ class StoreRequestTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testIsGeneratedCorrectNameForCustomModelNameOutsideDefaultFolder(): void
+    public function testStoreRequestGeneratorWithFullModelNameShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Cat/StoreCat.php');
 
@@ -49,6 +49,21 @@ class StoreRequestTest extends TestCase
         $this->artisan('admin:generate:request:store', [
             'table_name' => 'categories',
             '--model-name' => 'App\\Billing\\Cat',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
+
+    public function testStoreRequestGeneratorWithBelongsToManyShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Http/Requests/Admin/Category/StoreCategory.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:request:store', [
+            'table_name' => 'categories',
+            '--belongs-to-many' => 'posts',
         ]);
 
         self::assertFileExists($filePath);

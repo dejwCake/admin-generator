@@ -39,4 +39,19 @@ class ImpersonalLoginRequestTest extends TestCase
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
     }
+
+    public function testImpersonalLoginRequestGeneratorWithFullModelNameShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Http/Requests/Admin/Cat/ImpersonalLoginCat.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:request:impersonal-login', [
+            'table_name' => 'categories',
+            '--model-name' => 'App\\Billing\\Cat',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
 }

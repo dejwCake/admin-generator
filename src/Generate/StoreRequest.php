@@ -62,10 +62,9 @@ class StoreRequest extends ClassGenerator
         return view(
             'brackets/admin-generator::' . $this->view,
             [
-                'modelBaseName' => $this->modelBaseName,
+                'classBaseName' => $this->classBaseName,
+                'classNamespace' => $this->classNamespace,
                 'modelDotNotation' => $this->modelDotNotation,
-                'modelWithNamespaceFromDefault' => $this->modelWithNamespaceFromDefault,
-                'tableName' => $this->tableName,
 
                 // validation in store/update
                 'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),

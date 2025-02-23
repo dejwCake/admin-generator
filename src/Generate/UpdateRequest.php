@@ -60,12 +60,12 @@ class UpdateRequest extends ClassGenerator
     protected function buildClass(): string
     {
         return view('brackets/admin-generator::' . $this->view, [
+            'classBaseName' => $this->classBaseName,
+            'classNamespace' => $this->classNamespace,
             'modelBaseName' => $this->modelBaseName,
             'modelDotNotation' => $this->modelDotNotation,
-            'modelWithNamespaceFromDefault' => $this->modelWithNamespaceFromDefault,
             'modelVariableName' => $this->modelVariableName,
             'modelFullName' => $this->modelFullName,
-            'tableName' => $this->tableName,
             'containsPublishedAtColumn' => in_array(
                 'published_at',
                 array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
@@ -77,9 +77,6 @@ class UpdateRequest extends ClassGenerator
             'translatable' => $this->readColumnsFromTable($this->tableName)
                 ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
                 ->pluck('name'),
-            'hasSoftDelete' => $this->readColumnsFromTable($this->tableName)
-                ->filter(static fn (array $column): bool => $column['name'] === 'deleted_at')
-                ->count() > 0,
             'relations' => $this->relations,
         ])->render();
     }

@@ -4,7 +4,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\Admin\{{ $modelWithNamespaceFromDefault }};
+namespace {{ $classNamespace }};
 @php
     if($translatable->count() > 0) {
         $translatableColumns = $columns->filter(function($column) use ($translatable) {
@@ -32,9 +32,9 @@ use {{ $use }};
 @endforeach
 
 @if($translatable->count() > 0)
-class Store{{ $modelBaseName }} extends TranslatableFormRequest
+class {{ $classBaseName }} extends TranslatableFormRequest
 @else
-class Store{{ $modelBaseName }} extends FormRequest
+class {{ $classBaseName }} extends FormRequest
 @endif
 {
     /**
