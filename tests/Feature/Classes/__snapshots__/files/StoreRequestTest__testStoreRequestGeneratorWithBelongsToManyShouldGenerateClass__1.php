@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\Category;
 
+use Brackets\Translatable\Http\Requests\TranslatableFormRequest;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreCategory extends FormRequest
+class StoreCategory extends TranslatableFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -19,14 +19,40 @@ class StoreCategory extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Get the validation rules that apply to the requests untranslatable fields.
      */
-    public function rules(): array
+    public function untranslatableRules(): array
     {
         return [
+            'user_id' => ['nullable', 'integer'],
             'title' => ['required', 'string'],
+            'slug' => ['required', Rule::unique('categories', 'slug'), 'string'],
+            'perex' => ['nullable', 'string'],
+            'published_at' => ['nullable', 'date'],
+            'date_start' => ['nullable', 'date'],
+            'time_start' => ['nullable', 'date_format:H:i:s'],
+            'date_time_end' => ['nullable', 'date'],
+            'enabled' => ['required', 'boolean'],
+            'send' => ['required', 'boolean'],
+            'price' => ['nullable', 'numeric'],
+            'views' => ['required', 'integer'],
+            'created_by_admin_user_id' => ['nullable', 'integer'],
+            'updated_by_admin_user_id' => ['nullable', 'integer'],
 
             'posts' => ['array'],
+        ];
+    }
+
+    /**
+     * Get the validation rules that apply to the requests translatable fields.
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function translatableRules(string $locale): array
+    {
+        return [
+            'text' => ['required', 'string'],
+            'description' => ['required', 'string'],
         ];
     }
 

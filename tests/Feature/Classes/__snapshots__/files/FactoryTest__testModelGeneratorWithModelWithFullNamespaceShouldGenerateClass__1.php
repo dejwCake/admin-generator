@@ -23,7 +23,25 @@ class CategoryFactory extends Factory
     public function definition(): array
     {
         return [
+            'user_id' => $this->faker->randomNumber(5),
             'title' => $this->faker->sentence,
+            'slug' => $this->faker->unique()->slug,
+            'perex' => $this->faker->text(),
+            'published_at' => $this->faker->date(),
+            'date_start' => $this->faker->date(),
+            'time_start' => $this->faker->time(),
+            'date_time_end' => $this->faker->dateTime,
+            'enabled' => $this->faker->boolean(),
+            'send' => $this->faker->boolean(),
+            'price' => $this->faker->randomFloat(2),
+            'views' => $this->faker->randomNumber(5),
+            'created_by_admin_user_id' => $this->faker->randomNumber(5),
+            'updated_by_admin_user_id' => $this->faker->randomNumber(5),
+            'created_at' => $this->faker->dateTime,
+            'updated_at' => $this->faker->dateTime,
+            'deleted_at' => null,
+            'text' => ['en' => $this->faker->sentence],
+            'description' => ['en' => $this->faker->sentence],
         ];
     }
 }

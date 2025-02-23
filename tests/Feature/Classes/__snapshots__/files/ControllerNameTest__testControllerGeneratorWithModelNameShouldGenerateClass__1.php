@@ -12,6 +12,7 @@ use App\Http\Requests\Admin\Cat\IndexCat;
 use App\Http\Requests\Admin\Cat\StoreCat;
 use App\Http\Requests\Admin\Cat\UpdateCat;
 use Brackets\AdminListing\Services\AdminListingService;
+use Carbon\CarbonImmutable;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate;
@@ -19,6 +20,7 @@ use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
@@ -44,9 +46,12 @@ class CategoriesController extends Controller
                 // pass the request with params
                 $request,
                 // set columns to query
-                ['id', 'title'],
+                ['id', 'user_id', 'title', 'published_at', 'date_start', 'time_start', 'date_time_end', 'text', 'description', 'enabled', 'send', 'price', 'views', 'created_by_admin_user_id', 'updated_by_admin_user_id', 'created_at', 'updated_at'],
                 // set columns to searchIn
-                ['id', 'title'],
+                ['id', 'title', 'slug', 'perex', 'text', 'description'],
+                static function (Builder $query): void {
+                    $query->with(['createdByAdminUser', 'updatedByAdminUser']);
+                },
             );
 
         if ($request->ajax()) {
@@ -93,6 +98,8 @@ class CategoriesController extends Controller
     {
         // Sanitize input
         $sanitized = $request->getSanitized();
+        $sanitized['created_by_admin_user_id'] = $request->user()->id;
+        $sanitized['updated_by_admin_user_id'] = $request->user()->id;
 
         // Store the Cat
         Cat::create($sanitized);
@@ -128,6 +135,8 @@ class CategoriesController extends Controller
     {
         $this->gate->authorize('admin.cat.edit', $cat);
 
+        $cat->load(['createdByAdminUser', 'updatedByAdminUser']);
+
         return $this->viewFactory->make(
             'admin.cat.edit',
             [
@@ -144,6 +153,7 @@ class CategoriesController extends Controller
     {
         // Sanitize input
         $sanitized = $request->getSanitized();
+        $sanitized['updated_by_admin_user_id'] = $request->user()->id;
 
         // Update changed values Cat
         $cat->update($sanitized);
@@ -152,6 +162,7 @@ class CategoriesController extends Controller
             return [
                 'redirect' => $this->urlGenerator->to('admin/cats'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+                'object' => $cat,
             ];
         }
 
@@ -181,12 +192,15 @@ class CategoriesController extends Controller
      */
     public function bulkDestroy(BulkDestroyCat $request, DatabaseManager $databaseManager): array|RedirectResponse
     {
-        $databaseManager->transaction(static function () use ($request, $databaseManager) {
+        $databaseManager->transaction(static function () use ($request, $databaseManager): void {
             (new Collection($request->data['ids']))
                 ->chunk(1000)
-                ->each(static function ($bulkChunk) {
-                    Cat::whereIn('id', $bulkChunk)
-                        ->delete();
+                ->each(static function ($bulkChunk) use ($databaseManager): void {
+                    $databaseManager->table('cats')
+                        ->whereIn('id', $bulkChunk)
+                        ->update([
+                            'deleted_at' => CarbonImmutable::now(),
+                        ]);
 
                     // TODO your code goes here
                 });

@@ -7,6 +7,7 @@
     <billing-categ-ory-listing
         :data="{{ $data->toJson() }}"
         :url="'{{ $url }}'"
+        :trans="{{ json_encode(trans('brackets/admin-ui::admin.dialogs')) }}"
         inline-template>
 
         <div class="row">
@@ -50,12 +51,24 @@
                                         </th>
 
                                         <th is='sortable' :column="'id'">{{ trans('admin.billing_categ-ory.columns.id') }}</th>
+                                        <th is='sortable' :column="'user_id'">{{ trans('admin.billing_categ-ory.columns.user_id') }}</th>
                                         <th is='sortable' :column="'title'">{{ trans('admin.billing_categ-ory.columns.title') }}</th>
+                                        <th is='sortable' class="text-center" :column="'published_at'">{{ trans('admin.billing_categ-ory.columns.published_at') }}</th>
+                                        <th is='sortable' :column="'date_start'">{{ trans('admin.billing_categ-ory.columns.date_start') }}</th>
+                                        <th is='sortable' :column="'time_start'">{{ trans('admin.billing_categ-ory.columns.time_start') }}</th>
+                                        <th is='sortable' :column="'date_time_end'">{{ trans('admin.billing_categ-ory.columns.date_time_end') }}</th>
+                                        <th is='sortable' :column="'description'">{{ trans('admin.billing_categ-ory.columns.description') }}</th>
+                                        <th is='sortable' :column="'enabled'">{{ trans('admin.billing_categ-ory.columns.enabled') }}</th>
+                                        <th is='sortable' :column="'send'">{{ trans('admin.billing_categ-ory.columns.send') }}</th>
+                                        <th is='sortable' :column="'price'">{{ trans('admin.billing_categ-ory.columns.price') }}</th>
+                                        <th is='sortable' :column="'views'">{{ trans('admin.billing_categ-ory.columns.views') }}</th>
+                                        <th is='sortable' :column="'created_by_admin_user_id'">{{ trans('admin.billing_categ-ory.columns.created_by_admin_user_id') }}</th>
+                                        <th is='sortable' :column="'updated_by_admin_user_id'">{{ trans('admin.billing_categ-ory.columns.updated_by_admin_user_id') }}</th>
 
                                         <th></th>
                                     </tr>
                                     <tr v-show="(clickedBulkItemsCount > 0) || isClickedAll">
-                                        <td class="bg-bulk-info d-table-cell text-center" colspan="4">
+                                        <td class="bg-bulk-info d-table-cell text-center" colspan="16">
                                             <span class="align-middle font-weight-light text-dark">{{ trans('brackets/admin-ui::admin.listing.selected_items') }} @{{ clickedBulkItemsCount }}.  <a href="#" class="text-primary" @click="onBulkItemsClickedAll('/admin/billing-categ-ories')" v-if="(clickedBulkItemsCount < pagination.state.total)"> <i class="fa" :class="bulkCheckingAllLoader ? 'fa-spinner' : ''"></i> {{ trans('brackets/admin-ui::admin.listing.check_all_items') }} @{{ pagination.state.total }}</a> <span class="text-primary">|</span> <a
                                                         href="#" class="text-primary" @click="onBulkItemsClickedAllUncheck()">{{ trans('brackets/admin-ui::admin.listing.uncheck_all_items') }}</a>  </span>
 
@@ -75,7 +88,62 @@
                                         </td>
 
                                         <td>@{{ item.id }}</td>
+                                        <td>@{{ item.user_id }}</td>
                                         <td>@{{ item.title }}</td>
+                                        <td class="text-center text-nowrap">
+                                            <span v-if="item.published_at <= now">
+                                                @{{ item.published_at | datetime('DD.MM.YYYY, HH:mm') }}
+                                            </span>
+                                                <span v-if="item.published_at > now">
+                                                <small>{{ trans('admin.billing_categ-ory.actions.will_be_published') }}</small><br />
+                                                @{{ item.published_at | datetime('DD.MM.YYYY, HH:mm') }}
+                                                <span class="cursor-pointer" @click="publishLater(item.resource_url, collection[index], 'publishLaterDialog')" title="{{ trans('brackets/admin-ui::admin.operation.publish_later') }}" role="button"><i class="fa fa-calendar"></i></span>
+                                            </span>
+                                            <div v-if="!item.published_at">
+                                                <span class="btn btn-sm btn-info text-white mb-1" @click="publishLater(item.resource_url, collection[index], 'publishLaterDialog')" title="{{ trans('brackets/admin-ui::admin.operation.publish_later') }}" role="button"><i class="fa fa-calendar"></i>&nbsp;&nbsp;{{ trans('brackets/admin-ui::admin.operation.publish_later') }}</span>
+                                            </div>
+                                            <div v-if="!item.published_at || item.published_at > now">
+                                                <form class="d-inline" @submit.prevent="publishNow(item.resource_url, collection[index], 'publishNowDialog')">
+                                                    <button type="submit" class="btn btn-sm btn-success text-white" title="{{ trans('brackets/admin-ui::admin.operation.publish_now') }}"><i class="fa fa-send"></i>&nbsp;&nbsp;{{ trans('brackets/admin-ui::admin.operation.publish_now') }}</button>
+                                                </form>
+                                            </div>
+                                            <div v-if="item.published_at && item.published_at < now">
+                                                <form class="d-inline" @submit.prevent="unpublishNow(item.resource_url, collection[index])">
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="{{ trans('brackets/admin-ui::admin.operation.unpublish_now') }}"><i class="fa fa-send"></i>&nbsp;&nbsp;{{ trans('brackets/admin-ui::admin.operation.unpublish_now') }}</button>
+                                                </form>
+                                            </div>
+                                        </td>
+
+                                        <td>@{{ item.date_start | date }}</td>
+                                        <td>@{{ item.time_start | time }}</td>
+                                        <td>@{{ item.date_time_end | datetime }}</td>
+                                        <td>@{{ item.description }}</td>
+                                        <td>
+                                            <label class="switch switch-3d switch-success">
+                                                <input type="checkbox" class="switch-input" v-model="collection[index].enabled" @change="toggleSwitch(item.resource_url, 'enabled', collection[index])">
+                                                <span class="switch-slider"></span>
+                                            </label>
+                                        </td>
+
+                                        <td>@{{ item.send }}</td>
+                                        <td>@{{ item.price }}</td>
+                                        <td>@{{ item.views }}</td>
+                                        <div class="user-detail-tooltips-list">
+                                            <td>
+                                                <user-detail-tooltip :user="item.created_by_admin_user" v-if="item.created_by_admin_user">
+                                                    <p>Created on @{{ item.created_at | datetime('HH:mm:ss, DD.MM.YYYY') }}</p>
+                                                </user-detail-tooltip>
+                                            </td>
+                                        </div>
+
+                                        <div class="user-detail-tooltips-list">
+                                            <td>
+                                                <user-detail-tooltip :user="item.updated_by_admin_user" v-if="item.updated_by_admin_user">
+                                                    <p>Updated on @{{ item.updated_at | datetime('HH:mm:ss, DD.MM.YYYY') }}</p>
+                                                </user-detail-tooltip>
+                                            </td>
+                                        </div>
+
 
                                         <td>
                                             <div class="row no-gutters">

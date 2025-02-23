@@ -28,9 +28,46 @@ abstract class TestCase extends Orchestra
 
     protected function setUpDatabase(Application $app): void
     {
+        $app['db']->connection()->getSchemaBuilder()->create('admin_users', static function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
+            $table->string('email');
+            $table->string('password');
+            $table->rememberToken();
+
+            $table->boolean('activated')->default(false);
+            $table->boolean('forbidden')->default(false);
+            $table->string('language', 2)->default('en');
+
+            $table->softDeletes('deleted_at');
+            $table->timestamps();
+
+            $table->unique(['email', 'deleted_at']);
+        });
+
         $app['db']->connection()->getSchemaBuilder()->create('categories', static function (Blueprint $table): void {
             $table->increments('id');
+            $table->foreignId('user_id')->nullable()->index();
             $table->string('title');
+            $table->string('slug')->unique();
+            $table->text('perex')->nullable();
+            $table->date('published_at')->nullable();
+            $table->date('date_start')->nullable();
+            $table->time('time_start')->nullable();
+            $table->dateTime('date_time_end')->nullable();
+            $table->jsonb('text');
+            $table->json('description');
+            $table->boolean('enabled')->default(false);
+            $table->boolean('send')->default(true);
+            $table->decimal('price', 10, 2)->nullable();
+            $table->integer('views')->default(0);
+            $table->unsignedInteger('created_by_admin_user_id')->nullable();
+            $table->foreign('created_by_admin_user_id')->references('id')->on('admin_users');
+            $table->unsignedInteger('updated_by_admin_user_id')->nullable();
+            $table->foreign('updated_by_admin_user_id')->references('id')->on('admin_users');
+            $table->timestamps();
+            $table->softDeletes();
         });
 
         $app['db']->connection()->getSchemaBuilder()->create('posts', static function (Blueprint $table): void {
