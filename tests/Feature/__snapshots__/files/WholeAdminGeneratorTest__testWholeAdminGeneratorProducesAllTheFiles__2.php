@@ -23,11 +23,14 @@ class IndexCategory extends FormRequest
     public function rules(): array
     {
         return [
-            'orderBy' => 'in:id,user_id,title,published_at,date_start,time_start,date_time_end,text,description,enabled,send,price,views,created_by_admin_user_id,updated_by_admin_user_id|nullable',
-            'orderDirection' => 'in:asc,desc|nullable',
-            'search' => 'string|nullable',
-            'page' => 'integer|nullable',
-            'per_page' => 'integer|nullable',
+            'orderBy' => [
+                'in:id,user_id,title,published_at,date_start,time_start,date_time_end,text,description,enabled,send,price,views,created_by_admin_user_id,updated_by_admin_user_id',
+                'nullable',
+            ],
+            'orderDirection' => ['in:asc,desc', 'nullable'],
+            'search' => ['string', 'nullable'],
+            'page' => ['integer', 'nullable'],
+            'per_page' => ['integer', 'nullable'],
         ];
     }
 }

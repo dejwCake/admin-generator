@@ -23,11 +23,14 @@ class IndexUser extends FormRequest
     public function rules(): array
     {
         return [
-            'orderBy' => 'in:id,first_name,last_name,email,activated,forbidden,language|nullable',
-            'orderDirection' => 'in:asc,desc|nullable',
-            'search' => 'string|nullable',
-            'page' => 'integer|nullable',
-            'per_page' => 'integer|nullable',
+            'orderBy' => [
+                'in:id,first_name,last_name,email,activated,forbidden,language',
+                'nullable',
+            ],
+            'orderDirection' => ['in:asc,desc', 'nullable'],
+            'search' => ['string', 'nullable'],
+            'page' => ['integer', 'nullable'],
+            'per_page' => ['integer', 'nullable'],
         ];
     }
 }
