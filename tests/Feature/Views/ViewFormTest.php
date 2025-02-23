@@ -22,7 +22,7 @@ class ViewFormTest extends TestCase
         $bootstrapJsPath = resource_path('js/admin/index.js');
 
         self::assertFileDoesNotExist($formPath);
-//        self::assertFileDoesNotExist($formRightPath);
+        self::assertFileDoesNotExist($formRightPath);
         self::assertFileDoesNotExist($createPath);
         self::assertFileDoesNotExist($editPath);
         self::assertFileDoesNotExist($formJsPath);
@@ -61,7 +61,7 @@ class ViewFormTest extends TestCase
         $bootstrapJsPath = resource_path('js/admin/index.js');
 
         self::assertFileDoesNotExist($formPath);
-//        self::assertFileDoesNotExist($formRightPath);
+        self::assertFileDoesNotExist($formRightPath);
         self::assertFileDoesNotExist($createPath);
         self::assertFileDoesNotExist($editPath);
         self::assertFileDoesNotExist($formJsPath);
@@ -100,7 +100,7 @@ class ViewFormTest extends TestCase
         $bootstrapJsPath = resource_path('js/admin/index.js');
 
         self::assertFileDoesNotExist($formPath);
-//        self::assertFileDoesNotExist($formRightPath);
+        self::assertFileDoesNotExist($formRightPath);
         self::assertFileDoesNotExist($createPath);
         self::assertFileDoesNotExist($editPath);
         self::assertFileDoesNotExist($formJsPath);
@@ -139,7 +139,7 @@ class ViewFormTest extends TestCase
         $bootstrapJsPath = resource_path('js/admin/index.js');
 
         self::assertFileDoesNotExist($formPath);
-//        self::assertFileDoesNotExist($formRightPath);
+        self::assertFileDoesNotExist($formRightPath);
         self::assertFileDoesNotExist($createPath);
         self::assertFileDoesNotExist($editPath);
         self::assertFileDoesNotExist($formJsPath);

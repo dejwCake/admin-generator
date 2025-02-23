@@ -98,16 +98,19 @@ class GenerateAdminUser extends Command
             'table_name' => $tableNameArgument,
             '--template' => 'admin-user',
             '--belongs-to-many' => 'roles',
+            '--model-name' => $modelOption,
             '--model-with-full-namespace' => $modelWithFullNamespace,
         ]);
 
         $this->call('admin:generate:request:destroy', [
             'table_name' => $tableNameArgument,
+            '--model-name' => $modelOption,
             '--model-with-full-namespace' => $modelWithFullNamespace,
         ]);
 
         $this->call('admin:generate:request:impersonal-login', [
             'table_name' => $tableNameArgument,
+            '--model-name' => $modelOption,
             '--model-with-full-namespace' => $modelWithFullNamespace,
         ]);
 
