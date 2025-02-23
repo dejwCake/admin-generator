@@ -51,6 +51,7 @@ namespace {{ $controllerNamespace }};
     }
     if (in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery)) {
         $uses[] = 'Illuminate\Database\Eloquent\Builder';
+        $uses[] = 'Illuminate\Contracts\Config\Repository as Config';
     }
     $uses = Arr::sort($uses);
 @endphp
@@ -148,20 +149,25 @@ class {{ $controllerBaseName }} extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Store{{ $modelBaseName }} $request): array|RedirectResponse
+@if(in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery))
+    public function store(Store{{ $modelBaseName }} $request, Config $config): array|RedirectResponse
+@else
+    public function store(Store{{ $modelBaseName }} $request): RedirectResponse|array
+@endif
     {
         // Sanitize input
         $sanitized = $request->getSanitized();
 @if(in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery))
+        $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
 @if(in_array('created_by_admin_user_id', $columnsToQuery) && in_array('updated_by_admin_user_id', $columnsToQuery))
-        $sanitized['created_by_admin_user_id'] = $request->user()->id;
-        $sanitized['updated_by_admin_user_id'] = $request->user()->id;
+        $sanitized['created_by_admin_user_id'] = $request->user($adminUserGuard)->id;
+        $sanitized['updated_by_admin_user_id'] = $request->user($adminUserGuard)->id;
 @elseif(in_array('created_by_admin_user_id', $columnsToQuery))
-        $sanitized['created_by_admin_user_id'] = $request->user()->id;
+        $sanitized['created_by_admin_user_id'] = $request->user($adminUserGuard)->id;
 @elseif(in_array('updated_by_admin_user_id', $columnsToQuery))
-        $sanitized['updated_by_admin_user_id'] = $request->user()->id;
+        $sanitized['updated_by_admin_user_id'] = $request->user($adminUserGuard)->id;
 @endif
-@endif()
+@endif
 
         // Store the {{ $modelBaseName }}
 @if (count($belongsToManyRelations) > 0)
@@ -238,12 +244,17 @@ class {{ $controllerBaseName }} extends Controller
     /**
      * Update the specified resource in storage.
      */
+@if(in_array('updated_by_admin_user_id', $columnsToQuery))
+    public function update(Update{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}, Config $config): array|RedirectResponse
+@else
     public function update(Update{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}): array|RedirectResponse
+@endif
     {
         // Sanitize input
         $sanitized = $request->getSanitized();
 @if(in_array('updated_by_admin_user_id', $columnsToQuery))
-        $sanitized['updated_by_admin_user_id'] = $request->user()->id;
+        $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
+        $sanitized['updated_by_admin_user_id'] = $request->user($adminUserGuard)->id;
 @endif
 
         // Update changed values {{ $modelBaseName }}

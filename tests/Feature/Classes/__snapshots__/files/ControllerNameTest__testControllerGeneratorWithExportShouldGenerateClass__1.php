@@ -17,6 +17,7 @@ use Carbon\CarbonImmutable;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
@@ -98,12 +99,13 @@ class CategoriesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCategory $request): array|RedirectResponse
+    public function store(StoreCategory $request, Config $config): array|RedirectResponse
     {
         // Sanitize input
         $sanitized = $request->getSanitized();
-        $sanitized['created_by_admin_user_id'] = $request->user()->id;
-        $sanitized['updated_by_admin_user_id'] = $request->user()->id;
+        $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
+        $sanitized['created_by_admin_user_id'] = $request->user($adminUserGuard)->id;
+        $sanitized['updated_by_admin_user_id'] = $request->user($adminUserGuard)->id;
 
         // Store the Category
         Category::create($sanitized);
@@ -153,11 +155,12 @@ class CategoriesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCategory $request, Category $category): array|RedirectResponse
+    public function update(UpdateCategory $request, Category $category, Config $config): array|RedirectResponse
     {
         // Sanitize input
         $sanitized = $request->getSanitized();
-        $sanitized['updated_by_admin_user_id'] = $request->user()->id;
+        $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
+        $sanitized['updated_by_admin_user_id'] = $request->user($adminUserGuard)->id;
 
         // Update changed values Category
         $category->update($sanitized);

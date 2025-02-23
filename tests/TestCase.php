@@ -75,12 +75,15 @@ abstract class TestCase extends Orchestra
             $table->string('title');
         });
 
-        $app['db']->connection()->getSchemaBuilder()->create('category_post', static function (Blueprint $table): void {
-            $table->unsignedInteger('category_id')->nullable();
-            $table->foreign('category_id')->references('id')->on('categories');
-            $table->unsignedInteger('post_id')->nullable();
-            $table->foreign('post_id')->references('id')->on('posts');
-        });
+        $app['db']->connection()->getSchemaBuilder()->create(
+            'category_post',
+            static function (Blueprint $table): void {
+                $table->unsignedInteger('category_id')->nullable();
+                $table->foreign('category_id')->references('id')->on('categories');
+                $table->unsignedInteger('post_id')->nullable();
+                $table->foreign('post_id')->references('id')->on('posts');
+            },
+        );
     }
 
     /**

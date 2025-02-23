@@ -150,7 +150,7 @@ abstract class ClassGenerator extends Command
         $this->initClassNames(
             $this->hasArgument('class_name')
                 ? $this->argument('class_name')
-                : null
+                : null,
         );
 
         return parent::execute($input, $output);

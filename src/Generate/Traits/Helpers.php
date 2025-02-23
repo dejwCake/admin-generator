@@ -88,7 +88,11 @@ trait Helpers
         return (string) (new Collection([$this->tableName, $belongsToMany]))
             ->sortBy(static fn (string $table): string => $table)
             ->reduce(
-                static fn (string $relationTable, string $table): string => Str::singular($relationTable) . '_' . Str::singular($table),
+                static fn (string $relationTable, string $table): string => Str::singular(
+                    $relationTable,
+                ) . '_' . Str::singular(
+                    $table,
+                ),
                 '',
             );
     }
