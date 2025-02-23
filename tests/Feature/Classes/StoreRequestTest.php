@@ -7,7 +7,7 @@ namespace Brackets\AdminGenerator\Tests\Feature\Classes;
 use Brackets\AdminGenerator\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-class StoreRequestNameTest extends TestCase
+class StoreRequestTest extends TestCase
 {
     use DatabaseMigrations;
 
