@@ -11,7 +11,7 @@ class BulkDestroyRequestTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function testBulkDestroyRequestGenerationShouldGenerateClass(): void
+    public function testBulkDestroyRequestGeneratorShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Category/BulkDestroyCategory.php');
 
@@ -25,7 +25,7 @@ class BulkDestroyRequestTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testBulkDestroyRequestWithClassNameGenerationShouldGenerateClass(): void
+    public function testBulkDestroyRequestGeneratorWithClassNameShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Category/BulkDestroyDog.php');
 
@@ -40,7 +40,7 @@ class BulkDestroyRequestTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testBulkDestroyRequestWithModelNameGenerationShouldGenerateClass(): void
+    public function testBulkDestroyRequestGeneratorWithModelNameShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/BulkDestroyCat.php');
 
