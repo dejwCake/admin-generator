@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Generate;
 
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
 class Model extends ClassGenerator
@@ -107,6 +108,17 @@ class Model extends ClassGenerator
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating model'],
         ];
+    }
+
+    /** @return array<array<string|int>> */
+    protected function getArguments(): array
+    {
+        return array_merge(
+            parent::getArguments(),
+            [
+                ['class_name', InputArgument::OPTIONAL, 'Name of the generated class'],
+            ],
+        );
     }
 
     protected function getDefaultNamespace(string $rootNamespace): string

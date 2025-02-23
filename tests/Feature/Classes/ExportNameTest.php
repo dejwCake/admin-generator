@@ -7,17 +7,17 @@ namespace Brackets\AdminGenerator\Tests\Feature\Classes;
 use Brackets\AdminGenerator\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-class BulkDestroyRequestTest extends TestCase
+class ExportNameTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function testBulkDestroyRequestGeneratorShouldGenerateClass(): void
+    public function testExportGeneratorShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Category/BulkDestroyCategory.php');
+        $filePath = base_path('app/Exports/CategoriesExport.php');
 
         self::assertFileDoesNotExist($filePath);
 
-        $this->artisan('admin:generate:request:bulk-destroy', [
+        $this->artisan('admin:generate:export', [
             'table_name' => 'categories',
         ]);
 
@@ -25,15 +25,15 @@ class BulkDestroyRequestTest extends TestCase
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testBulkDestroyRequestGeneratorWithModelNameShouldGenerateClass(): void
+    public function testExportGeneratorWithModelWithFullNamespaceShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/BulkDestroyCat.php');
+        $filePath = base_path('app/Exports/CategoriesExport.php');
 
         self::assertFileDoesNotExist($filePath);
 
-        $this->artisan('admin:generate:request:bulk-destroy', [
+        $this->artisan('admin:generate:export', [
             'table_name' => 'categories',
-            '--model-name' => 'Billing\\Cat',
+            '--model-with-full-namespace' => 'App\\Billing\\Category',
         ]);
 
         self::assertFileExists($filePath);

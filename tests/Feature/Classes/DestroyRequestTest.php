@@ -7,7 +7,7 @@ namespace Brackets\AdminGenerator\Tests\Feature\Classes;
 use Brackets\AdminGenerator\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-class DestroyRequestNameTest extends TestCase
+class DestroyRequestTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -19,36 +19,6 @@ class DestroyRequestNameTest extends TestCase
 
         $this->artisan('admin:generate:request:destroy', [
             'table_name' => 'categories',
-        ]);
-
-        self::assertFileExists($filePath);
-        self::assertMatchesFileSnapshot($filePath);
-    }
-
-    public function testDestroyRequestGeneratorWithClassNameShouldGenerateClass(): void
-    {
-        $filePath = base_path('app/Http/Requests/Admin/Category/DestroyDog.php');
-
-        self::assertFileDoesNotExist($filePath);
-
-        $this->artisan('admin:generate:request:destroy', [
-            'table_name' => 'categories',
-            'class_name' => 'DestroyDog',
-        ]);
-
-        self::assertFileExists($filePath);
-        self::assertMatchesFileSnapshot($filePath);
-    }
-
-    public function testDestroyRequestGeneratorWithClassNameFullShouldGenerateClass(): void
-    {
-        $filePath = base_path('app/Http/Requests/Billing/DestroyDog.php');
-
-        self::assertFileDoesNotExist($filePath);
-
-        $this->artisan('admin:generate:request:destroy', [
-            'table_name' => 'categories',
-            'class_name' => 'App\\Http\\Requests\\Billing\\DestroyDog',
         ]);
 
         self::assertFileExists($filePath);

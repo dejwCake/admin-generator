@@ -7,6 +7,7 @@ namespace Brackets\AdminGenerator\Generate;
 use Brackets\AdminGenerator\Generate\Traits\FileManipulations;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
 class Controller extends ClassGenerator
@@ -165,6 +166,17 @@ class Controller extends ClassGenerator
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
         ];
+    }
+
+    /** @return array<array<string|int>> */
+    protected function getArguments(): array
+    {
+        return array_merge(
+            parent::getArguments(),
+            [
+                ['class_name', InputArgument::OPTIONAL, 'Name of the generated class'],
+            ],
+        );
     }
 
     protected function getDefaultNamespace(string $rootNamespace): string

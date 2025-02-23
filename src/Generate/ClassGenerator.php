@@ -83,7 +83,6 @@ abstract class ClassGenerator extends Command
     {
         return [
             ['table_name', InputArgument::REQUIRED, 'Name of the existing table'],
-            ['class_name', InputArgument::OPTIONAL, 'Name of the generated class'],
         ];
     }
 
@@ -133,7 +132,9 @@ abstract class ClassGenerator extends Command
         if ($this instanceof Model) {
             $this->initCommonNames(
                 $this->argument('table_name'),
-                $this->argument('class_name'),
+                $this->hasArgument('class_name')
+                    ? $this->argument('class_name')
+                    : null,
                 null,
                 $this->option('model-with-full-namespace'),
             );
@@ -146,7 +147,11 @@ abstract class ClassGenerator extends Command
             );
         }
 
-        $this->initClassNames($this->argument('class_name'));
+        $this->initClassNames(
+            $this->hasArgument('class_name')
+                ? $this->argument('class_name')
+                : null
+        );
 
         return parent::execute($input, $output);
     }
