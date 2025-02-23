@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\AdminUser;
 
-use App\Models\AdminUser;
+use Brackets\AdminAuth\Models\AdminUser;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 

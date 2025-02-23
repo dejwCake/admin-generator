@@ -54,4 +54,19 @@ class UpdateRequestTest extends TestCase
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
     }
+
+    public function testUpdateRequestGeneratorWithFullNamespaceShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Http/Requests/Admin/Category/UpdateCategory.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:request:update', [
+            'table_name' => 'categories',
+            '--model-with-full-namespace' => 'App\\Billing\\Category',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
 }

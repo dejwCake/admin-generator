@@ -86,6 +86,7 @@ class UpdateRequest extends ClassGenerator
     {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
+            ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],

@@ -96,19 +96,19 @@ class GenerateAdminUser extends Command
 
         $this->call('admin:generate:request:update', [
             'table_name' => $tableNameArgument,
-            '--model-name' => $modelOption,
             '--template' => 'admin-user',
             '--belongs-to-many' => 'roles',
+            '--model-with-full-namespace' => $modelWithFullNamespace,
         ]);
 
         $this->call('admin:generate:request:destroy', [
             'table_name' => $tableNameArgument,
-            '--model-name' => $modelOption,
+            '--model-with-full-namespace' => $modelWithFullNamespace,
         ]);
 
         $this->call('admin:generate:request:impersonal-login', [
             'table_name' => $tableNameArgument,
-            '--model-name' => $modelOption,
+            '--model-with-full-namespace' => $modelWithFullNamespace,
         ]);
 
         $this->call('admin:generate:routes', [

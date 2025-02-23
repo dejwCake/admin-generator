@@ -1,13 +1,22 @@
-@php echo "<?php"
+@php use Illuminate\Support\Arr;echo "<?php"
 @endphp
 
 
 declare(strict_types=1);
 
 namespace {{ $classNamespace }};
+@php
+    $uses = [
+        'Illuminate\Contracts\Auth\Access\Gate',
+        'Illuminate\Foundation\Http\FormRequest',
+        $modelFullName,
+    ];
+    $uses = Arr::sort($uses);
+@endphp
 
-use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Foundation\Http\FormRequest;
+@foreach($uses as $use)
+use {{ $use }};
+@endforeach
 
 /**
  * @property {{ $modelBaseName }} ${{ $modelVariableName }}

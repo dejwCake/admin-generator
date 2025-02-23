@@ -54,4 +54,19 @@ class DestroyRequestTest extends TestCase
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
     }
+
+    public function testDestroyRequestGeneratorWithFullNamespaceShouldGenerateClass(): void
+    {
+        $filePath = base_path('app/Http/Requests/Admin/Category/DestroyCategory.php');
+
+        self::assertFileDoesNotExist($filePath);
+
+        $this->artisan('admin:generate:request:destroy', [
+            'table_name' => 'categories',
+            '--model-with-full-namespace' => 'App\\Billing\\Category',
+        ]);
+
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
+    }
 }
