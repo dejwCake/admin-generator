@@ -42,10 +42,9 @@ class IndexRequest extends ClassGenerator
     protected function buildClass(): string
     {
         return view('brackets/admin-generator::index-request', [
-            'modelBaseName' => $this->modelBaseName,
+            'classBaseName' => $this->classBaseName,
+            'classNamespace' => $this->classNamespace,
             'modelDotNotation' => $this->modelDotNotation,
-            'modelWithNamespaceFromDefault' => $this->modelWithNamespaceFromDefault,
-            'modelVariableName' => $this->modelVariableName,
 
             'columnsToQuery' => $this->readColumnsFromTable($this->tableName)->filter(
                 static fn (array $column): bool => !(

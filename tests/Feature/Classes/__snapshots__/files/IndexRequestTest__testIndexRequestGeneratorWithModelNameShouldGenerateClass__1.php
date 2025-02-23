@@ -1,22 +1,20 @@
-@php echo "<?php"
-@endphp
-
+<?php
 
 declare(strict_types=1);
 
-namespace {{ $classNamespace }};
+namespace App\Http\Requests\Admin\Billing\Cat;
 
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 
-class {{ $classBaseName }} extends FormRequest
+class IndexCat extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(Gate $gate): bool
     {
-        return $gate->allows('admin.{{ $modelDotNotation }}.index');
+        return $gate->allows('admin.billing.cat.index');
     }
 
     /**
@@ -25,7 +23,7 @@ class {{ $classBaseName }} extends FormRequest
     public function rules(): array
     {
         return [
-            'orderBy' => 'in:{{ implode(',', $columnsToQuery) }}|nullable',
+            'orderBy' => 'in:id,title|nullable',
             'orderDirection' => 'in:asc,desc|nullable',
             'search' => 'string|nullable',
             'page' => 'integer|nullable',
