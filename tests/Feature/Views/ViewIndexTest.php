@@ -7,7 +7,7 @@ namespace Brackets\AdminGenerator\Tests\Feature\Views;
 use Brackets\AdminGenerator\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-class IndexTest extends TestCase
+class ViewIndexTest extends TestCase
 {
     use DatabaseMigrations;
 

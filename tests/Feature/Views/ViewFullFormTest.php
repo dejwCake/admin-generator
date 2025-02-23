@@ -7,7 +7,7 @@ namespace Brackets\AdminGenerator\Tests\Feature\Views;
 use Brackets\AdminGenerator\Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-class FullFormTest extends TestCase
+class ViewFullFormTest extends TestCase
 {
     use DatabaseMigrations;
 
