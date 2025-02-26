@@ -58,13 +58,11 @@
 @foreach($columns as $col)
                                     <td @if($col['name'] === 'activated')v-if="activation"@endif>
 @if($col['switch'])
-
                                         <label class="switch switch-3d switch-success">
                                             <input type="checkbox" class="switch-input" v-model="collection[index].{{ $col['name'] }}" @change="toggleSwitch(item.resource_url, '{{ $col['name'] }}', collection[index])">
                                             <span class="switch-slider"></span>
                                         </label>
 @elseif($col['name'] === 'forbidden')
-
                                         <label class="switch switch-3d switch-danger">
                                             <input type="checkbox" class="switch-input" v-model="collection[index].{{ $col['name'] }}" @change="toggleSwitch(item.resource_url, '{{ $col['name'] }}', collection[index])">
                                             <span class="switch-slider"></span>
@@ -74,7 +72,6 @@
 @endif
                                     </td>
 @endforeach
-
                                     <td>
                                         <div class="row no-gutters">
                                             {{'@'}}can('admin.admin-user.impersonal-login')
