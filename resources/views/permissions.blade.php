@@ -20,7 +20,7 @@ return new class extends Migration
     /** {{'@'}}var array<array<string, string|CarbonImmutable>> */
     private array $permissions;
 
-    /** {{'@'}}var array<array<string, string>> */
+    /** {{'@'}}var array<int, array<string, Collection<int, string>|string>> */
     private array $roles;
 
     public function __construct()
