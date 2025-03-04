@@ -6,6 +6,7 @@ namespace App\Http\Requests\Admin\User;
 
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class IndexUser extends FormRequest
 {
@@ -24,10 +25,18 @@ class IndexUser extends FormRequest
     {
         return [
             'orderBy' => [
-                'in:id,first_name,last_name,email,activated,forbidden,language',
+                Rule::in([
+                    'id',
+                    'first_name',
+                    'last_name',
+                    'email',
+                    'activated',
+                    'forbidden',
+                    'language',
+                ]),
                 'nullable',
             ],
-            'orderDirection' => ['in:asc,desc', 'nullable'],
+            'orderDirection' => [Rule::in(['asc', 'desc']), 'nullable'],
             'search' => ['string', 'nullable'],
             'page' => ['integer', 'nullable'],
             'per_page' => ['integer', 'nullable'],
