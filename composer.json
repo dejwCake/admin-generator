@@ -60,8 +60,7 @@
     "autoload": {
         "psr-4": {
             "Brackets\\AdminGenerator\\": "src/"
-        },
-        "classmap": []
+        }
     },
     "autoload-dev": {
         "psr-4": {
