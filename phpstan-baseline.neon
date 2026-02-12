@@ -73,7 +73,7 @@ parameters:
 			path: src/Generate/ViewIndex.php
 
 		-
-			message: '#^Cannot call static method factory\(\) on array\|bool\|string\.$#'
+			message: '#^Cannot call static method factory\(\) on array\|bool\|float\|int\|string\.$#'
 			identifier: staticMethod.nonObject
 			count: 1
 			path: src/GenerateUser.php

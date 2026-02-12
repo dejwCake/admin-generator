@@ -25,7 +25,7 @@
                             <div class="col-md-4 text-center">
                                 <div class="avatar-upload">
                                     @include('brackets/admin-ui::admin.includes.avatar-uploader', [
-                                        'mediaCollection' => app(\Brackets\AdminAuth\Models\AdminUser::class)->getMediaCollection('avatar'),
+                                        'mediaCollection' => app(\Brackets\AdminAuth\Models\AdminUser::class)->getCustomMediaCollection('avatar'),
                                         'media' => $adminUser->getThumbs200ForCollection('avatar')
                                     ])
                                 </div>
