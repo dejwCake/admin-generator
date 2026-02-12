@@ -8,6 +8,7 @@ namespace {{ $classNamespace }};
 
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class {{ $classBaseName }} extends FormRequest
 {
@@ -26,10 +27,12 @@ class {{ $classBaseName }} extends FormRequest
     {
         return [
             'orderBy' => [
-                'in:{{ implode(',', $columnsToQuery) }}',
+                Rule::in([
+                    '{!! implode("',\n                    '", $columnsToQuery) !!}',
+                ]),
                 'nullable',
             ],
-            'orderDirection' => ['in:asc,desc', 'nullable'],
+            'orderDirection' => [Rule::in(['asc', 'desc']), 'nullable'],
             'search' => ['string', 'nullable'],
             'page' => ['integer', 'nullable'],
             'per_page' => ['integer', 'nullable'],

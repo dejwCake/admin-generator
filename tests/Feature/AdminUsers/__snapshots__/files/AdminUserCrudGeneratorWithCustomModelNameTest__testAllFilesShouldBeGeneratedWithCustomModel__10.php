@@ -70,14 +70,12 @@
                                             @{{ item.email }}
                                     </td>
                                     <td v-if="activation">
-
                                         <label class="switch switch-3d switch-success">
                                             <input type="checkbox" class="switch-input" v-model="collection[index].activated" @change="toggleSwitch(item.resource_url, 'activated', collection[index])">
                                             <span class="switch-slider"></span>
                                         </label>
                                     </td>
                                     <td >
-
                                         <label class="switch switch-3d switch-danger">
                                             <input type="checkbox" class="switch-input" v-model="collection[index].forbidden" @change="toggleSwitch(item.resource_url, 'forbidden', collection[index])">
                                             <span class="switch-slider"></span>
@@ -86,7 +84,6 @@
                                     <td >
                                             @{{ item.language }}
                                     </td>
-
                                     <td>
                                         <div class="row no-gutters">
                                             @can('admin.admin-user.impersonal-login')

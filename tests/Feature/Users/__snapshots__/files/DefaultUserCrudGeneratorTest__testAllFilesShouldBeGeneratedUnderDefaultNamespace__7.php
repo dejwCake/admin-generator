@@ -64,7 +64,6 @@
                                     <td>
                                         @{{ item.email_verified_at | datetime }}
                                     </td>
-
                                     <td>
                                         <div class="row no-gutters">
                                             <div class="col-auto">
