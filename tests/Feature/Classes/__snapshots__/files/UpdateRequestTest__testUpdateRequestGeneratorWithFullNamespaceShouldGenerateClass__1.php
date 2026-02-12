@@ -42,8 +42,6 @@ class UpdateCategory extends TranslatableFormRequest
             'send' => ['sometimes', 'boolean'],
             'price' => ['nullable', 'numeric'],
             'views' => ['sometimes', 'integer'],
-            'created_by_admin_user_id' => ['nullable', 'integer'],
-            'updated_by_admin_user_id' => ['nullable', 'integer'],
             'publish_now' => ['nullable', 'boolean'],
             'unpublish_now' => ['nullable', 'boolean'],
         ];
