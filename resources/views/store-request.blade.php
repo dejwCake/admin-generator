@@ -52,7 +52,9 @@ class {{ $classBaseName }} extends FormRequest
     {
         return [
 @foreach($standardColumn as $column)
+@if(!($column['name'] === "updated_by_admin_user_id" || $column['name'] === "created_by_admin_user_id" ))
             '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverStoreRules']) !!}],
+@endif
 @endforeach
 @if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
 

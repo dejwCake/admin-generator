@@ -36,8 +36,6 @@ class StoreCategory extends TranslatableFormRequest
             'send' => ['required', 'boolean'],
             'price' => ['nullable', 'numeric'],
             'views' => ['required', 'integer'],
-            'created_by_admin_user_id' => ['nullable', 'integer'],
-            'updated_by_admin_user_id' => ['nullable', 'integer'],
         ];
     }
 
