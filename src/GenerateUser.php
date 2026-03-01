@@ -75,7 +75,7 @@ class GenerateUser extends Command
         $this->strReplaceInFile(
             resource_path('views/admin/layout/sidebar.blade.php'),
             '{{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
-            '<li class="nav-item"><a class="nav-link" href="{{ url(\'admin/users\') }}"><i class="nav-icon icon-user"></i> {{ __(\'Manage users\') }}</a></li>
+            '<li class="nav-item"><a class="nav-link" href="{{ url(\'admin/users\') }}"><i class="nav-icon fa fa-user"></i> {{ __(\'Manage users\') }}</a></li>
             {{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
             '|url\(\'admin\/users\'\)|',
         );
