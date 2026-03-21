@@ -5,10 +5,17 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator;
 
 use Illuminate\Support\ServiceProvider;
+use Override;
 
-class AdminGeneratorServiceProvider extends ServiceProvider
+final class AdminGeneratorServiceProvider extends ServiceProvider
 {
     public function boot(): void
+    {
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'brackets/admin-generator');
+    }
+
+    #[Override]
+    public function register(): void
     {
         $this->commands([
             GenerateAdmin::class,
@@ -32,12 +39,5 @@ class AdminGeneratorServiceProvider extends ServiceProvider
             Generate\Permissions::class,
             Generate\Export::class,
         ]);
-
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'brackets/admin-generator');
-    }
-
-    public function register(): void
-    {
-        //do nothing
     }
 }

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generate;
 
+use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-class StoreRequest extends ClassGenerator
+final class StoreRequest extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
@@ -52,11 +53,13 @@ class StoreRequest extends ClassGenerator
     }
 
     /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
+    #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
         return 'Store' . $this->modelBaseName;
     }
 
+    #[Override]
     protected function buildClass(): string
     {
         return view(
@@ -77,6 +80,7 @@ class StoreRequest extends ClassGenerator
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getOptions(): array
     {
         return [
@@ -87,6 +91,7 @@ class StoreRequest extends ClassGenerator
         ];
     }
 
+    #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace . '\Http\Requests\Admin\\' . $this->modelWithNamespaceFromDefault;

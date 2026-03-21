@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generate;
 
+use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-class Factory extends ClassGenerator
+final class Factory extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
@@ -52,6 +53,7 @@ class Factory extends ClassGenerator
     }
 
     /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
+    #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
         return $this->modelBaseName . 'Factory';
@@ -60,11 +62,13 @@ class Factory extends ClassGenerator
     /**
      * Get the root namespace for the class.
      */
+    #[Override]
     public function rootNamespace(): string
     {
         return 'Database';
     }
 
+    #[Override]
     protected function buildClass(): string
     {
         return view(
@@ -89,6 +93,7 @@ class Factory extends ClassGenerator
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getOptions(): array
     {
         return [
@@ -101,6 +106,7 @@ class Factory extends ClassGenerator
     }
 
     /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
+    #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
         return 'Database\Factories';

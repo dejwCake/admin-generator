@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generate;
 
+use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-class ViewFullForm extends ViewGenerator
+final class ViewFullForm extends ViewGenerator
 {
     /**
      * The name and signature of the console command.
@@ -93,7 +94,20 @@ class ViewFullForm extends ViewGenerator
         }
     }
 
-    public function generateIndexJs(bool $force): string
+    /** @return array<array<string|int>> */
+    #[Override]
+    protected function getOptions(): array
+    {
+        return [
+            ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
+            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
+            ['file-name', 'nm', InputOption::VALUE_OPTIONAL, 'Specify a blade file path'],
+            ['route', 'r', InputOption::VALUE_OPTIONAL, 'Specify custom route for form'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating full form'],
+        ];
+    }
+
+    private function generateIndexJs(bool $force): string
     {
         $indexJsPath = resource_path('js/admin/' . $this->formJsRelativePath . '/index.js');
         if ($this->alreadyExists($indexJsPath) && !$force) {
@@ -109,7 +123,7 @@ class ViewFullForm extends ViewGenerator
         return $indexJsPath;
     }
 
-    protected function buildForm(): string
+    private function buildForm(): string
     {
         return view('brackets/admin-generator::' . $this->view, [
             'modelBaseName' => $this->modelBaseName,
@@ -136,25 +150,13 @@ class ViewFullForm extends ViewGenerator
         ])->render();
     }
 
-    protected function buildFormJs(): string
+    private function buildFormJs(): string
     {
         return view('brackets/admin-generator::' . $this->viewJs, [
             'modelJSName' => $this->formJsRelativePath,
 
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
         ])->render();
-    }
-
-    /** @return array<array<string|int>> */
-    protected function getOptions(): array
-    {
-        return [
-            ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
-            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['file-name', 'nm', InputOption::VALUE_OPTIONAL, 'Specify a blade file path'],
-            ['route', 'r', InputOption::VALUE_OPTIONAL, 'Specify custom route for form'],
-            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating full form'],
-        ];
     }
 
     private function generateBlade(bool $force): void

@@ -28,7 +28,7 @@ class StoreAdminUser extends FormRequest
         $rules = [
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],
-            'email' => ['required', 'email', Rule::unique('admin_users', 'email')->whereNull('deleted_at'), 'string'],
+            'email' => ['required', 'email', Rule::unique('admin_users', 'email'), 'string'],
             'password' => ['required', 'confirmed', 'min:7', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/', 'string'],
             'forbidden' => ['required', 'boolean'],
             'language' => ['required', 'string'],

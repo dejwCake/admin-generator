@@ -33,8 +33,7 @@ class UpdateAdminUser extends FormRequest
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],
             'email' => ['sometimes', 'email', Rule::unique('admin_users', 'email')
-                ->ignore($this->adminUser->getKey(), $this->adminUser->getKeyName())
-                ->whereNull('deleted_at'), 'string'],
+                ->ignore($this->adminUser->getKey(), $this->adminUser->getKeyName()), 'string'],
             'password' => ['sometimes', 'confirmed', 'min:7', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/', 'string'],
             'forbidden' => ['sometimes', 'boolean'],
             'language' => ['sometimes', 'string'],

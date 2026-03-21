@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generate;
 
+use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-class IndexRequest extends ClassGenerator
+final class IndexRequest extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
@@ -34,11 +35,13 @@ class IndexRequest extends ClassGenerator
     }
 
     /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
+    #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
         return 'Index' . $this->modelBaseName;
     }
 
+    #[Override]
     protected function buildClass(): string
     {
         return view('brackets/admin-generator::index-request', [
@@ -61,6 +64,7 @@ class IndexRequest extends ClassGenerator
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getOptions(): array
     {
         return [
@@ -69,6 +73,7 @@ class IndexRequest extends ClassGenerator
         ];
     }
 
+    #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace . '\Http\Requests\Admin\\' . $this->modelWithNamespaceFromDefault;

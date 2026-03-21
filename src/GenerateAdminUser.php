@@ -7,9 +7,10 @@ namespace Brackets\AdminGenerator;
 use Brackets\AdminGenerator\Generate\Traits\FileManipulations;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-class GenerateAdminUser extends Command
+final class GenerateAdminUser extends Command
 {
     use FileManipulations;
 
@@ -27,7 +28,7 @@ class GenerateAdminUser extends Command
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $description = 'Scaffold complete admin CRUD for specified admin user model from admin-auth package. 
+    protected $description = 'Scaffold complete admin CRUD for specified admin user model from admin-auth package.
         This differs from admin:generate command in many additional features (password handling, roles, ...).';
 
     public function __construct(protected readonly Filesystem $files)
@@ -168,6 +169,7 @@ class GenerateAdminUser extends Command
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getArguments(): array
     {
         return [
@@ -175,6 +177,7 @@ class GenerateAdminUser extends Command
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getOptions(): array
     {
         return [

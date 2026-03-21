@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generate;
 
+use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-class Lang extends FileAppender
+final class Lang extends FileAppender
 {
     /**
      * The name and signature of the console command.
@@ -76,7 +77,20 @@ class Lang extends FileAppender
         }
     }
 
-    protected function buildClass(): string
+    /** @return array<array<string|int>> */
+    #[Override]
+    protected function getOptions(): array
+    {
+        return [
+            ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a controller for the given model'],
+            ['locale', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom locale'],
+            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
+            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
+        ];
+    }
+
+    private function buildClass(): string
     {
         return view('brackets/admin-generator::' . $this->view, [
             'modelLangFormat' => $this->modelLangFormat,
@@ -99,17 +113,5 @@ class Lang extends FileAppender
                 }),
             'relations' => $this->relations,
         ])->render();
-    }
-
-    /** @return array<array<string|int>> */
-    protected function getOptions(): array
-    {
-        return [
-            ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a controller for the given model'],
-            ['locale', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom locale'],
-            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
-            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
-        ];
     }
 }

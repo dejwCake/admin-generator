@@ -2,7 +2,7 @@
     "name": "dejwcake/admin-generator",
     "description": "Laravel CRUD generator for dejwcake/craftable",
     "license": "MIT",
-    "type": "project",
+    "type": "library",
     "keywords": [
         "generator",
         "make",
@@ -45,17 +45,15 @@
         }
     ],
     "require": {
-        "php": "^8.2",
-        "doctrine/dbal": "^4.2.2",
-        "illuminate/console": "^12.0",
-        "illuminate/support": "^12.0"
+        "php": "^8.5",
+        "illuminate/console": "^13.0",
+        "illuminate/support": "^13.0"
     },
     "require-dev": {
-        "larastan/larastan": "^3.1",
-        "mockery/mockery": "^1.6",
-        "orchestra/testbench": "^10.0",
-        "phpunit/phpunit": "^11.5.9",
-        "spatie/phpunit-snapshot-assertions": "^5.1.8"
+        "larastan/larastan": "^3.9",
+        "orchestra/testbench": "^11.0",
+        "phpunit/phpunit": "^13.0",
+        "spatie/phpunit-snapshot-assertions": "^5.3"
     },
     "autoload": {
         "psr-4": {
@@ -68,14 +66,14 @@
         }
     },
     "extra": {
+        "branch-alias": {
+            "dev-main": "2.0-dev",
+            "dev-v2-dev": "2.0-dev"
+        },
         "laravel": {
             "providers": [
                 "Brackets\\AdminGenerator\\AdminGeneratorServiceProvider"
             ]
-        },
-        "branch-alias": {
-            "dev-main": "1.0-dev",
-            "dev-v2-dev": "2.0-dev"
         }
     }
 }

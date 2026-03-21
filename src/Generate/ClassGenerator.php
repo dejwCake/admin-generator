@@ -10,6 +10,7 @@ use Brackets\AdminGenerator\Generate\Traits\Names;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
+use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -79,6 +80,7 @@ abstract class ClassGenerator extends Command
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getArguments(): array
     {
         return [
@@ -127,6 +129,7 @@ abstract class ClassGenerator extends Command
     /**
      * Execute the console command.
      */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this instanceof Model) {

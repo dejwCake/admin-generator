@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generate;
 
+use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-class ViewForm extends ViewGenerator
+final class ViewForm extends ViewGenerator
 {
     /**
      * The name and signature of the console command.
@@ -87,7 +88,19 @@ class ViewForm extends ViewGenerator
         }
     }
 
-    protected function isUsedTwoColumnsLayout(): bool
+    /** @return array<array<string|int>> */
+    #[Override]
+    protected function getOptions(): array
+    {
+        return [
+            ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
+            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating form'],
+        ];
+    }
+
+    private function isUsedTwoColumnsLayout(): bool
     {
         return in_array(
             'published_at',
@@ -96,7 +109,7 @@ class ViewForm extends ViewGenerator
         );
     }
 
-    protected function buildForm(): string
+    private function buildForm(): string
     {
         return view('brackets/admin-generator::' . $this->form, [
             'modelBaseName' => $this->modelBaseName,
@@ -115,7 +128,7 @@ class ViewForm extends ViewGenerator
         ])->render();
     }
 
-    protected function buildFormRight(): string
+    private function buildFormRight(): string
     {
         return view('brackets/admin-generator::' . $this->formRight, [
             'modelBaseName' => $this->modelBaseName,
@@ -135,7 +148,7 @@ class ViewForm extends ViewGenerator
         ])->render();
     }
 
-    protected function buildCreate(): string
+    private function buildCreate(): string
     {
         return view('brackets/admin-generator::' . $this->create, [
             'modelBaseName' => $this->modelBaseName,
@@ -156,7 +169,7 @@ class ViewForm extends ViewGenerator
         ])->render();
     }
 
-    protected function buildEdit(): string
+    private function buildEdit(): string
     {
         return view('brackets/admin-generator::' . $this->edit, [
             'modelBaseName' => $this->modelBaseName,
@@ -183,7 +196,7 @@ class ViewForm extends ViewGenerator
         ])->render();
     }
 
-    protected function buildFormJs(): string
+    private function buildFormJs(): string
     {
         return view('brackets/admin-generator::' . $this->formJs, [
             'modelViewsDirectory' => $this->modelViewsDirectory,
@@ -191,17 +204,6 @@ class ViewForm extends ViewGenerator
 
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
         ])->render();
-    }
-
-    /** @return array<array<string|int>> */
-    protected function getOptions(): array
-    {
-        return [
-            ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
-            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
-            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating form'],
-        ];
     }
 
     private function generateForm(bool $force): void

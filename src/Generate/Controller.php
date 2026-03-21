@@ -7,10 +7,11 @@ namespace Brackets\AdminGenerator\Generate;
 use Brackets\AdminGenerator\Generate\Traits\FileManipulations;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
-class Controller extends ClassGenerator
+final class Controller extends ClassGenerator
 {
     use FileManipulations;
 
@@ -106,11 +107,13 @@ class Controller extends ClassGenerator
         }
     }
 
+    #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
         return Str::studly($tableName) . 'Controller';
     }
 
+    #[Override]
     protected function buildClass(): string
     {
         return view('brackets/admin-generator::' . $this->view, [
@@ -155,6 +158,7 @@ class Controller extends ClassGenerator
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getOptions(): array
     {
         return [
@@ -169,6 +173,7 @@ class Controller extends ClassGenerator
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getArguments(): array
     {
         return array_merge(
@@ -179,6 +184,7 @@ class Controller extends ClassGenerator
         );
     }
 
+    #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace . '\Http\Controllers\Admin';
@@ -196,9 +202,9 @@ class Controller extends ClassGenerator
                 $haystack = ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'];
                 if ($createdByAdminUserIdPresent && $updatedByAdminUserIdPresent) {
                     $haystack = ['password', 'remember_token', 'slug', 'deleted_at'];
-                } else if ($createdByAdminUserIdPresent) {
+                } elseif ($createdByAdminUserIdPresent) {
                     $haystack = ['password', 'remember_token', 'slug', 'updated_at', 'deleted_at'];
-                } else if ($updatedByAdminUserIdPresent) {
+                } elseif ($updatedByAdminUserIdPresent) {
                     $haystack = ['password', 'remember_token', 'slug', 'created_at', 'deleted_at'];
                 }
 

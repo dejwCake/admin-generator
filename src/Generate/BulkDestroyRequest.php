@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generate;
 
+use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-class BulkDestroyRequest extends ClassGenerator
+final class BulkDestroyRequest extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
@@ -34,11 +35,13 @@ class BulkDestroyRequest extends ClassGenerator
     }
 
     /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
+    #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
         return 'BulkDestroy' . $this->modelBaseName;
     }
 
+    #[Override]
     protected function buildClass(): string
     {
         return view('brackets/admin-generator::bulk-destroy-request', [
@@ -51,6 +54,7 @@ class BulkDestroyRequest extends ClassGenerator
     /**
      * @return array<array<string|int>>
      */
+    #[Override]
     protected function getOptions(): array
     {
         return [
@@ -59,6 +63,7 @@ class BulkDestroyRequest extends ClassGenerator
         ];
     }
 
+    #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace . '\Http\Requests\Admin\\' . $this->modelWithNamespaceFromDefault;

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generate;
 
+use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-class ImpersonalLoginRequest extends ClassGenerator
+final class ImpersonalLoginRequest extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
@@ -34,11 +35,13 @@ class ImpersonalLoginRequest extends ClassGenerator
     }
 
     /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
+    #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
         return 'ImpersonalLogin' . $this->modelBaseName;
     }
 
+    #[Override]
     protected function buildClass(): string
     {
         return view('brackets/admin-generator::impersonal-login-request', [
@@ -52,6 +55,7 @@ class ImpersonalLoginRequest extends ClassGenerator
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getOptions(): array
     {
         return [
@@ -61,6 +65,7 @@ class ImpersonalLoginRequest extends ClassGenerator
         ];
     }
 
+    #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace . '\Http\Requests\Admin\\' . $this->modelWithNamespaceFromDefault;

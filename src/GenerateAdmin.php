@@ -6,10 +6,11 @@ namespace Brackets\AdminGenerator;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
-class GenerateAdmin extends Command
+final class GenerateAdmin extends Command
 {
     /**
      * The name and signature of the console command.
@@ -151,6 +152,7 @@ class GenerateAdmin extends Command
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getArguments(): array
     {
         return [
@@ -159,6 +161,7 @@ class GenerateAdmin extends Command
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getOptions(): array
     {
         return [
@@ -172,7 +175,7 @@ class GenerateAdmin extends Command
         ];
     }
 
-    protected function shouldGeneratePermissionsMigration(): bool
+    private function shouldGeneratePermissionsMigration(): bool
     {
         return class_exists('\Brackets\Craftable\CraftableServiceProvider');
     }

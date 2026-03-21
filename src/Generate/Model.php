@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Generate;
 
 use Illuminate\Support\Str;
+use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
-class Model extends ClassGenerator
+final class Model extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
@@ -55,11 +56,13 @@ class Model extends ClassGenerator
         // TODO think if we should use ide-helper:models ?
     }
 
+    #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
         return Str::studly(Str::singular($tableName));
     }
 
+    #[Override]
     protected function buildClass(): string
     {
         return view('brackets/admin-generator::' . $this->view, [
@@ -101,6 +104,7 @@ class Model extends ClassGenerator
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getOptions(): array
     {
         return [
@@ -111,6 +115,7 @@ class Model extends ClassGenerator
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getArguments(): array
     {
         return array_merge(
@@ -121,6 +126,7 @@ class Model extends ClassGenerator
         );
     }
 
+    #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace . '\Models';

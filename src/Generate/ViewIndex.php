@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Generate;
 
 use Illuminate\Support\Collection;
+use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-class ViewIndex extends ViewGenerator
+final class ViewIndex extends ViewGenerator
 {
     /**
      * The name and signature of the console command.
@@ -82,7 +83,20 @@ class ViewIndex extends ViewGenerator
         }
     }
 
-    public function generateView(string $viewPath, bool $force): void
+    /** @return array<array<string|int>> */
+    #[Override]
+    protected function getOptions(): array
+    {
+        return [
+            ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
+            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating index'],
+            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
+            ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+        ];
+    }
+
+    private function generateView(string $viewPath, bool $force): void
     {
         if ($this->alreadyExists($viewPath) && !$force) {
             $this->error('File ' . $viewPath . ' already exists!');
@@ -100,7 +114,7 @@ class ViewIndex extends ViewGenerator
         }
     }
 
-    public function generateListingJs(string $listingJsPath, bool $force): void
+    private function generateListingJs(string $listingJsPath, bool $force): void
     {
         if ($this->alreadyExists($listingJsPath) && !$force) {
             $this->error('File ' . $listingJsPath . ' already exists!');
@@ -117,7 +131,7 @@ class ViewIndex extends ViewGenerator
         }
     }
 
-    protected function buildView(): string
+    private function buildView(): string
     {
         return view('brackets/admin-generator::' . $this->view, [
             'modelBaseName' => $this->modelBaseName,
@@ -143,24 +157,12 @@ class ViewIndex extends ViewGenerator
         ])->render();
     }
 
-    protected function buildListingJs(): string
+    private function buildListingJs(): string
     {
         return view('brackets/admin-generator::' . $this->viewJs, [
             'modelViewsDirectory' => $this->modelViewsDirectory,
             'modelJSName' => $this->modelJSName,
         ])->render();
-    }
-
-    /** @return array<array<string|int>> */
-    protected function getOptions(): array
-    {
-        return [
-            ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
-            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating index'],
-            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
-            ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
-        ];
     }
 
     /** @param array<string, string|int> $column */

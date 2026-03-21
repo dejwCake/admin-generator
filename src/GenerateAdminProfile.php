@@ -7,10 +7,11 @@ namespace Brackets\AdminGenerator;
 use Brackets\AdminGenerator\Generate\Traits\FileManipulations;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
-class GenerateAdminProfile extends Command
+final class GenerateAdminProfile extends Command
 {
     use FileManipulations;
 
@@ -101,6 +102,7 @@ class GenerateAdminProfile extends Command
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getArguments(): array
     {
         return [
@@ -109,6 +111,7 @@ class GenerateAdminProfile extends Command
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getOptions(): array
     {
         return [

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generate;
 
+use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-class Export extends ClassGenerator
+final class Export extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
@@ -44,11 +45,13 @@ class Export extends ClassGenerator
     }
 
     /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
+    #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
         return $this->exportBaseName;
     }
 
+    #[Override]
     protected function buildClass(): string
     {
         return view('brackets/admin-generator::' . $this->view, [
@@ -70,6 +73,7 @@ class Export extends ClassGenerator
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getOptions(): array
     {
         return [
@@ -79,6 +83,7 @@ class Export extends ClassGenerator
         ];
     }
 
+    #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace . '\Exports';

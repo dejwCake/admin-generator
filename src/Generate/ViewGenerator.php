@@ -9,6 +9,7 @@ use Brackets\AdminGenerator\Generate\Traits\Helpers;
 use Brackets\AdminGenerator\Generate\Traits\Names;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -28,6 +29,7 @@ abstract class ViewGenerator extends Command
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getArguments(): array
     {
         return [
@@ -44,7 +46,7 @@ abstract class ViewGenerator extends Command
         if (!$this->files->exists($path)) {
             $this->makeDirectory($path);
             $this->files->put($path, $content);
-        } else if (!$this->alreadyAppended($path, $content)) {
+        } elseif (!$this->alreadyAppended($path, $content)) {
             $this->files->append($path, $content);
         } else {
             return false;
@@ -53,6 +55,7 @@ abstract class ViewGenerator extends Command
         return true;
     }
 
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->initCommonNames($this->argument('table_name'), $this->option('model-name'));

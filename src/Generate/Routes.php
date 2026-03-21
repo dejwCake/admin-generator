@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generate;
 
+use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-class Routes extends FileAppender
+final class Routes extends FileAppender
 {
     /**
      * The name and signature of the console command.
@@ -70,7 +71,20 @@ class Routes extends FileAppender
         }
     }
 
-    protected function buildClass(): string
+    /** @return array<array<string|int>> */
+    #[Override]
+    protected function getOptions(): array
+    {
+        return [
+            ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a controller for the given model'],
+            ['controller-name', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom controller name'],
+            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
+            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
+            ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+        ];
+    }
+
+    private function buildClass(): string
     {
         return view('brackets/admin-generator::' . $this->view, [
             'controllerPartiallyFullName' => $this->controllerWithNamespaceFromDefault,
@@ -81,17 +95,5 @@ class Routes extends FileAppender
             'export' => $this->export,
             'withoutBulk' => $this->withoutBulk,
         ])->render();
-    }
-
-    /** @return array<array<string|int>> */
-    protected function getOptions(): array
-    {
-        return [
-            ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a controller for the given model'],
-            ['controller-name', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom controller name'],
-            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
-            ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
-        ];
     }
 }

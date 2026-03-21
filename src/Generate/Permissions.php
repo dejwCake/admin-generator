@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generate;
 
+use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-class Permissions extends ClassGenerator
+final class Permissions extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
@@ -43,11 +44,13 @@ class Permissions extends ClassGenerator
     }
 
     /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
+    #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
         return 'FillPermissionsFor' . $this->modelBaseName;
     }
 
+    #[Override]
     protected function generateClass(bool $force = false): bool
     {
         $fileName = 'fill_permissions_for_' . $this->modelRouteAndViewName . '.php';
@@ -91,6 +94,7 @@ class Permissions extends ClassGenerator
         return false;
     }
 
+    #[Override]
     protected function buildClass(): string
     {
         return view('brackets/admin-generator::permissions', [
@@ -102,6 +106,7 @@ class Permissions extends ClassGenerator
     }
 
     /** @return array<array<string|int>> */
+    #[Override]
     protected function getOptions(): array
     {
         return [
