@@ -52,8 +52,6 @@ final class Model extends ClassGenerator
         if ($this->generateClass($force)) {
             $this->info('Generating ' . $this->classFullName . ' finished');
         }
-
-        // TODO think if we should use ide-helper:models ?
     }
 
     #[Override]
@@ -78,6 +76,9 @@ final class Model extends ClassGenerator
             'dates' => $this->readColumnsFromTable($this->tableName)->filter(
                 static fn (array $column): bool => in_array($column['majorType'], ['datetime', 'date'], true),
             )->pluck('name'),
+            'booleans' => $this->readColumnsFromTable($this->tableName)->filter(
+                static fn (array $column): bool => $column['majorType'] === 'bool',
+            )->pluck('name'),
             'fillable' => $this->readColumnsFromTable($this->tableName)->filter(
                 static fn (array $column): bool => !in_array(
                     $column['name'],
@@ -97,8 +98,9 @@ final class Model extends ClassGenerator
             'hasSoftDelete' => $this->readColumnsFromTable($this->tableName)->filter(
                 static fn (array $column): bool => $column['name'] === 'deleted_at',
             )->count() > 0,
-            'resource' => $this->resource,
-
+            'hasPublishedAt' => $this->readColumnsFromTable($this->tableName)->filter(
+                static fn (array $column): bool => $column['name'] === 'published_at',
+            )->count() > 0,
             'relations' => $this->relations,
         ])->render();
     }

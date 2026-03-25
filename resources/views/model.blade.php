@@ -34,6 +34,9 @@ namespace {{ $modelNameSpace }};
             'Brackets\Translatable\Traits\HasTranslations',
         ]);
     }
+    if ($hasPublishedAt) {
+        $uses[] = 'Brackets\Craftable\Traits\PublishableTrait';
+    }
     if ($fillable) {
         foreach ($fillable as $fillableColumn) {
             if ($fillableColumn === "created_by_admin_user_id") {
@@ -50,6 +53,12 @@ namespace {{ $modelNameSpace }};
     }
     if (isset($relations['belongsToMany']) && count($relations['belongsToMany'])) {
         $uses[] = 'Illuminate\Database\Eloquent\Relations\BelongsToMany';
+        foreach ($relations['belongsToMany'] as $belongsToMany) {
+            $relatedNamespace = implode('\\', array_slice(explode('\\', $belongsToMany['related_model']), 0, -1));
+            if ($relatedNamespace !== $modelNameSpace) {
+                $uses[] = $belongsToMany['related_model'];
+            }
+        }
     }
     $uses = Arr::sort($uses);
 @endphp
@@ -66,6 +75,9 @@ class {{ $modelBaseName }} extends Model
     ];
     if($hasSoftDelete) {
         $traitUses[] = 'SoftDeletes';
+    }
+    if($hasPublishedAt) {
+        $traitUses[] = 'PublishableTrait';
     }
     if($hasRoles) {
         $traitUses[] = 'HasRoles';
@@ -131,30 +143,19 @@ class {{ $modelBaseName }} extends Model
 @endforeach
     ];
 @endif
-
-    /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $appends = ['resource_url'];
 @if (!$timestamps)
 
     public $timestamps = false;
 @endif
-
-    public function getResourceUrlAttribute(): string
-    {
-        return url('/admin/{{$resource}}/' . $this->getKey());
-    }
 @if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
 
 @foreach($relations['belongsToMany'] as $belongsToMany)
     public function {{ $belongsToMany['related_table'] }}(): BelongsToMany {
-        return $this->belongsToMany({{ $belongsToMany['related_model_class'] }}, '{{ $belongsToMany['relation_table'] }}', '{{ $belongsToMany['foreign_key'] }}', '{{ $belongsToMany['related_key'] }}');
+        return $this->belongsToMany({{ $belongsToMany['related_model_name'] }}::class, '{{ $belongsToMany['relation_table'] }}', '{{ $belongsToMany['foreign_key'] }}', '{{ $belongsToMany['related_key'] }}');
     }
 @endforeach
 @endif
-@if (count($dates) > 0)
+@if (count($dates) > 0 || count($booleans) > 0)
 
     /**
      * @return array<string>
@@ -162,6 +163,9 @@ class {{ $modelBaseName }} extends Model
     protected function casts(): array
     {
         return [
+@foreach($booleans as $boolean)
+            '{{ $boolean }}' => 'boolean',
+@endforeach
 @foreach($dates as $date)
             '{{ $date }}' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
 @endforeach

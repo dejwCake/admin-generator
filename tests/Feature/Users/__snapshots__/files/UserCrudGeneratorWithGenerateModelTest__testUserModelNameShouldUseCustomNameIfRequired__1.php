@@ -32,8 +32,6 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
      * @var array<int, string>
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
@@ -41,19 +39,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'remember_token',
     ];
-
-    /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $appends = [
-        'resource_url',
-    ];
-
-    public function getResourceUrlAttribute(): string
-    {
-        return url('/admin/auth-users/' . $this->getKey());
-    }
 
     /**
      * Send the password reset notification.

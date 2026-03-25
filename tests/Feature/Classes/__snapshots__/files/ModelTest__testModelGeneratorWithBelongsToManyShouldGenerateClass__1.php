@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Brackets\Craftable\Traits\CreatedByAdminUserTrait;
+use Brackets\Craftable\Traits\PublishableTrait;
 use Brackets\Craftable\Traits\UpdatedByAdminUserTrait;
 use Brackets\Translatable\Traits\HasTranslations;
 use Carbon\CarbonInterface;
@@ -18,6 +19,7 @@ class Category extends Model
     use CreatedByAdminUserTrait;
     use HasFactory;
     use HasTranslations;
+    use PublishableTrait;
     use SoftDeletes;
     use UpdatedByAdminUserTrait;
 
@@ -55,19 +57,8 @@ class Category extends Model
         'description',
     ];
 
-    /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $appends = ['resource_url'];
-
-    public function getResourceUrlAttribute(): string
-    {
-        return url('/admin/categories/' . $this->getKey());
-    }
-
     public function posts(): BelongsToMany {
-        return $this->belongsToMany(App\Models\Post::class, 'category_post', 'category_id', 'post_id');
+        return $this->belongsToMany(Post::class, 'category_post', 'category_id', 'post_id');
     }
 
     /**
@@ -76,6 +67,8 @@ class Category extends Model
     protected function casts(): array
     {
         return [
+            'enabled' => 'boolean',
+            'send' => 'boolean',
             'published_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'date_start' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'date_time_end' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,

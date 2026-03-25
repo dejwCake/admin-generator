@@ -44,6 +44,12 @@ namespace {{ $modelNameSpace }};
     }
     if (isset($relations['belongsToMany']) && count($relations['belongsToMany'])) {
         $uses[] = 'Illuminate\Database\Eloquent\Relations\BelongsToMany';
+        foreach ($relations['belongsToMany'] as $belongsToMany) {
+            $relatedNamespace = implode('\\', array_slice(explode('\\', $belongsToMany['related_model']), 0, -1));
+            if ($relatedNamespace !== $modelNameSpace) {
+                $uses[] = $belongsToMany['related_model'];
+            }
+        }
     }
     $uses = Arr::sort($uses);
 @endphp
@@ -96,8 +102,6 @@ class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEmail
 @if (count($hidden) > 0)
 
     /**
-     * Get the attributes that should be cast.
-     *
      * @var array<int, string>
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
@@ -121,23 +125,10 @@ class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEmail
 @endforeach
     ];
 @endif
-
-    /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $appends = [
-        'resource_url',
-    ];
 @if (!$timestamps)
 
     public $timestamps = false;
 @endif
-
-    public function getResourceUrlAttribute(): string
-    {
-        return url('/admin/{{$resource}}/' . $this->getKey());
-    }
 
     /**
      * Send the password reset notification.
@@ -153,11 +144,11 @@ class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEmail
 
 @foreach($relations['belongsToMany'] as $belongsToMany)
     public function {{ $belongsToMany['related_table'] }}(): BelongsToMany {
-        return $this->belongsToMany({{ $belongsToMany['related_model_class'] }}, '{{ $belongsToMany['relation_table'] }}', '{{ $belongsToMany['foreign_key'] }}', '{{ $belongsToMany['related_key'] }}');
+        return $this->belongsToMany({{ $belongsToMany['related_model_name'] }}::class, '{{ $belongsToMany['relation_table'] }}', '{{ $belongsToMany['foreign_key'] }}', '{{ $belongsToMany['related_key'] }}');
     }
 @endforeach
 @endif
-@if (count($dates) > 0)
+@if (count($dates) > 0 || count($booleans) > 0)
 
     /**
      * @return array<string>
@@ -165,6 +156,9 @@ class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEmail
     protected function casts(): array
     {
         return [
+@foreach($booleans as $boolean)
+            '{{ $boolean }}' => 'boolean',
+@endforeach
 @foreach($dates as $date)
             '{{ $date }}' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
 @endforeach

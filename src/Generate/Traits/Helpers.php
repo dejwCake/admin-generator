@@ -42,10 +42,7 @@ trait Helpers
                     'related_table' => $belongsToMany,
                     'related_model' => $belongsToMany === 'roles'
                         ? 'Spatie\\Permission\\Models\\Role'
-                        : 'App\\Models\\' . Str::studly(Str::singular($belongsToMany),),
-                    'related_model_class' => $belongsToMany === 'roles'
-                        ? 'Spatie\\Permission\\Models\\Role::class'
-                        : 'App\\Models\\' . Str::studly(Str::singular($belongsToMany)) . '::class',
+                        : 'App\\Models\\' . Str::studly(Str::singular($belongsToMany)),
                     'related_model_name' => Str::studly(Str::singular($belongsToMany)),
                     'related_model_name_plural' => Str::studly($belongsToMany),
                     'related_model_variable_name' => lcfirst(Str::singular(class_basename($belongsToMany))),
