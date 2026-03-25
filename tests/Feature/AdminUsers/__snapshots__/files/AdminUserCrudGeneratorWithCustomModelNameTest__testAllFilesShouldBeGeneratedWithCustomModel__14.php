@@ -1,6 +1,6 @@
 @extends('brackets/admin-ui::admin.layout.default')
 
-@section('title', trans('admin.user.actions.edit', ['name' => $user->first_name]))
+@section('title', trans('admin.user.actions.create'))
 
 @section('body')
 
@@ -10,14 +10,13 @@
 
             <user-form
                 :action="'{{ $action }}'"
-                :data="{{ $user->toJson() }}"
                 :activation="!!'{{ $activation }}'"
                 inline-template>
 
-                <form class="form-horizontal form-edit" method="post" @submit.prevent="onSubmit" :action="action">
+                <form class="form-horizontal form-create" method="post" @submit.prevent="onSubmit" :action="action">
 
                     <div class="card-header">
-                        <i class="fa fa-pencil"></i> {{ trans('admin.user.actions.edit', ['name' => $user->first_name]) }}
+                        <i class="fa fa-plus"></i> {{ trans('admin.user.actions.create') }}
                     </div>
 
                     <div class="card-body">

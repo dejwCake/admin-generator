@@ -50,6 +50,7 @@ class UserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
         self::assertFileExists($formJsPath);
+
         self::assertMatchesFileSnapshot($controllerPath);
         self::assertMatchesFileSnapshot($storeRequestPath);
         self::assertMatchesFileSnapshot($updateRequestPath);

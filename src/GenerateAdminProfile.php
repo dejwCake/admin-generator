@@ -39,11 +39,11 @@ final class GenerateAdminProfile extends Command
     public function handle(): void
     {
         $tableNameArgument = $this->argument('table_name') ?: 'admin_users';
-        $modelOption = $this->option('model-name');
-        $controllerOption = $this->option('controller-name') ?: 'ProfileController';
-        $force = $this->option('force');
+        $modelNameOption = $this->option('model-name');
+        $controllerNameOption = $this->option('controller-name') ?: 'ProfileController';
+        $forceOption = $this->option('force');
 
-        if ($force) {
+        if ($forceOption) {
             //remove all files
             $this->files->delete(app_path('Http/Controllers/Admin/ProfileController.php'));
             $this->files->deleteDirectory(resource_path('js/admin/profile-edit-profile'));
@@ -53,22 +53,22 @@ final class GenerateAdminProfile extends Command
 
         $this->call('admin:generate:controller', [
             'table_name' => $tableNameArgument,
-            'class_name' => $controllerOption,
-            '--model-name' => $modelOption,
+            'class_name' => $controllerNameOption,
+            '--model-name' => $modelNameOption,
             '--template' => 'profile',
         ]);
 
         $this->call('admin:generate:routes', [
             'table_name' => $tableNameArgument,
-            '--model-name' => $modelOption,
-            '--controller-name' => $controllerOption,
+            '--model-name' => $modelNameOption,
+            '--controller-name' => $controllerNameOption,
             '--template' => 'profile',
         ]);
         // TODO add this route to the dropdown user-menu
 
         $this->call('admin:generate:full-form', [
             'table_name' => $tableNameArgument,
-            '--model-name' => $modelOption,
+            '--model-name' => $modelNameOption,
             '--file-name' => 'profile/edit-profile',
             '--route' => 'admin/profile',
             '--template' => 'profile',
@@ -76,7 +76,7 @@ final class GenerateAdminProfile extends Command
 
         $this->call('admin:generate:full-form', [
             'table_name' => $tableNameArgument,
-            '--model-name' => $modelOption,
+            '--model-name' => $modelNameOption,
             '--file-name' => 'profile/edit-password',
             '--route' => 'admin/password',
             '--template' => 'profile.password',

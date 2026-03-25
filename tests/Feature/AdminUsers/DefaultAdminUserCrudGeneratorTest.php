@@ -13,13 +13,14 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
     use DatabaseMigrations;
 
     #[DataProvider('getCases')]
-    public function testAllFilesShouldBeGeneratedUnderDefaultNamespace(bool $seed): void
+    public function testAllFilesShouldBeGeneratedUnderDefaultNamespace(array $options): void
     {
         $controllerPath = base_path('app/Http/Controllers/Admin/AdminUsersController.php');
         $indexRequestPath = base_path('app/Http/Requests/Admin/AdminUser/IndexAdminUser.php');
         $storeRequestPath = base_path('app/Http/Requests/Admin/AdminUser/StoreAdminUser.php');
         $updateRequestPath = base_path('app/Http/Requests/Admin/AdminUser/UpdateAdminUser.php');
         $destroyRequestPath = base_path('app/Http/Requests/Admin/AdminUser/DestroyAdminUser.php');
+        $bulkDestroyRequestPath = base_path('app/Http/Requests/Admin/AdminUser/BulkDestroyAdminUser.php');
         $impersonalLoginRequestPath = base_path('app/Http/Requests/Admin/AdminUser/ImpersonalLoginAdminUser.php');
         $exportPath = base_path('app/Exports/AdminUsersExport.php');
         $routesPath = base_path('routes/admin.php');
@@ -38,6 +39,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertFileDoesNotExist($storeRequestPath);
         self::assertFileDoesNotExist($updateRequestPath);
         self::assertFileDoesNotExist($destroyRequestPath);
+        self::assertFileDoesNotExist($bulkDestroyRequestPath);
         self::assertFileDoesNotExist($impersonalLoginRequestPath);
         self::assertFileDoesNotExist($exportPath);
         self::assertFileDoesNotExist($indexPath);
@@ -48,20 +50,24 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertFileDoesNotExist($formJsPath);
         self::assertFileDoesNotExist($indexJsPath);
 
-
-        if ($seed) {
-            $this->artisan('admin:generate:admin-user', ['--with-export' => true, '--seed' => true]);
-        } else {
-            $this->artisan('admin:generate:admin-user', ['--with-export' => true]);
-        }
+        $this->artisan('admin:generate:admin-user', $options);
 
         self::assertFileExists($controllerPath);
         self::assertFileExists($indexRequestPath);
         self::assertFileExists($storeRequestPath);
         self::assertFileExists($updateRequestPath);
         self::assertFileExists($destroyRequestPath);
+        if (!array_key_exists('--without-bulk', $options) || $options['--without-bulk'] !== true) {
+            self::assertFileExists($bulkDestroyRequestPath);
+        } else {
+            self::assertFileDoesNotExist($bulkDestroyRequestPath);
+        }
         self::assertFileExists($impersonalLoginRequestPath);
-        self::assertFileExists($exportPath);
+        if (array_key_exists('--with-export', $options) && $options['--with-export'] === true) {
+            self::assertFileExists($exportPath);
+        } else {
+            self::assertFileDoesNotExist($exportPath);
+        }
         self::assertFileExists($indexPath);
         self::assertFileExists($listingJsPath);
         self::assertFileExists($formPath);
@@ -76,8 +82,13 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertMatchesFileSnapshot($storeRequestPath);
         self::assertMatchesFileSnapshot($updateRequestPath);
         self::assertMatchesFileSnapshot($destroyRequestPath);
+        if (!array_key_exists('--without-bulk', $options) || $options['--without-bulk'] !== true) {
+            self::assertMatchesFileSnapshot($bulkDestroyRequestPath);
+        }
         self::assertMatchesFileSnapshot($impersonalLoginRequestPath);
-        self::assertMatchesFileSnapshot($exportPath);
+        if (array_key_exists('--with-export', $options) && $options['--with-export'] === true) {
+            self::assertMatchesFileSnapshot($exportPath);
+        }
         self::assertMatchesFileSnapshot($routesPath);
         self::assertMatchesFileSnapshot($indexPath);
         self::assertMatchesFileSnapshot($listingJsPath);
@@ -89,16 +100,20 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertMatchesFileSnapshot($factoryPath);
         self::assertMatchesFileSnapshot($langPath);
 
-        if ($seed) {
+        if (array_key_exists('--seed', $options) && $options['--seed'] === true) {
             self::assertDatabaseCount('admin_users', 20);
         }
     }
 
     public static function getCases(): iterable
     {
-        yield 'without seed' => [false];
+        yield 'empty' => ['options' => []];
 
         //disabled for now, because it's not working properly
-        //yield 'with seed' => [true];
+//        yield 'with seed' => ['options' => ['--seed' => true]];
+
+        yield 'with export' => ['options' => ['--with-export' => true]];
+
+        yield 'without bulk' => ['options' => ['--without-bulk' => true]];
     }
 }

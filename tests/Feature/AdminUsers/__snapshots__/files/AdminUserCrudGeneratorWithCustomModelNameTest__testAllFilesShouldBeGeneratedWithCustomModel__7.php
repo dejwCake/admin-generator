@@ -2,52 +2,30 @@
 
 declare(strict_types=1);
 
-namespace App\Exports;
+namespace App\Http\Requests\Admin\User;
 
-use App\Models\AdminUser;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use App\User;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Http\FormRequest;
 
-class AdminUsersExport implements FromCollection, WithMapping, WithHeadings
+/**
+ * @property User $user
+ */
+class ImpersonalLoginUser extends FormRequest
 {
     /**
-     * @return Collection
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
+     * Determine if the user is authorized to make this request.
      */
-    public function collection()
+    public function authorize(Gate $gate): bool
     {
-        return AdminUser::all();
-    }
-
-    public function headings(): array
-    {
-        return [
-            trans('admin.admin-user.columns.id'),
-            trans('admin.admin-user.columns.first_name'),
-            trans('admin.admin-user.columns.last_name'),
-            trans('admin.admin-user.columns.email'),
-            trans('admin.admin-user.columns.activated'),
-            trans('admin.admin-user.columns.forbidden'),
-            trans('admin.admin-user.columns.language'),
-        ];
+        return $gate->allows('admin.user.impersonal-login', $this->user);
     }
 
     /**
-     * @param AdminUser $adminUser
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * Get the validation rules that apply to the request.
      */
-    public function map($adminUser): array
+    public function rules(): array
     {
-        return [
-            $adminUser->id,
-            $adminUser->first_name,
-            $adminUser->last_name,
-            $adminUser->email,
-            $adminUser->activated,
-            $adminUser->forbidden,
-            $adminUser->language,
-        ];
+        return [];
     }
 }

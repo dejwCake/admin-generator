@@ -18,6 +18,7 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         $storeRequestPath = base_path('app/Http/Requests/Admin/User/StoreUser.php');
         $updateRequestPath = base_path('app/Http/Requests/Admin/User/UpdateUser.php');
         $destroyRequestPath = base_path('app/Http/Requests/Admin/User/DestroyUser.php');
+        $bulkDestroyRequestPath = base_path('app/Http/Requests/Admin/User/BulkDestroyUser.php');
         $impersonalLoginRequestPath = base_path('app/Http/Requests/Admin/User/ImpersonalLoginUser.php');
         $exportPath = base_path('app/Exports/AdminUsersExport.php');
         $routesPath = base_path('routes/admin.php');
@@ -36,6 +37,7 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         self::assertFileDoesNotExist($storeRequestPath);
         self::assertFileDoesNotExist($updateRequestPath);
         self::assertFileDoesNotExist($destroyRequestPath);
+        self::assertFileDoesNotExist($bulkDestroyRequestPath);
         self::assertFileDoesNotExist($impersonalLoginRequestPath);
         self::assertFileDoesNotExist($exportPath);
         self::assertFileDoesNotExist($listingJsPath);
@@ -46,7 +48,6 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         self::assertFileDoesNotExist($editPath);
         self::assertFileDoesNotExist($formJsPath);
         self::assertFileDoesNotExist($langPath);
-
 
         $this->artisan('admin:generate:admin-user', [
             '--controller-name' => 'Auth\\UsersController',
@@ -59,6 +60,7 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         self::assertFileExists($storeRequestPath);
         self::assertFileExists($updateRequestPath);
         self::assertFileExists($destroyRequestPath);
+        self::assertFileExists($bulkDestroyRequestPath);
         self::assertFileExists($impersonalLoginRequestPath);
         self::assertFileExists($exportPath);
         self::assertFileExists($routesPath);
@@ -77,6 +79,7 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         self::assertMatchesFileSnapshot($storeRequestPath);
         self::assertMatchesFileSnapshot($updateRequestPath);
         self::assertMatchesFileSnapshot($destroyRequestPath);
+        self::assertMatchesFileSnapshot($bulkDestroyRequestPath);
         self::assertMatchesFileSnapshot($impersonalLoginRequestPath);
         self::assertMatchesFileSnapshot($exportPath);
         self::assertMatchesFileSnapshot($routesPath);

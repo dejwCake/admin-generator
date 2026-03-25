@@ -2,51 +2,52 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Route;
+namespace App\Exports;
 
-/* Auto-generated admin routes */
-Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
-    ->prefix('admin')
-    ->name('admin/')
-    ->group(static function (): void {
-        Route::prefix('users')
-            ->name('users/')
-            ->group(static function (): void {
-                Route::get(
-                    '/',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'index'],
-                )->name('index');
-                Route::get(
-                    '/create',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'create'],
-                )->name('create');
-                Route::post(
-                    '/',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'store'],
-                )->name('store');
-                Route::get(
-                    '/{user}/impersonal-login',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'impersonalLogin'],
-                )->name('impersonal-login');
-                Route::get(
-                    '/{user}/edit',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'edit'],
-                )->name('edit');
-                Route::post(
-                    '/{user}',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'update'],
-                )->name('update');
-                Route::delete(
-                    '/{user}',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'destroy'],
-                )->name('destroy');
-                Route::get(
-                    '/export',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'export'],
-                )->name('export');
-                Route::get(
-                    '/{user}/resend-activation',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'resendActivationEmail'],
-                )->name('resend-activation-email');
-            });
-    });
+use App\Models\AdminUser;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
+
+class AdminUsersExport implements FromCollection, WithMapping, WithHeadings
+{
+    /**
+     * @return Collection
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
+     */
+    public function collection()
+    {
+        return AdminUser::all();
+    }
+
+    public function headings(): array
+    {
+        return [
+            trans('admin.admin-user.columns.id'),
+            trans('admin.admin-user.columns.first_name'),
+            trans('admin.admin-user.columns.last_name'),
+            trans('admin.admin-user.columns.email'),
+            trans('admin.admin-user.columns.activated'),
+            trans('admin.admin-user.columns.forbidden'),
+            trans('admin.admin-user.columns.language'),
+        ];
+    }
+
+    /**
+     * @param AdminUser $adminUser
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     */
+    public function map($adminUser): array
+    {
+        return [
+            $adminUser->id,
+            $adminUser->first_name,
+            $adminUser->last_name,
+            $adminUser->email,
+            $adminUser->activated,
+            $adminUser->forbidden,
+            $adminUser->language,
+        ];
+    }
+}

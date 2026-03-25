@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\User;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class UserFactory extends Factory
@@ -23,15 +23,11 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'first_name' => $this->faker->firstName,
-            'last_name' => $this->faker->lastName,
+            'name' => $this->faker->firstName,
             'email' => $this->faker->email,
+            'email_verified_at' => $this->faker->dateTime,
             'password' => bcrypt($this->faker->password),
             'remember_token' => null,
-            'activated' => true,
-            'forbidden' => $this->faker->boolean(),
-            'language' => 'en',
-            'deleted_at' => null,
             'created_at' => $this->faker->dateTime,
             'updated_at' => $this->faker->dateTime,
         ];
@@ -40,11 +36,9 @@ class UserFactory extends Factory
     /**
      * Indicate that the model's email address should be unverified.
      */
-    public function notActivated(): self
+    public function unverified(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => [
-            'activated' => false,
-        ]);
+        return $this->state(static fn (array $attributes) => ['email_verified_at' => null]);
     }
 }
