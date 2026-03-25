@@ -4,7 +4,10 @@
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/GenerateAdmin.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/GenerateAdminUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\CyclomaticComplexity" file="src/GenerateUser.php" method="handle"/>
+  <violation rule="PHPMD\Rule\Design\NpathComplexity" file="src/GenerateUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/GenerateUser.php" method="handle"/>
+  <violation rule="PHPMD\Rule\CyclomaticComplexity" file="tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
+  <violation rule="PHPMD\Rule\Design\NpathComplexity" file="tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
   <violation rule="PHPMD\Rule\Design\NumberOfChildren" file="tests/TestCase.php"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/UserTestCase.php" method="setUpDatabase"/>
 </phpmd-baseline>
