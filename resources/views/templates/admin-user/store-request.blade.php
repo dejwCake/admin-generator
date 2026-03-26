@@ -15,6 +15,7 @@ namespace {{ $classNamespace }};
         });
     }
     $uses = [
+        'Illuminate\Container\Container',
         'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Contracts\Config\Repository as Config',
         'Illuminate\Contracts\Hashing\Hasher',
@@ -33,9 +34,9 @@ use {{ $use }};
 @endforeach
 
 @if($translatable->count() > 0)
-class {{ $classBaseName }} extends TranslatableFormRequest
+final class {{ $classBaseName }} extends TranslatableFormRequest
 @else
-class {{ $classBaseName }} extends FormRequest
+final class {{ $classBaseName }} extends FormRequest
 @endif
 {
     /**
@@ -114,14 +115,14 @@ class {{ $classBaseName }} extends FormRequest
      */
     public function getModifiedData(): array
     {
-        $config = app(Config::class);
+        $config = Container::getInstance()->make(Config::class);
         assert($config instanceof Config);
         $data = $this->validated();
         if (!$config->get('admin-auth.activation_enabled')) {
             $data['activated'] = true;
         }
         if (isset($data['password'])) {
-            $hasher = app(Hasher::class);
+            $hasher = Container::getInstance()->make(Hasher::class);
             assert($hasher instanceof Hasher);
             $data['password'] = $hasher->make($data['password']);
         }

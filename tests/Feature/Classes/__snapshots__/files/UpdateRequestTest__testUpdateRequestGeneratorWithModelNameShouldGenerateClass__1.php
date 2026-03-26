@@ -13,7 +13,7 @@ use Illuminate\Validation\Rule;
 /**
  * @property Cat $cat
  */
-class UpdateCat extends TranslatableFormRequest
+final class UpdateCat extends TranslatableFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

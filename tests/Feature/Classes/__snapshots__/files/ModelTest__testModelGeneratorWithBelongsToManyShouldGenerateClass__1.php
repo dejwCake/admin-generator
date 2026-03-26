@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Category extends Model
+final class Category extends Model
 {
     use CreatedByAdminUserTrait;
     use HasFactory;
@@ -50,14 +50,14 @@ class Category extends Model
      * These attributes are translatable
      *
      * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $translatable = [
+    protected array $translatable = [
         'text',
         'description',
     ];
 
-    public function posts(): BelongsToMany {
+    public function posts(): BelongsToMany
+    {
         return $this->belongsToMany(Post::class, 'category_post', 'category_id', 'post_id');
     }
 

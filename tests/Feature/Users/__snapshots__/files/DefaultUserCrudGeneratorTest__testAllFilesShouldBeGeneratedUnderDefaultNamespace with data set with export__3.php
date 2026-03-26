@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\User;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreUser extends FormRequest
+final class StoreUser extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -41,7 +42,7 @@ class StoreUser extends FormRequest
     {
         $data = $this->validated();
         if (isset($data['password'])) {
-            $hasher = app(Hasher::class);
+            $hasher = Container::getInstance()->make(Hasher::class);
             assert($hasher instanceof Hasher);
             $data['password'] = $hasher->make($data['password']);
         }

@@ -11,7 +11,7 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @property Category $category
  */
-class ImpersonalLoginCategory extends FormRequest
+final class ImpersonalLoginCategory extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

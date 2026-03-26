@@ -7,7 +7,7 @@ namespace App\Http\Requests\Admin\AdminUser;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 
-class BulkDestroyAdminUser extends FormRequest
+final class BulkDestroyAdminUser extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,7 @@ class BulkDestroyAdminUser extends FormRequest
     public function rules(): array
     {
         return [
-            'ids.*' => 'integer',
+            'ids.*' => ['integer'],
         ];
     }
 }

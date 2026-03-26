@@ -7,7 +7,7 @@ namespace App\Http\Requests\Admin\Category;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 
-class BulkDestroyCategory extends FormRequest
+final class BulkDestroyCategory extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,7 @@ class BulkDestroyCategory extends FormRequest
     public function rules(): array
     {
         return [
-            'ids.*' => 'integer',
+            'ids.*' => ['integer'],
         ];
     }
 }

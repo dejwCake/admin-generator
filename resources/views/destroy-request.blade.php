@@ -21,7 +21,7 @@ use {{ $use }};
 /**
  * @property {{ $modelBaseName }} ${{ $modelVariableName }}
  */
-class {{ $classBaseName }} extends FormRequest
+final class {{ $classBaseName }} extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

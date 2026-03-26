@@ -9,7 +9,7 @@ namespace {{ $classNamespace }};
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 
-class {{ $classBaseName }} extends FormRequest
+final class {{ $classBaseName }} extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,7 @@ class {{ $classBaseName }} extends FormRequest
     public function rules(): array
     {
         return [
-            'ids.*' => 'integer',
+            'ids.*' => ['integer'],
         ];
     }
 }

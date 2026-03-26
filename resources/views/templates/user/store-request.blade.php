@@ -15,6 +15,7 @@ namespace {{ $classNamespace }};
         });
     }
     $uses = [
+        'Illuminate\Container\Container',
         'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Contracts\Hashing\Hasher',
         'Illuminate\Validation\Rule',
@@ -32,9 +33,9 @@ use {{ $use }};
 @endforeach
 
 @if($translatable->count() > 0)
-class {{ $classBaseName }} extends TranslatableFormRequest
+final class {{ $classBaseName }} extends TranslatableFormRequest
 @else
-class {{ $classBaseName }} extends FormRequest
+final class {{ $classBaseName }} extends FormRequest
 @endif
 {
     /**
@@ -104,7 +105,7 @@ class {{ $classBaseName }} extends FormRequest
     {
         $data = $this->validated();
         if (isset($data['password'])) {
-            $hasher = app(Hasher::class);
+            $hasher = Container::getInstance()->make(Hasher::class);
             assert($hasher instanceof Hasher);
             $data['password'] = $hasher->make($data['password']);
         }

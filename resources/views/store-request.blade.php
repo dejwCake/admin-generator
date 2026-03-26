@@ -31,9 +31,9 @@ use {{ $use }};
 @endforeach
 
 @if($translatable->count() > 0)
-class {{ $classBaseName }} extends TranslatableFormRequest
+final class {{ $classBaseName }} extends TranslatableFormRequest
 @else
-class {{ $classBaseName }} extends FormRequest
+final class {{ $classBaseName }} extends FormRequest
 @endif
 {
     /**

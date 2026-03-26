@@ -11,7 +11,7 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @property User $user
  */
-class DestroyUser extends FormRequest
+final class DestroyUser extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Admin\AdminUser;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StoreAdminUser extends FormRequest
+final class StoreAdminUser extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -48,14 +49,14 @@ class StoreAdminUser extends FormRequest
      */
     public function getModifiedData(): array
     {
-        $config = app(Config::class);
+        $config = Container::getInstance()->make(Config::class);
         assert($config instanceof Config);
         $data = $this->validated();
         if (!$config->get('admin-auth.activation_enabled')) {
             $data['activated'] = true;
         }
         if (isset($data['password'])) {
-            $hasher = app(Hasher::class);
+            $hasher = Container::getInstance()->make(Hasher::class);
             assert($hasher instanceof Hasher);
             $data['password'] = $hasher->make($data['password']);
         }

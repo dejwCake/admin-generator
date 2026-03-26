@@ -67,7 +67,7 @@ namespace {{ $modelNameSpace }};
 use {{ $use }};
 @endforeach
 
-class {{ $modelBaseName }} extends Model
+final class {{ $modelBaseName }} extends Model
 {
 @php
     $traitUses = [
@@ -135,9 +135,8 @@ class {{ $modelBaseName }} extends Model
      * These attributes are translatable
      *
      * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $translatable = [
+    protected array $translatable = [
 @foreach($translatable as $translatableField)
         '{{ $translatableField }}',
 @endforeach
@@ -150,7 +149,8 @@ class {{ $modelBaseName }} extends Model
 @if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
 
 @foreach($relations['belongsToMany'] as $belongsToMany)
-    public function {{ $belongsToMany['related_table'] }}(): BelongsToMany {
+    public function {{ $belongsToMany['related_table'] }}(): BelongsToMany
+    {
         return $this->belongsToMany({{ $belongsToMany['related_model_name'] }}::class, '{{ $belongsToMany['relation_table'] }}', '{{ $belongsToMany['foreign_key'] }}', '{{ $belongsToMany['related_key'] }}');
     }
 @endforeach

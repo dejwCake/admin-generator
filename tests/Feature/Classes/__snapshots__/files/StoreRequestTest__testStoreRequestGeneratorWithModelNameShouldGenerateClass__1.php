@@ -8,7 +8,7 @@ use Brackets\Translatable\Http\Requests\TranslatableFormRequest;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Validation\Rule;
 
-class StoreCat extends TranslatableFormRequest
+final class StoreCat extends TranslatableFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

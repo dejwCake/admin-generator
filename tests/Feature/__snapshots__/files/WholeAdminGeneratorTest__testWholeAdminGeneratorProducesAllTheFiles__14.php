@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Category extends Model
+final class Category extends Model
 {
     use CreatedByAdminUserTrait;
     use HasFactory;
@@ -49,9 +49,8 @@ class Category extends Model
      * These attributes are translatable
      *
      * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $translatable = [
+    protected array $translatable = [
         'text',
         'description',
     ];

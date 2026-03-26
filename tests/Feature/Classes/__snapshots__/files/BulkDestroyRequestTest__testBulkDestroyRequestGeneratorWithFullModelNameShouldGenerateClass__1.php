@@ -7,7 +7,7 @@ namespace App\Http\Requests\Admin\Cat;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 
-class BulkDestroyCat extends FormRequest
+final class BulkDestroyCat extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,7 @@ class BulkDestroyCat extends FormRequest
     public function rules(): array
     {
         return [
-            'ids.*' => 'integer',
+            'ids.*' => ['integer'],
         ];
     }
 }
