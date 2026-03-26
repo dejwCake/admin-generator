@@ -62,18 +62,29 @@ final class {{ $classBaseName }} extends FormRequest
         return [
 @foreach($standardColumn as $column)
 @if(!($column['name'] === "updated_by_admin_user_id" || $column['name'] === "created_by_admin_user_id" ))
-            '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
+            '{{ $column['name'] }}' => [
+                {!! implode(",\n                ", (array) $column['serverUpdateRules']) !!},
+            ],
 @endif
 @endforeach
 @if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
 
 @foreach($relations['belongsToMany'] as $belongsToMany)
-            '{{ $belongsToMany['related_table'] }}' => [{!! implode(', ', ['\'sometimes\'', '\'array\'']) !!}],
+            '{{ $belongsToMany['related_table'] }}' => [
+                'sometimes',
+                'array',
+            ],
 @endforeach
 @endif
 @if($containsPublishedAtColumn)
-            'publish_now' => ['nullable', 'boolean'],
-            'unpublish_now' => ['nullable', 'boolean'],
+            'publish_now' => [
+                'nullable',
+                'boolean',
+            ],
+            'unpublish_now' => [
+                'nullable',
+                'boolean',
+            ],
 @endif
         ];
     }
@@ -87,7 +98,9 @@ final class {{ $classBaseName }} extends FormRequest
     {
         return [
 @foreach($translatableColumns as $column)
-            '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
+            '{{ $column['name'] }}' => [
+                {!! implode(",\n                ", (array) $column['serverUpdateRules']) !!},
+            ],
 @endforeach
         ];
     }
@@ -100,18 +113,29 @@ final class {{ $classBaseName }} extends FormRequest
         return [
 @foreach($columns as $column)
 @if(!($column['name'] === "updated_by_admin_user_id" || $column['name'] === "created_by_admin_user_id" ))
-            '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
+            '{{ $column['name'] }}' => [
+                {!! implode(",\n                ", (array) $column['serverUpdateRules']) !!},
+            ],
 @endif
 @endforeach
 @if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
 
 @foreach($relations['belongsToMany'] as $belongsToMany)
-            '{{ $belongsToMany['related_table'] }}' => [{!! implode(', ', ['\'sometimes\'', '\'array\'']) !!}],
+            '{{ $belongsToMany['related_table'] }}' => [
+                'sometimes',
+                'array',
+            ],
 @endforeach
 @endif
 @if($containsPublishedAtColumn)
-            'publish_now' => ['nullable', 'boolean'],
-            'unpublish_now' => ['nullable', 'boolean'],
+            'publish_now' => [
+                'nullable',
+                'boolean',
+            ],
+            'unpublish_now' => [
+                'nullable',
+                'boolean',
+            ],
 @endif
         ];
     }

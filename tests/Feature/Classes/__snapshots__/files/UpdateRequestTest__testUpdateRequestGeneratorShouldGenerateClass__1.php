@@ -29,21 +29,64 @@ final class UpdateCategory extends TranslatableFormRequest
     public function untranslatableRules(): array
     {
         return [
-            'user_id' => ['nullable', 'integer'],
-            'title' => ['sometimes', 'string'],
-            'slug' => ['sometimes', Rule::unique('categories', 'slug')
-                ->ignore($this->category->getKey(), $this->category->getKeyName()), 'string'],
-            'perex' => ['nullable', 'string'],
-            'published_at' => ['nullable', 'date'],
-            'date_start' => ['nullable', 'date'],
-            'time_start' => ['nullable', Rule::date()->format('H:i:s')],
-            'date_time_end' => ['nullable', 'date'],
-            'enabled' => ['sometimes', 'boolean'],
-            'send' => ['sometimes', 'boolean'],
-            'price' => ['nullable', 'numeric'],
-            'views' => ['sometimes', 'integer'],
-            'publish_now' => ['nullable', 'boolean'],
-            'unpublish_now' => ['nullable', 'boolean'],
+            'user_id' => [
+                'nullable',
+                'integer',
+            ],
+            'title' => [
+                'sometimes',
+                'string',
+            ],
+            'slug' => [
+                'sometimes',
+                Rule::unique('categories', 'slug')
+                ->ignore($this->category->getKey(), $this->category->getKeyName()),
+                'string',
+            ],
+            'perex' => [
+                'nullable',
+                'string',
+            ],
+            'published_at' => [
+                'nullable',
+                'date',
+            ],
+            'date_start' => [
+                'nullable',
+                'date',
+            ],
+            'time_start' => [
+                'nullable',
+                Rule::date()->format('H:i:s'),
+            ],
+            'date_time_end' => [
+                'nullable',
+                'date',
+            ],
+            'enabled' => [
+                'sometimes',
+                'boolean',
+            ],
+            'send' => [
+                'sometimes',
+                'boolean',
+            ],
+            'price' => [
+                'nullable',
+                'numeric',
+            ],
+            'views' => [
+                'sometimes',
+                'integer',
+            ],
+            'publish_now' => [
+                'nullable',
+                'boolean',
+            ],
+            'unpublish_now' => [
+                'nullable',
+                'boolean',
+            ],
         ];
     }
 
@@ -55,8 +98,14 @@ final class UpdateCategory extends TranslatableFormRequest
     public function translatableRules(string $locale): array
     {
         return [
-            'text' => ['sometimes', 'string'],
-            'description' => ['sometimes', 'string'],
+            'text' => [
+                'sometimes',
+                'string',
+            ],
+            'description' => [
+                'sometimes',
+                'string',
+            ],
         ];
     }
 

@@ -36,10 +36,22 @@ final class IndexUser extends FormRequest
                 ]),
                 'nullable',
             ],
-            'orderDirection' => [Rule::in(['asc', 'desc']), 'nullable'],
-            'search' => ['string', 'nullable'],
-            'page' => ['integer', 'nullable'],
-            'per_page' => ['integer', 'nullable'],
+            'orderDirection' => [
+                Rule::in(['asc', 'desc']),
+                'nullable',
+            ],
+            'search' => [
+                'string',
+                'nullable',
+            ],
+            'page' => [
+                'integer',
+                'nullable',
+            ],
+            'per_page' => [
+                'integer',
+                'nullable',
+            ],
         ];
     }
 }

@@ -23,7 +23,9 @@ final class BulkDestroyCategory extends FormRequest
     public function rules(): array
     {
         return [
-            'ids.*' => ['integer'],
+            'ids.*' => [
+                'integer',
+            ],
         ];
     }
 }

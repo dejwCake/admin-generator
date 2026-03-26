@@ -18,8 +18,10 @@ namespace {{ $classNamespace }};
         'Illuminate\Container\Container',
         'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Contracts\Hashing\Hasher',
-        'Illuminate\Validation\Rule',
     ];
+    if ($hasRuleUsage) {
+        $uses[] = 'Illuminate\Validation\Rule';
+    }
     if ($translatable->count() > 0) {
         $uses[] = 'Brackets\Translatable\Http\Requests\TranslatableFormRequest';
     } else {
@@ -54,12 +56,16 @@ final class {{ $classBaseName }} extends FormRequest
     {
         return [
 @foreach($standardColumn as $column)
-            '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverStoreRules']) !!}],
+            '{{ $column['name'] }}' => [
+                {!! implode(",\n                ", (array) $column['serverStoreRules']) !!},
+            ],
 @endforeach
 @if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
 
 @foreach($relations['belongsToMany'] as $belongsToMany)
-            '{{ $belongsToMany['related_table'] }}' => [{!! implode(', ', ['\'array\'']) !!}],
+            '{{ $belongsToMany['related_table'] }}' => [
+                'array',
+            ],
 @endforeach
 @endif
         ];
@@ -74,7 +80,9 @@ final class {{ $classBaseName }} extends FormRequest
     {
         return [
 @foreach($translatableColumns as $column)
-            '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverStoreRules']) !!}],
+            '{{ $column['name'] }}' => [
+                {!! implode(",\n                ", (array) $column['serverStoreRules']) !!},
+            ],
 @endforeach
         ];
     }
@@ -86,12 +94,16 @@ final class {{ $classBaseName }} extends FormRequest
     {
         return [
 @foreach($columns as $column)
-            '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverStoreRules']) !!}],
+            '{{ $column['name'] }}' => [
+                {!! implode(",\n                ", (array) $column['serverStoreRules']) !!},
+            ],
 @endforeach
 @if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
 
 @foreach($relations['belongsToMany'] as $belongsToMany)
-            '{{ $belongsToMany['related_table'] }}' => [{!! implode(', ', ['\'array\'']) !!}],
+            '{{ $belongsToMany['related_table'] }}' => [
+                'array',
+            ],
 @endforeach
 @endif
         ];

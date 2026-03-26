@@ -27,18 +27,46 @@ final class StoreUser extends FormRequest
     public function rules(Config $config): array
     {
         $rules = [
-            'first_name' => ['nullable', 'string'],
-            'last_name' => ['nullable', 'string'],
-            'email' => ['required', 'email', Rule::unique('admin_users', 'email'), 'string'],
-            'password' => ['required', 'confirmed', 'min:7', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/', 'string'],
-            'forbidden' => ['required', 'boolean'],
-            'language' => ['required', 'string'],
+            'first_name' => [
+                'nullable',
+                'string',
+            ],
+            'last_name' => [
+                'nullable',
+                'string',
+            ],
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('admin_users', 'email'),
+                'string',
+            ],
+            'password' => [
+                'required',
+                'confirmed',
+                'min:7',
+                'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/',
+                'string',
+            ],
+            'forbidden' => [
+                'required',
+                'boolean',
+            ],
+            'language' => [
+                'required',
+                'string',
+            ],
 
-            'roles' => ['array'],
+            'roles' => [
+                'array',
+            ],
         ];
 
         if ($config->get('admin-auth.activation_enabled')) {
-            $rules['activated'] = ['required', 'boolean'];
+            $rules['activated'] = [
+                'required',
+                'boolean',
+            ];
         }
 
         return $rules;

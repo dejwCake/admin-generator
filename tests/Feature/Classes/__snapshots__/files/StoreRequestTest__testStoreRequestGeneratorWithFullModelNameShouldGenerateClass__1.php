@@ -24,18 +24,55 @@ final class StoreCat extends TranslatableFormRequest
     public function untranslatableRules(): array
     {
         return [
-            'user_id' => ['nullable', 'integer'],
-            'title' => ['required', 'string'],
-            'slug' => ['required', Rule::unique('categories', 'slug'), 'string'],
-            'perex' => ['nullable', 'string'],
-            'published_at' => ['nullable', 'date'],
-            'date_start' => ['nullable', 'date'],
-            'time_start' => ['nullable', Rule::date()->format('H:i:s')],
-            'date_time_end' => ['nullable', 'date'],
-            'enabled' => ['required', 'boolean'],
-            'send' => ['required', 'boolean'],
-            'price' => ['nullable', 'numeric'],
-            'views' => ['required', 'integer'],
+            'user_id' => [
+                'nullable',
+                'integer',
+            ],
+            'title' => [
+                'required',
+                'string',
+            ],
+            'slug' => [
+                'required',
+                Rule::unique('categories', 'slug'),
+                'string',
+            ],
+            'perex' => [
+                'nullable',
+                'string',
+            ],
+            'published_at' => [
+                'nullable',
+                'date',
+            ],
+            'date_start' => [
+                'nullable',
+                'date',
+            ],
+            'time_start' => [
+                'nullable',
+                Rule::date()->format('H:i:s'),
+            ],
+            'date_time_end' => [
+                'nullable',
+                'date',
+            ],
+            'enabled' => [
+                'required',
+                'boolean',
+            ],
+            'send' => [
+                'required',
+                'boolean',
+            ],
+            'price' => [
+                'nullable',
+                'numeric',
+            ],
+            'views' => [
+                'required',
+                'integer',
+            ],
         ];
     }
 
@@ -47,8 +84,14 @@ final class StoreCat extends TranslatableFormRequest
     public function translatableRules(string $locale): array
     {
         return [
-            'text' => ['required', 'string'],
-            'description' => ['required', 'string'],
+            'text' => [
+                'required',
+                'string',
+            ],
+            'description' => [
+                'required',
+                'string',
+            ],
         ];
     }
 

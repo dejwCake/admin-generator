@@ -31,19 +31,48 @@ final class UpdateUser extends FormRequest
     public function rules(Config $config): array
     {
         $rules = [
-            'first_name' => ['nullable', 'string'],
-            'last_name' => ['nullable', 'string'],
-            'email' => ['sometimes', 'email', Rule::unique('admin_users', 'email')
-                ->ignore($this->user->getKey(), $this->user->getKeyName()), 'string'],
-            'password' => ['sometimes', 'confirmed', 'min:7', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/', 'string'],
-            'forbidden' => ['sometimes', 'boolean'],
-            'language' => ['sometimes', 'string'],
+            'first_name' => [
+                'nullable',
+                'string',
+            ],
+            'last_name' => [
+                'nullable',
+                'string',
+            ],
+            'email' => [
+                'sometimes',
+                'email',
+                Rule::unique('admin_users', 'email')
+                ->ignore($this->user->getKey(), $this->user->getKeyName()),
+                'string',
+            ],
+            'password' => [
+                'sometimes',
+                'confirmed',
+                'min:7',
+                'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/',
+                'string',
+            ],
+            'forbidden' => [
+                'sometimes',
+                'boolean',
+            ],
+            'language' => [
+                'sometimes',
+                'string',
+            ],
 
-            'roles' => ['sometimes', 'array'],
+            'roles' => [
+                'sometimes',
+                'array',
+            ],
         ];
 
         if ($config->get('admin-auth.activation_enabled')) {
-            $rules['activated'] = ['required', 'boolean'];
+            $rules['activated'] = [
+                'required',
+                'boolean',
+            ];
         }
 
         return $rules;

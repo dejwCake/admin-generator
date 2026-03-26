@@ -25,7 +25,9 @@ final class {{ $classBaseName }} extends FormRequest
     public function rules(): array
     {
         return [
-            'ids.*' => ['integer'],
+            'ids.*' => [
+                'integer',
+            ],
         ];
     }
 }

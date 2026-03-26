@@ -19,9 +19,11 @@ namespace {{ $classNamespace }};
         'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Contracts\Config\Repository as Config',
         'Illuminate\Contracts\Hashing\Hasher',
-        'Illuminate\Validation\Rule',
         $modelFullName,
     ];
+    if ($hasRuleUsage) {
+        $uses[] = 'Illuminate\Validation\Rule';
+    }
     if ($translatable->count() > 0) {
         $uses[] = 'Brackets\Translatable\Http\Requests\TranslatableFormRequest';
     } else {
@@ -59,12 +61,17 @@ final class {{ $classBaseName }} extends FormRequest
     {
         return [
 @foreach($standardColumn as $column)
-            '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
+            '{{ $column['name'] }}' => [
+                {!! implode(",\n                ", (array) $column['serverUpdateRules']) !!},
+            ],
 @endforeach
 @if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
 
 @foreach($relations['belongsToMany'] as $belongsToMany)
-            '{{ $belongsToMany['related_table'] }}' => [{!! implode(', ', ['\'sometimes\'', '\'array\'']) !!}],
+            '{{ $belongsToMany['related_table'] }}' => [
+                'sometimes',
+                'array',
+            ],
 @endforeach
 @endif
         ];
@@ -79,7 +86,9 @@ final class {{ $classBaseName }} extends FormRequest
     {
         return [
 @foreach($translatableColumns as $column)
-            '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
+            '{{ $column['name'] }}' => [
+                {!! implode(",\n                ", (array) $column['serverUpdateRules']) !!},
+            ],
 @endforeach
         ];
     }
@@ -96,18 +105,26 @@ final class {{ $classBaseName }} extends FormRequest
 @endphp
         $rules = [
 @foreach($columns as $column)
-            '{{ $column['name'] }}' => [{!! implode(', ', (array) $column['serverUpdateRules']) !!}],
+            '{{ $column['name'] }}' => [
+                {!! implode(",\n                ", (array) $column['serverUpdateRules']) !!},
+            ],
 @endforeach
 @if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
 
 @foreach($relations['belongsToMany'] as $belongsToMany)
-            '{{ $belongsToMany['related_table'] }}' => [{!! implode(', ', ['\'sometimes\'', '\'array\'']) !!}],
+            '{{ $belongsToMany['related_table'] }}' => [
+                'sometimes',
+                'array',
+            ],
 @endforeach
 @endif
         ];
 
         if ($config->get('admin-auth.activation_enabled')) {
-            $rules['activated'] = ['required', 'boolean'];
+            $rules['activated'] = [
+                'required',
+                'boolean',
+            ];
         }
 
         return $rules;

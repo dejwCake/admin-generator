@@ -251,10 +251,10 @@ trait Columns
 
         if ($column['unique'] || $column['name'] === 'slug') {
             $updateRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '\')
-                ->ignore($this->' . $modelVariableName . '->getKey(), $this->' . $modelVariableName . '->getKeyName())';
+                    ->ignore($this->' . $modelVariableName . '->getKey(), $this->' . $modelVariableName . '->getKeyName())';
             if ($hasSoftDelete && $column['uniqueDeletedAtCondition']) {
                 $updateRule .= '
-                ->whereNull(\'deleted_at\')';
+                    ->whereNull(\'deleted_at\')';
             }
             $serverUpdateRules->push($updateRule);
         }
