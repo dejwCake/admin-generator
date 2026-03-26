@@ -1,4 +1,4 @@
-@php echo "<?php"
+@php use Illuminate\Support\Arr;echo "<?php"
 @endphp
 
 

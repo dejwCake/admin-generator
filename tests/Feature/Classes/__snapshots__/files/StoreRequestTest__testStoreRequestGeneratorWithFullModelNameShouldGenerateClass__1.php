@@ -30,7 +30,7 @@ class StoreCat extends TranslatableFormRequest
             'perex' => ['nullable', 'string'],
             'published_at' => ['nullable', 'date'],
             'date_start' => ['nullable', 'date'],
-            'time_start' => ['nullable', 'date_format:H:i:s'],
+            'time_start' => ['nullable', Rule::date()->format('H:i:s')],
             'date_time_end' => ['nullable', 'date'],
             'enabled' => ['required', 'boolean'],
             'send' => ['required', 'boolean'],

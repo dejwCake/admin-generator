@@ -350,7 +350,7 @@ trait Columns
         return match ($majorType) {
             'datetime',
             'date' => '\'date\'',
-            'time' => '\'date_format:H:i:s\'',
+            'time' => 'Rule::date()->format(\'H:i:s\')',
             'integer' => '\'integer\'',
             'float' => '\'numeric\'',
             'bool' => '\'boolean\'',
