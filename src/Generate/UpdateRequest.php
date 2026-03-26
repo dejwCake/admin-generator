@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generate;
 
+use Illuminate\Support\Collection;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -62,6 +63,8 @@ final class UpdateRequest extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
+        $columns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
+
         return view('brackets/admin-generator::' . $this->view, [
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,
@@ -76,7 +79,11 @@ final class UpdateRequest extends ClassGenerator
             ),
 
             // validation in store/update
-            'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
+            'columns' => $columns,
+            'hasRuleUsage' => $columns->contains(
+                static fn (array $column): bool => (new Collection($column['serverUpdateRules']))
+                    ->contains(static fn (string $rule): bool => str_contains($rule, 'Rule::')),
+            ),
             'translatable' => $this->readColumnsFromTable($this->tableName)
                 ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
                 ->pluck('name'),

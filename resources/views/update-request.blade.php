@@ -16,9 +16,11 @@ namespace {{ $classNamespace }};
     }
     $uses = [
         'Illuminate\Contracts\Auth\Access\Gate',
-        'Illuminate\Validation\Rule',
         $modelFullName,
     ];
+    if ($hasRuleUsage) {
+        $uses[] = 'Illuminate\Validation\Rule';
+    }
     if ($translatable->count() > 0) {
         $uses[] = 'Brackets\Translatable\Http\Requests\TranslatableFormRequest';
     } else {
