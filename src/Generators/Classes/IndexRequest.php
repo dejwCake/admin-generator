@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminGenerator\Generate;
+namespace Brackets\AdminGenerator\Generators\Classes;
 
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-final class DestroyRequest extends ClassGenerator
+final class IndexRequest extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
@@ -15,7 +15,7 @@ final class DestroyRequest extends ClassGenerator
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $name = 'admin:generate:request:destroy';
+    protected $name = 'admin:generate:request:index';
 
     /**
      * The console command description.
@@ -23,7 +23,7 @@ final class DestroyRequest extends ClassGenerator
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $description = 'Generate a Destroy request class';
+    protected $description = 'Generate an Index request class';
 
     public function handle(): void
     {
@@ -38,19 +38,28 @@ final class DestroyRequest extends ClassGenerator
     #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
-        return 'Destroy' . $this->modelBaseName;
+        return 'Index' . $this->modelBaseName;
     }
 
     #[Override]
     protected function buildClass(): string
     {
-        return view('brackets/admin-generator::destroy-request', [
+        return view('brackets/admin-generator::index-request', [
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,
-            'modelBaseName' => $this->modelBaseName,
             'modelDotNotation' => $this->modelDotNotation,
-            'modelVariableName' => $this->modelVariableName,
-            'modelFullName' => $this->modelFullName,
+
+            'columnsToQuery' => $this->readColumnsFromTable($this->tableName)->filter(
+                static fn (array $column): bool => !(
+                    $column['majorType'] === 'text'
+                    || in_array(
+                        $column['name'],
+                        ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'],
+                        true,
+                    )
+                ),
+            )->pluck('name')
+                ->toArray(),
         ])->render();
     }
 
@@ -60,7 +69,6 @@ final class DestroyRequest extends ClassGenerator
     {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
-            ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
         ];
     }

@@ -38,7 +38,7 @@ final class UpdateUser extends FormRequest
                 'sometimes',
                 'email',
                 Rule::unique('users', 'email')
-                ->ignore($this->user->getKey(), $this->user->getKeyName()),
+                    ->ignore($this->user->getKey(), $this->user->getKeyName()),
                 'string',
             ],
             'email_verified_at' => [

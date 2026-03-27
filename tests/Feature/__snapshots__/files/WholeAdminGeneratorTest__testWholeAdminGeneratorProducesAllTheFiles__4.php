@@ -40,7 +40,7 @@ final class UpdateCategory extends TranslatableFormRequest
             'slug' => [
                 'sometimes',
                 Rule::unique('categories', 'slug')
-                ->ignore($this->category->getKey(), $this->category->getKeyName()),
+                    ->ignore($this->category->getKey(), $this->category->getKeyName()),
                 'string',
             ],
             'perex' => [

@@ -68,7 +68,7 @@ class ProfileController extends Controller
             'first_name' => ['nullable', 'string'],
             'last_name' => ['nullable', 'string'],
             'email' => ['sometimes', 'email', Rule::unique('admin_users', 'email')
-                ->ignore($this->adminUser->getKey(), $this->adminUser->getKeyName()), 'string'],
+                    ->ignore($this->adminUser->getKey(), $this->adminUser->getKeyName()), 'string'],
             'language' => ['sometimes', 'string'],
         ]);
 

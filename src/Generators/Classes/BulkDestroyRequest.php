@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminGenerator\Generate;
+namespace Brackets\AdminGenerator\Generators\Classes;
 
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-final class IndexRequest extends ClassGenerator
+final class BulkDestroyRequest extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
@@ -15,7 +15,7 @@ final class IndexRequest extends ClassGenerator
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $name = 'admin:generate:request:index';
+    protected $name = 'admin:generate:request:bulk-destroy';
 
     /**
      * The console command description.
@@ -23,7 +23,7 @@ final class IndexRequest extends ClassGenerator
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $description = 'Generate an Index request class';
+    protected $description = 'Generate a Bulk Destroy request class';
 
     public function handle(): void
     {
@@ -38,37 +38,28 @@ final class IndexRequest extends ClassGenerator
     #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
-        return 'Index' . $this->modelBaseName;
+        return 'BulkDestroy' . $this->modelBaseName;
     }
 
     #[Override]
     protected function buildClass(): string
     {
-        return view('brackets/admin-generator::index-request', [
+        return view('brackets/admin-generator::bulk-destroy-request', [
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,
             'modelDotNotation' => $this->modelDotNotation,
-
-            'columnsToQuery' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn (array $column): bool => !(
-                    $column['majorType'] === 'text'
-                    || in_array(
-                        $column['name'],
-                        ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'],
-                        true,
-                    )
-                ),
-            )->pluck('name')
-                ->toArray(),
         ])->render();
     }
 
-    /** @return array<array<string|int>> */
+    /**
+     * @return array<array<string|int>>
+     */
     #[Override]
     protected function getOptions(): array
     {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
+            ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
         ];
     }

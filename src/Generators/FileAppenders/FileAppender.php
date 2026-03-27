@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminGenerator\Generate;
+namespace Brackets\AdminGenerator\Generators\FileAppenders;
 
-use Brackets\AdminGenerator\Generate\Traits\Columns;
-use Brackets\AdminGenerator\Generate\Traits\Helpers;
-use Brackets\AdminGenerator\Generate\Traits\Names;
+use Brackets\AdminGenerator\Generators\Traits\Columns;
+use Brackets\AdminGenerator\Generators\Traits\Helpers;
+use Brackets\AdminGenerator\Generators\Traits\Names;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Override;

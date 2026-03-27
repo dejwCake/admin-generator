@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminGenerator\Generate\Traits;
+namespace Brackets\AdminGenerator\Generators\Traits;
 
-use Brackets\AdminGenerator\Generate\Controller;
-use Brackets\AdminGenerator\Generate\Model;
+use Brackets\AdminGenerator\Generators\Classes\Controller;
+use Brackets\AdminGenerator\Generators\Classes\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 

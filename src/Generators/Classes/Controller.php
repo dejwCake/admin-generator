@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminGenerator\Generate;
+namespace Brackets\AdminGenerator\Generators\Classes;
 
-use Brackets\AdminGenerator\Generate\Traits\FileManipulations;
+use Brackets\AdminGenerator\Generators\Traits\FileManipulations;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Override;

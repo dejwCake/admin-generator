@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminGenerator\Generate;
+namespace Brackets\AdminGenerator\Generators\Classes;
 
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-final class Export extends ClassGenerator
+final class ImpersonalLoginRequest extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
@@ -15,7 +15,7 @@ final class Export extends ClassGenerator
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $name = 'admin:generate:export';
+    protected $name = 'admin:generate:request:impersonal-login';
 
     /**
      * The console command description.
@@ -23,21 +23,11 @@ final class Export extends ClassGenerator
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $description = 'Generate an export class';
-
-    /**
-     * Path for view
-     */
-    protected string $view = 'export';
+    protected $description = 'Generate a Impersonal login request class';
 
     public function handle(): void
     {
         $force = $this->option('force');
-
-        $template = $this->option('template');
-        if ($template !== null) {
-            $this->view = 'templates.' . $template . '.export';
-        }
 
         if ($this->generateClass($force)) {
             $this->info('Generating ' . $this->classFullName . ' finished');
@@ -48,27 +38,19 @@ final class Export extends ClassGenerator
     #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
-        return $this->exportBaseName;
+        return 'ImpersonalLogin' . $this->modelBaseName;
     }
 
     #[Override]
     protected function buildClass(): string
     {
-        return view('brackets/admin-generator::' . $this->view, [
-            'exportNamespace' => $this->classNamespace,
-            'modelFullName' => $this->modelFullName,
-            'classBaseName' => $this->exportBaseName,
+        return view('brackets/admin-generator::impersonal-login-request', [
+            'classBaseName' => $this->classBaseName,
+            'classNamespace' => $this->classNamespace,
             'modelBaseName' => $this->modelBaseName,
+            'modelDotNotation' => $this->modelDotNotation,
             'modelVariableName' => $this->modelVariableName,
-            'modelLangFormat' => $this->modelLangFormat,
-            'columnsToExport' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn (array $column): bool => !in_array(
-                    $column['name'],
-                    ['password', 'remember_token', 'updated_at', 'created_at', 'deleted_at'],
-                    true,
-                ),
-            )->pluck('name')
-                ->toArray(),
+            'modelFullName' => $this->modelFullName,
         ])->render();
     }
 
@@ -77,15 +59,15 @@ final class Export extends ClassGenerator
     protected function getOptions(): array
     {
         return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
+            ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
-            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
         ];
     }
 
     #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
-        return $rootNamespace . '\Exports';
+        return $rootNamespace . '\Http\Requests\Admin\\' . $this->modelWithNamespaceFromDefault;
     }
 }

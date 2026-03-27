@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminGenerator\Generate;
+namespace Brackets\AdminGenerator\Generators\Classes;
 
-use Illuminate\Support\Collection;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-final class UpdateRequest extends ClassGenerator
+final class DestroyRequest extends ClassGenerator
 {
     /**
      * The name and signature of the console command.
@@ -16,7 +15,7 @@ final class UpdateRequest extends ClassGenerator
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $name = 'admin:generate:request:update';
+    protected $name = 'admin:generate:request:destroy';
 
     /**
      * The console command description.
@@ -24,29 +23,11 @@ final class UpdateRequest extends ClassGenerator
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $description = 'Generate an Update request class';
-
-    /**
-     * Path for view
-     */
-    protected string $view = 'update-request';
+    protected $description = 'Generate a Destroy request class';
 
     public function handle(): void
     {
         $force = $this->option('force');
-
-        //TODO check if exists
-        //TODO make global for all generator
-        //TODO also with prefix
-        $template = $this->option('template');
-        if ($template !== null) {
-            $this->view = 'templates.' . $template . '.update-request';
-        }
-
-        $belongsToMany = $this->option('belongs-to-many');
-        if ($belongsToMany !== null) {
-            $this->setBelongToManyRelation($belongsToMany);
-        }
 
         if ($this->generateClass($force)) {
             $this->info('Generating ' . $this->classFullName . ' finished');
@@ -57,37 +38,19 @@ final class UpdateRequest extends ClassGenerator
     #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
-        return 'Update' . $this->modelBaseName;
+        return 'Destroy' . $this->modelBaseName;
     }
 
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
-
-        return view('brackets/admin-generator::' . $this->view, [
+        return view('brackets/admin-generator::destroy-request', [
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,
             'modelBaseName' => $this->modelBaseName,
             'modelDotNotation' => $this->modelDotNotation,
             'modelVariableName' => $this->modelVariableName,
             'modelFullName' => $this->modelFullName,
-            'containsPublishedAtColumn' => in_array(
-                'published_at',
-                array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
-                true,
-            ),
-
-            // validation in store/update
-            'columns' => $columns,
-            'hasRuleUsage' => $columns->contains(
-                static fn (array $column): bool => (new Collection($column['serverUpdateRules']))
-                    ->contains(static fn (string $rule): bool => str_contains($rule, 'Rule::')),
-            ),
-            'translatable' => $this->readColumnsFromTable($this->tableName)
-                ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
-                ->pluck('name'),
-            'relations' => $this->relations,
         ])->render();
     }
 
@@ -98,8 +61,6 @@ final class UpdateRequest extends ClassGenerator
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
-            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
         ];
     }

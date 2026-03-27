@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminGenerator;
+namespace Brackets\AdminGenerator\Generators;
 
-use Brackets\AdminGenerator\Generate\Traits\FileManipulations;
+use Brackets\AdminGenerator\Generators\Traits\FileManipulations;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
-final class GenerateAdminProfile extends Command
+final class GenerateAdminUserProfile extends Command
 {
     use FileManipulations;
 

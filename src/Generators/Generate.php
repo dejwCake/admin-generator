@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminGenerator;
+namespace Brackets\AdminGenerator\Generators;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
@@ -10,7 +10,7 @@ use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
-final class GenerateAdmin extends Command
+final class Generate extends Command
 {
     /**
      * The name and signature of the console command.

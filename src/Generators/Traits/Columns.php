@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminGenerator\Generate\Traits;
+namespace Brackets\AdminGenerator\Generators\Traits;
 
 use Illuminate\Database\Schema\Builder as Schema;
 use Illuminate\Support\Collection;

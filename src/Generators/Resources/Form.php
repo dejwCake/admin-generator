@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminGenerator\Generate;
+namespace Brackets\AdminGenerator\Generators\Resources;
 
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
-final class ViewForm extends ViewGenerator
+final class Form extends ResourceGenerator
 {
     /**
      * The name and signature of the console command.

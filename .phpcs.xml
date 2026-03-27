@@ -15,14 +15,6 @@
     <!--not exactly nice, but working solution-->
     <rule ref="/root/.composer/vendor/dejwcake/php-code-style/base.phpcs.xml" />
 
-    <rule ref="SlevomatCodingStandard.Complexity.Cognitive">
-        <properties>
-            <property name="maxComplexity" value="10"/>
-        </properties>
-        <exclude-pattern>src/GenerateUser.php</exclude-pattern>
-        <exclude-pattern>tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php</exclude-pattern>
-    </rule>
-
     <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
         <properties>
             <property name="rootNamespaces" type="array">
@@ -32,12 +24,21 @@
         </properties>
     </rule>
 
+    <rule ref="SlevomatCodingStandard.Complexity.Cognitive">
+        <properties>
+            <property name="maxComplexity" value="10"/>
+        </properties>
+        <exclude-pattern>src/Generators/GenerateUser.php</exclude-pattern>
+        <exclude-pattern>tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php</exclude-pattern>
+    </rule>
+
     <rule ref="SlevomatCodingStandard.Files.LineLength.LineTooLong">
-        <exclude-pattern>src/Generate/Controller.php</exclude-pattern>
-        <exclude-pattern>src/Generate/Lang.php</exclude-pattern>
-        <exclude-pattern>src/GenerateAdminProfile.php</exclude-pattern>
-        <exclude-pattern>src/GenerateAdminUser.php</exclude-pattern>
-        <exclude-pattern>src/GenerateUser.php</exclude-pattern>
+        <exclude-pattern>src/Generators/Classes/Controller.php</exclude-pattern>
+        <exclude-pattern>src/Generators/FileAppenders/Lang.php</exclude-pattern>
+        <exclude-pattern>src/Generators/GenerateAdminUserProfile.php</exclude-pattern>
+        <exclude-pattern>src/Generators/GenerateAdminUser.php</exclude-pattern>
+        <exclude-pattern>src/Generators/GenerateUser.php</exclude-pattern>
+        <exclude-pattern>src/Generators/Traits/Columns.php</exclude-pattern>
         <exclude-pattern>tests/Feature/AdminUsers/AdminUserCrudGeneratorWithCustomControllerNameTest.php</exclude-pattern>
         <exclude-pattern>tests/Feature/AdminUsers/AdminUserCrudGeneratorWithCustomModelNameTest.php</exclude-pattern>
         <exclude-pattern>tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php</exclude-pattern>
