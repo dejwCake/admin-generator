@@ -63,7 +63,7 @@ final class Model extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $allColumns = $this->readColumnsFromTable($this->tableName);
+        $columns = $this->readColumnsFromTable($this->tableName);
 
         return view('brackets/admin-generator::' . $this->view, [
             'modelBaseName' => $this->classBaseName,
@@ -75,36 +75,36 @@ final class Model extends ClassGenerator
                 ? $this->tableName
                 : null,
 
-            'allColumns' => $allColumns,
-            'hasCarbonProperty' => $allColumns->contains(
+            'allColumns' => $columns,
+            'hasCarbonProperty' => $columns->contains(
                 static fn (array $column): bool => in_array($column['majorType'], ['datetime', 'date'], true),
             ),
-            'dates' => $allColumns->filter(
+            'dates' => $columns->filter(
                 static fn (array $column): bool => in_array($column['majorType'], ['datetime', 'date'], true),
             )->pluck('name'),
-            'booleans' => $allColumns->filter(
+            'booleans' => $columns->filter(
                 static fn (array $column): bool => $column['majorType'] === 'bool',
             )->pluck('name'),
-            'fillable' => $allColumns->filter(
+            'fillable' => $columns->filter(
                 static fn (array $column): bool => !in_array(
                     $column['name'],
                     ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token'],
                     true,
                 ),
             )->pluck('name'),
-            'hidden' => $allColumns->filter(
+            'hidden' => $columns->filter(
                 static fn (array $column): bool => in_array($column['name'], ['password', 'remember_token'], true),
             )->pluck('name'),
-            'translatable' => $allColumns->filter(
+            'translatable' => $columns->filter(
                 static fn (array $column): bool => $column['majorType'] === 'json',
             )->pluck('name'),
-            'timestamps' => $allColumns->filter(
+            'timestamps' => $columns->filter(
                 static fn (array $column): bool => in_array($column['name'], ['created_at', 'updated_at'], true),
             )->count() > 0,
-            'hasSoftDelete' => $allColumns->filter(
+            'hasSoftDelete' => $columns->filter(
                 static fn (array $column): bool => $column['name'] === 'deleted_at',
             )->count() > 0,
-            'hasPublishedAt' => $allColumns->filter(
+            'hasPublishedAt' => $columns->filter(
                 static fn (array $column): bool => $column['name'] === 'published_at',
             )->count() > 0,
             'relations' => $this->relations,
@@ -116,9 +116,9 @@ final class Model extends ClassGenerator
     protected function getOptions(): array
     {
         return [
-            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating model'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
+            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
         ];
     }
 

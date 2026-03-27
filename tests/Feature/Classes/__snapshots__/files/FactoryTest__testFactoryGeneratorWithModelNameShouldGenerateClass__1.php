@@ -5,21 +5,12 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Billing\Cat;
+use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class CatFactory extends Factory
+#[UseModel(Cat::class)]
+final class CatFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $model = Cat::class;
-
-    /**
-     * Define the model's default state.
-     */
     public function definition(): array
     {
         return [
@@ -33,7 +24,7 @@ class CatFactory extends Factory
             'date_time_end' => $this->faker->dateTime,
             'enabled' => $this->faker->boolean(),
             'send' => $this->faker->boolean(),
-            'price' => $this->faker->randomFloat(2),
+            'price' => $this->faker->randomFloat(2, max: 10000),
             'views' => $this->faker->randomNumber(5),
             'created_by_admin_user_id' => $this->faker->randomNumber(5),
             'updated_by_admin_user_id' => $this->faker->randomNumber(5),
@@ -43,5 +34,35 @@ class CatFactory extends Factory
             'text' => ['en' => $this->faker->sentence],
             'description' => ['en' => $this->faker->sentence],
         ];
+    }
+
+    public function enabled(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => ['enabled' => true]);
+    }
+
+    public function notEnabled(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => ['enabled' => false]);
+    }
+
+    public function send(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => ['send' => true]);
+    }
+
+    public function notSend(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => ['send' => false]);
+    }
+
+    public function notPublished(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => ['published_at' => null]);
     }
 }

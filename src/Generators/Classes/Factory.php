@@ -71,6 +71,12 @@ final class Factory extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
+        $columns = $this->readColumnsFromTable($this->tableName)
+            ->filter(static fn (array $column): bool => $column['name'] !== 'id');
+        $translatable = $columns
+            ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
+            ->pluck('name');
+
         return view(
             'brackets/admin-generator::' . $this->view,
             [
@@ -78,16 +84,24 @@ final class Factory extends ClassGenerator
                 'modelBaseName' => $this->modelBaseName,
                 'namespace' => $this->classNamespace,
 
-                'columns' => $this->readColumnsFromTable($this->tableName)
-                    // we skip primary key
-                    ->filter(static fn (array $column): bool => $column['name'] !== 'id')
-                    ->map(fn (array $column): array => [
-                            'name' => $column['name'],
-                            'faker' => $this->getType($column),
-                        ]),
-                'translatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
-                    ->pluck('name'),
+                'translatableColumns' => $columns->filter(function($column) use ($translatable) {
+                    return in_array($column['name'], $translatable->toArray());
+                }),
+                'standardColumns' => $columns->reject(function($column) use ($translatable) {
+                    return in_array($column['name'], $translatable->toArray());
+                }),
+                'booleanColumns' => $columns->filter(function($column) use ($translatable) {
+                    return $column['majorType'] === 'bool';
+                }),
+                'hasPassword' => $columns
+                    ->filter(static fn (array $column): bool => $column['name'] === 'password')
+                    ->count() > 0,
+                'hasEmailVerified' => $columns
+                    ->filter(static fn (array $column): bool => $column['name'] === 'email_verified_at')
+                    ->count() > 0,
+                'hasPublishedAt' => $columns
+                    ->filter(static fn (array $column): bool => $column['name'] === 'published_at')
+                    ->count() > 0,
             ],
         )->render();
     }
@@ -98,10 +112,10 @@ final class Factory extends ClassGenerator
     {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
-            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['seed', 's', InputOption::VALUE_OPTIONAL, 'Seeds the table with fake data'],
             ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating factory'],
+            ['seed', 's', InputOption::VALUE_OPTIONAL, 'Seeds the table with fake data'],
+            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
         ];
     }
 
@@ -110,45 +124,5 @@ final class Factory extends ClassGenerator
     protected function getDefaultNamespace(string $rootNamespace): string
     {
         return 'Database\Factories';
-    }
-
-    /**
-     * @param array<string, string|bool> $column
-     */
-    private function getType(array $column): string
-    {
-        if ($column['name'] === 'deleted_at') {
-            return 'null';
-        }
-
-        if ($column['name'] === 'remember_token') {
-            return 'null';
-        }
-
-        $type = match ($column['name']) {
-            'email' => '$this->faker->email',
-            'name',
-            'first_name' => '$this->faker->firstName',
-            'surname',
-            'last_name' => '$this->faker->lastName',
-            'slug' => '$this->faker->unique()->slug',
-            'password' => 'bcrypt($this->faker->password)',
-            default => null,
-        };
-
-        if ($type !== null) {
-            return $type;
-        }
-
-        return match ($column['majorType']) {
-            'date' => '$this->faker->date()',
-            'time' => '$this->faker->time()',
-            'datetime' => '$this->faker->dateTime',
-            'text' => '$this->faker->text()',
-            'bool' => '$this->faker->boolean()',
-            'integer' => '$this->faker->randomNumber(5)',
-            'float' => '$this->faker->randomFloat(2)',
-            default => '$this->faker->sentence',
-        };
     }
 }

@@ -158,7 +158,6 @@ final class GenerateAdminUser extends Command
         $this->call('admin:generate:factory', [
             'table_name' => $tableNameArgument,
             '--model-name' => $modelNameOption,
-            '--template' => 'admin-user',
             '--model-with-full-namespace' => $modelWithFullNamespace,
             '--force' => $forceOption,
         ]);

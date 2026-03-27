@@ -5,30 +5,25 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Auth\User;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class UserFactory extends Factory
+#[UseModel(User::class)]
+final class UserFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $model = User::class;
-
-    /**
-     * Define the model's default state.
-     */
     public function definition(): array
     {
+        $hasher = Container::getInstance()->make(Hasher::class);
+
         return [
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
             'email' => $this->faker->email,
-            'password' => bcrypt($this->faker->password),
+            'password' => $hasher->make($this->faker->password),
             'remember_token' => null,
-            'activated' => true,
+            'activated' => $this->faker->boolean(),
             'forbidden' => $this->faker->boolean(),
             'language' => 'en',
             'deleted_at' => null,
@@ -37,14 +32,27 @@ class UserFactory extends Factory
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
+    public function activated(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => ['activated' => true]);
+    }
+
     public function notActivated(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => [
-            'activated' => false,
-        ]);
+        return $this->state(static fn (array $attributes) => ['activated' => false]);
+    }
+
+    public function forbidden(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => ['forbidden' => true]);
+    }
+
+    public function notForbidden(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => ['forbidden' => false]);
     }
 }

@@ -36,6 +36,7 @@ trait Columns
                     'type' => $column['type_name'],
                     'majorType' => $majorType,
                     'phpType' => $this->getPhpType($majorType),
+                    'faker' => $this->getFaker($column['name'], $majorType),
                     'required' => $column['nullable'] === false,
                     'unique' => $columnUniqueIndexes->count() > 0,
                     'uniqueDeletedAtCondition' => $columnUniqueDeleteAtCondition->count() > 0,
@@ -429,6 +430,48 @@ trait Columns
             'uuid',
             'string' => 'string',
             default => 'text',
+        };
+    }
+
+    /**
+     * @param array<string, string|bool> $column
+     */
+    private function getFaker(string $name, string $majorType): string
+    {
+        if ($name === 'deleted_at') {
+            return 'null';
+        }
+
+        if ($name === 'remember_token') {
+            return 'null';
+        }
+
+        $faker = match ($name) {
+            'email' => '$this->faker->email',
+            'name',
+            'first_name' => '$this->faker->firstName',
+            'surname',
+            'last_name' => '$this->faker->lastName',
+            'slug' => '$this->faker->unique()->slug',
+            'password' => '$hasher->make($this->faker->password)',
+            'language' => '\'en\'',
+            'price' => '$this->faker->randomFloat(2, max: 10000)',
+            default => null,
+        };
+
+        if ($faker !== null) {
+            return $faker;
+        }
+
+        return match ($majorType) {
+            'date' => '$this->faker->date()',
+            'time' => '$this->faker->time()',
+            'datetime' => '$this->faker->dateTime',
+            'text' => '$this->faker->text()',
+            'bool' => '$this->faker->boolean()',
+            'integer' => '$this->faker->randomNumber(5)',
+            'float' => '$this->faker->randomFloat(2)',
+            default => '$this->faker->sentence',
         };
     }
 }

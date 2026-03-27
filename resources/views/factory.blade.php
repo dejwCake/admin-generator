@@ -1,4 +1,4 @@
-@php echo "<?php"
+@php use Illuminate\Support\Str;echo "<?php"
 @endphp
 
 
@@ -6,34 +6,31 @@ declare(strict_types=1);
 
 namespace {{ $namespace }};
 @php
-    $translatableColumns = $columns->filter(function($column) use ($translatable) {
-        return in_array($column['name'], $translatable->toArray());
-    });
-    $standardColumn = $columns->reject(function($column) use ($translatable) {
-        return in_array($column['name'], $translatable->toArray());
-    });
+    $uses[] = $modelFullName;
+    $uses[] = 'Illuminate\Database\Eloquent\Factories\Attributes\UseModel';
+    $uses[] = 'Illuminate\Database\Eloquent\Factories\Factory';
+    if ($hasPassword) {
+        $uses[] = 'Illuminate\Container\Container';
+        $uses[] = 'Illuminate\Contracts\Hashing\Hasher';
+    }
+    $uses = Arr::sort($uses);
 @endphp
 
-use {{ $modelFullName }};
-use Illuminate\Database\Eloquent\Factories\Factory;
+@foreach($uses as $use)
+use {{ $use }};
+@endforeach
 
-class {{ $modelBaseName }}Factory extends Factory
+#[UseModel({{ $modelBaseName }}::class)]
+final class {{ $modelBaseName }}Factory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $model = {{ $modelBaseName }}::class;
-
-    /**
-     * Define the model's default state.
-     */
     public function definition(): array
     {
+@if($hasPassword)
+        $hasher = Container::getInstance()->make(Hasher::class);
+
+@endif
         return [
-@foreach($standardColumn as $col)
+@foreach($standardColumns as $col)
             '{{ $col['name'] }}' => {!! $col['faker'] !!},
 @endforeach
 @foreach($translatableColumns as $col)
@@ -41,4 +38,34 @@ class {{ $modelBaseName }}Factory extends Factory
 @endforeach
         ];
     }
+@foreach($booleanColumns as $col)
+
+    public function {{ $col['name'] }}(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => ['{{ $col['name'] }}' => true]);
+    }
+
+    public function not{{ Str::ucfirst($col['name']) }}(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => ['{{ $col['name'] }}' => false]);
+    }
+@endforeach
+@if($hasEmailVerified)
+
+    public function unverified(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => ['email_verified_at' => null]);
+    }
+@endif
+@if($hasPublishedAt)
+
+    public function notPublished(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => ['published_at' => null]);
+    }
+@endif
 }

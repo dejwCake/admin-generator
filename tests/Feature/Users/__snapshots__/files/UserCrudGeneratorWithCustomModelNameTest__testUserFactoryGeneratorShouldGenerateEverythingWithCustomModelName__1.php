@@ -5,37 +5,29 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Auth\User;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class UserFactory extends Factory
+#[UseModel(User::class)]
+final class UserFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $model = User::class;
-
-    /**
-     * Define the model's default state.
-     */
     public function definition(): array
     {
+        $hasher = Container::getInstance()->make(Hasher::class);
+
         return [
             'name' => $this->faker->firstName,
             'email' => $this->faker->email,
             'email_verified_at' => $this->faker->dateTime,
-            'password' => bcrypt($this->faker->password),
+            'password' => $hasher->make($this->faker->password),
             'remember_token' => null,
             'created_at' => $this->faker->dateTime,
             'updated_at' => $this->faker->dateTime,
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
     public function unverified(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter

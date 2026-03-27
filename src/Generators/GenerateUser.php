@@ -156,7 +156,6 @@ final class GenerateUser extends Command
         $this->call('admin:generate:factory', [
             'table_name' => $tableNameArgument,
             '--model-name' => $modelNameOption,
-            '--template' => 'user',
             '--force' => $forceOption,
         ]);
 
