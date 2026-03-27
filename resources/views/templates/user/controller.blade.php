@@ -29,18 +29,14 @@ namespace {{ $controllerNamespace }};
         $modelFullName,
     ];
     if ($export) {
-        $uses = array_merge($uses, [
-            sprintf('App\Exports\%s', $exportBaseName),
-            'Maatwebsite\Excel\Excel',
-            'Symfony\Component\HttpFoundation\BinaryFileResponse',
-        ]);
+        $uses[] = sprintf('App\Exports\%s', $exportBaseName);
+        $uses[] = 'Maatwebsite\Excel\Excel';
+        $uses[] = 'Symfony\Component\HttpFoundation\BinaryFileResponse';
     }
     if ($mustVerifyEmail) {
-        $uses = array_merge($uses, [
-            'Illuminate\Contracts\Auth\MustVerifyEmail',
-            'Illuminate\Http\Request',
-            'Symfony\Component\HttpKernel\Exception\HttpException',
-        ]);
+        $uses[] = 'Illuminate\Contracts\Auth\MustVerifyEmail';
+        $uses[] = 'Illuminate\Http\Request';
+        $uses[] = 'Symfony\Component\HttpKernel\Exception\HttpException';
     }
 
     $belongsToManyRelations = [];

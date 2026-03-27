@@ -29,10 +29,13 @@ trait Columns
                 );
                 // TODO add foreign key
 
+                $majorType = $this->getMajorTypeFromType($column['type_name']);
+
                 return [
                     'name' => $column['name'],
                     'type' => $column['type_name'],
-                    'majorType' => $this->getMajorTypeFromType($column['type_name']),
+                    'majorType' => $majorType,
+                    'phpType' => $this->getPhpType($majorType),
                     'required' => $column['nullable'] === false,
                     'unique' => $columnUniqueIndexes->count() > 0,
                     'uniqueDeletedAtCondition' => $columnUniqueDeleteAtCondition->count() > 0,
@@ -355,6 +358,18 @@ trait Columns
             'float' => '\'numeric\'',
             'bool' => '\'boolean\'',
             default => '\'string\'',
+        };
+    }
+
+    private function getPhpType(string $majorType): string
+    {
+        return match ($majorType) {
+            'integer' => 'int',
+            'float' => 'float',
+            'bool' => 'bool',
+            'datetime', 'date' => 'CarbonInterface',
+            'json' => 'array',
+            default => 'string',
         };
     }
 

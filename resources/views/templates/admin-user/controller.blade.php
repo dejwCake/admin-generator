@@ -33,17 +33,13 @@ namespace {{ $controllerNamespace }};
         $modelFullName,
     ];
     if ($export) {
-        $uses = array_merge($uses, [
-            sprintf('App\Exports\%s', $exportBaseName),
-            'Maatwebsite\Excel\Excel',
-            'Symfony\Component\HttpFoundation\BinaryFileResponse',
-        ]);
+        $uses[] = sprintf('App\Exports\%s', $exportBaseName);
+        $uses[] = 'Maatwebsite\Excel\Excel';
+        $uses[] = 'Symfony\Component\HttpFoundation\BinaryFileResponse';
     }
     if ($activation) {
-        $uses = array_merge($uses, [
-            'Brackets\AdminAuth\Activation\Contracts\ActivationBroker',
-            'Brackets\AdminAuth\Services\ActivationService',
-        ]);
+        $uses[] = 'Brackets\AdminAuth\Activation\Contracts\ActivationBroker';
+        $uses[] = 'Brackets\AdminAuth\Services\ActivationService';
     }
 
     $belongsToManyRelations = [];

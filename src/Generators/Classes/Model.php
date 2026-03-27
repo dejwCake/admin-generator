@@ -63,6 +63,8 @@ final class Model extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
+        $allColumns = $this->readColumnsFromTable($this->tableName);
+
         return view('brackets/admin-generator::' . $this->view, [
             'modelBaseName' => $this->classBaseName,
             'modelNameSpace' => $this->classNamespace,
@@ -73,32 +75,36 @@ final class Model extends ClassGenerator
                 ? $this->tableName
                 : null,
 
-            'dates' => $this->readColumnsFromTable($this->tableName)->filter(
+            'allColumns' => $allColumns,
+            'hasCarbonProperty' => $allColumns->contains(
+                static fn (array $column): bool => in_array($column['majorType'], ['datetime', 'date'], true),
+            ),
+            'dates' => $allColumns->filter(
                 static fn (array $column): bool => in_array($column['majorType'], ['datetime', 'date'], true),
             )->pluck('name'),
-            'booleans' => $this->readColumnsFromTable($this->tableName)->filter(
+            'booleans' => $allColumns->filter(
                 static fn (array $column): bool => $column['majorType'] === 'bool',
             )->pluck('name'),
-            'fillable' => $this->readColumnsFromTable($this->tableName)->filter(
+            'fillable' => $allColumns->filter(
                 static fn (array $column): bool => !in_array(
                     $column['name'],
                     ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token'],
                     true,
                 ),
             )->pluck('name'),
-            'hidden' => $this->readColumnsFromTable($this->tableName)->filter(
+            'hidden' => $allColumns->filter(
                 static fn (array $column): bool => in_array($column['name'], ['password', 'remember_token'], true),
             )->pluck('name'),
-            'translatable' => $this->readColumnsFromTable($this->tableName)->filter(
+            'translatable' => $allColumns->filter(
                 static fn (array $column): bool => $column['majorType'] === 'json',
             )->pluck('name'),
-            'timestamps' => $this->readColumnsFromTable($this->tableName)->filter(
+            'timestamps' => $allColumns->filter(
                 static fn (array $column): bool => in_array($column['name'], ['created_at', 'updated_at'], true),
             )->count() > 0,
-            'hasSoftDelete' => $this->readColumnsFromTable($this->tableName)->filter(
+            'hasSoftDelete' => $allColumns->filter(
                 static fn (array $column): bool => $column['name'] === 'deleted_at',
             )->count() > 0,
-            'hasPublishedAt' => $this->readColumnsFromTable($this->tableName)->filter(
+            'hasPublishedAt' => $allColumns->filter(
                 static fn (array $column): bool => $column['name'] === 'published_at',
             )->count() > 0,
             'relations' => $this->relations,

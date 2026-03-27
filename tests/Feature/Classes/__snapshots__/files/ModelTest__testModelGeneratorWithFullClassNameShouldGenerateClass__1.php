@@ -13,6 +13,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int|null $user_id
+ * @property string $title
+ * @property string $slug
+ * @property string|null $perex
+ * @property CarbonInterface|null $published_at
+ * @property CarbonInterface|null $date_start
+ * @property string|null $time_start
+ * @property CarbonInterface|null $date_time_end
+ * @property array $text
+ * @property array $description
+ * @property bool $enabled
+ * @property bool $send
+ * @property float|null $price
+ * @property int $views
+ * @property int|null $created_by_admin_user_id
+ * @property int|null $updated_by_admin_user_id
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
+ * @property CarbonInterface|null $deleted_at
+ */
 final class Category extends Model
 {
     use CreatedByAdminUserTrait;

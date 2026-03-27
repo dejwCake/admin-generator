@@ -25,11 +25,9 @@ namespace {{ $controllerNamespace }};
         $modelFullName,
     ];
     if ($export) {
-        $uses = array_merge($uses, [
-            sprintf('App\Exports\%s', $exportBaseName),
-            'Maatwebsite\Excel\Excel',
-            'Symfony\Component\HttpFoundation\BinaryFileResponse',
-        ]);
+        $uses[] = sprintf('App\Exports\%s', $exportBaseName);
+        $uses[] = 'Maatwebsite\Excel\Excel';
+        $uses[] = 'Symfony\Component\HttpFoundation\BinaryFileResponse';
     }
 
     $belongsToManyRelations = [];
@@ -40,10 +38,8 @@ namespace {{ $controllerNamespace }};
         }
     }
     if (!$withoutBulk) {
-        $uses = array_merge($uses, [
-            sprintf('App\Http\Requests\Admin\%s\BulkDestroy%s', $modelWithNamespaceFromDefault, $modelBaseName),
-            'Illuminate\Database\DatabaseManager',
-        ]);
+        $uses[] = sprintf('App\Http\Requests\Admin\%s\BulkDestroy%s', $modelWithNamespaceFromDefault, $modelBaseName);
+        $uses[] = 'Illuminate\Database\DatabaseManager';
     }
     if (!$withoutBulk && $hasSoftDelete) {
         $uses[] = 'Carbon\CarbonImmutable';

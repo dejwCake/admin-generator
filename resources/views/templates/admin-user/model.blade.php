@@ -24,24 +24,16 @@ namespace {{ $modelNameSpace }};
         'Illuminate\Notifications\Notifiable',
     ];
     if ($hasSoftDelete) {
-        $uses = array_merge($uses, [
-            'Illuminate\Database\Eloquent\SoftDeletes',
-        ]);
+        $uses[] = 'Illuminate\Database\Eloquent\SoftDeletes';
     }
     if ($hasRoles) {
-        $uses = array_merge($uses, [
-            'Spatie\Permission\Traits\HasRoles',
-        ]);
+        $uses[] = 'Spatie\Permission\Traits\HasRoles';
     }
     if ($translatable->count() > 0) {
-        $uses = array_merge($uses, [
-            'Brackets\Translatable\Traits\HasTranslations',
-        ]);
+        $uses[] = 'Brackets\Translatable\Traits\HasTranslations';
     }
-    if (count($dates) > 0) {
-        $uses = array_merge($uses, [
-            'Carbon\CarbonInterface',
-        ]);
+    if (count($dates) > 0 || $hasCarbonProperty) {
+        $uses[] = 'Carbon\CarbonInterface';
     }
     if (isset($relations['belongsToMany']) && count($relations['belongsToMany'])) {
         $uses[] = 'Illuminate\Database\Eloquent\Relations\BelongsToMany';
@@ -59,6 +51,11 @@ namespace {{ $modelNameSpace }};
 use {{ $use }};
 @endforeach
 
+/**
+@foreach($allColumns as $column)
+ * @property {{ !$column['required'] ? $column['phpType'] . '|null' : $column['phpType'] }} ${{ $column['name'] }}
+@endforeach
+ */
 final class {{ $modelBaseName }} extends Authenticatable implements CanActivateContract
 {
 @php

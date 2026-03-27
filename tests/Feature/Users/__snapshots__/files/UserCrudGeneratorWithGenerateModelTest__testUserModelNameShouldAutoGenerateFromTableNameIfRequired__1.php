@@ -12,6 +12,16 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property CarbonInterface|null $email_verified_at
+ * @property string $password
+ * @property string|null $remember_token
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
+ */
 final class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory;
