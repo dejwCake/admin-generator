@@ -77,8 +77,8 @@ final class Export extends ClassGenerator
     protected function getOptions(): array
     {
         return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
             ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
         ];
     }
