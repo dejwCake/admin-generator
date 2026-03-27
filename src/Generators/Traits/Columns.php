@@ -433,9 +433,6 @@ trait Columns
         };
     }
 
-    /**
-     * @param array<string, string|bool> $column
-     */
     private function getFaker(string $name, string $majorType): string
     {
         if ($name === 'deleted_at') {

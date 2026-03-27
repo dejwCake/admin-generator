@@ -84,15 +84,13 @@ final class Factory extends ClassGenerator
                 'modelBaseName' => $this->modelBaseName,
                 'namespace' => $this->classNamespace,
 
-                'translatableColumns' => $columns->filter(function($column) use ($translatable) {
-                    return in_array($column['name'], $translatable->toArray());
-                }),
-                'standardColumns' => $columns->reject(function($column) use ($translatable) {
-                    return in_array($column['name'], $translatable->toArray());
-                }),
-                'booleanColumns' => $columns->filter(function($column) use ($translatable) {
-                    return $column['majorType'] === 'bool';
-                }),
+                'translatableColumns' => $columns->filter(
+                    static fn ($column) => in_array($column['name'], $translatable->toArray(), true),
+                ),
+                'standardColumns' => $columns->reject(
+                    static fn ($column) => in_array($column['name'], $translatable->toArray(), true),
+                ),
+                'booleanColumns' => $columns->filter(static fn ($column) => $column['majorType'] === 'bool'),
                 'hasPassword' => $columns
                     ->filter(static fn (array $column): bool => $column['name'] === 'password')
                     ->count() > 0,
