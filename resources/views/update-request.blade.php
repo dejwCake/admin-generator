@@ -14,12 +14,16 @@ namespace {{ $classNamespace }};
             return in_array($column['name'], $translatable->toArray());
         });
     }
+    $hasBelongsToMany = count($relations) > 0 && count($relations['belongsToMany']) > 0;
     $uses = [
         'Illuminate\Contracts\Auth\Access\Gate',
         $modelFullName,
     ];
     if ($hasRuleUsage) {
         $uses[] = 'Illuminate\Validation\Rule';
+    }
+    if ($hasBelongsToMany) {
+        $uses[] = 'Illuminate\Support\Collection';
     }
     if ($translatable->count() > 0) {
         $uses[] = 'Brackets\Translatable\Http\Requests\TranslatableFormRequest';
@@ -147,6 +151,13 @@ final class {{ $classBaseName }} extends FormRequest
     public function getSanitized(): array
     {
         $sanitized = $this->validated();
+@if($hasBelongsToMany)
+@foreach($relations['belongsToMany'] as $belongsToMany)
+        if (isset($sanitized['{{ $belongsToMany['related_table'] }}'])) {
+            $sanitized['{{ $belongsToMany['related_table'] }}'] = new Collection($sanitized['{{ $belongsToMany['related_table'] }}'] ?? []);
+        }
+@endforeach
+@endif
 
 @if($containsPublishedAtColumn)
         if (isset($sanitized['publish_now']) && $sanitized['publish_now'] === true) {
@@ -162,4 +173,21 @@ final class {{ $classBaseName }} extends FormRequest
 
         return $sanitized;
     }
+@if($hasBelongsToMany)
+
+@foreach($relations['belongsToMany'] as $belongsToMany)
+    public function get{{ $belongsToMany['related_model_name'] }}Ids(): ?Collection
+    {
+        $sanitized = $this->getSanitized();
+        if (!isset($sanitized['{{ $belongsToMany['related_table'] }}']) || $sanitized['{{ $belongsToMany['related_table'] }}'] === null) {
+            return null;
+        }
+
+        return $sanitized['{{ $belongsToMany['related_table'] }}']->pluck('id');
+    }
+@if(!$loop->last)
+
+@endif
+@endforeach
+@endif
 }

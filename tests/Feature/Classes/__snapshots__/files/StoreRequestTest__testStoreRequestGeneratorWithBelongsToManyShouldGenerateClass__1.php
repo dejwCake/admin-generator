@@ -6,6 +6,7 @@ namespace App\Http\Requests\Admin\Category;
 
 use Brackets\Translatable\Http\Requests\TranslatableFormRequest;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 
 final class StoreCategory extends TranslatableFormRequest
@@ -104,11 +105,18 @@ final class StoreCategory extends TranslatableFormRequest
      */
     public function getSanitized(): array
     {
-        //phpcs:ignore SlevomatCodingStandard.Variables.UselessVariable.UselessVariable
         $sanitized = $this->validated();
+        $sanitized['posts'] = new Collection($sanitized['posts'] ?? []);
 
         //Add your code for manipulation with request data here
 
         return $sanitized;
+    }
+
+    public function getPostIds(): Collection
+    {
+        $sanitized = $this->getSanitized();
+
+        return $sanitized['posts']->pluck('id');
     }
 }

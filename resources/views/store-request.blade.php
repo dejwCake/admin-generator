@@ -14,11 +14,15 @@ namespace {{ $classNamespace }};
             return in_array($column['name'], $translatable->toArray());
         });
     }
+    $hasBelongsToMany = count($relations) > 0 && count($relations['belongsToMany']) > 0;
     $uses = [
         'Illuminate\Contracts\Auth\Access\Gate',
     ];
     if ($hasRuleUsage) {
         $uses[] = 'Illuminate\Validation\Rule';
+    }
+    if ($hasBelongsToMany) {
+        $uses[] = 'Illuminate\Support\Collection';
     }
     if ($translatable->count() > 0) {
         $uses[] = 'Brackets\Translatable\Http\Requests\TranslatableFormRequest';
@@ -117,11 +121,32 @@ final class {{ $classBaseName }} extends FormRequest
      */
     public function getSanitized(): array
     {
+@if($hasBelongsToMany)
+        $sanitized = $this->validated();
+@foreach($relations['belongsToMany'] as $belongsToMany)
+        $sanitized['{{ $belongsToMany['related_table'] }}'] = new Collection($sanitized['{{ $belongsToMany['related_table'] }}'] ?? []);
+@endforeach
+@else
         //phpcs:ignore SlevomatCodingStandard.Variables.UselessVariable.UselessVariable
         $sanitized = $this->validated();
+@endif
 
         //Add your code for manipulation with request data here
 
         return $sanitized;
     }
+@if($hasBelongsToMany)
+
+@foreach($relations['belongsToMany'] as $belongsToMany)
+    public function get{{ $belongsToMany['related_model_name'] }}Ids(): Collection
+    {
+        $sanitized = $this->getSanitized();
+
+        return $sanitized['{{ $belongsToMany['related_table'] }}']->pluck('id');
+    }
+@if(!$loop->last)
+
+@endif
+@endforeach
+@endif
 }
