@@ -8,6 +8,7 @@ use Brackets\AdminGenerator\Generators\Classes\BulkDestroyRequest;
 use Brackets\AdminGenerator\Generators\Classes\Controller;
 use Brackets\AdminGenerator\Generators\Classes\DestroyRequest;
 use Brackets\AdminGenerator\Generators\Classes\Export;
+use Brackets\AdminGenerator\Generators\Classes\ExportRequest;
 use Brackets\AdminGenerator\Generators\Classes\Factory;
 use Brackets\AdminGenerator\Generators\Classes\ImpersonalLoginRequest;
 use Brackets\AdminGenerator\Generators\Classes\IndexRequest;
@@ -48,6 +49,7 @@ final class AdminGeneratorServiceProvider extends ServiceProvider
             Controller::class,
             DestroyRequest::class,
             Export::class,
+            ExportRequest::class,
             Factory::class,
             ImpersonalLoginRequest::class,
             IndexRequest::class,

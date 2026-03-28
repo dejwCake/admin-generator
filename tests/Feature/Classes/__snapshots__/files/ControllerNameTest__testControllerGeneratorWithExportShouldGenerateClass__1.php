@@ -8,12 +8,14 @@ use App\Exports\CategoriesExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Category\BulkDestroyCategory;
 use App\Http\Requests\Admin\Category\DestroyCategory;
+use App\Http\Requests\Admin\Category\ExportCategory;
 use App\Http\Requests\Admin\Category\IndexCategory;
 use App\Http\Requests\Admin\Category\StoreCategory;
 use App\Http\Requests\Admin\Category\UpdateCategory;
 use App\Models\Category;
 use Brackets\AdminListing\Builders\ListingBuilder;
 use Brackets\AdminListing\Builders\ListingQueryBuilder;
+use Carbon\CarbonImmutable;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate;
@@ -230,9 +232,14 @@ final class CategoriesController extends Controller
 
     /**
      * Export entities
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    public function export(Excel $excel, CategoriesExport $export): ?BinaryFileResponse
+    public function export(ExportCategory $request, Excel $excel, CategoriesExport $export): ?BinaryFileResponse
     {
-        return $excel->download($export, 'categories.xlsx');
+        $currentTime = CarbonImmutable::now()->toDateTimeString();
+        $nameOfExportedFile = sprintf('categories_%s.xlsx', $currentTime);
+
+        return $excel->download($export, $nameOfExportedFile);
     }
 }

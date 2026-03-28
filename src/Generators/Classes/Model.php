@@ -49,6 +49,11 @@ final class Model extends ClassGenerator
             $this->setBelongToManyRelation($belongsToMany);
         }
 
+        $media = $this->option('media');
+        if ($media !== null && $media !== []) {
+            $this->setMediaCollections($media);
+        }
+
         if ($this->generateClass($force)) {
             $this->info('Generating ' . $this->classFullName . ' finished');
         }
@@ -108,6 +113,7 @@ final class Model extends ClassGenerator
                 static fn (array $column): bool => $column['name'] === 'published_at',
             )->count() > 0,
             'relations' => $this->relations,
+            'mediaCollections' => $this->mediaCollections,
         ])->render();
     }
 
@@ -119,6 +125,12 @@ final class Model extends ClassGenerator
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating model'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
+            [
+                'media',
+                'M',
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Media collections (format: name:type:disk:maxFiles)',
+            ],
         ];
     }
 

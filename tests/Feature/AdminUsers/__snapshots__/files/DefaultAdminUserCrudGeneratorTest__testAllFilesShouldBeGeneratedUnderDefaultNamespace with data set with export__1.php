@@ -8,6 +8,7 @@ use App\Exports\AdminUsersExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdminUser\BulkDestroyAdminUser;
 use App\Http\Requests\Admin\AdminUser\DestroyAdminUser;
+use App\Http\Requests\Admin\AdminUser\ExportAdminUser;
 use App\Http\Requests\Admin\AdminUser\ImpersonalLoginAdminUser;
 use App\Http\Requests\Admin\AdminUser\IndexAdminUser;
 use App\Http\Requests\Admin\AdminUser\StoreAdminUser;
@@ -17,6 +18,7 @@ use Brackets\AdminAuth\Models\AdminUser;
 use Brackets\AdminAuth\Services\ActivationService;
 use Brackets\AdminListing\Builders\ListingBuilder;
 use Brackets\AdminListing\Builders\ListingQueryBuilder;
+use Carbon\CarbonImmutable;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate;
@@ -245,10 +247,15 @@ final class AdminUsersController extends Controller
 
     /**
      * Export entities
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    public function export(Excel $excel, AdminUsersExport $export): ?BinaryFileResponse
+    public function export(ExportAdminUser $request, Excel $excel, AdminUsersExport $export): ?BinaryFileResponse
     {
-        return $excel->download($export, 'adminUsers.xlsx');
+        $currentTime = CarbonImmutable::now()->toDateTimeString();
+        $nameOfExportedFile = sprintf('adminUsers_%s.xlsx', $currentTime);
+
+        return $excel->download($export, $nameOfExportedFile);
     }
 
     /**

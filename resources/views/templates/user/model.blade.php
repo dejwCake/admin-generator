@@ -1,4 +1,4 @@
-@php use Illuminate\Support\Arr;echo "<?php"
+@php use Illuminate\Support\Arr;echo "<?php";
 @endphp
 
 
@@ -31,6 +31,16 @@ namespace {{ $modelNameSpace }};
     if ($translatable->count() > 0) {
         $uses[] = 'Brackets\Translatable\Traits\HasTranslations';
     }
+    if ($mediaCollections->isNotEmpty()) {
+        $uses[] = 'Brackets\Media\HasMedia\AutoProcessMediaTrait';
+        $uses[] = 'Brackets\Media\HasMedia\HasMediaCollectionsTrait';
+        $uses[] = 'Brackets\Media\HasMedia\HasMediaThumbsTrait';
+        $uses[] = 'Brackets\Media\HasMedia\ProcessMediaTrait';
+        $uses[] = 'Spatie\MediaLibrary\HasMedia';
+        if ($mediaCollections->contains(fn ($collection) => $collection->isImage())) {
+            $uses[] = 'Spatie\MediaLibrary\MediaCollections\Models\Media';
+        }
+    }
     if (count($dates) > 0 || $hasCarbonProperty) {
         $uses[] = 'Carbon\CarbonInterface';
     }
@@ -55,7 +65,7 @@ use {{ $use }};
  * @property {{ !$column['required'] ? $column['phpType'] . '|null' : $column['phpType'] }} ${{ $column['name'] }}
 @endforeach
  */
-final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEmail
+final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEmail{{ $mediaCollections->isNotEmpty() ? ', HasMedia' : '' }}
 {
 @php
     $traitUses = [
@@ -70,6 +80,12 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
     }
     if($translatable->count() > 0) {
         $traitUses[] = 'HasTranslations';
+    }
+    if ($mediaCollections->isNotEmpty()) {
+        $traitUses[] = 'AutoProcessMediaTrait';
+        $traitUses[] = 'HasMediaCollectionsTrait';
+        $traitUses[] = 'HasMediaThumbsTrait';
+        $traitUses[] = 'ProcessMediaTrait';
     }
     $traitUses = Arr::sort($traitUses);
 @endphp
@@ -88,7 +104,7 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     * {{'@'}}phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $fillable = [
 @foreach($fillable as $fillableField)
@@ -100,7 +116,7 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
 
     /**
      * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     * {{'@'}}phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $hidden = [
 @foreach($hidden as $hiddenField)
@@ -130,7 +146,7 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
      * Send the password reset notification.
      *
      * @param string $token
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * {{'@'}}phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     public function sendPasswordResetNotification($token): void
     {
@@ -144,6 +160,80 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
         return $this->belongsToMany({{ $belongsToMany['related_model_name'] }}::class, '{{ $belongsToMany['relation_table'] }}', '{{ $belongsToMany['foreign_key'] }}', '{{ $belongsToMany['related_key'] }}');
     }
 @endforeach
+@endif
+@if($mediaCollections->isNotEmpty())
+
+    public function registerMediaCollections(): void
+    {
+@foreach($mediaCollections as $collection)
+        $this->addMediaCollection('{{ $collection->collectionName }}')
+@if($collection->isPrivate())
+            ->private()
+@endif
+            ->maxFilesize(10 * 1024 * 1024)
+            ->maxNumberOfFiles({{ $collection->maxFiles }})
+@if($collection->isImage())
+            ->accepts('image/*');
+@else
+            ->accepts('application/pdf', 'application/zip', 'application/x-zip');
+@endif
+@if(!$loop->last)
+
+@endif
+@endforeach
+    }
+@endif
+@if($mediaCollections->contains(fn ($collection) => $collection->isImage()))
+
+    /**
+     * {{'@'}}phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->autoRegisterThumb200();
+@foreach($mediaCollections as $collection)
+@if($collection->isImage())
+
+        $converted = [
+            'name' => 'converted',
+            'collection' => '{{ $collection->collectionName }}',
+            'width' => 960,
+            'height' => 360,
+        ];
+
+        $this->addMediaConversion($converted['name'])
+            ->width($converted['width'])
+            ->height($converted['height'])
+            ->crop($converted['width'], $converted['height'])
+            ->performOnCollections($converted['collection'])
+            ->keepOriginalImageFormat()
+            ->nonQueued();
+
+        $this->addMediaConversion($converted['name'] . 'Retina')
+            ->width(2 * $converted['width'])
+            ->height(2 * $converted['height'])
+            ->crop(2 * $converted['width'], 2 * $converted['height'])
+            ->performOnCollections($converted['collection'])
+            ->keepOriginalImageFormat()
+            ->nonQueued();
+
+        $original = [
+            'name' => 'original',
+            'collection' => '{{ $collection->collectionName }}',
+        ];
+
+        $this->addMediaConversion($original['name'])
+            ->performOnCollections($original['collection'])
+            ->keepOriginalImageFormat()
+            ->nonQueued();
+
+        $this->addMediaConversion($original['name'] . 'Retina')
+            ->performOnCollections($original['collection'])
+            ->keepOriginalImageFormat()
+            ->nonQueued();
+@endif
+@endforeach
+    }
 @endif
 @if (count($dates) > 0 || count($booleans) > 0)
 

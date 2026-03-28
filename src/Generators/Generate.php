@@ -44,12 +44,14 @@ final class Generate extends Command
         $withoutBulkOption = $this->option('without-bulk');
         $forcePermissionsOption = $this->option('force-permissions');
         $belongsToManyOption = $this->option('belongs-to-many');
+        $mediaOption = $this->option('media');
 
         $this->call('admin:generate:model', [
             'table_name' => $tableNameArgument,
             'class_name' => $modelNameOption,
             '--force' => $forceOption,
             '--belongs-to-many' => $belongsToManyOption,
+            '--media' => $mediaOption,
         ]);
 
         $this->call('admin:generate:factory', [
@@ -67,6 +69,7 @@ final class Generate extends Command
             '--with-export' => $withExportOption,
             '--without-bulk' => $withoutBulkOption,
             '--belongs-to-many' => $belongsToManyOption,
+            '--media' => $mediaOption,
         ]);
 
         $this->call('admin:generate:request:index', [
@@ -97,6 +100,14 @@ final class Generate extends Command
 
         if (!$withoutBulkOption) {
             $this->call('admin:generate:request:bulk-destroy', [
+                'table_name' => $tableNameArgument,
+                '--model-name' => $modelNameOption,
+                '--force' => $forceOption,
+            ]);
+        }
+
+        if ($withExportOption) {
+            $this->call('admin:generate:request:export', [
                 'table_name' => $tableNameArgument,
                 '--model-name' => $modelNameOption,
                 '--force' => $forceOption,
@@ -181,6 +192,12 @@ final class Generate extends Command
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
             ['force-permissions', 'fp', InputOption::VALUE_NONE, 'Force permission will generate permission migration'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
+            [
+                'media',
+                'M',
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Media collections (format: name:type:disk:maxFiles)',
+            ],
         ];
     }
 
@@ -189,40 +206,3 @@ final class Generate extends Command
         return class_exists('\Brackets\Craftable\CraftableServiceProvider');
     }
 }
-
-
-/**
- * TODO test belongs_to_many in all generators
- *
- * TODO add template to all + it can be relative or absolute path
- *
- * Admin: seed, controller_name, model_name
- *
- * Model: class_name (App\Models), template, belongs_to_many
- *
- * Controller: class_name (App\Http\Controllers\Admin), model_name, template, belongs_to_many
- *
- * StoreRequest: class_name (App\Http\Requests\Admin\{model_name}), model_name
- *
- * UpdateRequest: class_name (App\Http\Requests\Admin\{model_name}), model_name
- *
- * TODO add DestroyRequest
- * DestroyRequest: class_name (App\Http\Requests\Admin\{model_name}), model_name
- *
- *
- * Appendor:
- *
- * ModelFactory: model_name
- *
- * Routes: model_name, controller_name, template
- *
- *
- * ViewGenerator:
- *
- * ViewForm: file_name, model_name, belongs_to_many
- *
- * TODO refactor ViewFullForm generator
- * ViewFullForm: file_name, model_name, template, name, view_name, route
- *
- * ViewIndex: file_name, model_name, template
- */

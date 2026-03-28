@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Classes;
 
+use Brackets\AdminGenerator\Generators\Dtos\MediaCollection;
 use Brackets\AdminGenerator\Generators\Traits\Columns;
 use Brackets\AdminGenerator\Generators\Traits\Helpers;
 use Brackets\AdminGenerator\Generators\Traits\Names;
@@ -29,12 +30,17 @@ abstract class ClassGenerator extends Command
     /** @var array<string, Collection> */
     protected array $relations = [];
 
+    /** @var Collection<string, MediaCollection> */
+    protected Collection $mediaCollections;
+
     /**
      * Create a new controller creator command instance.
      */
     public function __construct(protected readonly Filesystem $files)
     {
         parent::__construct();
+
+        $this->mediaCollections = new Collection();
     }
 
     /**

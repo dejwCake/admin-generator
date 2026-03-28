@@ -13,16 +13,16 @@ parameters:
 			path: src/Generators/Classes/ClassGenerator.php
 
 		-
-			message: '#^Property Brackets\\AdminGenerator\\Generators\\Classes\\ClassGenerator\:\:\$relations \(array\<string, string\>\) does not accept array\<string, Illuminate\\Support\\Collection\<\(int\|string\), array\<string, string\>\>\|string\>\.$#'
-			identifier: assign.propertyType
+			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
+			identifier: argument.type
 			count: 1
-			path: src/Generators/Classes/ClassGenerator.php
+			path: src/Generators/Classes/DestroyRequest.php
 
 		-
 			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
 			identifier: argument.type
 			count: 1
-			path: src/Generators/Classes/DestroyRequest.php
+			path: src/Generators/Classes/ExportRequest.php
 
 		-
 			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'

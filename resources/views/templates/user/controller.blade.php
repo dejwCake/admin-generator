@@ -32,6 +32,8 @@ namespace {{ $controllerNamespace }};
         $uses[] = sprintf('App\Exports\%s', $exportBaseName);
         $uses[] = 'Maatwebsite\Excel\Excel';
         $uses[] = 'Symfony\Component\HttpFoundation\BinaryFileResponse';
+        $uses[] = 'Carbon\CarbonImmutable';
+        $uses[] = sprintf('App\Http\Requests\Admin\%s\Export%s', $modelWithNamespaceFromDefault, $modelBaseName);
     }
 
     $belongsToManyRelations = [];
@@ -138,6 +140,10 @@ final class {{ $controllerBaseName }} extends Controller
     {
         $this->gate->authorize('admin.{{ $modelDotNotation }}.create');
 
+@if($mediaCollections->isNotEmpty())
+        ${{ $modelVariableName }}Model = new {{ $modelBaseName }}();
+
+@endif
         return $this->viewFactory->make(
             'admin.{{ $modelDotNotation }}.create',
             [
@@ -148,6 +154,9 @@ final class {{ $controllerBaseName }} extends Controller
 @else
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
 @endif
+@endforeach
+@foreach($mediaCollections as $collection)
+                '{{ $collection->collectionName }}Collection' => ${{ $modelVariableName }}Model->getCustomMediaCollection('{{ $collection->collectionName }}'),
 @endforeach
             ],
         );
@@ -204,6 +213,14 @@ final class {{ $controllerBaseName }} extends Controller
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::where('guard_name', $this->guard)->get(),
 @else
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
+@endif
+@endforeach
+@foreach($mediaCollections as $collection)
+                '{{ $collection->collectionName }}Collection' => ${{ $modelVariableName }}->getCustomMediaCollection('{{ $collection->collectionName }}'),
+@if($collection->isImage())
+                '{{ $collection->collectionName }}Media' => ${{ $modelVariableName }}->getThumbs200ForCollection('{{ $collection->collectionName }}'),
+@else
+                '{{ $collection->collectionName }}Media' => ${{ $modelVariableName }}->getMedia('{{ $collection->collectionName }}'),
 @endif
 @endforeach
             ],
@@ -284,10 +301,15 @@ final class {{ $controllerBaseName }} extends Controller
 
     /**
      * Export entities
+     *
+     * {{'@'}}phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    public function export(Excel $excel, {{ $exportBaseName }} $export): ?BinaryFileResponse
+    public function export(Export{{ $modelBaseName }} $request, Excel $excel, {{ $exportBaseName }} $export): ?BinaryFileResponse
     {
-        return $excel->download($export, '{{ Str::plural($modelVariableName) }}.xlsx');
+        $currentTime = CarbonImmutable::now()->toDateTimeString();
+        $nameOfExportedFile = sprintf('{{ Str::plural($modelVariableName) }}_%s.xlsx', $currentTime);
+
+        return $excel->download($export, $nameOfExportedFile);
     }
 @endif
 

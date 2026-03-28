@@ -73,6 +73,11 @@ final class Controller extends ClassGenerator
             $this->setBelongToManyRelation($belongsToMany);
         }
 
+        $media = $this->option('media');
+        if ($media !== null && $media !== []) {
+            $this->setMediaCollections($media);
+        }
+
         if ($this->generateClass($force)) {
             $this->info('Generating ' . $this->classFullName . ' finished');
 
@@ -146,6 +151,7 @@ final class Controller extends ClassGenerator
             // validation in store/update
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
             'relations' => $this->relations,
+            'mediaCollections' => $this->mediaCollections,
         ])->render();
     }
 
@@ -161,6 +167,7 @@ final class Controller extends ClassGenerator
             ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+            ['media', 'M', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Media collections (format: name:type:disk:maxFiles)'],
         ];
     }
 

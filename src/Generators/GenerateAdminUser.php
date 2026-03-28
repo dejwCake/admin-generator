@@ -44,6 +44,7 @@ final class GenerateAdminUser extends Command
         $forceOption = $this->option('force');
         $withExportOption = $this->option('with-export');
         $withoutBulkOption = $this->option('without-bulk');
+        $mediaOption = $this->option('media');
 
         if ($modelNameOption === null) {
             $modelNameOption = 'AdminUser';
@@ -83,6 +84,7 @@ final class GenerateAdminUser extends Command
             '--with-export' => $withExportOption,
             '--without-bulk' => $withoutBulkOption,
             '--belongs-to-many' => 'roles',
+            '--media' => $mediaOption,
         ]);
 
         $this->call('admin:generate:request:index', [
@@ -116,6 +118,14 @@ final class GenerateAdminUser extends Command
                 'table_name' => $tableNameArgument,
                 '--model-name' => $modelNameOption,
                 '--model-with-full-namespace' => $modelWithFullNamespace,
+                '--force' => $forceOption,
+            ]);
+        }
+
+        if ($withExportOption) {
+            $this->call('admin:generate:request:export', [
+                'table_name' => $tableNameArgument,
+                '--model-name' => $modelNameOption,
                 '--force' => $forceOption,
             ]);
         }
@@ -198,6 +208,7 @@ final class GenerateAdminUser extends Command
             ['seed', 's', InputOption::VALUE_NONE, 'Seeds table with fake data'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+            ['media', 'M', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Media collections (format: name:type:disk:maxFiles)'],
         ];
     }
 }

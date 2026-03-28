@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
+use Brackets\AdminGenerator\Generators\Dtos\MediaCollection;
 use Brackets\AdminGenerator\Generators\Traits\Columns;
 use Brackets\AdminGenerator\Generators\Traits\Helpers;
 use Brackets\AdminGenerator\Generators\Traits\Names;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,6 +24,9 @@ abstract class ResourceGenerator extends Command
 
     /** @var array<string, string> */
     protected array $relations = [];
+
+    /** @var Collection<string, MediaCollection> */
+    protected Collection $mediaCollections;
 
     public function __construct(protected readonly Filesystem $files)
     {
