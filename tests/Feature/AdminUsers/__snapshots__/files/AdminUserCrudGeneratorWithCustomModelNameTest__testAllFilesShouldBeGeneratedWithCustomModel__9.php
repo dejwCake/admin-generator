@@ -3,50 +3,39 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\Auth\UsersController;
+/* Auto-generated admin routes uses */
 
-/* Auto-generated admin routes */
 Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
     ->prefix('admin')
     ->name('admin/')
     ->group(static function (): void {
+        /* Auto-generated users routes */
         Route::prefix('users')
             ->name('users/')
+            ->controller(UsersController::class)
             ->group(static function (): void {
-                Route::get(
-                    '/',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'index'],
-                )->name('index');
-                Route::get(
-                    '/create',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'create'],
-                )->name('create');
-                Route::post(
-                    '/',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'store'],
-                )->name('store');
-                Route::get(
-                    '/{user}/impersonal-login',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'impersonalLogin'],
-                )->name('impersonal-login');
-                Route::get(
-                    '/{user}/edit',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'edit'],
-                )->name('edit');
-                Route::post(
-                    '/{user}',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'update'],
-                )->name('update');
-                Route::delete(
-                    '/{user}',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'destroy'],
-                )->name('destroy');
-                Route::get(
-                    '/export',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'export'],
-                )->name('export');
-                Route::get(
-                    '/{user}/resend-activation',
-                    [\App\Http\Controllers\Admin\Auth\UsersController::class, 'resendActivationEmail'],
-                )->name('resend-activation-email');
+                Route::get('/', 'index')
+                    ->name('index');
+                Route::get('/create', 'create')
+                    ->name('create');
+                Route::post('/', 'store')
+                    ->name('store');
+                Route::get('/{user}/edit', 'edit')
+                    ->name('edit');
+                Route::post('/bulk-destroy', 'bulkDestroy')
+                    ->name('bulk-destroy');
+                Route::post('/{user}', 'update')
+                    ->name('update');
+                Route::delete('/{user}', 'destroy')
+                    ->name('destroy');
+                Route::get('/export', 'export')
+                    ->name('export');
+                Route::get('/{user}/impersonal-login', 'impersonalLogin')
+                    ->name('impersonal-login');
+                Route::get('/{user}/resend-activation', 'resendActivationEmail')
+                    ->name('resend-activation-email');
             });
+        /* End of users routes */
+        // Do not delete me :) I'm used for auto-generation of admin routes
     });

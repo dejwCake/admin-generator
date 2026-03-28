@@ -64,6 +64,7 @@ final class GenerateAdminUserProfile extends Command
             '--model-name' => $modelName,
             '--controller-name' => $controllerName,
             '--template' => 'profile',
+            '--resource' => 'profile',
         ]);
         // TODO add this route to the dropdown user-menu
 

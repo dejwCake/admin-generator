@@ -150,6 +150,67 @@ abstract class FileAppender extends Command
         return true;
     }
 
+    protected function replaceOrInsertRouteBlock(
+        string $path,
+        string $resource,
+        string $newBlock,
+        string $insertMarker,
+        string $defaultContent,
+    ): bool {
+        if (!$this->files->exists($path)) {
+            $this->makeDirectory($path);
+            $this->files->put($path, $defaultContent);
+        }
+
+        $content = $this->files->get($path);
+        $startMarker = '/* Auto-generated ' . $resource . ' routes */';
+        $endMarker = '/* End of ' . $resource . ' routes */';
+
+        if (str_contains($content, $startMarker)) {
+            $startPos = strpos($content, $startMarker);
+            $endPos = strpos($content, $endMarker);
+            if ($endPos === false) {
+                return false;
+            }
+            $endPos += strlen($endMarker);
+
+            // Skip trailing newlines
+            while ($endPos < strlen($content) && $content[$endPos] === "\n") {
+                $endPos++;
+            }
+
+            $before = substr($content, 0, $startPos);
+            $after = substr($content, $endPos);
+            $this->files->put($path, $before . $newBlock . $after);
+        } elseif (str_contains($content, $insertMarker)) {
+            $this->files->put(
+                $path,
+                str_replace(
+                    $insertMarker,
+                    $newBlock . '        ' . $insertMarker,
+                    $content,
+                ),
+            );
+        } else {
+            $this->files->append($path, PHP_EOL . $newBlock);
+        }
+
+        return true;
+    }
+
+    protected function insertUseStatement(string $path, string $useStatement, string $useMarker): void
+    {
+        $content = $this->files->get($path);
+        if (str_contains($content, $useStatement)) {
+            return;
+        }
+
+        $this->files->put(
+            $path,
+            str_replace($useMarker, $useStatement . PHP_EOL . $useMarker, $content),
+        );
+    }
+
     #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

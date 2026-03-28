@@ -61,15 +61,33 @@ final class Routes extends FileAppender
             $this->withoutBulk = true;
         }
 
+        $routesPath = base_path('routes/admin.php');
+        $insertMarker = "// Do not delete me :) I'm used for auto-generation of admin routes";
+        $useMarker = '/* Auto-generated admin routes uses */';
+
+        $defaultContent = '<?php' . PHP_EOL . PHP_EOL
+            . 'declare(strict_types=1);' . PHP_EOL . PHP_EOL
+            . 'use Illuminate\Support\Facades\Route;' . PHP_EOL
+            . $useMarker . PHP_EOL . PHP_EOL
+            . "Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])" . PHP_EOL
+            . "    ->prefix('admin')" . PHP_EOL
+            . "    ->name('admin/')" . PHP_EOL
+            . '    ->group(static function (): void {' . PHP_EOL
+            . '        ' . $insertMarker . PHP_EOL
+            . '    });' . PHP_EOL;
+
+        $resource = $this->option('resource') ?? $this->resource;
+
         if (
-            $this->appendIfNotAlreadyAppended(
-                base_path('routes/admin.php'),
-                PHP_EOL . $this->buildClass() . PHP_EOL,
-                '<?php' . PHP_EOL . PHP_EOL
-                . 'declare(strict_types=1);' . PHP_EOL . PHP_EOL
-                . 'use Illuminate\Support\Facades\Route;' . PHP_EOL,
+            $this->replaceOrInsertRouteBlock(
+                $routesPath,
+                $resource,
+                $this->buildClass($resource) . PHP_EOL,
+                $insertMarker,
+                $defaultContent,
             )
         ) {
+            $this->insertUseStatement($routesPath, 'use ' . $this->controllerFullName . ';', $useMarker);
             $this->info('Appending routes finished');
         }
     }
@@ -84,17 +102,16 @@ final class Routes extends FileAppender
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+            ['resource', 'r', InputOption::VALUE_OPTIONAL, 'Specify custom resource name for route identification'],
         ];
     }
 
-    private function buildClass(): string
+    private function buildClass(string $resource): string
     {
         return view('brackets/admin-generator::' . $this->view, [
-            'controllerPartiallyFullName' => $this->controllerWithNamespaceFromDefault,
-            'controllerFullName' => $this->controllerFullName,
+            'controllerBaseName' => class_basename($this->controllerFullName),
             'modelVariableName' => $this->modelVariableName,
-            'modelViewsDirectory' => $this->modelViewsDirectory,
-            'resource' => $this->resource,
+            'resource' => $resource,
             'export' => $this->export,
             'withoutBulk' => $this->withoutBulk,
         ])->render();

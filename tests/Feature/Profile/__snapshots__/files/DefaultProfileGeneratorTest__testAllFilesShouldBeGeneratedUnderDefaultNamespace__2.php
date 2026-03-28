@@ -3,26 +3,25 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\ProfileController;
+/* Auto-generated admin routes uses */
 
-/* Auto-generated admin routes */
 Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
     ->prefix('admin')
     ->name('admin/')
     ->group(static function (): void {
-        Route::get(
-            '/profile',
-            [\App\Http\Controllers\Admin\ProfileController::class, 'editProfile'],
-        )->name('edit-profile');
-        Route::post(
-            '/profile',
-            [\App\Http\Controllers\Admin\ProfileController::class, 'updateProfile'],
-        )->name('update-profile');
-        Route::get(
-            '/password',
-            [\App\Http\Controllers\Admin\ProfileController::class, 'editPassword'],
-        )->name('edit-password');
-        Route::post(
-            '/password',
-            [\App\Http\Controllers\Admin\ProfileController::class, 'updatePassword'],
-        )->name('update-password');
+        /* Auto-generated profile routes */
+        Route::controller(ProfileController::class)
+            ->group(static function (): void {
+                Route::get('/profile', 'editProfile')
+                    ->name('edit-profile');
+                Route::post('/profile', 'updateProfile')
+                    ->name('update-profile');
+                Route::get('/password', 'editPassword')
+                    ->name('edit-password');
+                Route::post('/password', 'updatePassword')
+                    ->name('update-password');
+            });
+        /* End of profile routes */
+        // Do not delete me :) I'm used for auto-generation of admin routes
     });
