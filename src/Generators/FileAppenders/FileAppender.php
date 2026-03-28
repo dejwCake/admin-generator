@@ -101,6 +101,55 @@ abstract class FileAppender extends Command
         return true;
     }
 
+    /**
+     * Replace an existing block identified by root key, or insert before marker if not present.
+     *
+     * @param string $newBlock Content from buildClass() — starts without indent, ends with marker comment
+     * @param string $markerText The marker comment text without leading whitespace
+     */
+    protected function replaceOrInsertBlock(
+        string $path,
+        string $rootKey,
+        string $newBlock,
+        string $markerText,
+        string $defaultContent,
+    ): bool {
+        if (!$this->files->exists($path)) {
+            $this->makeDirectory($path);
+            $this->files->put($path, $defaultContent);
+        }
+
+        $content = $this->files->get($path);
+        $keyPattern = "    '" . $rootKey . "' => [";
+
+        if (str_contains($content, $keyPattern)) {
+            $startPos = strpos($content, $keyPattern);
+            $endPos = $this->findBlockEnd($content, $startPos);
+            if ($endPos === false) {
+                return false;
+            }
+
+            // Strip the marker (and its leading indent) from newBlock — it already exists in the file
+            $markerWithIndent = '    ' . $markerText;
+            $blockWithoutMarker = str_contains($newBlock, $markerWithIndent)
+                ? substr($newBlock, 0, strpos($newBlock, $markerWithIndent))
+                : $newBlock;
+
+            $before = substr($content, 0, $startPos);
+            $after = substr($content, $endPos);
+            $this->files->put($path, $before . '    ' . $blockWithoutMarker . $after);
+        } else {
+            // Replace marker text (without leading spaces) — the existing indent
+            // before the marker becomes the indent for the first line of newBlock
+            $this->files->put(
+                $path,
+                str_replace($markerText, $newBlock, $content),
+            );
+        }
+
+        return true;
+    }
+
     #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -112,5 +161,82 @@ abstract class FileAppender extends Command
         );
 
         return parent::execute($input, $output);
+    }
+
+    private function findBlockEnd(string $content, int $startPos): int|false
+    {
+        $closingBracketPos = $this->findMatchingClosingBracket($content, $startPos);
+        if ($closingBracketPos === false) {
+            return false;
+        }
+
+        return $this->skipTrailingChars($content, $closingBracketPos + 1);
+    }
+
+    private function findMatchingClosingBracket(string $content, int $startPos): int|false
+    {
+        $depth = 0;
+        $length = strlen($content);
+        $inString = false;
+        $escape = false;
+
+        for ($i = $startPos; $i < $length; $i++) {
+            $char = $content[$i];
+
+            if ($escape) {
+                $escape = false;
+
+                continue;
+            }
+
+            if ($char === '\\') {
+                $escape = true;
+
+                continue;
+            }
+
+            if ($char === "'") {
+                $inString = !$inString;
+
+                continue;
+            }
+
+            if ($inString) {
+                continue;
+            }
+
+            if ($char === '[') {
+                $depth++;
+            }
+
+            if ($char === ']') {
+                $depth--;
+
+                if ($depth === 0) {
+                    return $i;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private function skipTrailingChars(string $content, int $pos): int
+    {
+        $length = strlen($content);
+
+        // Skip comma after closing bracket
+        if ($pos < $length && $content[$pos] === ',') {
+            $pos++;
+        }
+
+        // Skip up to two newlines (line break + blank line)
+        for ($n = 0; $n < 2; $n++) {
+            if ($pos < $length && $content[$pos] === "\n") {
+                $pos++;
+            }
+        }
+
+        return $pos;
     }
 }

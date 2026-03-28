@@ -64,17 +64,19 @@ final class Lang extends FileAppender
             $this->setMediaCollections($media);
         }
 
-        // TODO what if a file has been changed? this will append it again
-        // (because the content is not present anymore -> we should probably check only for a root key for existence)
-
         // TODO name-spaced model names should be probably inserted as a sub-array in a translation file..
 
+        $markerText = "// Do not delete me :) I'm used for auto-generation" . PHP_EOL;
+        $defaultContent = "<?php" . PHP_EOL . PHP_EOL . "declare(strict_types=1);"
+            . PHP_EOL . PHP_EOL . "return [" . PHP_EOL . "    " . $markerText . "];" . PHP_EOL;
+
         if (
-            $this->replaceIfNotPresent(
+            $this->replaceOrInsertBlock(
                 lang_path($locale . '/admin.php'),
-                "// Do not delete me :) I'm used for auto-generation" . PHP_EOL,
+                $this->modelLangFormat,
                 $this->buildClass() . PHP_EOL,
-                "<?php" . PHP_EOL . PHP_EOL . "declare(strict_types=1);" . PHP_EOL . PHP_EOL . "return [" . PHP_EOL . "    // Do not delete me :) I'm used for auto-generation" . PHP_EOL . "];" . PHP_EOL,
+                $markerText,
+                $defaultContent,
             )
         ) {
             $this->call('cache:clear');

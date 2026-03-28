@@ -81,4 +81,45 @@ class LangTest extends TestCase
 
         self::assertMatchesFileSnapshot($filePath);
     }
+
+    public function testLangGeneratorShouldBeIdempotent(): void
+    {
+        $filePath = lang_path('en/admin.php');
+
+        $this->artisan('admin:generate:lang', [
+            'table_name' => 'categories',
+        ]);
+
+        $contentAfterFirst = file_get_contents($filePath);
+
+        $this->artisan('admin:generate:lang', [
+            'table_name' => 'categories',
+        ]);
+
+        $contentAfterSecond = file_get_contents($filePath);
+
+        self::assertSame($contentAfterFirst, $contentAfterSecond);
+    }
+
+    public function testLangGeneratorShouldReplaceExistingKeyAfterUserEdit(): void
+    {
+        $filePath = lang_path('en/admin.php');
+
+        $this->artisan('admin:generate:lang', [
+            'table_name' => 'categories',
+        ]);
+
+        $originalContent = file_get_contents($filePath);
+
+        file_put_contents(
+            $filePath,
+            str_replace("'Title'", "'Nadpis'", $originalContent),
+        );
+
+        $this->artisan('admin:generate:lang', [
+            'table_name' => 'categories',
+        ]);
+
+        self::assertSame($originalContent, file_get_contents($filePath));
+    }
 }
