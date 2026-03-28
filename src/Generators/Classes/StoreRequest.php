@@ -64,6 +64,8 @@ final class StoreRequest extends ClassGenerator
     protected function buildClass(): string
     {
         $columns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
+        $allColumns = $this->readColumnsFromTable($this->tableName);
+        $columnNames = $allColumns->pluck('name')->toArray();
 
         return view(
             'brackets/admin-generator::' . $this->view,
@@ -74,14 +76,19 @@ final class StoreRequest extends ClassGenerator
 
                 // validation in store/update
                 'columns' => $columns,
+                'translatable' => $allColumns
+                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
+                    ->pluck('name'),
+                'relations' => $this->relations,
+
+                'hasBelongsToMany' => count($this->relations) > 0 && count($this->relations['belongsToMany']) > 0,
                 'hasRuleUsage' => $columns->contains(
                     static fn (array $column): bool => (new Collection($column['serverStoreRules']))
                         ->contains(static fn (string $rule): bool => str_contains($rule, 'Rule::')),
                 ),
-                'translatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
-                    ->pluck('name'),
-                'relations' => $this->relations,
+                'hasPassword' => in_array('password', $columnNames, true),
+                'hasCreatedByAdminUserId' => in_array('created_by_admin_user_id', $columnNames, true),
+                'hasUpdatedByAdminUserId' => in_array('updated_by_admin_user_id', $columnNames, true),
             ],
         )->render();
     }
@@ -93,8 +100,8 @@ final class StoreRequest extends ClassGenerator
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
         ];
     }
 

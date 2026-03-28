@@ -8,7 +8,9 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 final class StoreUser extends FormRequest
 {
@@ -43,13 +45,21 @@ final class StoreUser extends FormRequest
             'password' => [
                 'required',
                 'confirmed',
-                'min:7',
-                'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised(),
                 'string',
             ],
 
             'roles' => [
                 'array',
+            ],
+            'roles.*.id' => [
+                'required',
+                'integer',
             ],
         ];
     }
@@ -60,6 +70,8 @@ final class StoreUser extends FormRequest
     public function getModifiedData(): array
     {
         $data = $this->validated();
+        $data['roles'] = new Collection($data['roles'] ?? []);
+
         if (isset($data['password'])) {
             $hasher = Container::getInstance()->make(Hasher::class);
             assert($hasher instanceof Hasher);
@@ -67,5 +79,12 @@ final class StoreUser extends FormRequest
         }
 
         return $data;
+    }
+
+    public function getRoleIds(): Collection
+    {
+        $data = $this->getModifiedData();
+
+        return $data['roles']->pluck('id');
     }
 }

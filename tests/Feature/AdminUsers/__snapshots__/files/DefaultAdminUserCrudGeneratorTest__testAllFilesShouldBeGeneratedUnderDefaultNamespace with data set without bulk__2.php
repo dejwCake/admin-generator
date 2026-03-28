@@ -37,7 +37,10 @@ final class IndexAdminUser extends FormRequest
                 'nullable',
             ],
             'orderDirection' => [
-                Rule::in(['asc', 'desc']),
+                Rule::in([
+                    'asc',
+                    'desc',
+                ]),
                 'nullable',
             ],
             'search' => [

@@ -9,7 +9,9 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 final class StoreUser extends FormRequest
 {
@@ -44,8 +46,12 @@ final class StoreUser extends FormRequest
             'password' => [
                 'required',
                 'confirmed',
-                'min:7',
-                'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised(),
                 'string',
             ],
             'forbidden' => [
@@ -59,6 +65,10 @@ final class StoreUser extends FormRequest
 
             'roles' => [
                 'array',
+            ],
+            'roles.*.id' => [
+                'required',
+                'integer',
             ],
         ];
 
@@ -77,9 +87,11 @@ final class StoreUser extends FormRequest
      */
     public function getModifiedData(): array
     {
+        $data = $this->validated();
+        $data['roles'] = new Collection($data['roles'] ?? []);
+
         $config = Container::getInstance()->make(Config::class);
         assert($config instanceof Config);
-        $data = $this->validated();
         if (!$config->get('admin-auth.activation_enabled')) {
             $data['activated'] = true;
         }
@@ -90,5 +102,12 @@ final class StoreUser extends FormRequest
         }
 
         return $data;
+    }
+
+    public function getRoleIds(): Collection
+    {
+        $data = $this->getModifiedData();
+
+        return $data['roles']->pluck('id');
     }
 }

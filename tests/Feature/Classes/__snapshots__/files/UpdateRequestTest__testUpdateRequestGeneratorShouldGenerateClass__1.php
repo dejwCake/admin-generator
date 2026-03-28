@@ -7,7 +7,9 @@ namespace App\Http\Requests\Admin\Category;
 use App\Models\Category;
 use Brackets\Translatable\Http\Requests\TranslatableFormRequest;
 use Carbon\CarbonImmutable;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Validation\Rule;
 
 /**
@@ -79,6 +81,7 @@ final class UpdateCategory extends TranslatableFormRequest
                 'sometimes',
                 'integer',
             ],
+
             'publish_now' => [
                 'nullable',
                 'boolean',
@@ -112,20 +115,25 @@ final class UpdateCategory extends TranslatableFormRequest
     /**
      * Modify input data
      */
-    public function getSanitized(): array
+    public function getModifiedData(): array
     {
-        $sanitized = $this->validated();
+        $data = $this->validated();
 
-        if (isset($sanitized['publish_now']) && $sanitized['publish_now'] === true) {
-            $sanitized['published_at'] = CarbonImmutable::now();
+        if (isset($data['publish_now']) && $data['publish_now'] === true) {
+            $data['published_at'] = CarbonImmutable::now();
         }
 
-        if (isset($sanitized['unpublish_now']) && $sanitized['unpublish_now'] === true) {
-            $sanitized['published_at'] = null;
+        if (isset($data['unpublish_now']) && $data['unpublish_now'] === true) {
+            $data['published_at'] = null;
         }
+
+        $config = Container::getInstance()->make(Config::class);
+        assert($config instanceof Config);
+        $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
+        $data['updated_by_admin_user_id'] = $this->user($adminUserGuard)->id;
 
         //Add your code for manipulation with request data here
 
-        return $sanitized;
+        return $data;
     }
 }

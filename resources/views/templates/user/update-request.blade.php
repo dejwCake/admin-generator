@@ -18,10 +18,14 @@ namespace {{ $classNamespace }};
         'Illuminate\Container\Container',
         'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Contracts\Hashing\Hasher',
+        'Illuminate\Validation\Rules\Password',
         $modelFullName,
     ];
     if ($hasRuleUsage) {
         $uses[] = 'Illuminate\Validation\Rule';
+    }
+    if ($hasBelongsToMany) {
+        $uses[] = 'Illuminate\Support\Collection';
     }
     if ($translatable->count() > 0) {
         $uses[] = 'Brackets\Translatable\Http\Requests\TranslatableFormRequest';
@@ -71,6 +75,10 @@ final class {{ $classBaseName }} extends FormRequest
                 'sometimes',
                 'array',
             ],
+            '{{ $belongsToMany['related_table'] }}.*.id' => [
+                'required',
+                'integer',
+            ],
 @endforeach
 @endif
         ];
@@ -110,6 +118,10 @@ final class {{ $classBaseName }} extends FormRequest
                 'sometimes',
                 'array',
             ],
+            '{{ $belongsToMany['related_table'] }}.*.id' => [
+                'required',
+                'integer',
+            ],
 @endforeach
 @endif
         ];
@@ -122,6 +134,14 @@ final class {{ $classBaseName }} extends FormRequest
     public function getModifiedData(): array
     {
         $data = $this->validated();
+@if($hasBelongsToMany)
+@foreach($relations['belongsToMany'] as $belongsToMany)
+        if (isset($data['{{ $belongsToMany['related_table'] }}'])) {
+            $data['{{ $belongsToMany['related_table'] }}'] = new Collection($data['{{ $belongsToMany['related_table'] }}'] ?? []);
+        }
+@endforeach
+@endif
+
         if (array_key_exists('password', $data) && ($data['password'] === '' || $data['password'] === null)) {
             unset($data['password']);
         }
@@ -133,4 +153,21 @@ final class {{ $classBaseName }} extends FormRequest
 
         return $data;
     }
+@if($hasBelongsToMany)
+
+@foreach($relations['belongsToMany'] as $belongsToMany)
+    public function get{{ $belongsToMany['related_model_name'] }}Ids(): ?Collection
+    {
+        $data = $this->getModifiedData();
+        if (!isset($data['{{ $belongsToMany['related_table'] }}'])) {
+            return null;
+        }
+
+        return $data['{{ $belongsToMany['related_table'] }}']->pluck('id');
+    }
+@if(!$loop->last)
+
+@endif
+@endforeach
+@endif
 }

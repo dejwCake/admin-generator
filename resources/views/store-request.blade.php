@@ -14,10 +14,19 @@ namespace {{ $classNamespace }};
             return in_array($column['name'], $translatable->toArray());
         });
     }
-    $hasBelongsToMany = count($relations) > 0 && count($relations['belongsToMany']) > 0;
     $uses = [
         'Illuminate\Contracts\Auth\Access\Gate',
     ];
+    if ($hasPassword || $hasCreatedByAdminUserId || $hasUpdatedByAdminUserId) {
+        $uses[] = 'Illuminate\Container\Container';
+    }
+    if ($hasCreatedByAdminUserId || $hasUpdatedByAdminUserId) {
+        $uses[] = 'Illuminate\Contracts\Config\Repository as Config';
+    }
+    if ($hasPassword) {
+        $uses[] = 'Illuminate\Contracts\Hashing\Hasher';
+        $uses[] = 'Illuminate\Validation\Rules\Password';
+    }
     if ($hasRuleUsage) {
         $uses[] = 'Illuminate\Validation\Rule';
     }
@@ -70,6 +79,10 @@ final class {{ $classBaseName }} extends FormRequest
             '{{ $belongsToMany['related_table'] }}' => [
                 'array',
             ],
+            '{{ $belongsToMany['related_table'] }}.*.id' => [
+                'required',
+                'integer',
+            ],
 @endforeach
 @endif
         ];
@@ -110,6 +123,10 @@ final class {{ $classBaseName }} extends FormRequest
             '{{ $belongsToMany['related_table'] }}' => [
                 'array',
             ],
+            '{{ $belongsToMany['related_table'] }}.*.id' => [
+                'required',
+                'integer',
+            ],
 @endforeach
 @endif
         ];
@@ -119,34 +136,53 @@ final class {{ $classBaseName }} extends FormRequest
     /**
      * Modify input data
      */
-    public function getSanitized(): array
+    public function getModifiedData(): array
     {
 @if($hasBelongsToMany)
-        $sanitized = $this->validated();
+        $data = $this->validated();
 @foreach($relations['belongsToMany'] as $belongsToMany)
-        $sanitized['{{ $belongsToMany['related_table'] }}'] = new Collection($sanitized['{{ $belongsToMany['related_table'] }}'] ?? []);
+        $data['{{ $belongsToMany['related_table'] }}'] = new Collection($data['{{ $belongsToMany['related_table'] }}'] ?? []);
 @endforeach
-@else
+@elseif(!$hasPassword && !$hasCreatedByAdminUserId && !$hasUpdatedByAdminUserId)
         //phpcs:ignore SlevomatCodingStandard.Variables.UselessVariable.UselessVariable
-        $sanitized = $this->validated();
+        $data = $this->validated();
+@else
+        $data = $this->validated();
 @endif
 
+@if($hasPassword)
+        if (isset($data['password'])) {
+            $hasher = Container::getInstance()->make(Hasher::class);
+            assert($hasher instanceof Hasher);
+            $data['password'] = $hasher->make($data['password']);
+        }
+
+@endif
+@if($hasCreatedByAdminUserId || $hasUpdatedByAdminUserId)
+        $config = Container::getInstance()->make(Config::class);
+        assert($config instanceof Config);
+        $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
+@if($hasCreatedByAdminUserId)
+        $data['created_by_admin_user_id'] = $this->user($adminUserGuard)->id;
+@endif
+@if($hasUpdatedByAdminUserId)
+        $data['updated_by_admin_user_id'] = $this->user($adminUserGuard)->id;
+@endif
+
+@endif
         //Add your code for manipulation with request data here
 
-        return $sanitized;
+        return $data;
     }
 @if($hasBelongsToMany)
-
 @foreach($relations['belongsToMany'] as $belongsToMany)
+
     public function get{{ $belongsToMany['related_model_name'] }}Ids(): Collection
     {
-        $sanitized = $this->getSanitized();
+        $data = $this->getModifiedData();
 
-        return $sanitized['{{ $belongsToMany['related_table'] }}']->pluck('id');
+        return $data['{{ $belongsToMany['related_table'] }}']->pluck('id');
     }
-@if(!$loop->last)
-
-@endif
 @endforeach
 @endif
 }

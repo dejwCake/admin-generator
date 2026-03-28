@@ -177,8 +177,9 @@ trait Columns
 
         if ($name === 'password') {
             $serverStoreRules->push('\'confirmed\'');
-            $serverStoreRules->push('\'min:7\'');
-            $serverStoreRules->push('\'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/\'');
+            $serverStoreRules->push(
+                "Password::min(8)\n                    ->letters()\n                    ->mixedCase()\n                    ->numbers()\n                    ->symbols()\n                    ->uncompromised()",
+            );
         }
 
         return $serverStoreRules;
@@ -192,8 +193,9 @@ trait Columns
 
         if ($name === 'password') {
             $serverUpdateRules->push('\'confirmed\'');
-            $serverUpdateRules->push('\'min:7\'');
-            $serverUpdateRules->push('\'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/\'');
+            $serverUpdateRules->push(
+                "Password::min(8)\n                    ->letters()\n                    ->mixedCase()\n                    ->numbers()\n                    ->symbols()\n                    ->uncompromised()",
+            );
         }
 
         return $serverUpdateRules;
@@ -207,7 +209,7 @@ trait Columns
 
         if ($name === 'password') {
             $frontendRules->push('confirmed:password');
-            $frontendRules->push('min:7');
+            $frontendRules->push('min:8');
             //TODO not working, need fixing
 //            $frontendRules->push('regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!$#%]).*$/g');
         }

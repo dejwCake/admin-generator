@@ -9,6 +9,7 @@ use Brackets\AdminGenerator\Generators\Traits\Helpers;
 use Brackets\AdminGenerator\Generators\Traits\Names;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Override;
 use Symfony\Component\Console\Input\InputArgument;
@@ -25,7 +26,7 @@ abstract class ClassGenerator extends Command
     protected string $classFullName;
     protected string $classNamespace;
 
-    /** @var array<string, string> */
+    /** @var array<string, Collection> */
     protected array $relations = [];
 
     /**

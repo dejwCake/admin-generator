@@ -8,6 +8,7 @@ namespace {{ $classNamespace }};
 
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Collection;
 
 final class {{ $classBaseName }} extends FormRequest
 {
@@ -29,5 +30,12 @@ final class {{ $classBaseName }} extends FormRequest
                 'integer',
             ],
         ];
+    }
+
+    public function getIds(): Collection
+    {
+        $data = $this->validated();
+
+        return new Collection($data['ids'] ?? []);
     }
 }

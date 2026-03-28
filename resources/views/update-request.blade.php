@@ -14,11 +14,20 @@ namespace {{ $classNamespace }};
             return in_array($column['name'], $translatable->toArray());
         });
     }
-    $hasBelongsToMany = count($relations) > 0 && count($relations['belongsToMany']) > 0;
     $uses = [
         'Illuminate\Contracts\Auth\Access\Gate',
         $modelFullName,
     ];
+    if ($hasPassword || $hasUpdatedByAdminUserId) {
+        $uses[] = 'Illuminate\Container\Container';
+    }
+    if ($hasUpdatedByAdminUserId) {
+        $uses[] = 'Illuminate\Contracts\Config\Repository as Config';
+    }
+    if ($hasPassword) {
+        $uses[] = 'Illuminate\Contracts\Hashing\Hasher';
+        $uses[] = 'Illuminate\Validation\Rules\Password';
+    }
     if ($hasRuleUsage) {
         $uses[] = 'Illuminate\Validation\Rule';
     }
@@ -71,16 +80,8 @@ final class {{ $classBaseName }} extends FormRequest
             ],
 @endif
 @endforeach
-@if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
-
-@foreach($relations['belongsToMany'] as $belongsToMany)
-            '{{ $belongsToMany['related_table'] }}' => [
-                'sometimes',
-                'array',
-            ],
-@endforeach
-@endif
 @if($containsPublishedAtColumn)
+
             'publish_now' => [
                 'nullable',
                 'boolean',
@@ -89,6 +90,19 @@ final class {{ $classBaseName }} extends FormRequest
                 'nullable',
                 'boolean',
             ],
+@endif
+@if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
+
+@foreach($relations['belongsToMany'] as $belongsToMany)
+            '{{ $belongsToMany['related_table'] }}' => [
+                'sometimes',
+                'array',
+            ],
+            '{{ $belongsToMany['related_table'] }}.*.id' => [
+                'required',
+                'integer',
+            ],
+@endforeach
 @endif
         ];
     }
@@ -129,6 +143,10 @@ final class {{ $classBaseName }} extends FormRequest
                 'sometimes',
                 'array',
             ],
+            '{{ $belongsToMany['related_table'] }}.*.id' => [
+                'required',
+                'integer',
+            ],
 @endforeach
 @endif
 @if($containsPublishedAtColumn)
@@ -148,42 +166,60 @@ final class {{ $classBaseName }} extends FormRequest
     /**
      * Modify input data
      */
-    public function getSanitized(): array
+    public function getModifiedData(): array
     {
-        $sanitized = $this->validated();
+        $data = $this->validated();
 @if($hasBelongsToMany)
 @foreach($relations['belongsToMany'] as $belongsToMany)
-        if (isset($sanitized['{{ $belongsToMany['related_table'] }}'])) {
-            $sanitized['{{ $belongsToMany['related_table'] }}'] = new Collection($sanitized['{{ $belongsToMany['related_table'] }}'] ?? []);
+        if (isset($data['{{ $belongsToMany['related_table'] }}'])) {
+            $data['{{ $belongsToMany['related_table'] }}'] = new Collection($data['{{ $belongsToMany['related_table'] }}'] ?? []);
         }
 @endforeach
 @endif
 
-@if($containsPublishedAtColumn)
-        if (isset($sanitized['publish_now']) && $sanitized['publish_now'] === true) {
-            $sanitized['published_at'] = CarbonImmutable::now();
+@if($hasPassword)
+        if (array_key_exists('password', $data) && ($data['password'] === '' || $data['password'] === null)) {
+            unset($data['password']);
+        }
+        if (isset($data['password'])) {
+            $hasher = Container::getInstance()->make(Hasher::class);
+            assert($hasher instanceof Hasher);
+            $data['password'] = $hasher->make($data['password']);
         }
 
-        if (isset($sanitized['unpublish_now']) && $sanitized['unpublish_now'] === true) {
-            $sanitized['published_at'] = null;
+@endif
+@if($containsPublishedAtColumn)
+        if (isset($data['publish_now']) && $data['publish_now'] === true) {
+            $data['published_at'] = CarbonImmutable::now();
         }
+
+        if (isset($data['unpublish_now']) && $data['unpublish_now'] === true) {
+            $data['published_at'] = null;
+        }
+
+@endif
+@if($hasUpdatedByAdminUserId)
+        $config = Container::getInstance()->make(Config::class);
+        assert($config instanceof Config);
+        $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
+        $data['updated_by_admin_user_id'] = $this->user($adminUserGuard)->id;
 
 @endif
         //Add your code for manipulation with request data here
 
-        return $sanitized;
+        return $data;
     }
 @if($hasBelongsToMany)
 
 @foreach($relations['belongsToMany'] as $belongsToMany)
     public function get{{ $belongsToMany['related_model_name'] }}Ids(): ?Collection
     {
-        $sanitized = $this->getSanitized();
-        if (!isset($sanitized['{{ $belongsToMany['related_table'] }}']) || $sanitized['{{ $belongsToMany['related_table'] }}'] === null) {
+        $data = $this->getModifiedData();
+        if (!isset($data['{{ $belongsToMany['related_table'] }}'])) {
             return null;
         }
 
-        return $sanitized['{{ $belongsToMany['related_table'] }}']->pluck('id');
+        return $data['{{ $belongsToMany['related_table'] }}']->pluck('id');
     }
 @if(!$loop->last)
 

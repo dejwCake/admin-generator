@@ -6,6 +6,7 @@ namespace App\Http\Requests\Admin\Cat;
 
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Collection;
 
 final class BulkDestroyCat extends FormRequest
 {
@@ -27,5 +28,12 @@ final class BulkDestroyCat extends FormRequest
                 'integer',
             ],
         ];
+    }
+
+    public function getIds(): Collection
+    {
+        $data = $this->validated();
+
+        return new Collection($data['ids'] ?? []);
     }
 }

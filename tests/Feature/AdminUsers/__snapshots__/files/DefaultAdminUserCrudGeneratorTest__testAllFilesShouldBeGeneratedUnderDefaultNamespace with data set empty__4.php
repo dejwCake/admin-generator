@@ -10,7 +10,9 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 /**
  * @property AdminUser $adminUser
@@ -49,8 +51,12 @@ final class UpdateAdminUser extends FormRequest
             'password' => [
                 'sometimes',
                 'confirmed',
-                'min:7',
-                'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised(),
                 'string',
             ],
             'forbidden' => [
@@ -65,6 +71,10 @@ final class UpdateAdminUser extends FormRequest
             'roles' => [
                 'sometimes',
                 'array',
+            ],
+            'roles.*.id' => [
+                'required',
+                'integer',
             ],
         ];
 
@@ -83,9 +93,13 @@ final class UpdateAdminUser extends FormRequest
      */
     public function getModifiedData(): array
     {
+        $data = $this->validated();
+        if (isset($data['roles'])) {
+            $data['roles'] = new Collection($data['roles'] ?? []);
+        }
+
         $config = Container::getInstance()->make(Config::class);
         assert($config instanceof Config);
-        $data = $this->validated();
         if (!$config->get('admin-auth.activation_enabled')) {
             $data['activated'] = true;
         }
@@ -99,5 +113,15 @@ final class UpdateAdminUser extends FormRequest
         }
 
         return $data;
+    }
+
+    public function getRoleIds(): ?Collection
+    {
+        $data = $this->getModifiedData();
+        if (!isset($data['roles'])) {
+            return null;
+        }
+
+        return $data['roles']->pluck('id');
     }
 }

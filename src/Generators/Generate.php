@@ -43,11 +43,13 @@ final class Generate extends Command
         $withExportOption = $this->option('with-export');
         $withoutBulkOption = $this->option('without-bulk');
         $forcePermissionsOption = $this->option('force-permissions');
+        $belongsToManyOption = $this->option('belongs-to-many');
 
         $this->call('admin:generate:model', [
             'table_name' => $tableNameArgument,
             'class_name' => $modelNameOption,
             '--force' => $forceOption,
+            '--belongs-to-many' => $belongsToManyOption,
         ]);
 
         $this->call('admin:generate:factory', [
@@ -64,6 +66,7 @@ final class Generate extends Command
             '--force' => $forceOption,
             '--with-export' => $withExportOption,
             '--without-bulk' => $withoutBulkOption,
+            '--belongs-to-many' => $belongsToManyOption,
         ]);
 
         $this->call('admin:generate:request:index', [
@@ -76,12 +79,14 @@ final class Generate extends Command
             'table_name' => $tableNameArgument,
             '--model-name' => $modelNameOption,
             '--force' => $forceOption,
+            '--belongs-to-many' => $belongsToManyOption,
         ]);
 
         $this->call('admin:generate:request:update', [
             'table_name' => $tableNameArgument,
             '--model-name' => $modelNameOption,
             '--force' => $forceOption,
+            '--belongs-to-many' => $belongsToManyOption,
         ]);
 
         $this->call('admin:generate:request:destroy', [
@@ -118,12 +123,14 @@ final class Generate extends Command
             'table_name' => $tableNameArgument,
             '--model-name' => $modelNameOption,
             '--force' => $forceOption,
+            '--belongs-to-many' => $belongsToManyOption,
         ]);
 
         $this->call('admin:generate:lang', [
             'table_name' => $tableNameArgument,
             '--model-name' => $modelNameOption,
             '--with-export' => $withExportOption,
+            '--belongs-to-many' => $belongsToManyOption,
         ]);
 
         if ($withExportOption) {
@@ -173,6 +180,7 @@ final class Generate extends Command
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
             ['force-permissions', 'fp', InputOption::VALUE_NONE, 'Force permission will generate permission migration'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
         ];
     }
 

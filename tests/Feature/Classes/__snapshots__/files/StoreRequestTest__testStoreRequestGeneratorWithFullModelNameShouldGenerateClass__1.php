@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Requests\Admin\Cat;
 
 use Brackets\Translatable\Http\Requests\TranslatableFormRequest;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Validation\Rule;
 
 final class StoreCat extends TranslatableFormRequest
@@ -98,13 +100,18 @@ final class StoreCat extends TranslatableFormRequest
     /**
      * Modify input data
      */
-    public function getSanitized(): array
+    public function getModifiedData(): array
     {
-        //phpcs:ignore SlevomatCodingStandard.Variables.UselessVariable.UselessVariable
-        $sanitized = $this->validated();
+        $data = $this->validated();
+
+        $config = Container::getInstance()->make(Config::class);
+        assert($config instanceof Config);
+        $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
+        $data['created_by_admin_user_id'] = $this->user($adminUserGuard)->id;
+        $data['updated_by_admin_user_id'] = $this->user($adminUserGuard)->id;
 
         //Add your code for manipulation with request data here
 
-        return $sanitized;
+        return $data;
     }
 }

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Brackets\AdminAuth\Models\AdminUser;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Contracts\Routing\UrlGenerator;
@@ -15,41 +16,39 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class ProfileController extends Controller
+final class ProfileController extends Controller
 {
-    /**
-     * Guard used for admin user
-     */
+    private AdminUser $adminUser;
     private string $guard;
 
-    private AdminUser $adminUser;
-
     public function __construct(
-        public readonly Config $config,
-        public readonly Hasher $hasher,
-        public readonly Redirector $redirector,
-        public readonly UrlGenerator $urlGenerator,
-        public readonly ViewFactory $viewFactory,
+        private readonly Config $config,
+        private readonly Hasher $hasher,
+        private readonly Redirector $redirector,
+        private readonly UrlGenerator $urlGenerator,
+        private readonly ViewFactory $viewFactory,
     ) {
-        // TODO add authorization
         $this->guard = $this->config->get('admin-auth.defaults.guard', 'admin');
     }
 
     /**
-     * Show the form for editing logged user profile.
+     * Show the form for editing a logged user profile.
      */
     public function editProfile(Request $request): View
     {
-        $this->setUser($request);
+        $this->adminUser = $this->getUser($request);
 
         return $this->viewFactory->make(
             'admin.profile.edit-profile',
             [
                 'adminUser' => $this->adminUser,
                 'action' => $this->urlGenerator->route('admin/update-profile'),
+                'mediaCollection' => $this->adminUser->getCustomMediaCollection('avatar'),
+                'media' => $this->adminUser->getThumbs200ForCollection('avatar'),
             ],
         );
     }
@@ -61,36 +60,40 @@ class ProfileController extends Controller
      */
     public function updateProfile(Request $request): array|RedirectResponse
     {
-        $this->setUser($request);
+        $this->adminUser = $this->getUser($request);
 
-        // Validate the request
-        $request->validate([
-            'first_name' => ['nullable', 'string'],
-            'last_name' => ['nullable', 'string'],
-            'email' => ['sometimes', 'email', Rule::unique('admin_users', 'email')
-                    ->ignore($this->adminUser->getKey(), $this->adminUser->getKeyName()), 'string'],
-            'language' => ['sometimes', 'string'],
+        $data = $request->validate([
+            'first_name' => [
+                'nullable',
+                'string',
+            ],
+            'last_name' => [
+                'nullable',
+                'string',
+            ],
+            'email' => [
+                'sometimes',
+                'email',
+                Rule::unique('admin_users', 'email')
+                    ->ignore($this->adminUser->getKey(), $this->adminUser->getKeyName()),
+                'string',
+            ],
+            'language' => [
+                'sometimes',
+                'string',
+            ],
         ]);
 
-        // Sanitize input
-        $sanitized = $request->only([
-            'first_name',
-            'last_name',
-            'email',
-            'language',
-        ]);
-
-        // Update changed values AdminUser
-        $this->adminUser->update($sanitized);
+        $this->adminUser->update($data);
 
         if ($request->ajax()) {
             return [
-                'redirect' => $this->urlGenerator->to('admin/profile'),
+                'redirect' => $this->urlGenerator->route('admin/edit-profile'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
-        return $this->redirector->to('admin/profile');
+        return $this->redirector->route('admin/edit-profile');
     }
 
     /**
@@ -98,7 +101,7 @@ class ProfileController extends Controller
      */
     public function editPassword(Request $request): View
     {
-        $this->setUser($request);
+        $this->adminUser = $this->getUser($request);
 
         return $this->viewFactory->make(
             'admin.profile.edit-password',
@@ -116,40 +119,42 @@ class ProfileController extends Controller
      */
     public function updatePassword(Request $request): array|RedirectResponse
     {
-        $this->setUser($request);
+        $this->adminUser = $this->getUser($request);
 
-        // Validate the request
-        $request->validate([
-            'password' => ['sometimes', 'confirmed', 'min:7', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9]).*$/', 'string'],
+        $data = $request->validate([
+            'password' => [
+                'sometimes',
+                'confirmed',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised(),
+                'string',
+            ],
         ]);
 
-        // Sanitize input
-        $sanitized = $request->only([
-            'password',
-        ]);
+        $data['password'] = $this->hasher->make($data['password']);
 
-        //Modify input, set hashed password
-        $sanitized['password'] = $this->hasher->make($sanitized['password']);
-
-        // Update changed values AdminUser
-        $this->adminUser->update($sanitized);
+        $this->adminUser->update($data);
 
         if ($request->ajax()) {
             return [
-                'redirect' => $this->urlGenerator->to('admin/password'),
+                'redirect' => $this->urlGenerator->route('admin/edit-password'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
-        return $this->redirector->to('admin/password');
+        return $this->redirector->route('admin/edit-password');
     }
 
     /**
-     * Get logged user before each method
+     * Get a logged user before each method
      *
      * @throws NotFoundHttpException
      */
-    private function setUser(Request $request): void
+    private function getUser(Request $request): AdminUser|Authenticatable
     {
         if ($request->user($this->guard) === null) {
             throw NotFoundHttpException::fromStatusCode(
@@ -158,6 +163,6 @@ class ProfileController extends Controller
             );
         }
 
-        $this->adminUser = $request->user($this->guard);
+        return $request->user($this->guard);
     }
 }

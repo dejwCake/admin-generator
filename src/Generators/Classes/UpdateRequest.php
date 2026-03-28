@@ -64,31 +64,36 @@ final class UpdateRequest extends ClassGenerator
     protected function buildClass(): string
     {
         $columns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
+        $allColumns = $this->readColumnsFromTable($this->tableName);
+        $columnNames = $allColumns->pluck('name')->toArray();
 
-        return view('brackets/admin-generator::' . $this->view, [
-            'classBaseName' => $this->classBaseName,
-            'classNamespace' => $this->classNamespace,
-            'modelBaseName' => $this->modelBaseName,
-            'modelDotNotation' => $this->modelDotNotation,
-            'modelVariableName' => $this->modelVariableName,
-            'modelFullName' => $this->modelFullName,
-            'containsPublishedAtColumn' => in_array(
-                'published_at',
-                array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
-                true,
-            ),
+        return view(
+            'brackets/admin-generator::' . $this->view,
+            [
+                'classBaseName' => $this->classBaseName,
+                'classNamespace' => $this->classNamespace,
+                'modelBaseName' => $this->modelBaseName,
+                'modelDotNotation' => $this->modelDotNotation,
+                'modelVariableName' => $this->modelVariableName,
+                'modelFullName' => $this->modelFullName,
+                'containsPublishedAtColumn' => in_array('published_at', $columnNames, true),
 
-            // validation in store/update
-            'columns' => $columns,
-            'hasRuleUsage' => $columns->contains(
-                static fn (array $column): bool => (new Collection($column['serverUpdateRules']))
-                    ->contains(static fn (string $rule): bool => str_contains($rule, 'Rule::')),
-            ),
-            'translatable' => $this->readColumnsFromTable($this->tableName)
-                ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
-                ->pluck('name'),
-            'relations' => $this->relations,
-        ])->render();
+                // validation in store/update
+                'columns' => $columns,
+                'translatable' => $allColumns
+                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
+                    ->pluck('name'),
+                'relations' => $this->relations,
+                'hasBelongsToMany' => count($this->relations) > 0 && count($this->relations['belongsToMany']) > 0,
+                'hasRuleUsage' => $columns->contains(
+                    static fn (array $column): bool => (new Collection($column['serverUpdateRules']))
+                        ->contains(static fn (string $rule): bool => str_contains($rule, 'Rule::')),
+                ),
+                'hasPassword' => in_array('password', $columnNames, true),
+                'hasCreatedByAdminUserId' => in_array('created_by_admin_user_id', $columnNames, true),
+                'hasUpdatedByAdminUserId' => in_array('updated_by_admin_user_id', $columnNames, true),
+            ],
+        )->render();
     }
 
     /** @return array<array<string|int>> */
@@ -99,8 +104,8 @@ final class UpdateRequest extends ClassGenerator
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
         ];
     }
 

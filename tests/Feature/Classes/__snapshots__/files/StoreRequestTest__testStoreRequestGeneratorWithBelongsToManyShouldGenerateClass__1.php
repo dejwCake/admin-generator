@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Requests\Admin\Category;
 
 use Brackets\Translatable\Http\Requests\TranslatableFormRequest;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 
@@ -78,6 +80,10 @@ final class StoreCategory extends TranslatableFormRequest
             'posts' => [
                 'array',
             ],
+            'posts.*.id' => [
+                'required',
+                'integer',
+            ],
         ];
     }
 
@@ -103,20 +109,26 @@ final class StoreCategory extends TranslatableFormRequest
     /**
      * Modify input data
      */
-    public function getSanitized(): array
+    public function getModifiedData(): array
     {
-        $sanitized = $this->validated();
-        $sanitized['posts'] = new Collection($sanitized['posts'] ?? []);
+        $data = $this->validated();
+        $data['posts'] = new Collection($data['posts'] ?? []);
+
+        $config = Container::getInstance()->make(Config::class);
+        assert($config instanceof Config);
+        $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
+        $data['created_by_admin_user_id'] = $this->user($adminUserGuard)->id;
+        $data['updated_by_admin_user_id'] = $this->user($adminUserGuard)->id;
 
         //Add your code for manipulation with request data here
 
-        return $sanitized;
+        return $data;
     }
 
     public function getPostIds(): Collection
     {
-        $sanitized = $this->getSanitized();
+        $data = $this->getModifiedData();
 
-        return $sanitized['posts']->pluck('id');
+        return $data['posts']->pluck('id');
     }
 }
