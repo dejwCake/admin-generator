@@ -7,7 +7,7 @@
     <{{ $modelJSName }}-listing
         :data="{{'{{'}} $data->toJson() }}"
         :url="'{{'{{'}} $url }}'"
-@if($containsPublishedAtColumn)
+@if($hasPublishedAt)
         :trans="{{'{{'}} json_encode(trans('brackets/admin-ui::admin.dialogs')) }}"
 @endif
         inline-template>

@@ -133,6 +133,8 @@ final class Index extends ResourceGenerator
 
     private function buildView(): string
     {
+        $columns = $this->readColumnsFromTable($this->tableName);
+
         return view('brackets/admin-generator::' . $this->view, [
             'modelBaseName' => $this->modelBaseName,
             'modelRouteAndViewName' => $this->modelRouteAndViewName,
@@ -143,15 +145,13 @@ final class Index extends ResourceGenerator
             'modelLangFormat' => $this->modelLangFormat,
             'resource' => $this->resource,
             'export' => $this->export,
-            'containsPublishedAtColumn' => in_array(
-                'published_at',
-                array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
-                true,
-            ),
+            'hasPublishedAt' => $columns
+                ->filter(static fn (array $column): bool => $column['name'] === 'published_at')
+                ->count() > 0,
             'withoutBulk' => $this->withoutBulk,
 
             'columns' => $this->getColumns(),
-//            'filters' => $this->readColumnsFromTable($tableName)->filter(function($column) {
+//            'filters' => $columns->filter(function($column) {
 //                return in_array($column['majorType'], ['bool', 'date'], true);
 //            }),
         ])->render();

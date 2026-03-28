@@ -142,6 +142,7 @@ final class Generate extends Command
             '--model-name' => $modelNameOption,
             '--with-export' => $withExportOption,
             '--belongs-to-many' => $belongsToManyOption,
+            '--media' => $mediaOption,
         ]);
 
         if ($withExportOption) {

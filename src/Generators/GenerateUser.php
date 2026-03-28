@@ -160,9 +160,9 @@ final class GenerateUser extends Command
         $this->call('admin:generate:lang', [
             'table_name' => $tableNameArgument,
             '--model-name' => $modelNameOption,
-            '--template' => 'user',
             '--belongs-to-many' => 'roles',
             '--with-export' => $withExportOption,
+            '--media' => $mediaOption,
         ]);
 
         $this->call('admin:generate:factory', [

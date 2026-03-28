@@ -6,6 +6,7 @@ namespace Brackets\AdminGenerator\Generators\Traits;
 
 use Illuminate\Database\Schema\Builder as Schema;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 trait Columns
 {
@@ -40,25 +41,27 @@ trait Columns
                     'required' => $column['nullable'] === false,
                     'unique' => $columnUniqueIndexes->count() > 0,
                     'uniqueDeletedAtCondition' => $columnUniqueDeleteAtCondition->count() > 0,
+                    'defaultTranslation' => $this->getDefaultTranslation($column['name']),
                 ];
             },
         );
     }
 
     /** @return Collection<string|int, array<string, string|array<string>>> */
-    protected function getVisibleColumns(string $tableName, string $modelVariableName): Collection
-    {
+    protected function getVisibleColumns(
+        string $tableName,
+        string $modelVariableName,
+        array $ignoredColumns = ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token', 'last_login_at'],
+    ): Collection {
         $columns = $this->readColumnsFromTable($tableName);
         $hasSoftDelete = (
             $columns->filter(static fn (array $column): bool => $column['name'] === 'deleted_at')
                 ->count() > 0
         );
 
-        return $columns->filter(static fn (array $column): bool => !in_array(
-            $column['name'],
-            ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token', 'last_login_at'],
-            true,
-        ))->map(fn (array $column): array => [
+        return $columns
+            ->filter(static fn (array $column): bool => !in_array($column['name'], $ignoredColumns, true))
+            ->map(fn (array $column): array => [
                 'name' => $column['name'],
                 'type' => $column['type'],
                 'majorType' => $column['majorType'],
@@ -472,5 +475,18 @@ trait Columns
             'float' => '$this->faker->randomFloat(2)',
             default => '$this->faker->sentence',
         };
+    }
+
+    private function getDefaultTranslation(string $string): string
+    {
+        if ($string === 'id') {
+            return 'ID';
+        }
+
+        if (Str::endsWith(Str::lower($string), '_id')) {
+            $string = Str::substr($string, 0, -3);
+        }
+
+        return Str::ucfirst(str_replace('_', ' ', $string));
     }
 }

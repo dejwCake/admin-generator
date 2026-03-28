@@ -31,6 +31,9 @@ return [
             'views' => 'Views',
             'created_by_admin_user_id' => 'Created by admin user',
             'updated_by_admin_user_id' => 'Updated by admin user',
+            'created_at' => 'Created at',
+            'updated_at' => 'Updated at',
+            'deleted_at' => 'Deleted at',
             //Belongs to many relations
             'posts' => 'Posts',
         ],

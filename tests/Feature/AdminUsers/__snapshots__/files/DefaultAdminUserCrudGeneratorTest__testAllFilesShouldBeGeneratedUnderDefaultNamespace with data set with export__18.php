@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 return [
     'admin-user' => [
-        'title' => 'Users',
+        'title' => 'Admin Users',
 
         'actions' => [
-            'index' => 'Users',
-            'create' => 'New User',
+            'index' => 'Admin Users',
+            'create' => 'New Admin User',
             'edit' => 'Edit :name',
             'edit_profile' => 'Edit Profile',
             'edit_password' => 'Edit Password',
@@ -17,15 +17,18 @@ return [
 
         'columns' => [
             'id' => 'ID',
-            'last_login_at' => 'Last login',
             'first_name' => 'First name',
             'last_name' => 'Last name',
             'email' => 'Email',
             'password' => 'Password',
             'password_repeat' => 'Password Confirmation',
+            'remember_token' => 'Remember token',
             'activated' => 'Activated',
             'forbidden' => 'Forbidden',
             'language' => 'Language',
+            'deleted_at' => 'Deleted at',
+            'created_at' => 'Created at',
+            'updated_at' => 'Updated at',
             //Belongs to many relations
             'roles' => 'Roles',
         ],

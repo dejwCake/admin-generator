@@ -32,15 +32,6 @@ trait Names
     protected string $controllerFullName;
     protected string $controllerWithNamespaceFromDefault;
 
-    public function valueWithoutId(string $string): string
-    {
-        if (Str::endsWith(Str::lower($string), '_id')) {
-            $string = Str::substr($string, 0, -3);
-        }
-
-        return Str::ucfirst(str_replace('_', ' ', $string));
-    }
-
     protected function initCommonNames(
         string $tableName,
         ?string $modelName = null,

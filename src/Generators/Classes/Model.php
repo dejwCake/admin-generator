@@ -109,9 +109,9 @@ final class Model extends ClassGenerator
             'hasSoftDelete' => $columns->filter(
                 static fn (array $column): bool => $column['name'] === 'deleted_at',
             )->count() > 0,
-            'hasPublishedAt' => $columns->filter(
-                static fn (array $column): bool => $column['name'] === 'published_at',
-            )->count() > 0,
+            'hasPublishedAt' => $columns
+                ->filter(static fn (array $column): bool => $column['name'] === 'published_at')
+                ->count() > 0,
             'relations' => $this->relations,
             'mediaCollections' => $this->mediaCollections,
         ])->render();

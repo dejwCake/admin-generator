@@ -31,6 +31,8 @@ abstract class ResourceGenerator extends Command
     public function __construct(protected readonly Filesystem $files)
     {
         parent::__construct();
+
+        $this->mediaCollections = new Collection();
     }
 
     /** @return array<array<string|int>> */

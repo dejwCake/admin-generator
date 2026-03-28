@@ -63,9 +63,8 @@ final class UpdateRequest extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
-        $allColumns = $this->readColumnsFromTable($this->tableName);
-        $columnNames = $allColumns->pluck('name')->toArray();
+        $visibleColumns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
+        $columns = $this->readColumnsFromTable($this->tableName);
 
         return view(
             'brackets/admin-generator::' . $this->view,
@@ -76,22 +75,30 @@ final class UpdateRequest extends ClassGenerator
                 'modelDotNotation' => $this->modelDotNotation,
                 'modelVariableName' => $this->modelVariableName,
                 'modelFullName' => $this->modelFullName,
-                'containsPublishedAtColumn' => in_array('published_at', $columnNames, true),
-
-                // validation in store/update
-                'columns' => $columns,
-                'translatable' => $allColumns
-                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
-                    ->pluck('name'),
-                'relations' => $this->relations,
+                'hasPublishedAt' => $columns
+                    ->filter(static fn (array $column): bool => $column['name'] === 'published_at')
+                    ->count() > 0,
+                'hasPassword' => $columns
+                    ->filter(static fn (array $column): bool => $column['name'] === 'password')
+                    ->count() > 0,
+                'hasCreatedByAdminUserId' => $columns
+                    ->filter(static fn (array $column): bool => $column['name'] === 'created_by_admin_user_id')
+                    ->count() > 0,
+                'hasUpdatedByAdminUserId' => $columns
+                    ->filter(static fn (array $column): bool => $column['name'] === 'updated_by_admin_user_id')
+                    ->count() > 0,
                 'hasBelongsToMany' => count($this->relations) > 0 && count($this->relations['belongsToMany']) > 0,
-                'hasRuleUsage' => $columns->contains(
+                'hasRuleUsage' => $visibleColumns->contains(
                     static fn (array $column): bool => (new Collection($column['serverUpdateRules']))
                         ->contains(static fn (string $rule): bool => str_contains($rule, 'Rule::')),
                 ),
-                'hasPassword' => in_array('password', $columnNames, true),
-                'hasCreatedByAdminUserId' => in_array('created_by_admin_user_id', $columnNames, true),
-                'hasUpdatedByAdminUserId' => in_array('updated_by_admin_user_id', $columnNames, true),
+
+                // validation in store/update
+                'columns' => $visibleColumns,
+                'translatable' => $columns
+                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
+                    ->pluck('name'),
+                'relations' => $this->relations,
             ],
         )->render();
     }

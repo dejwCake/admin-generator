@@ -59,6 +59,11 @@ final class Lang extends FileAppender
             $this->setBelongToManyRelation($belongsToMany);
         }
 
+        $media = $this->option('media');
+        if ($media !== null && $media !== []) {
+            $this->setMediaCollections($media);
+        }
+
         // TODO what if a file has been changed? this will append it again
         // (because the content is not present anymore -> we should probably check only for a root key for existence)
 
@@ -85,13 +90,21 @@ final class Lang extends FileAppender
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a controller for the given model'],
             ['locale', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom locale'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
+            [
+                'media',
+                'M',
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Media collections (format: name:type:disk:maxFiles)',
+            ],
         ];
     }
 
     private function buildClass(): string
     {
+        $columns = $this->readColumnsFromTable($this->tableName);
+
         return view('brackets/admin-generator::' . $this->view, [
             'modelLangFormat' => $this->modelLangFormat,
             'modelBaseName' => $this->modelBaseName,
@@ -99,19 +112,14 @@ final class Lang extends FileAppender
             'titleSingular' => $this->titleSingular,
             'titlePlural' => $this->titlePlural,
             'export' => $this->export,
-            'containsPublishedAtColumn' => in_array(
-                'published_at',
-                array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
-                true,
-            ),
+            'hasPublishedAt' => $columns
+                ->filter(static fn (array $column): bool => $column['name'] === 'published_at')
+                ->count() > 0,
+            'hasProfile' => $this->tableName === 'admin_users',
 
-            'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)
-                ->map(function (array $column): array {
-                    $column['defaultTranslation'] = $this->valueWithoutId($column['name']);
-
-                    return $column;
-                }),
+            'columns' => $columns,
             'relations' => $this->relations,
+            'mediaCollections' => $this->mediaCollections,
         ])->render();
     }
 }

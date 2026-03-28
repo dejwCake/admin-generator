@@ -39,7 +39,7 @@ namespace {{ $classNamespace }};
     } else {
         $uses[] = 'Illuminate\Foundation\Http\FormRequest';
     }
-    if ($containsPublishedAtColumn) {
+    if ($hasPublishedAt) {
         $uses[] = 'Carbon\CarbonImmutable';
     }
     $uses = Arr::sort($uses);
@@ -80,7 +80,7 @@ final class {{ $classBaseName }} extends FormRequest
             ],
 @endif
 @endforeach
-@if($containsPublishedAtColumn)
+@if($hasPublishedAt)
 
             'publish_now' => [
                 'nullable',
@@ -149,7 +149,7 @@ final class {{ $classBaseName }} extends FormRequest
             ],
 @endforeach
 @endif
-@if($containsPublishedAtColumn)
+@if($hasPublishedAt)
             'publish_now' => [
                 'nullable',
                 'boolean',
@@ -188,7 +188,7 @@ final class {{ $classBaseName }} extends FormRequest
         }
 
 @endif
-@if($containsPublishedAtColumn)
+@if($hasPublishedAt)
         if (isset($data['publish_now']) && $data['publish_now'] === true) {
             $data['published_at'] = CarbonImmutable::now();
         }
