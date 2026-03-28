@@ -65,7 +65,6 @@ final class StoreRequest extends ClassGenerator
     {
         $columns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
         $allColumns = $this->readColumnsFromTable($this->tableName);
-        $columnNames = $allColumns->pluck('name')->toArray();
 
         return view(
             'brackets/admin-generator::' . $this->view,
@@ -74,21 +73,27 @@ final class StoreRequest extends ClassGenerator
                 'classNamespace' => $this->classNamespace,
                 'modelDotNotation' => $this->modelDotNotation,
 
+                'hasBelongsToMany' => count($this->relations) > 0 && count($this->relations['belongsToMany']) > 0,
+                'hasRuleUsage' => $columns->contains(
+                    static fn (array $column): bool => (new Collection($column['serverStoreRules']))
+                        ->contains(static fn (string $rule): bool => str_contains($rule, 'Rule::')),
+                ),
+                'hasPassword' => $allColumns->contains(
+                    static fn (array $column): bool => $column['name'] === 'password',
+                ),
+                'hasCreatedByAdminUserId' => $allColumns->contains(
+                    static fn (array $column): bool => $column['name'] === 'created_by_admin_user_id',
+                ),
+                'hasUpdatedByAdminUserId' => $allColumns->contains(
+                    static fn (array $column): bool => $column['name'] === 'updated_by_admin_user_id',
+                ),
+
                 // validation in store/update
                 'columns' => $columns,
                 'translatable' => $allColumns
                     ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
                     ->pluck('name'),
                 'relations' => $this->relations,
-
-                'hasBelongsToMany' => count($this->relations) > 0 && count($this->relations['belongsToMany']) > 0,
-                'hasRuleUsage' => $columns->contains(
-                    static fn (array $column): bool => (new Collection($column['serverStoreRules']))
-                        ->contains(static fn (string $rule): bool => str_contains($rule, 'Rule::')),
-                ),
-                'hasPassword' => in_array('password', $columnNames, true),
-                'hasCreatedByAdminUserId' => in_array('created_by_admin_user_id', $columnNames, true),
-                'hasUpdatedByAdminUserId' => in_array('updated_by_admin_user_id', $columnNames, true),
             ],
         )->render();
     }

@@ -113,16 +113,16 @@ final class Form extends ResourceGenerator
     {
         return view('brackets/admin-generator::' . $this->form, [
             'modelBaseName' => $this->modelBaseName,
-            'modelRouteAndViewName' => $this->modelRouteAndViewName,
             'modelPlural' => $this->modelPlural,
+            'modelRouteAndViewName' => $this->modelRouteAndViewName,
             'modelDotNotation' => $this->modelDotNotation,
             'modelLangFormat' => $this->modelLangFormat,
 
+            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)->contains(
+                static fn (array $column): bool => $column['majorType'] === 'json',
+            ),
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)
                 ->sortBy(static fn (array $column): bool => !($column['majorType'] === 'json')),
-            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
-                    ->count() > 0,
             'wysiwygTextColumnNames' => ['text', 'body', 'description'],
             'relations' => $this->relations,
         ])->render();
@@ -132,17 +132,17 @@ final class Form extends ResourceGenerator
     {
         return view('brackets/admin-generator::' . $this->formRight, [
             'modelBaseName' => $this->modelBaseName,
-            'modelRouteAndViewName' => $this->modelRouteAndViewName,
             'modelPlural' => $this->modelPlural,
+            'modelRouteAndViewName' => $this->modelRouteAndViewName,
+            'modelVariableName' => $this->modelVariableName,
             'modelDotNotation' => $this->modelDotNotation,
             'modelLangFormat' => $this->modelLangFormat,
-            'modelVariableName' => $this->modelVariableName,
 
+            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)->contains(
+                static fn (array $column): bool => $column['majorType'] === 'json',
+            ),
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)
                 ->sortBy(static fn (array $column): bool => !($column['majorType'] === 'json')),
-            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
-                    ->count() > 0,
             'translatableTextarea' => ['perex', 'text', 'body'],
             'relations' => $this->relations,
         ])->render();
@@ -152,9 +152,9 @@ final class Form extends ResourceGenerator
     {
         return view('brackets/admin-generator::' . $this->create, [
             'modelBaseName' => $this->modelBaseName,
-            'modelRouteAndViewName' => $this->modelRouteAndViewName,
-            'modelVariableName' => $this->modelVariableName,
             'modelPlural' => $this->modelPlural,
+            'modelVariableName' => $this->modelVariableName,
+            'modelRouteAndViewName' => $this->modelRouteAndViewName,
             'modelViewsDirectory' => $this->modelViewsDirectory,
             'modelDotNotation' => $this->modelDotNotation,
             'modelJSName' => $this->modelJSName,
@@ -162,10 +162,10 @@ final class Form extends ResourceGenerator
             'resource' => $this->resource,
             'isUsedTwoColumnsLayout' => $this->isUsedTwoColumnsLayout(),
 
+            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)->contains(
+                static fn (array $column): bool => $column['majorType'] === 'json',
+            ),
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
-            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
-                    ->count() > 0,
         ])->render();
     }
 
@@ -173,26 +173,26 @@ final class Form extends ResourceGenerator
     {
         return view('brackets/admin-generator::' . $this->edit, [
             'modelBaseName' => $this->modelBaseName,
-            'modelRouteAndViewName' => $this->modelRouteAndViewName,
-            'modelVariableName' => $this->modelVariableName,
             'modelPlural' => $this->modelPlural,
+            'modelVariableName' => $this->modelVariableName,
+            'modelRouteAndViewName' => $this->modelRouteAndViewName,
             'modelViewsDirectory' => $this->modelViewsDirectory,
             'modelDotNotation' => $this->modelDotNotation,
             'modelJSName' => $this->modelJSName,
             'modelLangFormat' => $this->modelLangFormat,
-            'resource' => $this->resource,
-            'isUsedTwoColumnsLayout' => $this->isUsedTwoColumnsLayout(),
-
             'modelTitle' => $this->readColumnsFromTable($this->tableName)
                 ->filter(static fn (array $column): bool => in_array(
                     $column['name'],
                     ['title', 'name', 'first_name', 'email'],
                     true,
                 ))->first(null, ['name' => 'id'])['name'],
+            'resource' => $this->resource,
+            'isUsedTwoColumnsLayout' => $this->isUsedTwoColumnsLayout(),
+
+            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)->contains(
+                static fn (array $column): bool => $column['majorType'] === 'json',
+            ),
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
-            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
-                    ->count() > 0,
         ])->render();
     }
 

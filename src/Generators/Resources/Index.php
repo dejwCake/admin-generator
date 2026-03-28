@@ -139,23 +139,23 @@ final class Index extends ResourceGenerator
 
         return view('brackets/admin-generator::' . $this->view, [
             'modelBaseName' => $this->modelBaseName,
-            'modelRouteAndViewName' => $this->modelRouteAndViewName,
             'modelPlural' => $this->modelPlural,
+            'modelRouteAndViewName' => $this->modelRouteAndViewName,
             'modelViewsDirectory' => $this->modelViewsDirectory,
             'modelJSName' => $this->modelJSName,
             'modelDotNotation' => $this->modelDotNotation,
             'modelLangFormat' => $this->modelLangFormat,
-            'resource' => $this->resource,
             'export' => $this->export,
-            'hasPublishedAt' => $columns
-                ->filter(static fn (array $column): bool => $column['name'] === 'published_at')
-                ->count() > 0,
             'withoutBulk' => $this->withoutBulk,
+            'resource' => $this->resource,
+            'hasPublishedAt' => $columns->contains(
+                static fn (array $column): bool => $column['name'] === 'published_at',
+            ),
 
-            'columns' => $this->getColumns(),
-//            'filters' => $columns->filter(function($column) {
-//                return in_array($column['majorType'], ['bool', 'date'], true);
-//            }),
+            'columns' => $this->getColumnsForIndex($columns),
+            //            'filters' => $columns->filter(function($column) {
+            //                return in_array($column['majorType'], ['bool', 'date'], true);
+            //            }),
         ])->render();
     }
 
@@ -178,9 +178,9 @@ final class Index extends ResourceGenerator
             );
     }
 
-    private function getColumns(): Collection
+    private function getColumnsForIndex(Collection $columns): Collection
     {
-        return $this->readColumnsFromTable($this->tableName)
+        return $columns
             ->reject(static fn (array $column): bool => $column['majorType'] === 'text'
             || in_array(
                 $column['name'],

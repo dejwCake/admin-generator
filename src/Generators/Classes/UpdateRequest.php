@@ -72,21 +72,21 @@ final class UpdateRequest extends ClassGenerator
                 'classBaseName' => $this->classBaseName,
                 'classNamespace' => $this->classNamespace,
                 'modelBaseName' => $this->modelBaseName,
-                'modelDotNotation' => $this->modelDotNotation,
-                'modelVariableName' => $this->modelVariableName,
                 'modelFullName' => $this->modelFullName,
-                'hasPublishedAt' => $columns
-                    ->filter(static fn (array $column): bool => $column['name'] === 'published_at')
-                    ->count() > 0,
-                'hasPassword' => $columns
-                    ->filter(static fn (array $column): bool => $column['name'] === 'password')
-                    ->count() > 0,
-                'hasCreatedByAdminUserId' => $columns
-                    ->filter(static fn (array $column): bool => $column['name'] === 'created_by_admin_user_id')
-                    ->count() > 0,
-                'hasUpdatedByAdminUserId' => $columns
-                    ->filter(static fn (array $column): bool => $column['name'] === 'updated_by_admin_user_id')
-                    ->count() > 0,
+                'modelVariableName' => $this->modelVariableName,
+                'modelDotNotation' => $this->modelDotNotation,
+                'hasPublishedAt' => $columns->contains(
+                    static fn (array $column): bool => $column['name'] === 'published_at',
+                ),
+                'hasPassword' => $columns->contains(
+                    static fn (array $column): bool => $column['name'] === 'password',
+                ),
+                'hasCreatedByAdminUserId' => $columns->contains(
+                    static fn (array $column): bool => $column['name'] === 'created_by_admin_user_id',
+                ),
+                'hasUpdatedByAdminUserId' => $columns->contains(
+                    static fn (array $column): bool => $column['name'] === 'updated_by_admin_user_id',
+                ),
                 'hasBelongsToMany' => count($this->relations) > 0 && count($this->relations['belongsToMany']) > 0,
                 'hasRuleUsage' => $visibleColumns->contains(
                     static fn (array $column): bool => (new Collection($column['serverUpdateRules']))

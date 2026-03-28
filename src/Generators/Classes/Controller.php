@@ -6,6 +6,7 @@ namespace Brackets\AdminGenerator\Generators\Classes;
 
 use Brackets\AdminGenerator\Generators\Traits\FileManipulations;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Override;
 use Symfony\Component\Console\Input\InputArgument;
@@ -97,9 +98,12 @@ final class Controller extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
+        $columns = $this->readColumnsFromTable($this->tableName);
+
         return view('brackets/admin-generator::' . $this->view, [
             'controllerBaseName' => $this->classBaseName,
             'controllerNamespace' => $this->classNamespace,
+            'exportBaseName' => $this->exportBaseName,
             'modelBaseName' => $this->modelBaseName,
             'modelFullName' => $this->modelFullName,
             'modelPlural' => $this->modelPlural,
@@ -110,11 +114,10 @@ final class Controller extends ClassGenerator
             'modelWithNamespaceFromDefault' => $this->modelWithNamespaceFromDefault,
             'export' => $this->export,
             'withoutBulk' => $this->withoutBulk,
-            'exportBaseName' => $this->exportBaseName,
             'resource' => $this->resource,
             // index
-            'columnsToQuery' => $this->getColumnsToQuery(),
-            'columnsToSearchIn' => $this->readColumnsFromTable($this->tableName)->filter(
+            'columnsToQuery' => $this->getColumnsToQuery($columns),
+            'columnsToSearchIn' => $columns->filter(
                 static fn (array $column): bool => (
                     in_array($column['majorType'], ['json', 'text', 'string'], true)
                     || $column['name'] === 'id')
@@ -198,9 +201,8 @@ final class Controller extends ClassGenerator
     }
 
     /** @return array<string> */
-    private function getColumnsToQuery(): array
+    private function getColumnsToQuery(Collection $columns): array
     {
-        $columns = $this->readColumnsFromTable($this->tableName);
         $createdByAdminUserIdPresent = $columns->contains('name', 'created_by_admin_user_id');
         $updatedByAdminUserIdPresent = $columns->contains('name', 'updated_by_admin_user_id');
 
@@ -215,7 +217,7 @@ final class Controller extends ClassGenerator
                     $haystack = ['password', 'remember_token', 'slug', 'created_at', 'deleted_at'];
                 }
 
-                return !($column['majorType'] === 'text' || in_array($column['name'], $haystack, true,));
+                return !($column['majorType'] === 'text' || in_array($column['name'], $haystack, true));
             })->pluck('name')->toArray();
     }
 }

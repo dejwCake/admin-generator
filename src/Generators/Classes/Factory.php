@@ -81,10 +81,19 @@ final class Factory extends ClassGenerator
         return view(
             'brackets/admin-generator::' . $this->view,
             [
+                'namespace' => $this->classNamespace,
                 'modelFullName' => $this->modelFullName,
                 'modelBaseName' => $this->modelBaseName,
-                'namespace' => $this->classNamespace,
 
+                'hasPassword' => $columns->contains(
+                    static fn (array $column): bool => $column['name'] === 'password',
+                ),
+                'hasEmailVerified' => $columns->contains(
+                    static fn (array $column): bool => $column['name'] === 'email_verified_at',
+                ),
+                'hasPublishedAt' => $columns->contains(
+                    static fn (array $column): bool => $column['name'] === 'published_at',
+                ),
                 'translatableColumns' => $columns->filter(
                     static fn ($column) => in_array($column['name'], $translatable->toArray(), true),
                 ),
@@ -92,15 +101,6 @@ final class Factory extends ClassGenerator
                     static fn ($column) => in_array($column['name'], $translatable->toArray(), true),
                 ),
                 'booleanColumns' => $columns->filter(static fn ($column) => $column['majorType'] === 'bool'),
-                'hasPassword' => $columns
-                    ->filter(static fn (array $column): bool => $column['name'] === 'password')
-                    ->count() > 0,
-                'hasEmailVerified' => $columns
-                    ->filter(static fn (array $column): bool => $column['name'] === 'email_verified_at')
-                    ->count() > 0,
-                'hasPublishedAt' => $columns
-                    ->filter(static fn (array $column): bool => $column['name'] === 'published_at')
-                    ->count() > 0,
             ],
         )->render();
     }

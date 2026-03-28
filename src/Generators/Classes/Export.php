@@ -56,8 +56,8 @@ final class Export extends ClassGenerator
     {
         return view('brackets/admin-generator::' . $this->view, [
             'exportNamespace' => $this->classNamespace,
-            'modelFullName' => $this->modelFullName,
             'classBaseName' => $this->exportBaseName,
+            'modelFullName' => $this->modelFullName,
             'modelBaseName' => $this->modelBaseName,
             'modelVariableName' => $this->modelVariableName,
             'modelLangFormat' => $this->modelLangFormat,

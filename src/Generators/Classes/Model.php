@@ -80,10 +80,16 @@ final class Model extends ClassGenerator
                 ? $this->tableName
                 : null,
 
-            'allColumns' => $columns,
             'hasCarbonProperty' => $columns->contains(
                 static fn (array $column): bool => in_array($column['majorType'], ['datetime', 'date'], true),
             ),
+            'hasSoftDelete' => $columns->contains(
+                static fn (array $column): bool => $column['name'] === 'deleted_at',
+            ),
+            'hasPublishedAt' => $columns->contains(
+                static fn (array $column): bool => $column['name'] === 'published_at',
+            ),
+            'allColumns' => $columns,
             'dates' => $columns->filter(
                 static fn (array $column): bool => in_array($column['majorType'], ['datetime', 'date'], true),
             )->pluck('name'),
@@ -106,12 +112,6 @@ final class Model extends ClassGenerator
             'timestamps' => $columns->filter(
                 static fn (array $column): bool => in_array($column['name'], ['created_at', 'updated_at'], true),
             )->count() > 0,
-            'hasSoftDelete' => $columns->filter(
-                static fn (array $column): bool => $column['name'] === 'deleted_at',
-            )->count() > 0,
-            'hasPublishedAt' => $columns
-                ->filter(static fn (array $column): bool => $column['name'] === 'published_at')
-                ->count() > 0,
             'relations' => $this->relations,
             'mediaCollections' => $this->mediaCollections,
         ])->render();

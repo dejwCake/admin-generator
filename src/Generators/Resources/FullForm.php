@@ -126,25 +126,28 @@ final class FullForm extends ResourceGenerator
 
     private function buildForm(): string
     {
+        $columns = $this->readColumnsFromTable($this->tableName);
+
         return view('brackets/admin-generator::' . $this->view, [
             'modelBaseName' => $this->modelBaseName,
             'modelVariableName' => $this->modelVariableName,
-            'route' => $this->route,
-            'modelJSName' => $this->formJsRelativePath,
             'modelDotNotation' => $this->modelDotNotation,
+            'modelJSName' => $this->formJsRelativePath,
             'modelLangFormat' => $this->modelLangFormat,
-            'modelTitle' => $this->readColumnsFromTable($this->tableName)
+            'modelTitle' => $columns
                 ->filter(static fn (array $column): bool => in_array(
                     $column['name'],
                     ['title', 'name', 'first_name', 'email'],
                     true,
                 ))
                 ->first(null, ['name' => 'id'])['name'],
+            'route' => $this->route,
+
+            'hasTranslatable' => $columns->contains(
+                static fn (array $column): bool => $column['majorType'] === 'json',
+            ),
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)
                 ->sortByDesc(static fn (array $column): bool => $column['majorType'] === 'json'),
-            'hasTranslatable' => $this->readColumnsFromTable($this->tableName)
-                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
-                    ->count() > 0,
             'translatableTextarea' => ['perex', 'text'],
             'wysiwygTextColumnNames' => ['text', 'body', 'description'],
             'relations' => $this->relations,

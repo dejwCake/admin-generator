@@ -116,9 +116,9 @@ final class Lang extends FileAppender
             'titleSingular' => $this->titleSingular,
             'titlePlural' => $this->titlePlural,
             'export' => $this->export,
-            'hasPublishedAt' => $columns
-                ->filter(static fn (array $column): bool => $column['name'] === 'published_at')
-                ->count() > 0,
+            'hasPublishedAt' => $columns->contains(
+                static fn (array $column): bool => $column['name'] === 'published_at',
+            ),
             'hasProfile' => $this->tableName === 'admin_users',
 
             'columns' => $columns,
