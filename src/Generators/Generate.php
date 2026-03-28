@@ -35,129 +35,128 @@ final class Generate extends Command
 
     public function handle(): void
     {
-        $tableNameArgument = $this->argument('table_name');
-        $modelNameOption = $this->option('model-name');
-        $controllerNameOption = $this->option('controller-name');
-        $forceOption = $this->option('force');
-        $seedOption = $this->option('seed');
-        $withExportOption = $this->option('with-export');
-        $withoutBulkOption = $this->option('without-bulk');
-        $forcePermissionsOption = $this->option('force-permissions');
-        $belongsToManyOption = $this->option('belongs-to-many');
-        $mediaOption = $this->option('media');
+        $tableName = $this->argument('table_name');
+        $modelName = $this->option('model-name');
+        $controllerName = $this->option('controller-name');
+        $force = $this->option('force');
+        $belongsToMany = $this->option('belongs-to-many');
+        $withExport = $this->option('with-export');
+        $withoutBulk = $this->option('without-bulk');
+        $media = $this->option('media');
+        $seed = $this->option('seed');
 
         $this->call('admin:generate:model', [
-            'table_name' => $tableNameArgument,
-            'class_name' => $modelNameOption,
-            '--force' => $forceOption,
-            '--belongs-to-many' => $belongsToManyOption,
-            '--media' => $mediaOption,
+            'table_name' => $tableName,
+            'class_name' => $modelName,
+            '--force' => $force,
+            '--belongs-to-many' => $belongsToMany,
+            '--media' => $media,
         ]);
 
         $this->call('admin:generate:factory', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
-            '--force' => $forceOption,
-            '--seed' => $seedOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--seed' => $seed,
         ]);
 
         $this->call('admin:generate:controller', [
-            'table_name' => $tableNameArgument,
-            'class_name' => $controllerNameOption,
-            '--model-name' => $modelNameOption,
-            '--force' => $forceOption,
-            '--with-export' => $withExportOption,
-            '--without-bulk' => $withoutBulkOption,
-            '--belongs-to-many' => $belongsToManyOption,
-            '--media' => $mediaOption,
+            'table_name' => $tableName,
+            'class_name' => $controllerName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--belongs-to-many' => $belongsToMany,
+            '--with-export' => $withExport,
+            '--without-bulk' => $withoutBulk,
+            '--media' => $media,
         ]);
 
         $this->call('admin:generate:request:index', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
-            '--force' => $forceOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
         ]);
 
         $this->call('admin:generate:request:store', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
-            '--force' => $forceOption,
-            '--belongs-to-many' => $belongsToManyOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--belongs-to-many' => $belongsToMany,
         ]);
 
         $this->call('admin:generate:request:update', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
-            '--force' => $forceOption,
-            '--belongs-to-many' => $belongsToManyOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--belongs-to-many' => $belongsToMany,
         ]);
 
         $this->call('admin:generate:request:destroy', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
-            '--force' => $forceOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
         ]);
 
-        if (!$withoutBulkOption) {
+        if (!$withoutBulk) {
             $this->call('admin:generate:request:bulk-destroy', [
-                'table_name' => $tableNameArgument,
-                '--model-name' => $modelNameOption,
-                '--force' => $forceOption,
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
             ]);
         }
 
-        if ($withExportOption) {
+        if ($withExport) {
             $this->call('admin:generate:request:export', [
-                'table_name' => $tableNameArgument,
-                '--model-name' => $modelNameOption,
-                '--force' => $forceOption,
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
             ]);
         }
 
         $this->call('admin:generate:routes', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
-            '--controller-name' => $controllerNameOption,
-            '--with-export' => $withExportOption,
-            '--without-bulk' => $withoutBulkOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--controller-name' => $controllerName,
+            '--with-export' => $withExport,
+            '--without-bulk' => $withoutBulk,
         ]);
 
         $this->call('admin:generate:index', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
-            '--force' => $forceOption,
-            '--with-export' => $withExportOption,
-            '--without-bulk' => $withoutBulkOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--with-export' => $withExport,
+            '--without-bulk' => $withoutBulk,
         ]);
 
         $this->call('admin:generate:form', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
-            '--force' => $forceOption,
-            '--belongs-to-many' => $belongsToManyOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--belongs-to-many' => $belongsToMany,
         ]);
 
         $this->call('admin:generate:lang', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
-            '--with-export' => $withExportOption,
-            '--belongs-to-many' => $belongsToManyOption,
-            '--media' => $mediaOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--belongs-to-many' => $belongsToMany,
+            '--with-export' => $withExport,
+            '--media' => $media,
         ]);
 
-        if ($withExportOption) {
+        if ($withExport) {
             $this->call('admin:generate:export', [
-                'table_name' => $tableNameArgument,
-                '--force' => $forceOption,
+                'table_name' => $tableName,
+                '--force' => $force,
             ]);
         }
 
-        if ($forcePermissionsOption || $this->shouldGeneratePermissionsMigration()) {
+        if ($this->shouldGeneratePermissionsMigration()) {
             $this->call('admin:generate:permissions', [
-                'table_name' => $tableNameArgument,
-                '--model-name' => $modelNameOption,
-                '--force' => $forceOption,
-                '--without-bulk' => $withoutBulkOption,
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--without-bulk' => $withoutBulk,
             ]);
 
             if (
@@ -188,17 +187,16 @@ final class Generate extends Command
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Specify custom model name'],
             ['controller-name', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom controller name'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating admin'],
-            ['seed', 's', InputOption::VALUE_NONE, 'Seeds the table with fake data'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
-            ['force-permissions', 'fp', InputOption::VALUE_NONE, 'Force permission will generate permission migration'],
-            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             [
                 'media',
                 'M',
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 'Media collections (format: name:type:disk:maxFiles)',
             ],
+            ['seed', 's', InputOption::VALUE_NONE, 'Seeds the table with fake data'],
         ];
     }
 

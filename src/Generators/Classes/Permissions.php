@@ -33,8 +33,9 @@ final class Permissions extends ClassGenerator
     public function handle(): void
     {
         $force = $this->option('force');
+        $withoutBulk = $this->option('without-bulk');
 
-        if ($this->option('without-bulk')) {
+        if ($withoutBulk) {
             $this->withoutBulk = true;
         }
 

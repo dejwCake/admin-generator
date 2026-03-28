@@ -33,11 +33,12 @@ final class Factory extends ClassGenerator
     public function handle(): void
     {
         $force = $this->option('force');
+        $template = $this->option('template');
+        $seed = $this->option('seed');
 
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        $template = $this->option('template');
         if ($template !== null) {
             $this->view = 'templates.' . $template . '.factory';
         }
@@ -46,7 +47,7 @@ final class Factory extends ClassGenerator
             $this->info('Generating ' . $this->classFullName . ' finished');
         }
 
-        if ($this->option('seed')) {
+        if ($seed) {
             $this->info('Seeding testing data');
             $this->modelFullName::factory()->count(50)->create();
         }
@@ -112,8 +113,8 @@ final class Factory extends ClassGenerator
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating factory'],
-            ['seed', 's', InputOption::VALUE_OPTIONAL, 'Seeds the table with fake data'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
+            ['seed', 's', InputOption::VALUE_OPTIONAL, 'Seeds the table with fake data'],
         ];
     }
 

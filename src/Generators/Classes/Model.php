@@ -35,21 +35,21 @@ final class Model extends ClassGenerator
     public function handle(): void
     {
         $force = $this->option('force');
+        $template = $this->option('template');
+        $belongsToMany = $this->option('belongs-to-many');
+        $media = $this->option('media');
 
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        $template = $this->option('template');
         if ($template !== null) {
             $this->view = 'templates.' . $template . '.model';
         }
 
-        $belongsToMany = $this->option('belongs-to-many');
         if ($belongsToMany !== null) {
             $this->setBelongToManyRelation($belongsToMany);
         }
 
-        $media = $this->option('media');
         if ($media !== null && $media !== []) {
             $this->setMediaCollections($media);
         }
@@ -123,8 +123,8 @@ final class Model extends ClassGenerator
     {
         return [
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating model'],
-            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             [
                 'media',
                 'M',

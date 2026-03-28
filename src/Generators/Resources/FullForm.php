@@ -50,25 +50,26 @@ final class FullForm extends ResourceGenerator
     public function handle(): void
     {
         $force = $this->option('force');
+        $template = $this->option('template');
+        $fileName = $this->option('file-name');
+        $this->route = $this->option('route');
 
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        $template = $this->option('template');
         if ($template !== null) {
             $this->view = 'templates.' . $template . '.full-form';
             $this->viewJs = 'templates.' . $template . '.form-js';
         }
 
-        $this->fileName = $this->option('file-name') ?: $this->modelViewsDirectory;
+        $this->fileName = $fileName ?: $this->modelViewsDirectory;
         $this->formJsRelativePath = str_replace([DIRECTORY_SEPARATOR, '/', '\\'], '-', $this->fileName);
-        if (!$this->option('file-name')) {
+        if (!$fileName) {
             $this->fileName .= DIRECTORY_SEPARATOR . 'form';
         }
 
-        $this->route = $this->option('route');
         if (!$this->route) {
-            $this->route = $this->option('file-name')
+            $this->route = $fileName
                 ? 'admin/' . $this->fileName
                 : 'admin/' . $this->resource . '/update';
         }
@@ -100,10 +101,10 @@ final class FullForm extends ResourceGenerator
     {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating full form'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['file-name', 'nm', InputOption::VALUE_OPTIONAL, 'Specify a blade file path'],
             ['route', 'r', InputOption::VALUE_OPTIONAL, 'Specify custom route for form'],
-            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating full form'],
         ];
     }
 

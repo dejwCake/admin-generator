@@ -49,31 +49,34 @@ final class Controller extends ClassGenerator
     public function handle(): void
     {
         $force = $this->option('force');
+        $template = $this->option('template');
+        $belongsToMany = $this->option('belongs-to-many');
+        $withExport = $this->option('with-export');
+        $withoutBulk = $this->option('without-bulk');
+        $media = $this->option('media');
 
-        if ($this->option('with-export')) {
-            $this->export = true;
-        }
-
-        if ($this->option('without-bulk')) {
-            $this->withoutBulk = true;
-        }
         // TODO test the case, if someone passes a class_name outside Laravel's
         // default App\Http\Controllers folder, if it's going to work
 
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        $template = $this->option('template');
         if ($template !== null) {
             $this->view = 'templates.' . $template . '.controller';
         }
 
-        $belongsToMany = $this->option('belongs-to-many');
         if ($belongsToMany !== null) {
             $this->setBelongToManyRelation($belongsToMany);
         }
 
-        $media = $this->option('media');
+        if ($withExport) {
+            $this->export = true;
+        }
+
+        if ($withoutBulk) {
+            $this->withoutBulk = true;
+        }
+
         if ($media !== null && $media !== []) {
             $this->setMediaCollections($media);
         }
@@ -81,34 +84,7 @@ final class Controller extends ClassGenerator
         if ($this->generateClass($force)) {
             $this->info('Generating ' . $this->classFullName . ' finished');
 
-            $icon = Arr::random(
-                [
-                    'fa fa-graduation-cap',
-                    'fa fa-puzzle-piece',
-                    'fa fa-compass',
-                    'fa fa-droplet',
-                    'fa fa-globe',
-                    'fa fa-ghost',
-                    'fa fa-book-open',
-                    'fa fa-flag',
-                    'fa fa-star',
-                    'fa fa-umbrella',
-                    'fa fa-bolt',
-                    'fa fa-plane',
-                    'fa fa-magnet',
-                    'fa fa-gem',
-                ],
-            );
-            if (
-                $this->strReplaceInFile(
-                    resource_path('views/admin/layout/sidebar.blade.php'),
-                    "{{-- Do not delete me :) I'm used for auto-generation menu items --}}",
-                    "<li class=\"nav-item\"><a class=\"nav-link\" href=\"{{ url('admin/" . $this->resource . "') }}\"><i class=\"nav-icon " . $icon . "\"></i> {{ trans('admin." . $this->modelLangFormat . ".title') }}</a></li>" . PHP_EOL . "           {{-- Do not delete me :) I'm used for auto-generation menu items --}}",
-                    '|url\(\'admin\/' . $this->resource . '\'\)|',
-                )
-            ) {
-                $this->info('Updating sidebar');
-            }
+            $this->addToSidebar();
         }
     }
 
@@ -161,10 +137,10 @@ final class Controller extends ClassGenerator
     {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
+            ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating controller'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
-            ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating controller'],
-            ['model-with-full-namespace', 'fnm', InputOption::VALUE_OPTIONAL, 'Specify model with full namespace'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
             ['media', 'M', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Media collections (format: name:type:disk:maxFiles)'],
@@ -187,6 +163,38 @@ final class Controller extends ClassGenerator
     protected function getDefaultNamespace(string $rootNamespace): string
     {
         return $rootNamespace . '\Http\Controllers\Admin';
+    }
+
+    private function addToSidebar(): void
+    {
+        $icon = Arr::random(
+            [
+                'fa fa-graduation-cap',
+                'fa fa-puzzle-piece',
+                'fa fa-compass',
+                'fa fa-droplet',
+                'fa fa-globe',
+                'fa fa-ghost',
+                'fa fa-book-open',
+                'fa fa-flag',
+                'fa fa-star',
+                'fa fa-umbrella',
+                'fa fa-bolt',
+                'fa fa-plane',
+                'fa fa-magnet',
+                'fa fa-gem',
+            ],
+        );
+        if (
+            $this->strReplaceInFile(
+                resource_path('views/admin/layout/sidebar.blade.php'),
+                "{{-- Do not delete me :) I'm used for auto-generation menu items --}}",
+                "<li class=\"nav-item\"><a class=\"nav-link\" href=\"{{ url('admin/" . $this->resource . "') }}\"><i class=\"nav-icon " . $icon . "\"></i> {{ trans('admin." . $this->modelLangFormat . ".title') }}</a></li>" . PHP_EOL . "           {{-- Do not delete me :) I'm used for auto-generation menu items --}}",
+                '|url\(\'admin\/' . $this->resource . '\'\)|',
+            )
+        ) {
+            $this->info('Updating sidebar');
+        }
     }
 
     /** @return array<string> */

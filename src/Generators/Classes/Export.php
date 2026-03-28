@@ -33,8 +33,8 @@ final class Export extends ClassGenerator
     public function handle(): void
     {
         $force = $this->option('force');
-
         $template = $this->option('template');
+
         if ($template !== null) {
             $this->view = 'templates.' . $template . '.export';
         }

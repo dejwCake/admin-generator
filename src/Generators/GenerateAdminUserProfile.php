@@ -38,12 +38,12 @@ final class GenerateAdminUserProfile extends Command
 
     public function handle(): void
     {
-        $tableNameArgument = $this->argument('table_name') ?: 'admin_users';
-        $modelNameOption = $this->option('model-name');
-        $controllerNameOption = $this->option('controller-name') ?: 'ProfileController';
-        $forceOption = $this->option('force');
+        $tableName = $this->argument('table_name') ?: 'admin_users';
+        $modelName = $this->option('model-name');
+        $controllerName = $this->option('controller-name') ?: 'ProfileController';
+        $force = $this->option('force');
 
-        if ($forceOption) {
+        if ($force) {
             //remove all files
             $this->files->delete(app_path('Http/Controllers/Admin/ProfileController.php'));
             $this->files->deleteDirectory(resource_path('js/admin/profile-edit-profile'));
@@ -52,34 +52,37 @@ final class GenerateAdminUserProfile extends Command
         }
 
         $this->call('admin:generate:controller', [
-            'table_name' => $tableNameArgument,
-            'class_name' => $controllerNameOption,
-            '--model-name' => $modelNameOption,
+            'table_name' => $tableName,
+            'class_name' => $controllerName,
+            '--model-name' => $modelName,
+            '--force' => $force,
             '--template' => 'profile',
         ]);
 
         $this->call('admin:generate:routes', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
-            '--controller-name' => $controllerNameOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--controller-name' => $controllerName,
             '--template' => 'profile',
         ]);
         // TODO add this route to the dropdown user-menu
 
         $this->call('admin:generate:full-form', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--template' => 'profile',
             '--file-name' => 'profile/edit-profile',
             '--route' => 'admin/profile',
-            '--template' => 'profile',
         ]);
 
         $this->call('admin:generate:full-form', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--template' => 'profile.password',
             '--file-name' => 'profile/edit-password',
             '--route' => 'admin/password',
-            '--template' => 'profile.password',
         ]);
 
         $this->strReplaceInFile(

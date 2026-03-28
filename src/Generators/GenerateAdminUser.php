@@ -38,23 +38,23 @@ final class GenerateAdminUser extends Command
 
     public function handle(): void
     {
-        $tableNameArgument = 'admin_users';
-        $modelNameOption = $this->option('model-name');
-        $controllerNameOption = $this->option('controller-name');
-        $forceOption = $this->option('force');
-        $withExportOption = $this->option('with-export');
-        $withoutBulkOption = $this->option('without-bulk');
-        $mediaOption = $this->option('media');
+        $tableName = 'admin_users';
+        $modelName = $this->option('model-name');
+        $controllerName = $this->option('controller-name');
+        $force = $this->option('force');
+        $withExport = $this->option('with-export');
+        $withoutBulk = $this->option('without-bulk');
+        $media = $this->option('media');
 
-        if ($modelNameOption === null) {
-            $modelNameOption = 'AdminUser';
+        if ($modelName === null) {
+            $modelName = 'AdminUser';
             $modelWithFullNamespace = 'Brackets\AdminAuth\Models\AdminUser';
         } else {
             $modelWithFullNamespace = null;
         }
 
-        if ($forceOption) {
-            if ($withExportOption) {
+        if ($force) {
+            if ($withExport) {
                 $this->files->delete(app_path('Exports/AdminUsersExport.php'));
             }
             $this->files->delete(app_path('Http/Controllers/Admin/AdminUsersController.php'));
@@ -76,107 +76,118 @@ final class GenerateAdminUser extends Command
         );
 
         $this->call('admin:generate:controller', [
-            'table_name' => $tableNameArgument,
-            'class_name' => $controllerNameOption,
-            '--model-name' => $modelNameOption,
-            '--template' => 'admin-user',
+            'table_name' => $tableName,
+            'class_name' => $controllerName,
+            '--model-name' => $modelName,
             '--model-with-full-namespace' => $modelWithFullNamespace,
-            '--with-export' => $withExportOption,
-            '--without-bulk' => $withoutBulkOption,
+            '--template' => 'admin-user',
             '--belongs-to-many' => 'roles',
-            '--media' => $mediaOption,
+            '--with-export' => $withExport,
+            '--without-bulk' => $withoutBulk,
+            '--media' => $media,
         ]);
 
         $this->call('admin:generate:request:index', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
         ]);
 
         $this->call('admin:generate:request:store', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
             '--template' => 'admin-user',
             '--belongs-to-many' => 'roles',
         ]);
 
         $this->call('admin:generate:request:update', [
-            'table_name' => $tableNameArgument,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--model-with-full-namespace' => $modelWithFullNamespace,
+            '--force' => $force,
             '--template' => 'admin-user',
             '--belongs-to-many' => 'roles',
-            '--model-name' => $modelNameOption,
-            '--model-with-full-namespace' => $modelWithFullNamespace,
         ]);
 
         $this->call('admin:generate:request:destroy', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
             '--model-with-full-namespace' => $modelWithFullNamespace,
+            '--force' => $force,
         ]);
 
-        if (!$withoutBulkOption) {
+        if (!$withoutBulk) {
             $this->call('admin:generate:request:bulk-destroy', [
-                'table_name' => $tableNameArgument,
-                '--model-name' => $modelNameOption,
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
                 '--model-with-full-namespace' => $modelWithFullNamespace,
-                '--force' => $forceOption,
+                '--force' => $force,
             ]);
         }
 
-        if ($withExportOption) {
+        if ($withExport) {
             $this->call('admin:generate:request:export', [
-                'table_name' => $tableNameArgument,
-                '--model-name' => $modelNameOption,
-                '--force' => $forceOption,
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--model-with-full-namespace' => $modelWithFullNamespace,
+                '--force' => $force,
             ]);
         }
 
         $this->call('admin:generate:request:impersonal-login', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
             '--model-with-full-namespace' => $modelWithFullNamespace,
+            '--force' => $force,
         ]);
 
         $this->call('admin:generate:routes', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
-            '--controller-name' => $controllerNameOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--controller-name' => $controllerName,
             '--template' => 'admin-user',
-            '--with-export' => $withExportOption,
+            '--with-export' => $withExport,
+            '--without-bulk' => $withoutBulk,
         ]);
 
         $this->call('admin:generate:index', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
             '--template' => 'admin-user',
-            '--with-export' => $withExportOption,
+            '--with-export' => $withExport,
+            '--without-bulk' => $withoutBulk,
         ]);
 
         $this->call('admin:generate:form', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
-            '--belongs-to-many' => 'roles',
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
             '--template' => 'admin-user',
+            '--belongs-to-many' => 'roles',
         ]);
 
         $this->call('admin:generate:lang', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
             '--belongs-to-many' => 'roles',
-            '--with-export' => $withExportOption,
-            '--media' => $mediaOption,
+            '--with-export' => $withExport,
+            '--media' => $media,
         ]);
 
         $this->call('admin:generate:factory', [
-            'table_name' => $tableNameArgument,
-            '--model-name' => $modelNameOption,
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
             '--model-with-full-namespace' => $modelWithFullNamespace,
-            '--force' => $forceOption,
+            '--force' => $force,
         ]);
 
-        if ($withExportOption) {
+        if ($withExport) {
             $this->call('admin:generate:export', [
-                'table_name' => $tableNameArgument,
+                'table_name' => $tableName,
                 '--model-with-full-namespace' => $modelWithFullNamespace,
+                '--force' => $force,
             ]);
         }
 
@@ -203,12 +214,11 @@ final class GenerateAdminUser extends Command
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Specify custom model name'],
             ['controller-name', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom controller name'],
-            ['generate-model', 'g', InputOption::VALUE_NONE, 'Generates model'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating admin user'],
-            ['seed', 's', InputOption::VALUE_NONE, 'Seeds table with fake data'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
             ['media', 'M', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Media collections (format: name:type:disk:maxFiles)'],
+            ['seed', 's', InputOption::VALUE_NONE, 'Seeds table with fake data'],
         ];
     }
 }

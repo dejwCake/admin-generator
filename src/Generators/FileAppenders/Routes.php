@@ -42,20 +42,23 @@ final class Routes extends FileAppender
 
     public function handle(): void
     {
-        if ($this->option('with-export')) {
-            $this->export = true;
-        }
-
-        if ($this->option('without-bulk')) {
-            $this->withoutBulk = true;
-        }
+        $template = $this->option('template');
+        $withExport = $this->option('with-export');
+        $withoutBulk = $this->option('without-bulk');
 
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        $template = $this->option('template');
         if ($template !== null) {
             $this->view = 'templates.' . $template . '.routes';
+        }
+
+        if ($withExport) {
+            $this->export = true;
+        }
+
+        if ($withoutBulk) {
+            $this->withoutBulk = true;
         }
 
         if (

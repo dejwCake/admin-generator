@@ -53,11 +53,12 @@ final class Form extends ResourceGenerator
     public function handle(): void
     {
         $force = (bool) $this->option('force');
+        $template = $this->option('template');
+        $belongsToMany = $this->option('belongs-to-many');
 
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        $template = $this->option('template');
         if ($template !== null) {
             $this->create = 'templates.' . $template . '.create';
             $this->edit = 'templates.' . $template . '.edit';
@@ -66,7 +67,6 @@ final class Form extends ResourceGenerator
             $this->formJs = 'templates.' . $template . '.form-js';
         }
 
-        $belongsToMany = $this->option('belongs-to-many');
         if ($belongsToMany !== null) {
             $this->setBelongToManyRelation($belongsToMany);
         }
@@ -94,9 +94,9 @@ final class Form extends ResourceGenerator
     {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
-            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
-            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating form'],
+            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
         ];
     }
 

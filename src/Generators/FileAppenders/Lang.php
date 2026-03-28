@@ -37,31 +37,33 @@ final class Lang extends FileAppender
 
     public function handle(): void
     {
+        $template = $this->option('template');
+        $belongsToMany = $this->option('belongs-to-many');
+        $withExport = $this->option('with-export');
+        $media = $this->option('media');
+        $locale = $this->option('locale');
+
 //        //TODO check if exists
 //        //TODO make global for all generator
 //        //TODO also with prefix
-        $template = $this->option('template');
         if ($template !== null) {
             $this->view = 'templates.' . $template . '.lang';
         }
 
-        $locale = $this->option('locale');
-        if ($locale === null) {
-            $locale = 'en';
-        }
-
-        if ($this->option('with-export')) {
-            $this->export = true;
-        }
-
-        $belongsToMany = $this->option('belongs-to-many');
         if ($belongsToMany !== null) {
             $this->setBelongToManyRelation($belongsToMany);
         }
 
-        $media = $this->option('media');
+        if ($withExport) {
+            $this->export = true;
+        }
+
         if ($media !== null && $media !== []) {
             $this->setMediaCollections($media);
+        }
+
+        if ($locale === null) {
+            $locale = 'en';
         }
 
         // TODO name-spaced model names should be probably inserted as a sub-array in a translation file..
@@ -90,16 +92,16 @@ final class Lang extends FileAppender
     {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a controller for the given model'],
-            ['locale', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom locale'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
+            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             [
                 'media',
                 'M',
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 'Media collections (format: name:type:disk:maxFiles)',
             ],
+            ['locale', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom locale'],
         ];
     }
 

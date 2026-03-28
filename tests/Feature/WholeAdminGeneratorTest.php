@@ -31,7 +31,6 @@ class WholeAdminGeneratorTest extends TestCase
         $factoryPath = base_path('database/factories/CategoryFactory.php');
         $indexJsPath = resource_path('js/admin/category/index.js');
         $langPath = lang_path('en/admin.php');
-        $permissionMigrationFile = 'fill_permissions_for_category.php';
 
         self::assertFileDoesNotExist($controllerPath);
         self::assertFileDoesNotExist($indexRequestPath);
@@ -55,10 +54,8 @@ class WholeAdminGeneratorTest extends TestCase
         $this->artisan('admin:generate', [
             'table_name' => 'categories',
             '--with-export' => true,
-            '--force-permissions' => true,
-        ])->expectsConfirmation('Do you want to attach generated permissions to the default role now?', 'no');
+        ]);
 
-        $permissionMigrationPath = $this->getPermissionMigrationPath($permissionMigrationFile);
 
         self::assertFileExists($controllerPath);
         self::assertFileExists($indexRequestPath);
@@ -78,7 +75,6 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertFileExists($factoryPath);
         self::assertFileExists($indexJsPath);
         self::assertFileExists($langPath);
-        self::assertFileExists($permissionMigrationPath);
 
         self::assertMatchesFileSnapshot($controllerPath);
         self::assertMatchesFileSnapshot($indexRequestPath);
@@ -98,6 +94,5 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertMatchesFileSnapshot($factoryPath);
         self::assertMatchesFileSnapshot($indexJsPath);
         self::assertMatchesFileSnapshot($langPath);
-        self::assertMatchesFileSnapshot($permissionMigrationPath);
     }
 }

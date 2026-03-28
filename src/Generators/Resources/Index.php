@@ -49,22 +49,24 @@ final class Index extends ResourceGenerator
     public function handle(): void
     {
         $force = (bool) $this->option('force');
-
-        if ($this->option('with-export')) {
-            $this->export = true;
-        }
-
-        if ($this->option('without-bulk')) {
-            $this->withoutBulk = true;
-        }
+        $template = $this->option('template');
+        $withExport = (bool) $this->option('with-export');
+        $withoutBulk = $this->option('without-bulk');
 
         //TODO check if exists
         //TODO make global for all generator
         //TODO also with prefix
-        $template = $this->option('template');
         if ($template !== null) {
             $this->view = 'templates.' . $template . '.index';
             $this->viewJs = 'templates.' . $template . '.listing-js';
+        }
+
+        if ($withExport) {
+            $this->export = true;
+        }
+
+        if ($withoutBulk) {
+            $this->withoutBulk = true;
         }
 
         $viewPath = resource_path('views/admin/' . $this->modelViewsDirectory . '/index.blade.php');
@@ -89,8 +91,8 @@ final class Index extends ResourceGenerator
     {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
-            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating index'],
+            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
         ];
