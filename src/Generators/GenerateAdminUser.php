@@ -79,9 +79,10 @@ final class GenerateAdminUser extends Command
             'class_name' => $controllerNameOption,
             '--model-name' => $modelNameOption,
             '--template' => 'admin-user',
-            '--belongs-to-many' => 'roles',
             '--model-with-full-namespace' => $modelWithFullNamespace,
             '--with-export' => $withExportOption,
+            '--without-bulk' => $withoutBulkOption,
+            '--belongs-to-many' => 'roles',
         ]);
 
         $this->call('admin:generate:request:index', [

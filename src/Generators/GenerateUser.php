@@ -87,8 +87,9 @@ final class GenerateUser extends Command
             'class_name' => $controllerNameOption,
             '--model-name' => $modelNameOption,
             '--template' => 'user',
-            '--belongs-to-many' => 'roles',
             '--with-export' => $withExportOption,
+            '--without-bulk' => $withoutBulkOption,
+            '--belongs-to-many' => 'roles',
         ]);
 
         $this->call('admin:generate:request:index', [

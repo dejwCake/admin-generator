@@ -13,11 +13,12 @@ use App\Http\Requests\Admin\AdminUser\UpdateAdminUser;
 use Brackets\AdminAuth\Activation\Contracts\ActivationBroker;
 use Brackets\AdminAuth\Models\AdminUser;
 use Brackets\AdminAuth\Services\ActivationService;
-use Brackets\AdminListing\Services\AdminListingService;
+use Brackets\AdminListing\Builders\ListingBuilder;
+use Brackets\AdminListing\Builders\ListingQueryBuilder;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\View\Factory as ViewFactory;
@@ -25,23 +26,21 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class AdminUsersController extends Controller
+final class AdminUsersController extends Controller
 {
-    /**
-     * Guard used for admin user
-     */
-    protected string $guard;
+    private readonly string $guard;
 
     public function __construct(
-        public readonly Config $config,
-        public readonly Gate $gate,
-        public readonly Redirector $redirector,
-        public readonly UrlGenerator $urlGenerator,
-        public readonly ViewFactory $viewFactory,
+        private readonly Config $config,
+        private readonly Gate $gate,
+        private readonly Redirector $redirector,
+        private readonly UrlGenerator $urlGenerator,
+        private readonly ViewFactory $viewFactory,
+        private readonly ListingBuilder $listingBuilder,
+        private readonly ListingQueryBuilder $listingQueryBuilder,
     ) {
         $this->guard = $this->config->get('admin-auth.defaults.guard', 'admin');
     }
@@ -51,21 +50,33 @@ class AdminUsersController extends Controller
      */
     public function index(IndexAdminUser $request): array|View
     {
-        // create and AdminListingService instance for a specific model and
-        $data = AdminListingService::create(AdminUser::class)
+        $data = $this->listingBuilder->for(AdminUser::class)
+            ->build()
             ->processRequestAndGet(
-                // pass the request with params
-                $request,
-                // set columns to query
-                ['id', 'first_name', 'last_name', 'email', 'activated', 'forbidden', 'language'],
-                // set columns to searchIn
-                ['id', 'first_name', 'last_name', 'email', 'language'],
+                $this->listingQueryBuilder->fromRequest(
+                    $request,
+                    [
+                        'id',
+                        'first_name',
+                        'last_name',
+                        'email',
+                        'activated',
+                        'forbidden',
+                        'language',
+                    ],
+                    [
+                        'id',
+                        'first_name',
+                        'last_name',
+                        'email',
+                        'language',
+                    ],
+                ),
             );
 
         if ($request->ajax()) {
             return [
                 'data' => $data,
-                'activation' => $this->config->get('admin-auth.activation_enabled'),
             ];
         }
 
@@ -75,7 +86,19 @@ class AdminUsersController extends Controller
                 'data' => $data,
                 'url' => $this->urlGenerator->route('admin/admin-users/index'),
                 'createUrl' => $this->urlGenerator->route('admin/admin-users/create'),
+                'editUrlTemplate' => $this->urlGenerator->route('admin/admin-users/edit', ['adminUser' => ':id']),
+                'updateUrlTemplate' => $this->urlGenerator->route('admin/admin-users/update', ['adminUser' => ':id']),
+                'destroyUrlTemplate' => $this->urlGenerator->route('admin/admin-users/destroy', ['adminUser' => ':id']),
+                'resendActivationUrlTemplate' => $this->urlGenerator->route(
+                    'admin/admin-users/resend-activation-email',
+                    ['adminUser' => ':id'],
+                ),
+                'impersonalLoginUrlTemplate' => $this->urlGenerator->route(
+                    'admin/admin-users/impersonal-login',
+                    ['adminUser' => ':id'],
+                ),
                 'activation' => $this->config->get('admin-auth.activation_enabled'),
+                'canImpersonalLogin' => $this->gate->check('admin.admin-user.impersonal-login'),
             ],
         );
     }
@@ -92,7 +115,7 @@ class AdminUsersController extends Controller
         return $this->viewFactory->make(
             'admin.admin-user.create',
             [
-                'action' => $this->urlGenerator->to('admin/admin-users'),
+                'action' => $this->urlGenerator->route('admin/admin-users/store'),
                 'activation' => $this->config->get('admin-auth.activation_enabled'),
                 'roles' => Role::where('guard_name', $this->guard)->get(),
             ],
@@ -104,35 +127,19 @@ class AdminUsersController extends Controller
      */
     public function store(StoreAdminUser $request): array|RedirectResponse
     {
-        // Sanitize input
-        $sanitized = $request->getModifiedData();
+        $data = $request->getModifiedData();
 
-        // Store the AdminUser
-        $adminUser = AdminUser::create($sanitized);
-
-        // But we do have a roles, so we need to attach the roles to the adminUser
-        $adminUser->roles()->sync((new Collection($request->input('roles', [])))->map->id->toArray());
+        $adminUser = AdminUser::create($data);
+        $adminUser->roles()->sync($request->getRoleIds());
 
         if ($request->ajax()) {
             return [
-                'redirect' => $this->urlGenerator->to('admin/admin-users'),
+                'redirect' => $this->urlGenerator->route('admin/admin-users/index'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
-        return $this->redirector->to('admin/admin-users');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @throws AuthorizationException
-     */
-    public function show(AdminUser $adminUser): void
-    {
-        $this->gate->authorize('admin.admin-user.show', $adminUser);
-
-        // TODO your code goes here
+        return $this->redirector->route('admin/admin-users/index');
     }
 
     /**
@@ -162,25 +169,21 @@ class AdminUsersController extends Controller
      */
     public function update(UpdateAdminUser $request, AdminUser $adminUser): array|RedirectResponse
     {
-        // Sanitize input
-        $sanitized = $request->getModifiedData();
+        $data = $request->getModifiedData();
 
-        // Update changed values AdminUser
-        $adminUser->update($sanitized);
-
-        // But we do have a roles, so we need to attach the roles to the adminUser
-        if ($request->input('roles')) {
-            $adminUser->roles()->sync((new Collection($request->input('roles', [])))->map->id->toArray());
+        $adminUser->update($data);
+        if ($request->getRoleIds() !== null) {
+            $adminUser->roles()->sync($request->getRoleIds());
         }
 
         if ($request->ajax()) {
             return [
-                'redirect' => $this->urlGenerator->to('admin/admin-users'),
+                'redirect' => $this->urlGenerator->route('admin/admin-users/index'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
-        return $this->redirector->to('admin/admin-users');
+        return $this->redirector->route('admin/admin-users/index');
     }
 
     /**
@@ -193,7 +196,9 @@ class AdminUsersController extends Controller
         $adminUser->delete();
 
         if ($request->ajax()) {
-            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
         return $this->redirector->back();
@@ -223,7 +228,9 @@ class AdminUsersController extends Controller
         $response = $activationService->handle($adminUser);
         if ($response === ActivationBroker::ACTIVATION_LINK_SENT) {
             if ($request->ajax()) {
-                return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+                return [
+                    'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+                ];
             }
 
             return $this->redirector->back();
@@ -247,9 +254,10 @@ class AdminUsersController extends Controller
     public function impersonalLogin(
         ImpersonalLoginAdminUser $request,
         AdminUser $adminUser,
-        StatefulGuard $statefulGuard,
+        AuthFactory $auth,
     ): RedirectResponse {
-        $statefulGuard->login($adminUser);
+        $auth->guard($this->guard)
+            ->login($adminUser);
 
         return $this->redirector->back();
     }

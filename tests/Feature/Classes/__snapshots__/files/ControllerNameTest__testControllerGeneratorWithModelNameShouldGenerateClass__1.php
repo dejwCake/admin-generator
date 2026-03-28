@@ -11,12 +11,11 @@ use App\Http\Requests\Admin\Cat\DestroyCat;
 use App\Http\Requests\Admin\Cat\IndexCat;
 use App\Http\Requests\Admin\Cat\StoreCat;
 use App\Http\Requests\Admin\Cat\UpdateCat;
-use Brackets\AdminListing\Services\AdminListingService;
-use Carbon\CarbonImmutable;
+use Brackets\AdminListing\Builders\ListingBuilder;
+use Brackets\AdminListing\Builders\ListingQueryBuilder;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
@@ -24,15 +23,16 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Collection;
 
-class CategoriesController extends Controller
+final class CategoriesController extends Controller
 {
     public function __construct(
-        public readonly Gate $gate,
-        public readonly Redirector $redirector,
-        public readonly UrlGenerator $urlGenerator,
-        public readonly ViewFactory $viewFactory,
+        private readonly Gate $gate,
+        private readonly Redirector $redirector,
+        private readonly UrlGenerator $urlGenerator,
+        private readonly ViewFactory $viewFactory,
+        private readonly ListingBuilder $listingBuilder,
+        private readonly ListingQueryBuilder $listingQueryBuilder,
     ) {
     }
 
@@ -41,15 +41,39 @@ class CategoriesController extends Controller
      */
     public function index(IndexCat $request): array|View
     {
-        // create and AdminListingService instance for a specific model and
-        $data = AdminListingService::create(Cat::class)
+        $data = $this->listingBuilder->for(Cat::class)
+            ->build()
             ->processRequestAndGet(
-                // pass the request with params
-                $request,
-                // set columns to query
-                ['id', 'user_id', 'title', 'published_at', 'date_start', 'time_start', 'date_time_end', 'text', 'description', 'enabled', 'send', 'price', 'views', 'created_by_admin_user_id', 'updated_by_admin_user_id', 'created_at', 'updated_at'],
-                // set columns to searchIn
-                ['id', 'title', 'slug', 'perex', 'text', 'description'],
+                $this->listingQueryBuilder->fromRequest(
+                    $request,
+                    [
+                        'id',
+                        'user_id',
+                        'title',
+                        'published_at',
+                        'date_start',
+                        'time_start',
+                        'date_time_end',
+                        'text',
+                        'description',
+                        'enabled',
+                        'send',
+                        'price',
+                        'views',
+                        'created_by_admin_user_id',
+                        'updated_by_admin_user_id',
+                        'created_at',
+                        'updated_at',
+                    ],
+                    [
+                        'id',
+                        'title',
+                        'slug',
+                        'perex',
+                        'text',
+                        'description',
+                    ],
+                ),
                 static function (Builder $query): void {
                     $query->with(['createdByAdminUser', 'updatedByAdminUser']);
                 },
@@ -62,7 +86,9 @@ class CategoriesController extends Controller
                 ];
             }
 
-            return ['data' => $data];
+            return [
+                'data' => $data,
+            ];
         }
 
         return $this->viewFactory->make(
@@ -71,6 +97,11 @@ class CategoriesController extends Controller
                 'data' => $data,
                 'url' => $this->urlGenerator->route('admin/cats/index'),
                 'createUrl' => $this->urlGenerator->route('admin/cats/create'),
+                'editUrlTemplate' => $this->urlGenerator->route('admin/cats/edit', ['cat' => ':id']),
+                'updateUrlTemplate' => $this->urlGenerator->route('admin/cats/update', ['cat' => ':id']),
+                'destroyUrlTemplate' => $this->urlGenerator->route('admin/cats/destroy', ['cat' => ':id']),
+                'bulkAllUrl' => $this->urlGenerator->route('admin/cats/index'),
+                'bulkDestroyUrl' => $this->urlGenerator->route('admin/cats/bulk-destroy'),
             ],
         );
     }
@@ -87,7 +118,7 @@ class CategoriesController extends Controller
         return $this->viewFactory->make(
             'admin.cat.create',
             [
-                'action' => $this->urlGenerator->to('admin/cats'),
+                'action' => $this->urlGenerator->route('admin/cats/store'),
             ],
         );
     }
@@ -95,37 +126,20 @@ class CategoriesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCat $request, Config $config): array|RedirectResponse
+    public function store(StoreCat $request): array|RedirectResponse
     {
-        // Sanitize input
-        $sanitized = $request->getSanitized();
-        $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
-        $sanitized['created_by_admin_user_id'] = $request->user($adminUserGuard)->id;
-        $sanitized['updated_by_admin_user_id'] = $request->user($adminUserGuard)->id;
+        $data = $request->getModifiedData();
 
-        // Store the Cat
-        Cat::create($sanitized);
+        Cat::create($data);
 
         if ($request->ajax()) {
             return [
-                'redirect' => $this->urlGenerator->to('admin/cats'),
+                'redirect' => $this->urlGenerator->route('admin/cats/index'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
-        return $this->redirector->to('admin/cats');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @throws AuthorizationException
-     */
-    public function show(Cat $cat): void
-    {
-        $this->gate->authorize('admin.cat.show', $cat);
-
-        // TODO your code goes here
+        return $this->redirector->route('admin/cats/index');
     }
 
     /**
@@ -151,25 +165,20 @@ class CategoriesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCat $request, Cat $cat, Config $config): array|RedirectResponse
+    public function update(UpdateCat $request, Cat $cat): array|RedirectResponse
     {
-        // Sanitize input
-        $sanitized = $request->getSanitized();
-        $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
-        $sanitized['updated_by_admin_user_id'] = $request->user($adminUserGuard)->id;
+        $data = $request->getModifiedData();
 
-        // Update changed values Cat
-        $cat->update($sanitized);
+        $cat->update($data);
 
         if ($request->ajax()) {
             return [
-                'redirect' => $this->urlGenerator->to('admin/cats'),
+                'redirect' => $this->urlGenerator->route('admin/cats/index'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
-                'object' => $cat,
             ];
         }
 
-        return $this->redirector->to('admin/cats');
+        return $this->redirector->route('admin/cats/index');
     }
 
     /**
@@ -182,7 +191,9 @@ class CategoriesController extends Controller
         $cat->delete();
 
         if ($request->ajax()) {
-            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
         return $this->redirector->back();
@@ -195,22 +206,19 @@ class CategoriesController extends Controller
      */
     public function bulkDestroy(BulkDestroyCat $request, DatabaseManager $databaseManager): array|RedirectResponse
     {
-        $databaseManager->transaction(static function () use ($request, $databaseManager): void {
-            (new Collection($request->data['ids']))
+        $databaseManager->transaction(static function () use ($request): void {
+            $request->getIds()
                 ->chunk(1000)
-                ->each(static function ($bulkChunk) use ($databaseManager): void {
-                    $databaseManager->table('cats')
-                        ->whereIn('id', $bulkChunk)
-                        ->update([
-                            'deleted_at' => CarbonImmutable::now(),
-                        ]);
-
-                    // TODO your code goes here
+                ->each(static function ($bulkChunk): void {
+                    Cat::whereIn('id', $bulkChunk)
+                        ->delete();
                 });
         });
 
         if ($request->ajax()) {
-            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
         return $this->redirector->back();

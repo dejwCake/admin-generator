@@ -16,6 +16,9 @@
     <file>src/</file>
     <file>tests/</file>
 
+    <exclude-pattern>resources/views/*.blade.php</exclude-pattern>
+    <exclude-pattern>resources/views/**/*.blade.php</exclude-pattern>
+
     <!-- Include whole PHPCompatibility standard -->
     <rule ref="PHPCompatibility" />
     <config name="testVersion" value="8.5-"/>

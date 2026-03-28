@@ -131,11 +131,6 @@ final class Controller extends ClassGenerator
             'withoutBulk' => $this->withoutBulk,
             'exportBaseName' => $this->exportBaseName,
             'resource' => $this->resource,
-            'containsPublishedAtColumn' => in_array(
-                'published_at',
-                array_column($this->readColumnsFromTable($this->tableName)->toArray(), 'name'),
-                true,
-            ),
             // index
             'columnsToQuery' => $this->getColumnsToQuery(),
             'columnsToSearchIn' => $this->readColumnsFromTable($this->tableName)->filter(
@@ -151,9 +146,6 @@ final class Controller extends ClassGenerator
             // validation in store/update
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
             'relations' => $this->relations,
-            'hasSoftDelete' => $this->readColumnsFromTable($this->tableName)->filter(
-                static fn (array $column): bool => $column['name'] === 'deleted_at',
-            )->count() > 0,
         ])->render();
     }
 

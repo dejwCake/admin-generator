@@ -6,12 +6,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\User\BulkDestroyUser;
 use App\Http\Requests\Admin\User\DestroyUser;
 use App\Http\Requests\Admin\User\IndexUser;
 use App\Http\Requests\Admin\User\StoreUser;
 use App\Http\Requests\Admin\User\UpdateUser;
 use App\Models\User;
-use Brackets\AdminListing\Services\AdminListingService;
+use Brackets\AdminListing\Builders\ListingBuilder;
+use Brackets\AdminListing\Builders\ListingQueryBuilder;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate;
@@ -20,24 +22,29 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
-use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Excel;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class UsersController extends Controller
+final class UsersController extends Controller
 {
+    private readonly string $guard;
+
     public function __construct(
-        public readonly Config $config,
-        public readonly Gate $gate,
-        public readonly Redirector $redirector,
-        public readonly UrlGenerator $urlGenerator,
-        public readonly ViewFactory $viewFactory,
+        private readonly Config $config,
+        private readonly Gate $gate,
+        private readonly Redirector $redirector,
+        private readonly UrlGenerator $urlGenerator,
+        private readonly ViewFactory $viewFactory,
+        private readonly ListingBuilder $listingBuilder,
+        private readonly ListingQueryBuilder $listingQueryBuilder,
     ) {
+        $this->guard = $this->config->get('auth.defaults.guard', 'web');
     }
 
     /**
@@ -45,18 +52,32 @@ class UsersController extends Controller
      */
     public function index(IndexUser $request): array|View
     {
-        // create and AdminListingService instance for a specific model and
-        $data = AdminListingService::create(User::class)
+        $data = $this->listingBuilder->for(User::class)
+            ->build()
             ->processRequestAndGet(
-                // pass the request with params
-                $request,
-                // set columns to query
-                ['id', 'name', 'email', 'email_verified_at'],
-                // set columns to searchIn
-                ['id', 'name', 'email'],
+                $this->listingQueryBuilder->fromRequest(
+                    $request,
+                    [
+                        'id',
+                        'name',
+                        'email',
+                        'email_verified_at',
+                    ],
+                    [
+                        'id',
+                        'name',
+                        'email',
+                    ],
+                ),
             );
 
         if ($request->ajax()) {
+            if ($request->has('bulk')) {
+                return [
+                    'bulkItems' => $data->pluck('id'),
+                ];
+            }
+
             return [
                 'data' => $data,
             ];
@@ -68,6 +89,15 @@ class UsersController extends Controller
                 'data' => $data,
                 'url' => $this->urlGenerator->route('admin/users/index'),
                 'createUrl' => $this->urlGenerator->route('admin/users/create'),
+                'editUrlTemplate' => $this->urlGenerator->route('admin/users/edit', ['user' => ':id']),
+                'updateUrlTemplate' => $this->urlGenerator->route('admin/users/update', ['user' => ':id']),
+                'destroyUrlTemplate' => $this->urlGenerator->route('admin/users/destroy', ['user' => ':id']),
+                'bulkAllUrl' => $this->urlGenerator->route('admin/users/index'),
+                'bulkDestroyUrl' => $this->urlGenerator->route('admin/users/bulk-destroy'),
+                'resendVerifyEmailUrlTemplate' => $this->urlGenerator->route(
+                    'admin/users/resend-verify-email',
+                    ['user' => ':id'],
+                ),
                 'exportUrl' => $this->urlGenerator->route('admin/users/export'),
             ],
         );
@@ -85,8 +115,8 @@ class UsersController extends Controller
         return $this->viewFactory->make(
             'admin.user.create',
             [
-                'action' => $this->urlGenerator->to('admin/users'),
-                'roles' => Role::all(),
+                'action' => $this->urlGenerator->route('admin/users/store'),
+                'roles' => Role::where('guard_name', $this->guard)->get(),
             ],
         );
     }
@@ -96,35 +126,19 @@ class UsersController extends Controller
      */
     public function store(StoreUser $request): array|RedirectResponse
     {
-        // Sanitize input
-        $sanitized = $request->getModifiedData();
+        $data = $request->getModifiedData();
 
-        // Store the User
-        $user = User::create($sanitized);
-
-        // But we do have a roles, so we need to attach the roles to the user
-        $user->roles()->sync((new Collection($request->input('roles', [])))->map->id->toArray());
+        $user = User::create($data);
+        $user->roles()->sync($request->getRoleIds());
 
         if ($request->ajax()) {
             return [
-                'redirect' => $this->urlGenerator->to('admin/users'),
+                'redirect' => $this->urlGenerator->route('admin/users/index'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
-        return $this->redirector->to('admin/users');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @throws AuthorizationException
-     */
-    public function show(User $user): void
-    {
-        $this->gate->authorize('admin.user.show', $user);
-
-        // TODO your code goes here
+        return $this->redirector->route('admin/users/index');
     }
 
     /**
@@ -143,7 +157,7 @@ class UsersController extends Controller
             [
                 'user' => $user,
                 'action' => $this->urlGenerator->route('admin/users/update', [$user]),
-                'roles' => Role::all(),
+                'roles' => Role::where('guard_name', $this->guard)->get(),
             ],
         );
     }
@@ -153,25 +167,21 @@ class UsersController extends Controller
      */
     public function update(UpdateUser $request, User $user): array|RedirectResponse
     {
-        // Sanitize input
-        $sanitized = $request->getModifiedData();
+        $data = $request->getModifiedData();
 
-        // Update changed values User
-        $user->update($sanitized);
-
-        // But we do have a roles, so we need to attach the roles to the user
-        if ($request->input('roles')) {
-            $user->roles()->sync((new Collection($request->input('roles', [])))->map->id->toArray());
+        $user->update($data);
+        if ($request->getRoleIds() !== null) {
+            $user->roles()->sync($request->getRoleIds());
         }
 
         if ($request->ajax()) {
             return [
-                'redirect' => $this->urlGenerator->to('admin/users'),
+                'redirect' => $this->urlGenerator->route('admin/users/index'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
-        return $this->redirector->to('admin/users');
+        return $this->redirector->route('admin/users/index');
     }
 
     /**
@@ -184,10 +194,45 @@ class UsersController extends Controller
         $user->delete();
 
         if ($request->ajax()) {
-            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
         return $this->redirector->back();
+    }
+
+    /**
+     * Remove the specified resources from storage.
+     *
+     * @throws Exception
+     */
+    public function bulkDestroy(BulkDestroyUser $request, DatabaseManager $databaseManager): array|RedirectResponse
+    {
+        $databaseManager->transaction(static function () use ($request): void {
+            $request->getIds()
+                ->chunk(1000)
+                ->each(static function ($bulkChunk): void {
+                    User::whereIn('id', $bulkChunk)
+                        ->delete();
+                });
+        });
+
+        if ($request->ajax()) {
+            return [
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+            ];
+        }
+
+        return $this->redirector->back();
+    }
+
+    /**
+     * Export entities
+     */
+    public function export(Excel $excel, UsersExport $export): ?BinaryFileResponse
+    {
+        return $excel->download($export, 'users.xlsx');
     }
 
     /**
@@ -208,17 +253,11 @@ class UsersController extends Controller
 
         $user->sendEmailVerificationNotification();
         if ($request->ajax()) {
-            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
         return $this->redirector->back();
-    }
-
-    /**
-     * Export entities
-     */
-    public function export(Excel $excel, UsersExport $export): ?BinaryFileResponse
-    {
-        return $excel->download($export, 'users.xlsx');
     }
 }

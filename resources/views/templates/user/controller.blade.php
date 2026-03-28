@@ -1,4 +1,4 @@
-@php use Illuminate\Support\Arr;echo "<?php";
+@php use Illuminate\Support\Arr;use Illuminate\Support\Str;echo "<?php";
 @endphp
 
 
@@ -6,22 +6,22 @@ declare(strict_types=1);
 
 namespace {{ $controllerNamespace }};
 @php
-    $mustVerifyEmail = $columns->search(function ($column, $key) {
-            return $column['name'] === 'email_verified_at';
-        }) !== false;
     $uses = [
         'App\Http\Controllers\Controller',
-        'Brackets\AdminListing\Services\AdminListingService',
+        'Brackets\AdminListing\Builders\ListingBuilder',
+        'Brackets\AdminListing\Builders\ListingQueryBuilder',
         'Exception',
         'Illuminate\Auth\Access\AuthorizationException',
         'Illuminate\Contracts\Auth\Access\Gate',
+        'Illuminate\Contracts\Auth\MustVerifyEmail',
         'Illuminate\Contracts\Config\Repository as Config',
         'Illuminate\Contracts\Routing\UrlGenerator',
         'Illuminate\Contracts\View\Factory as ViewFactory',
         'Illuminate\Contracts\View\View',
         'Illuminate\Http\RedirectResponse',
+        'Illuminate\Http\Request',
         'Illuminate\Routing\Redirector',
-        'Illuminate\Support\Collection',
+        'Symfony\Component\HttpKernel\Exception\HttpException',
         sprintf('App\Http\Requests\Admin\%s\Destroy%s', $modelWithNamespaceFromDefault, $modelBaseName),
         sprintf('App\Http\Requests\Admin\%s\Index%s', $modelWithNamespaceFromDefault, $modelBaseName),
         sprintf('App\Http\Requests\Admin\%s\Store%s', $modelWithNamespaceFromDefault, $modelBaseName),
@@ -33,11 +33,6 @@ namespace {{ $controllerNamespace }};
         $uses[] = 'Maatwebsite\Excel\Excel';
         $uses[] = 'Symfony\Component\HttpFoundation\BinaryFileResponse';
     }
-    if ($mustVerifyEmail) {
-        $uses[] = 'Illuminate\Contracts\Auth\MustVerifyEmail';
-        $uses[] = 'Illuminate\Http\Request';
-        $uses[] = 'Symfony\Component\HttpKernel\Exception\HttpException';
-    }
 
     $belongsToManyRelations = [];
     if (count($relations) > 0 && count($relations['belongsToMany']) > 0) {
@@ -46,6 +41,10 @@ namespace {{ $controllerNamespace }};
             $uses[] = $belongsToMany['related_model'];
         }
     }
+    if (!$withoutBulk) {
+        $uses[] = sprintf('App\Http\Requests\Admin\%s\BulkDestroy%s', $modelWithNamespaceFromDefault, $modelBaseName);
+        $uses[] = 'Illuminate\Database\DatabaseManager';
+    }
     $uses = Arr::sort($uses);
 @endphp
 
@@ -53,15 +52,20 @@ namespace {{ $controllerNamespace }};
 use {{ $use }};
 @endforeach
 
-class {{ $controllerBaseName }} extends Controller
+final class {{ $controllerBaseName }} extends Controller
 {
+    private readonly string $guard;
+
     public function __construct(
-        public readonly Config $config,
-        public readonly Gate $gate,
-        public readonly Redirector $redirector,
-        public readonly UrlGenerator $urlGenerator,
-        public readonly ViewFactory $viewFactory,
+        private readonly Config $config,
+        private readonly Gate $gate,
+        private readonly Redirector $redirector,
+        private readonly UrlGenerator $urlGenerator,
+        private readonly ViewFactory $viewFactory,
+        private readonly ListingBuilder $listingBuilder,
+        private readonly ListingQueryBuilder $listingQueryBuilder,
     ) {
+        $this->guard = $this->config->get('auth.defaults.guard', 'web');
     }
 
     /**
@@ -69,18 +73,33 @@ class {{ $controllerBaseName }} extends Controller
      */
     public function index(Index{{ $modelBaseName }} $request): array|View
     {
-        // create and AdminListingService instance for a specific model and
-        $data = AdminListingService::create({{ $modelBaseName }}::class)
+        $data = $this->listingBuilder->for({{ $modelBaseName }}::class)
+            ->build()
             ->processRequestAndGet(
-                // pass the request with params
-                $request,
-                // set columns to query
-                ['{!! implode('\', \'', $columnsToQuery) !!}'],
-                // set columns to searchIn
-                ['{!! implode('\', \'', $columnsToSearchIn) !!}'],
+                $this->listingQueryBuilder->fromRequest(
+                    $request,
+                    [
+@foreach($columnsToQuery as $column)
+                        '{{ $column }}',
+@endforeach
+                    ],
+                    [
+@foreach($columnsToSearchIn as $column)
+                        '{{ $column }}',
+@endforeach
+                    ],
+                ),
             );
 
         if ($request->ajax()) {
+@if(!$withoutBulk)
+            if ($request->has('bulk')) {
+                return [
+                    'bulkItems' => $data->pluck('id'),
+                ];
+            }
+
+@endif
             return [
                 'data' => $data,
             ];
@@ -92,6 +111,17 @@ class {{ $controllerBaseName }} extends Controller
                 'data' => $data,
                 'url' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
                 'createUrl' => $this->urlGenerator->route('admin/{{ $resource }}/create'),
+                'editUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/edit', ['{{ $modelVariableName }}' => ':id']),
+                'updateUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/update', ['{{ $modelVariableName }}' => ':id']),
+                'destroyUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/destroy', ['{{ $modelVariableName }}' => ':id']),
+@if(!$withoutBulk)
+                'bulkAllUrl' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
+                'bulkDestroyUrl' => $this->urlGenerator->route('admin/{{ $resource }}/bulk-destroy'),
+@endif
+                'resendVerifyEmailUrlTemplate' => $this->urlGenerator->route(
+                    'admin/{{ $resource }}/resend-verify-email',
+                    ['{{ $modelVariableName }}' => ':id'],
+                ),
 @if($export)
                 'exportUrl' => $this->urlGenerator->route('admin/{{ $resource }}/export'),
 @endif
@@ -102,7 +132,7 @@ class {{ $controllerBaseName }} extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * {{'@'}}throws AuthorizationException
+     * @throws AuthorizationException
      */
     public function create(): View
     {
@@ -111,9 +141,13 @@ class {{ $controllerBaseName }} extends Controller
         return $this->viewFactory->make(
             'admin.{{ $modelDotNotation }}.create',
             [
-                'action' => $this->urlGenerator->to('admin/{{ $resource }}'),
+                'action' => $this->urlGenerator->route('admin/{{ $resource }}/store'),
 @foreach($belongsToManyRelations as $belongsToMany)
+@if($belongsToMany['related_table'] === 'roles')
+                '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::where('guard_name', $this->guard)->get(),
+@else
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
+@endif
 @endforeach
             ],
         );
@@ -124,54 +158,37 @@ class {{ $controllerBaseName }} extends Controller
      */
     public function store(Store{{ $modelBaseName }} $request): array|RedirectResponse
     {
-        // Sanitize input
-        $sanitized = $request->getModifiedData();
+        $data = $request->getModifiedData();
 
-        // Store the {{ $modelBaseName }}
-@if (count($belongsToManyRelations) > 0)
+@if(count($belongsToManyRelations) > 0)
+        ${{ $modelVariableName }} = {{ $modelBaseName }}::create($data);
 @foreach($belongsToManyRelations as $belongsToMany)
-        ${{ $modelVariableName }} = {{ $modelBaseName }}::create($sanitized);
-
-        // But we do have a {{ $belongsToMany['related_table'] }}, so we need to attach the {{ $belongsToMany['related_table'] }} to the {{ $modelVariableName }}
-        ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync((new Collection($request->input('{{ $belongsToMany['related_table'] }}', [])))->map->id->toArray());
+        ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync($request->get{{ $belongsToMany['related_model_name'] }}Ids());
 @endforeach
-
 @else
-        {{ $modelBaseName }}::create($sanitized);
-
+        {{ $modelBaseName }}::create($data);
 @endif
+
         if ($request->ajax()) {
             return [
-                'redirect' => $this->urlGenerator->to('admin/{{ $resource }}'),
+                'redirect' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
-        return $this->redirector->to('admin/{{ $resource }}');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * {{'@'}}throws AuthorizationException
-     */
-    public function show({{ $modelBaseName }} ${{ $modelVariableName }}): void
-    {
-        $this->gate->authorize('admin.{{ $modelDotNotation }}.show', ${{ $modelVariableName }});
-
-        // TODO your code goes here
+        return $this->redirector->route('admin/{{ $resource }}/index');
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * {{'@'}}throws AuthorizationException
+     * @throws AuthorizationException
      */
     public function edit({{ $modelBaseName }} ${{ $modelVariableName }}): View
     {
         $this->gate->authorize('admin.{{ $modelDotNotation }}.edit', ${{ $modelVariableName }});
 
-@if (count($belongsToManyRelations) > 0)
+@if(count($belongsToManyRelations) > 0)
 @foreach($belongsToManyRelations as $belongsToMany)
         ${{ $modelVariableName }}->load('{{ $belongsToMany['related_table'] }}');
 @endforeach
@@ -183,7 +200,11 @@ class {{ $controllerBaseName }} extends Controller
                 '{{ $modelVariableName }}' => ${{ $modelVariableName }},
                 'action' => $this->urlGenerator->route('admin/{{ $resource }}/update', [${{ $modelVariableName }}]),
 @foreach($belongsToManyRelations as $belongsToMany)
+@if($belongsToMany['related_table'] === 'roles')
+                '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::where('guard_name', $this->guard)->get(),
+@else
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
+@endif
 @endforeach
             ],
         );
@@ -194,67 +215,66 @@ class {{ $controllerBaseName }} extends Controller
      */
     public function update(Update{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}): array|RedirectResponse
     {
-        // Sanitize input
-        $sanitized = $request->getModifiedData();
+        $data = $request->getModifiedData();
 
-        // Update changed values {{ $modelBaseName }}
-        ${{ $modelVariableName }}->update($sanitized);
-
-@if (count($belongsToManyRelations) > 0)
+        ${{ $modelVariableName }}->update($data);
+@if(count($belongsToManyRelations) > 0)
 @foreach($belongsToManyRelations as $belongsToMany)
-        // But we do have a {{ $belongsToMany['related_table'] }}, so we need to attach the {{ $belongsToMany['related_table'] }} to the {{ $modelVariableName }}
-        if ($request->input('{{ $belongsToMany['related_table'] }}')) {
-            ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync((new Collection($request->input('{{ $belongsToMany['related_table'] }}', [])))->map->id->toArray());
+        if ($request->get{{ $belongsToMany['related_model_name'] }}Ids() !== null) {
+            ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync($request->get{{ $belongsToMany['related_model_name'] }}Ids());
         }
 @endforeach
 @endif
 
         if ($request->ajax()) {
             return [
-                'redirect' => $this->urlGenerator->to('admin/{{ $resource }}'),
+                'redirect' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
-        return $this->redirector->to('admin/{{ $resource }}');
+        return $this->redirector->route('admin/{{ $resource }}/index');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * {{'@'}}throws Exception
+     * @throws Exception
      */
     public function destroy(Destroy{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}): array|RedirectResponse
     {
         ${{ $modelVariableName }}->delete();
 
         if ($request->ajax()) {
-            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
         return $this->redirector->back();
     }
-@if($mustVerifyEmail)
+@if(!$withoutBulk)
 
     /**
-     * Resend verify e-mail
+     * Remove the specified resources from storage.
+     *
+     * @throws Exception
      */
-    public function resendVerifyEmail(Request $request, User $user): array|RedirectResponse
+    public function bulkDestroy(BulkDestroy{{ $modelBaseName }} $request, DatabaseManager $databaseManager): array|RedirectResponse
     {
-        if (!(${{ $modelVariableName }} instanceof MustVerifyEmail) || ${{ $modelVariableName }}->hasVerifiedEmail()) {
-            if ($request->ajax()) {
-                throw HttpException::fromStatusCode(
-                    400,
-                    trans('brackets/admin-ui::admin.operation.not_allowed'),
-                );
-            }
+        $databaseManager->transaction(static function () use ($request): void {
+            $request->getIds()
+                ->chunk(1000)
+                ->each(static function ($bulkChunk): void {
+                    {{ $modelBaseName }}::whereIn('id', $bulkChunk)
+                        ->delete();
+                });
+        });
 
-            return $this->redirector->back();
-        }
-
-        ${{ $modelVariableName }}->sendEmailVerificationNotification();
         if ($request->ajax()) {
-            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
         return $this->redirector->back();
@@ -269,4 +289,31 @@ class {{ $controllerBaseName }} extends Controller
     {
         return $excel->download($export, '{{ Str::plural($modelVariableName) }}.xlsx');
     }
-@endif}
+@endif
+
+    /**
+     * Resend verify e-mail
+     */
+    public function resendVerifyEmail(Request $request, {{ $modelBaseName }} ${{ $modelVariableName }}): array|RedirectResponse
+    {
+        if (!(${{ $modelVariableName }} instanceof MustVerifyEmail) || ${{ $modelVariableName }}->hasVerifiedEmail()) {
+            if ($request->ajax()) {
+                throw HttpException::fromStatusCode(
+                    400,
+                    trans('brackets/admin-ui::admin.operation.not_allowed'),
+                );
+            }
+
+            return $this->redirector->back();
+        }
+
+        ${{ $modelVariableName }}->sendEmailVerificationNotification();
+        if ($request->ajax()) {
+            return [
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+            ];
+        }
+
+        return $this->redirector->back();
+    }
+}

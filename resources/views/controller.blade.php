@@ -8,7 +8,8 @@ namespace {{ $controllerNamespace }};
 @php
     $uses = [
         'App\Http\Controllers\Controller',
-        'Brackets\AdminListing\Services\AdminListingService',
+        'Brackets\AdminListing\Builders\ListingBuilder',
+        'Brackets\AdminListing\Builders\ListingQueryBuilder',
         'Exception',
         'Illuminate\Auth\Access\AuthorizationException',
         'Illuminate\Contracts\Auth\Access\Gate',
@@ -17,7 +18,6 @@ namespace {{ $controllerNamespace }};
         'Illuminate\Contracts\View\View',
         'Illuminate\Http\RedirectResponse',
         'Illuminate\Routing\Redirector',
-        'Illuminate\Support\Collection',
         sprintf('App\Http\Requests\Admin\%s\Destroy%s', $modelWithNamespaceFromDefault, $modelBaseName),
         sprintf('App\Http\Requests\Admin\%s\Index%s', $modelWithNamespaceFromDefault, $modelBaseName),
         sprintf('App\Http\Requests\Admin\%s\Store%s', $modelWithNamespaceFromDefault, $modelBaseName),
@@ -41,13 +41,8 @@ namespace {{ $controllerNamespace }};
         $uses[] = sprintf('App\Http\Requests\Admin\%s\BulkDestroy%s', $modelWithNamespaceFromDefault, $modelBaseName);
         $uses[] = 'Illuminate\Database\DatabaseManager';
     }
-    if (!$withoutBulk && $hasSoftDelete) {
-        $uses[] = 'Carbon\CarbonImmutable';
-
-    }
     if (in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery)) {
         $uses[] = 'Illuminate\Database\Eloquent\Builder';
-        $uses[] = 'Illuminate\Contracts\Config\Repository as Config';
     }
     $uses = Arr::sort($uses);
 @endphp
@@ -56,13 +51,15 @@ namespace {{ $controllerNamespace }};
 use {{ $use }};
 @endforeach
 
-class {{ $controllerBaseName }} extends Controller
+final class {{ $controllerBaseName }} extends Controller
 {
     public function __construct(
-        public readonly Gate $gate,
-        public readonly Redirector $redirector,
-        public readonly UrlGenerator $urlGenerator,
-        public readonly ViewFactory $viewFactory,
+        private readonly Gate $gate,
+        private readonly Redirector $redirector,
+        private readonly UrlGenerator $urlGenerator,
+        private readonly ViewFactory $viewFactory,
+        private readonly ListingBuilder $listingBuilder,
+        private readonly ListingQueryBuilder $listingQueryBuilder,
     ) {
     }
 
@@ -71,15 +68,22 @@ class {{ $controllerBaseName }} extends Controller
      */
     public function index(Index{{ $modelBaseName }} $request): array|View
     {
-        // create and AdminListingService instance for a specific model and
-        $data = AdminListingService::create({{ $modelBaseName }}::class)
+        $data = $this->listingBuilder->for({{ $modelBaseName }}::class)
+            ->build()
             ->processRequestAndGet(
-                // pass the request with params
-                $request,
-                // set columns to query
-                ['{!! implode('\', \'', $columnsToQuery) !!}'],
-                // set columns to searchIn
-                ['{!! implode('\', \'', $columnsToSearchIn) !!}'],
+                $this->listingQueryBuilder->fromRequest(
+                    $request,
+                    [
+@foreach($columnsToQuery as $column)
+                        '{{ $column }}',
+@endforeach
+                    ],
+                    [
+@foreach($columnsToSearchIn as $column)
+                        '{{ $column }}',
+@endforeach
+                    ],
+                ),
 @if(in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery))
 @if(in_array('created_by_admin_user_id', $columnsToQuery) && in_array('updated_by_admin_user_id', $columnsToQuery))
                 static function (Builder $query): void {
@@ -94,7 +98,7 @@ class {{ $controllerBaseName }} extends Controller
                     $query->with(['updatedByAdminUser']);
                 },
 @endif
-@endif()
+@endif
             );
 
         if ($request->ajax()) {
@@ -104,9 +108,11 @@ class {{ $controllerBaseName }} extends Controller
                     'bulkItems' => $data->pluck('id'),
                 ];
             }
-@endif
 
-            return ['data' => $data];
+@endif
+            return [
+                'data' => $data,
+            ];
         }
 
         return $this->viewFactory->make(
@@ -115,6 +121,13 @@ class {{ $controllerBaseName }} extends Controller
                 'data' => $data,
                 'url' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
                 'createUrl' => $this->urlGenerator->route('admin/{{ $resource }}/create'),
+                'editUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/edit', ['{{ $modelVariableName }}' => ':id']),
+                'updateUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/update', ['{{ $modelVariableName }}' => ':id']),
+                'destroyUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/destroy', ['{{ $modelVariableName }}' => ':id']),
+@if(!$withoutBulk)
+                'bulkAllUrl' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
+                'bulkDestroyUrl' => $this->urlGenerator->route('admin/{{ $resource }}/bulk-destroy'),
+@endif
 @if($export)
                 'exportUrl' => $this->urlGenerator->route('admin/{{ $resource }}/export'),
 @endif
@@ -125,7 +138,7 @@ class {{ $controllerBaseName }} extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * {{'@'}}throws AuthorizationException
+     * @throws AuthorizationException
      */
     public function create(): View
     {
@@ -134,7 +147,7 @@ class {{ $controllerBaseName }} extends Controller
         return $this->viewFactory->make(
             'admin.{{ $modelDotNotation }}.create',
             [
-                'action' => $this->urlGenerator->to('admin/{{ $resource }}'),
+                'action' => $this->urlGenerator->route('admin/{{ $resource }}/store'),
 @foreach($belongsToManyRelations as $belongsToMany)
                 '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
 @endforeach
@@ -145,65 +158,33 @@ class {{ $controllerBaseName }} extends Controller
     /**
      * Store a newly created resource in storage.
      */
-@if(in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery))
-    public function store(Store{{ $modelBaseName }} $request, Config $config): array|RedirectResponse
-@else
-    public function store(Store{{ $modelBaseName }} $request): RedirectResponse|array
-@endif
+    public function store(Store{{ $modelBaseName }} $request): array|RedirectResponse
     {
-        // Sanitize input
-        $sanitized = $request->getSanitized();
-@if(in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery))
-        $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
-@if(in_array('created_by_admin_user_id', $columnsToQuery) && in_array('updated_by_admin_user_id', $columnsToQuery))
-        $sanitized['created_by_admin_user_id'] = $request->user($adminUserGuard)->id;
-        $sanitized['updated_by_admin_user_id'] = $request->user($adminUserGuard)->id;
-@elseif(in_array('created_by_admin_user_id', $columnsToQuery))
-        $sanitized['created_by_admin_user_id'] = $request->user($adminUserGuard)->id;
-@elseif(in_array('updated_by_admin_user_id', $columnsToQuery))
-        $sanitized['updated_by_admin_user_id'] = $request->user($adminUserGuard)->id;
-@endif
-@endif
+        $data = $request->getModifiedData();
 
-        // Store the {{ $modelBaseName }}
-@if (count($belongsToManyRelations) > 0)
+@if(count($belongsToManyRelations) > 0)
+        ${{ $modelVariableName }} = {{ $modelBaseName }}::create($data);
 @foreach($belongsToManyRelations as $belongsToMany)
-        ${{ $modelVariableName }} = {{ $modelBaseName }}::create($sanitized);
-
-        // But we do have a {{ $belongsToMany['related_table'] }}, so we need to attach the {{ $belongsToMany['related_table'] }} to the {{ $modelVariableName }}
-        ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync((new Collection($request->input('{{ $belongsToMany['related_table'] }}', [])))->map->id->toArray());
+        ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync($request->get{{ $belongsToMany['related_model_name'] }}Ids());
 @endforeach
-
 @else
-        {{ $modelBaseName }}::create($sanitized);
-
+        {{ $modelBaseName }}::create($data);
 @endif
+
         if ($request->ajax()) {
             return [
-                'redirect' => $this->urlGenerator->to('admin/{{ $resource }}'),
+                'redirect' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
 
-        return $this->redirector->to('admin/{{ $resource }}');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * {{'@'}}throws AuthorizationException
-     */
-    public function show({{ $modelBaseName }} ${{ $modelVariableName }}): void
-    {
-        $this->gate->authorize('admin.{{ $modelDotNotation }}.show', ${{ $modelVariableName }});
-
-        // TODO your code goes here
+        return $this->redirector->route('admin/{{ $resource }}/index');
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * {{'@'}}throws AuthorizationException
+     * @throws AuthorizationException
      */
     public function edit({{ $modelBaseName }} ${{ $modelVariableName }}): View
     {
@@ -219,7 +200,7 @@ class {{ $controllerBaseName }} extends Controller
 @endif
 
 @endif
-@if (count($belongsToManyRelations) > 0)
+@if(count($belongsToManyRelations) > 0)
 @foreach($belongsToManyRelations as $belongsToMany)
         ${{ $modelVariableName }}->load('{{ $belongsToMany['related_table'] }}');
 @endforeach
@@ -240,97 +221,68 @@ class {{ $controllerBaseName }} extends Controller
     /**
      * Update the specified resource in storage.
      */
-@if(in_array('updated_by_admin_user_id', $columnsToQuery))
-    public function update(Update{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}, Config $config): array|RedirectResponse
-@else
     public function update(Update{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}): array|RedirectResponse
-@endif
     {
-        // Sanitize input
-        $sanitized = $request->getSanitized();
-@if(in_array('updated_by_admin_user_id', $columnsToQuery))
-        $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
-        $sanitized['updated_by_admin_user_id'] = $request->user($adminUserGuard)->id;
-@endif
+        $data = $request->getModifiedData();
 
-        // Update changed values {{ $modelBaseName }}
-        ${{ $modelVariableName }}->update($sanitized);
-
-@if (count($belongsToManyRelations) > 0)
+        ${{ $modelVariableName }}->update($data);
+@if(count($belongsToManyRelations) > 0)
 @foreach($belongsToManyRelations as $belongsToMany)
-        // But we do have a {{ $belongsToMany['related_table'] }}, so we need to attach the {{ $belongsToMany['related_table'] }} to the {{ $modelVariableName }}
-        if ($request->has('{{ $belongsToMany['related_table'] }}')) {
-            ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync((new Collection($request->input('{{ $belongsToMany['related_table'] }}', [])))->map->id->toArray());
+        if ($request->get{{ $belongsToMany['related_model_name'] }}Ids() !== null) {
+            ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync($request->get{{ $belongsToMany['related_model_name'] }}Ids());
         }
 @endforeach
-
 @endif
+
         if ($request->ajax()) {
             return [
-                'redirect' => $this->urlGenerator->to('admin/{{ $resource }}'),
+                'redirect' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
-@if($containsPublishedAtColumn)
-                'object' => ${{ $modelVariableName }},
-@endif
             ];
         }
 
-        return $this->redirector->to('admin/{{ $resource }}');
+        return $this->redirector->route('admin/{{ $resource }}/index');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * {{'@'}}throws Exception
+     * @throws Exception
      */
     public function destroy(Destroy{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}): array|RedirectResponse
     {
         ${{ $modelVariableName }}->delete();
 
         if ($request->ajax()) {
-            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
         return $this->redirector->back();
     }
-
 @if(!$withoutBulk)
+
     /**
      * Remove the specified resources from storage.
      *
-     * {{'@'}}throws Exception
+     * @throws Exception
      */
     public function bulkDestroy(BulkDestroy{{ $modelBaseName }} $request, DatabaseManager $databaseManager): array|RedirectResponse
     {
-@if($hasSoftDelete)
-        $databaseManager->transaction(static function () use ($request, $databaseManager): void {
-            (new Collection($request->data['ids']))
+        $databaseManager->transaction(static function () use ($request): void {
+            $request->getIds()
                 ->chunk(1000)
-                ->each(static function ($bulkChunk) use ($databaseManager): void {
-                    $databaseManager->table('{{ Str::plural($modelVariableName) }}')
-                        ->whereIn('id', $bulkChunk)
-                        ->update([
-                            'deleted_at' => CarbonImmutable::now(),
-                        ]);
-
-                    // TODO your code goes here
-                });
-        });
-@else
-        $databaseManager->transaction(static function () use ($request, $databaseManager) {
-            (new Collection($request->data['ids']))
-                ->chunk(1000)
-                ->each(static function ($bulkChunk) {
+                ->each(static function ($bulkChunk): void {
                     {{ $modelBaseName }}::whereIn('id', $bulkChunk)
                         ->delete();
-
-                    // TODO your code goes here
                 });
         });
-@endif
 
         if ($request->ajax()) {
-            return ['message' => trans('brackets/admin-ui::admin.operation.succeeded')];
+            return [
+                'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+            ];
         }
 
         return $this->redirector->back();
@@ -345,4 +297,5 @@ class {{ $controllerBaseName }} extends Controller
     {
         return $excel->download($export, '{{ Str::plural($modelVariableName) }}.xlsx');
     }
-@endif}
+@endif
+}
