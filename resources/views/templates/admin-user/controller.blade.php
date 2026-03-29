@@ -322,7 +322,7 @@ final class {{ $controllerBaseName }} extends Controller
      *
      * {{'@'}}phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    public function export(Export{{ $modelBaseName }} $request, Excel $excel, {{ $exportBaseName }} $export): ?BinaryFileResponse
+    public function export(Export{{ $modelBaseName }} $request, Excel $excel, {{ $exportBaseName }} $export): BinaryFileResponse
     {
         $currentTime = CarbonImmutable::now()->toDateTimeString();
         $nameOfExportedFile = sprintf('{{ Str::plural($modelVariableName) }}_%s.xlsx', $currentTime);

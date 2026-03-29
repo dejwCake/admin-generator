@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Billing\CategOryController;
+
+
 /* Auto-generated admin routes uses */
 
 Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])

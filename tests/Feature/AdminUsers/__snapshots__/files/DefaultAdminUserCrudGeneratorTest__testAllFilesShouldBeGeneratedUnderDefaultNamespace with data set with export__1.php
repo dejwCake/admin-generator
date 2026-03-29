@@ -250,7 +250,7 @@ final class AdminUsersController extends Controller
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    public function export(ExportAdminUser $request, Excel $excel, AdminUsersExport $export): ?BinaryFileResponse
+    public function export(ExportAdminUser $request, Excel $excel, AdminUsersExport $export): BinaryFileResponse
     {
         $currentTime = CarbonImmutable::now()->toDateTimeString();
         $nameOfExportedFile = sprintf('adminUsers_%s.xlsx', $currentTime);

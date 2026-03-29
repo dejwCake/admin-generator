@@ -207,7 +207,7 @@ abstract class FileAppender extends Command
 
         $this->files->put(
             $path,
-            str_replace($useMarker, $useStatement . PHP_EOL . $useMarker, $content),
+            str_replace($useMarker, $useStatement . PHP_EOL . PHP_EOL . $useMarker, $content),
         );
     }
 

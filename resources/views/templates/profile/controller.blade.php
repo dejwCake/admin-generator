@@ -9,7 +9,6 @@ namespace {{ $controllerNamespace }};
     $uses = [
         'App\Http\Controllers\Controller',
         'Brackets\AdminAuth\Models\AdminUser',
-        'Illuminate\Contracts\Auth\Authenticatable',
         'Illuminate\Contracts\Config\Repository as Config',
         'Illuminate\Contracts\Hashing\Hasher',
         'Illuminate\Contracts\Routing\UrlGenerator',
@@ -154,7 +153,7 @@ final class {{ $controllerBaseName }} extends Controller
      *
      * {{'@'}}throws NotFoundHttpException
      */
-    private function getUser(Request $request): AdminUser|Authenticatable
+    private function getUser(Request $request): AdminUser
     {
         if ($request->user($this->guard) === null) {
             throw NotFoundHttpException::fromStatusCode(

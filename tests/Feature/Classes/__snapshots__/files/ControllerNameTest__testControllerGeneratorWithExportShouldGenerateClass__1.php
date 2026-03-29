@@ -181,6 +181,7 @@ final class CategoriesController extends Controller
             return [
                 'redirect' => $this->urlGenerator->route('admin/categories/index'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+                'object' => $category,
             ];
         }
 
@@ -235,7 +236,7 @@ final class CategoriesController extends Controller
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    public function export(ExportCategory $request, Excel $excel, CategoriesExport $export): ?BinaryFileResponse
+    public function export(ExportCategory $request, Excel $excel, CategoriesExport $export): BinaryFileResponse
     {
         $currentTime = CarbonImmutable::now()->toDateTimeString();
         $nameOfExportedFile = sprintf('categories_%s.xlsx', $currentTime);

@@ -175,6 +175,7 @@ final class CategoriesController extends Controller
             return [
                 'redirect' => $this->urlGenerator->route('admin/cats/index'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+                'object' => $cat,
             ];
         }
 

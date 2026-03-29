@@ -234,7 +234,7 @@ final class UsersController extends Controller
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    public function export(ExportUser $request, Excel $excel, UsersExport $export): ?BinaryFileResponse
+    public function export(ExportUser $request, Excel $excel, UsersExport $export): BinaryFileResponse
     {
         $currentTime = CarbonImmutable::now()->toDateTimeString();
         $nameOfExportedFile = sprintf('users_%s.xlsx', $currentTime);
