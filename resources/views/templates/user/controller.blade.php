@@ -120,13 +120,13 @@ final class {{ $controllerBaseName }} extends Controller
                 'bulkAllUrl' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
                 'bulkDestroyUrl' => $this->urlGenerator->route('admin/{{ $resource }}/bulk-destroy'),
 @endif
+@if($export)
+                'exportUrl' => $this->urlGenerator->route('admin/{{ $resource }}/export'),
+@endif
                 'resendVerifyEmailUrlTemplate' => $this->urlGenerator->route(
                     'admin/{{ $resource }}/resend-verify-email',
                     ['{{ $modelVariableName }}' => ':id'],
                 ),
-@if($export)
-                'exportUrl' => $this->urlGenerator->route('admin/{{ $resource }}/export'),
-@endif
             ],
         );
     }

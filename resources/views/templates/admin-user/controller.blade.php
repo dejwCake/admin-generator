@@ -128,6 +128,9 @@ final class {{ $controllerBaseName }} extends Controller
                 'bulkAllUrl' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
                 'bulkDestroyUrl' => $this->urlGenerator->route('admin/{{ $resource }}/bulk-destroy'),
 @endif
+@if($export)
+                'exportUrl' => $this->urlGenerator->route('admin/{{ $resource }}/export'),
+@endif
 @if($activation)
                 'resendActivationUrlTemplate' => $this->urlGenerator->route(
                     'admin/{{ $resource }}/resend-activation-email',
@@ -138,9 +141,6 @@ final class {{ $controllerBaseName }} extends Controller
                     'admin/{{ $resource }}/impersonal-login',
                     ['{{ $modelVariableName }}' => ':id'],
                 ),
-@if($export)
-                'exportUrl' => $this->urlGenerator->route('admin/{{ $resource }}/export'),
-@endif
                 'activation' => $this->config->get('admin-auth.activation_enabled'),
                 'canImpersonalLogin' => $this->gate->check('admin.{{ $modelDotNotation }}.impersonal-login'),
             ],
