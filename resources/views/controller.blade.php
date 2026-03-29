@@ -255,6 +255,9 @@ final class {{ $controllerBaseName }} extends Controller
             return [
                 'redirect' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
+@if($hasPublishedAt)
+                'object' => ${{ $modelVariableName }},
+@endif
             ];
         }
 

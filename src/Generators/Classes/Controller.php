@@ -131,6 +131,9 @@ final class Controller extends ClassGenerator
             'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
             'relations' => $this->relations,
             'mediaCollections' => $this->mediaCollections,
+            'hasPublishedAt' => $columns->contains(
+                static fn (array $column): bool => $column['name'] === 'published_at',
+            ),
         ])->render();
     }
 
