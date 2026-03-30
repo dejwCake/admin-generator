@@ -10,6 +10,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 final class Index extends ResourceGenerator
 {
+    private const array WYSIWYG_COLUMN_NAMES = ['perex', 'text', 'body', 'description'];
+
     /**
      * The name and signature of the console command.
      *
@@ -32,9 +34,9 @@ final class Index extends ResourceGenerator
     protected string $view = 'index';
 
     /**
-     * Path for js view
+     * Path for Vue listing component view
      */
-    protected string $viewJs = 'listing-js';
+    protected string $viewVue = 'listing-vue';
 
     /**
      * Index view has also export button
@@ -58,7 +60,7 @@ final class Index extends ResourceGenerator
         //TODO also with prefix
         if ($template !== null) {
             $this->view = 'templates.' . $template . '.index';
-            $this->viewJs = 'templates.' . $template . '.listing-js';
+            $this->viewVue = 'templates.' . $template . '.listing-vue';
         }
 
         if ($withExport) {
@@ -70,19 +72,11 @@ final class Index extends ResourceGenerator
         }
 
         $viewPath = resource_path('views/admin/' . $this->modelViewsDirectory . '/index.blade.php');
-        $listingJsPath = resource_path('js/admin/' . $this->modelJSName . '/Listing.js');
-        $indexJsPath = resource_path('js/admin/' . $this->modelJSName . '/index.js');
-        $bootstrapJsPath = resource_path('js/admin/index.js');
+        $listingVuePath = resource_path('js/admin/' . $this->modelJSName . '/Listing.vue');
 
         $this->generateView($viewPath, $force);
-        $this->generateListingJs($listingJsPath, $force);
-
-        if ($this->appendIfNotAlreadyAppended($indexJsPath, 'import \'./Listing\';' . PHP_EOL)) {
-            $this->info('Appending Listing to ' . $indexJsPath . ' finished');
-        }
-        if ($this->appendIfNotAlreadyAppended($bootstrapJsPath, 'import \'./' . $this->modelJSName . '\';' . PHP_EOL)) {
-            $this->info('Appending ' . $this->modelJSName . '/index.js to ' . $bootstrapJsPath . ' finished');
-        }
+        $this->generateListingVue($listingVuePath, $force);
+        $this->registerInAdminJs();
     }
 
     /** @return array<array<string|int>> */
@@ -102,40 +96,44 @@ final class Index extends ResourceGenerator
     {
         if ($this->alreadyExists($viewPath) && !$force) {
             $this->error('File ' . $viewPath . ' already exists!');
-        } else {
-            if ($this->alreadyExists($viewPath) && $force) {
-                $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
-                $this->files->delete($viewPath);
-            }
 
-            $this->makeDirectory($viewPath);
-
-            $this->files->put($viewPath, $this->buildView());
-
-            $this->info('Generating ' . $viewPath . ' finished');
+            return;
         }
+
+        if ($this->alreadyExists($viewPath) && $force) {
+            $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
+            $this->files->delete($viewPath);
+        }
+
+        $this->makeDirectory($viewPath);
+
+        $this->files->put($viewPath, $this->buildView());
+        $this->info('Generating ' . $viewPath . ' finished');
     }
 
-    private function generateListingJs(string $listingJsPath, bool $force): void
+    private function generateListingVue(string $listingVuePath, bool $force): void
     {
-        if ($this->alreadyExists($listingJsPath) && !$force) {
-            $this->error('File ' . $listingJsPath . ' already exists!');
-        } else {
-            if ($this->alreadyExists($listingJsPath) && $force) {
-                $this->warn('File ' . $listingJsPath . ' already exists! File will be deleted.');
-                $this->files->delete($listingJsPath);
-            }
+        if ($this->alreadyExists($listingVuePath) && !$force) {
+            $this->error('File ' . $listingVuePath . ' already exists!');
 
-            $this->makeDirectory($listingJsPath);
-
-            $this->files->put($listingJsPath, $this->buildListingJs());
-            $this->info('Generating ' . $listingJsPath . ' finished');
+            return;
         }
+
+        if ($this->alreadyExists($listingVuePath) && $force) {
+            $this->warn('File ' . $listingVuePath . ' already exists! File will be deleted.');
+            $this->files->delete($listingVuePath);
+        }
+
+        $this->makeDirectory($listingVuePath);
+
+        $this->files->put($listingVuePath, $this->buildListingVue());
+        $this->info('Generating ' . $listingVuePath . ' finished');
     }
 
     private function buildView(): string
     {
         $columns = $this->readColumnsFromTable($this->tableName);
+        $indexColumns = $this->getColumnsForIndex($columns);
 
         return view('brackets/admin-generator::' . $this->view, [
             'modelBaseName' => $this->modelBaseName,
@@ -151,36 +149,107 @@ final class Index extends ResourceGenerator
             'hasPublishedAt' => $columns->contains(
                 static fn (array $column): bool => $column['name'] === 'published_at',
             ),
+            'hasCreatedByAdminUser' => $columns->contains(
+                static fn (array $column): bool => $column['name'] === 'created_by_admin_user_id',
+            ),
+            'hasUpdatedByAdminUser' => $columns->contains(
+                static fn (array $column): bool => $column['name'] === 'updated_by_admin_user_id',
+            ),
 
-            'columns' => $this->getColumnsForIndex($columns),
-            //            'filters' => $columns->filter(function($column) {
-            //                return in_array($column['majorType'], ['bool', 'date'], true);
-            //            }),
+            'columns' => $indexColumns,
         ])->render();
     }
 
-    private function buildListingJs(): string
+    private function buildListingVue(): string
     {
-        return view('brackets/admin-generator::' . $this->viewJs, [
-            'modelViewsDirectory' => $this->modelViewsDirectory,
+        $columns = $this->readColumnsFromTable($this->tableName);
+        $indexColumns = $this->getColumnsForIndex($columns);
+
+        $hasPublishedAt = $columns->contains(
+            static fn (array $column): bool => $column['name'] === 'published_at',
+        );
+        $hasCreatedByAdminUser = $columns->contains(
+            static fn (array $column): bool => $column['name'] === 'created_by_admin_user_id',
+        );
+        $hasUpdatedByAdminUser = $columns->contains(
+            static fn (array $column): bool => $column['name'] === 'updated_by_admin_user_id',
+        );
+        $hasUserDetailTooltip = $hasCreatedByAdminUser || $hasUpdatedByAdminUser;
+        $hasSwitchColumns = $indexColumns->contains(
+            static fn (array $column): bool => $column['switch'],
+        );
+        $hasDateColumns = $indexColumns->contains(
+            static fn (array $column): bool => in_array($column['majorType'], ['date', 'time', 'datetime'], true),
+        ) || $hasPublishedAt || $hasUserDetailTooltip;
+
+        $dateImports = new Collection();
+        if ($indexColumns->contains(static fn (array $column): bool => $column['majorType'] === 'date')) {
+            $dateImports->push('formatDate');
+        }
+        if ($indexColumns->contains(static fn (array $column): bool => $column['majorType'] === 'time')) {
+            $dateImports->push('formatTime');
+        }
+        if (
+            $indexColumns->contains(static fn (array $column): bool => $column['majorType'] === 'datetime')
+            || $hasPublishedAt
+            || $hasUserDetailTooltip
+        ) {
+            $dateImports->push('formatDatetime');
+        }
+        $dateImports = $dateImports->sort();
+
+        return view('brackets/admin-generator::' . $this->viewVue, [
             'modelJSName' => $this->modelJSName,
+            'modelVariableName' => $this->modelVariableName,
+            'export' => $this->export,
+            'withoutBulk' => $this->withoutBulk,
+            'hasPublishedAt' => $hasPublishedAt,
+            'hasUserDetailTooltip' => $hasUserDetailTooltip,
+            'hasSwitchColumns' => $hasSwitchColumns,
+            'hasDateColumns' => $hasDateColumns,
+            'dateImports' => $dateImports->implode(', '),
+            'columns' => $indexColumns,
         ])->render();
     }
 
     /** @param array<string, string|int> $column */
     private function isSwitch(array $column): bool
     {
-        return ($column['majorType'] === 'bool')
-            && (
-                $column['name'] === 'enabled'
-                || $column['name'] === 'activated'
-                || $column['name'] === 'is_published'
-            );
+        return $column['majorType'] === 'bool';
+    }
+
+    private function registerInAdminJs(): void
+    {
+        $adminJsPath = resource_path('js/admin/admin.js');
+
+        if (!$this->files->exists($adminJsPath)) {
+            $this->warn('File ' . $adminJsPath . ' does not exist, skipping component registration.');
+
+            return;
+        }
+
+        $content = $this->files->get($adminJsPath);
+
+        $importMarker = '//-- Do not delete me :) I\'m used for auto-generation js import--';
+        $componentMarker = '//-- Do not delete me :) I\'m used for auto-generation component registration--';
+
+        $importLine = "import {$this->modelBaseName}Listing from './{$this->modelJSName}/Listing.vue';";
+        $componentLine = "app.component('{$this->modelBaseName}Listing', {$this->modelBaseName}Listing);";
+
+        if (!str_contains($content, $importLine)) {
+            $content = str_replace($importMarker, $importLine . PHP_EOL . $importMarker, $content);
+        }
+
+        if (!str_contains($content, $componentLine)) {
+            $content = str_replace($componentMarker, $componentLine . PHP_EOL . $componentMarker, $content);
+        }
+
+        $this->files->put($adminJsPath, $content);
     }
 
     private function getColumnsForIndex(Collection $columns): Collection
     {
-        return $columns
+        $columnsForIndex = $columns
             ->reject(static fn (array $column): bool => $column['majorType'] === 'text'
             || in_array(
                 $column['name'],
@@ -189,25 +258,57 @@ final class Index extends ResourceGenerator
             )
             || ($column['majorType'] === 'json' && in_array(
                 $column['name'],
-                ['perex', 'text', 'body'],
+                self::WYSIWYG_COLUMN_NAMES,
                 true,
             )))->map(function (array $column): array {
-                $filters = new Collection([]);
-                $column['switch'] = false;
-
-                if (in_array($column['majorType'], ['date', 'time', 'datetime'], true)) {
-                    $filters->push($column['majorType']);
-                }
-
-                if ($this->isSwitch($column)) {
-                    $column['switch'] = true;
-                }
-
-                $column['filters'] = $filters->isNotEmpty()
-                    ? ' | ' . implode(' | ', $filters->toArray())
-                    : '';
+                $column['switch'] = $this->isSwitch($column);
+                $column['priority'] = $this->getColumnFixedPriority($column['name']);
 
                 return $column;
             });
+
+        return $this->assignColumnPriorities($columnsForIndex);
+    }
+
+    private function getColumnFixedPriority(string $name): ?int
+    {
+        return match (true) {
+            in_array($name, ['name', 'title', 'last_name', 'subject'], true) => 0,
+            in_array($name, ['first_name', 'email', 'author'], true) => 1,
+            $name === 'id' => 2,
+            $name === 'published_at' => 3,
+            default => null,
+        };
+    }
+
+    private function assignColumnPriorities(Collection $columns): Collection
+    {
+        $fixedPriorities = $columns
+            ->pluck('priority')
+            ->filter(static fn (?int $priority): bool => $priority !== null)
+            ->unique()
+            ->sort()
+            ->values();
+
+        $priorityMap = $fixedPriorities
+            ->mapWithKeys(static fn (int $priority, int $index): array => [$priority => $index])
+            ->all();
+
+        $nextPriority = count($priorityMap);
+
+        $result = [];
+
+        foreach ($columns as $column) {
+            if ($column['priority'] !== null) {
+                $column['priority'] = $priorityMap[$column['priority']];
+            } else {
+                $column['priority'] = min($nextPriority, 10);
+                $nextPriority++;
+            }
+
+            $result[] = $column;
+        }
+
+        return new Collection($result);
     }
 }

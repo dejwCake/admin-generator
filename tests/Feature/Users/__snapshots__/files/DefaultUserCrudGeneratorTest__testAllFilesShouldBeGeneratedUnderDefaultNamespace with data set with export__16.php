@@ -2,35 +2,31 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories;
+return [
+    'user' => [
+        'title' => 'Users',
 
-use App\Models\User;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Hashing\Hasher;
-use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
-use Illuminate\Database\Eloquent\Factories\Factory;
+        'actions' => [
+            'index' => 'Users',
+            'create' => 'New User',
+            'edit' => 'Edit :name',
+            'export' => 'Export',
+        ],
 
-#[UseModel(User::class)]
-final class UserFactory extends Factory
-{
-    public function definition(): array
-    {
-        $hasher = Container::getInstance()->make(Hasher::class);
+        'columns' => [
+            'id' => 'ID',
+            'name' => 'Name',
+            'email' => 'Email',
+            'email_verified_at' => 'Email verified at',
+            'password' => 'Password',
+            'password_repeat' => 'Password Confirmation',
+            'remember_token' => 'Remember token',
+            'created_at' => 'Created at',
+            'updated_at' => 'Updated at',
+            //Belongs to many relations
+            'roles' => 'Roles',
+        ],
+    ],
 
-        return [
-            'name' => $this->faker->firstName,
-            'email' => $this->faker->email,
-            'email_verified_at' => $this->faker->dateTime,
-            'password' => $hasher->make($this->faker->password),
-            'remember_token' => null,
-            'created_at' => $this->faker->dateTime,
-            'updated_at' => $this->faker->dateTime,
-        ];
-    }
-
-    public function unverified(): self
-    {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['email_verified_at' => null]);
-    }
-}
+    // Do not delete me :) I'm used for auto-generation
+];

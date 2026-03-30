@@ -23,8 +23,7 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         $exportPath = base_path('app/Exports/AdminUsersExport.php');
         $routesPath = base_path('routes/admin.php');
         $indexPath = resource_path('views/admin/user/index.blade.php');
-        $listingJsPath = resource_path('js/admin/user/Listing.js');
-        $indexJsPath = resource_path('js/admin/user/index.js');
+        $listingVuePath = resource_path('js/admin/user/Listing.vue');
         $formPath = resource_path('views/admin/user/components/form-elements.blade.php');
         $createPath = resource_path('views/admin/user/create.blade.php');
         $editPath = resource_path('views/admin/user/edit.blade.php');
@@ -40,9 +39,8 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         self::assertFileDoesNotExist($bulkDestroyRequestPath);
         self::assertFileDoesNotExist($impersonalLoginRequestPath);
         self::assertFileDoesNotExist($exportPath);
-        self::assertFileDoesNotExist($listingJsPath);
+        self::assertFileDoesNotExist($listingVuePath);
         self::assertFileDoesNotExist($indexPath);
-        self::assertFileDoesNotExist($indexJsPath);
         self::assertFileDoesNotExist($formPath);
         self::assertFileDoesNotExist($createPath);
         self::assertFileDoesNotExist($editPath);
@@ -64,9 +62,8 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         self::assertFileExists($impersonalLoginRequestPath);
         self::assertFileExists($exportPath);
         self::assertFileExists($routesPath);
-        self::assertFileExists($listingJsPath);
+        self::assertFileExists($listingVuePath);
         self::assertFileExists($indexPath);
-        self::assertFileExists($indexJsPath);
         self::assertFileExists($formPath);
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
@@ -83,9 +80,8 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         self::assertMatchesFileSnapshot($impersonalLoginRequestPath);
         self::assertMatchesFileSnapshot($exportPath);
         self::assertMatchesFileSnapshot($routesPath);
-        self::assertMatchesFileSnapshot($listingJsPath);
+        self::assertMatchesFileSnapshot($listingVuePath);
         self::assertMatchesFileSnapshot($indexPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
         self::assertMatchesFileSnapshot($formPath);
         self::assertMatchesFileSnapshot($createPath);
         self::assertMatchesFileSnapshot($editPath);

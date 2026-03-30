@@ -14,38 +14,28 @@ class ViewIndexTest extends TestCase
     public function testViewIndexGeneratorShouldGenerateViews(): void
     {
         $indexPath = resource_path('views/admin/category/index.blade.php');
-        $listingJsPath = resource_path('js/admin/category/Listing.js');
-        $indexJsPath = resource_path('js/admin/category/index.js');
-        $bootstrapJsPath = resource_path('js/admin/index.js');
+        $listingVuePath = resource_path('js/admin/category/Listing.vue');
 
         self::assertFileDoesNotExist($indexPath);
-        self::assertFileDoesNotExist($listingJsPath);
-        self::assertFileDoesNotExist($indexJsPath);
+        self::assertFileDoesNotExist($listingVuePath);
 
         $this->artisan('admin:generate:index', [
             'table_name' => 'categories',
         ]);
 
         self::assertFileExists($indexPath);
-        self::assertFileExists($listingJsPath);
-        self::assertFileExists($indexJsPath);
+        self::assertFileExists($listingVuePath);
         self::assertMatchesFileSnapshot($indexPath);
-        self::assertMatchesFileSnapshot($listingJsPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
-        self::assertMatchesFileSnapshot($bootstrapJsPath);
+        self::assertMatchesFileSnapshot($listingVuePath);
     }
 
     public function testViewIndexGeneratorWithModelNameShouldGenerateViews(): void
     {
         $indexPath = resource_path('views/admin/billing/categ-ory/index.blade.php');
-        $listingJsPath = resource_path('js/admin/billing-categ-ory/Listing.js');
-        $indexJsPath = resource_path('js/admin/billing-categ-ory/index.js');
-        $bootstrapJsPath = resource_path('js/admin/index.js');
+        $listingVuePath = resource_path('js/admin/billing-categ-ory/Listing.vue');
 
         self::assertFileDoesNotExist($indexPath);
-        self::assertFileDoesNotExist($listingJsPath);
-        self::assertFileDoesNotExist($indexJsPath);
-
+        self::assertFileDoesNotExist($listingVuePath);
 
         $this->artisan('admin:generate:index', [
             'table_name' => 'categories',
@@ -53,25 +43,18 @@ class ViewIndexTest extends TestCase
         ]);
 
         self::assertFileExists($indexPath);
-        self::assertFileExists($listingJsPath);
-        self::assertFileExists($indexJsPath);
+        self::assertFileExists($listingVuePath);
         self::assertMatchesFileSnapshot($indexPath);
-        self::assertMatchesFileSnapshot($listingJsPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
-        self::assertMatchesFileSnapshot($bootstrapJsPath);
+        self::assertMatchesFileSnapshot($listingVuePath);
     }
 
     public function testViewIndexGeneratorWithFullModelNameShouldGenerateViews(): void
     {
         $indexPath = resource_path('views/admin/categ-ory/index.blade.php');
-        $listingJsPath = resource_path('js/admin/categ-ory/Listing.js');
-        $indexJsPath = resource_path('js/admin/categ-ory/index.js');
-        $bootstrapJsPath = resource_path('js/admin/index.js');
+        $listingVuePath = resource_path('js/admin/categ-ory/Listing.vue');
 
         self::assertFileDoesNotExist($indexPath);
-        self::assertFileDoesNotExist($listingJsPath);
-        self::assertFileDoesNotExist($indexJsPath);
-
+        self::assertFileDoesNotExist($listingVuePath);
 
         $this->artisan('admin:generate:index', [
             'table_name' => 'categories',
@@ -79,24 +62,18 @@ class ViewIndexTest extends TestCase
         ]);
 
         self::assertFileExists($indexPath);
-        self::assertFileExists($listingJsPath);
-        self::assertFileExists($indexJsPath);
+        self::assertFileExists($listingVuePath);
         self::assertMatchesFileSnapshot($indexPath);
-        self::assertMatchesFileSnapshot($listingJsPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
-        self::assertMatchesFileSnapshot($bootstrapJsPath);
+        self::assertMatchesFileSnapshot($listingVuePath);
     }
 
     public function testViewIndexGeneratorWithExportShouldGenerateViews(): void
     {
         $indexPath = resource_path('views/admin/category/index.blade.php');
-        $listingJsPath = resource_path('js/admin/category/Listing.js');
-        $indexJsPath = resource_path('js/admin/category/index.js');
-        $bootstrapJsPath = resource_path('js/admin/index.js');
+        $listingVuePath = resource_path('js/admin/category/Listing.vue');
 
         self::assertFileDoesNotExist($indexPath);
-        self::assertFileDoesNotExist($listingJsPath);
-        self::assertFileDoesNotExist($indexJsPath);
+        self::assertFileDoesNotExist($listingVuePath);
 
         $this->artisan('admin:generate:index', [
             'table_name' => 'categories',
@@ -104,24 +81,18 @@ class ViewIndexTest extends TestCase
         ]);
 
         self::assertFileExists($indexPath);
-        self::assertFileExists($listingJsPath);
-        self::assertFileExists($indexJsPath);
+        self::assertFileExists($listingVuePath);
         self::assertMatchesFileSnapshot($indexPath);
-        self::assertMatchesFileSnapshot($listingJsPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
-        self::assertMatchesFileSnapshot($bootstrapJsPath);
+        self::assertMatchesFileSnapshot($listingVuePath);
     }
 
     public function testViewIndexGeneratorWithoutBulkShouldGenerateViews(): void
     {
         $indexPath = resource_path('views/admin/category/index.blade.php');
-        $listingJsPath = resource_path('js/admin/category/Listing.js');
-        $indexJsPath = resource_path('js/admin/category/index.js');
-        $bootstrapJsPath = resource_path('js/admin/index.js');
+        $listingVuePath = resource_path('js/admin/category/Listing.vue');
 
         self::assertFileDoesNotExist($indexPath);
-        self::assertFileDoesNotExist($listingJsPath);
-        self::assertFileDoesNotExist($indexJsPath);
+        self::assertFileDoesNotExist($listingVuePath);
 
         $this->artisan('admin:generate:index', [
             'table_name' => 'categories',
@@ -129,11 +100,8 @@ class ViewIndexTest extends TestCase
         ]);
 
         self::assertFileExists($indexPath);
-        self::assertFileExists($listingJsPath);
-        self::assertFileExists($indexJsPath);
+        self::assertFileExists($listingVuePath);
         self::assertMatchesFileSnapshot($indexPath);
-        self::assertMatchesFileSnapshot($listingJsPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
-        self::assertMatchesFileSnapshot($bootstrapJsPath);
+        self::assertMatchesFileSnapshot($listingVuePath);
     }
 }

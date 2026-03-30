@@ -40,6 +40,11 @@ final class Routes extends FileAppender
      */
     protected bool $withoutBulk = false;
 
+    /**
+     * Resource name
+     */
+    protected string $resource = '';
+
     public function handle(): void
     {
         $template = $this->option('template');
@@ -76,13 +81,13 @@ final class Routes extends FileAppender
             . '        ' . $insertMarker . PHP_EOL
             . '    });' . PHP_EOL;
 
-        $resource = $this->option('resource') ?? $this->resource;
+        $this->resource = $this->option('resource') ?? $this->resource;
 
         if (
             $this->replaceOrInsertRouteBlock(
                 $routesPath,
-                $resource,
-                $this->buildClass($resource) . PHP_EOL,
+                $this->resource,
+                $this->buildContent() . PHP_EOL,
                 $insertMarker,
                 $defaultContent,
             )
@@ -106,12 +111,12 @@ final class Routes extends FileAppender
         ];
     }
 
-    private function buildClass(string $resource): string
+    protected function buildContent(): string
     {
         return view('brackets/admin-generator::' . $this->view, [
             'controllerBaseName' => class_basename($this->controllerFullName),
             'modelVariableName' => $this->modelVariableName,
-            'resource' => $resource,
+            'resource' => $this->resource,
             'export' => $this->export,
             'withoutBulk' => $this->withoutBulk,
         ])->render();

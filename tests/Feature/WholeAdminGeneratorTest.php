@@ -23,13 +23,12 @@ class WholeAdminGeneratorTest extends TestCase
         $exportPath = base_path('app/Exports/CategoriesExport.php');
         $routesPath = base_path('routes/admin.php');
         $indexPath = resource_path('views/admin/category/index.blade.php');
-        $listingJsPath = resource_path('js/admin/category/Listing.js');
+        $listingVuePath = resource_path('js/admin/category/Listing.vue');
         $formPath = resource_path('views/admin/category/components/form-elements.blade.php');
         $createPath = resource_path('views/admin/category/create.blade.php');
         $editPath = resource_path('views/admin/category/edit.blade.php');
         $formJsPath = resource_path('js/admin/category/Form.js');
         $factoryPath = base_path('database/factories/CategoryFactory.php');
-        $indexJsPath = resource_path('js/admin/category/index.js');
         $langPath = lang_path('en/admin.php');
 
         self::assertFileDoesNotExist($controllerPath);
@@ -40,7 +39,7 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertFileDoesNotExist($bulkDestroyRequestPath);
         self::assertFileDoesNotExist($exportPath);
         self::assertFileDoesNotExist($indexPath);
-        self::assertFileDoesNotExist($listingJsPath);
+        self::assertFileDoesNotExist($listingVuePath);
         self::assertFileDoesNotExist($formPath);
         self::assertFileDoesNotExist($createPath);
         self::assertFileDoesNotExist($editPath);
@@ -48,7 +47,6 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertFileDoesNotExist($modelPath);
         self::assertFileDoesNotExist($routesPath);
         self::assertFileDoesNotExist($factoryPath);
-        self::assertFileDoesNotExist($indexJsPath);
         self::assertFileDoesNotExist($langPath);
 
         $this->artisan('admin:generate', [
@@ -65,7 +63,7 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertFileExists($bulkDestroyRequestPath);
         self::assertFileExists($exportPath);
         self::assertFileExists($indexPath);
-        self::assertFileExists($listingJsPath);
+        self::assertFileExists($listingVuePath);
         self::assertFileExists($formPath);
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
@@ -73,7 +71,6 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertFileExists($modelPath);
         self::assertFileExists($routesPath);
         self::assertFileExists($factoryPath);
-        self::assertFileExists($indexJsPath);
         self::assertFileExists($langPath);
 
         self::assertMatchesFileSnapshot($controllerPath);
@@ -84,7 +81,7 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertMatchesFileSnapshot($bulkDestroyRequestPath);
         self::assertMatchesFileSnapshot($exportPath);
         self::assertMatchesFileSnapshot($indexPath);
-        self::assertMatchesFileSnapshot($listingJsPath);
+        self::assertMatchesFileSnapshot($listingVuePath);
         self::assertMatchesFileSnapshot($formPath);
         self::assertMatchesFileSnapshot($createPath);
         self::assertMatchesFileSnapshot($editPath);
@@ -92,7 +89,6 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertMatchesFileSnapshot($modelPath);
         self::assertMatchesFileSnapshot($routesPath);
         self::assertMatchesFileSnapshot($factoryPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
         self::assertMatchesFileSnapshot($langPath);
     }
 }

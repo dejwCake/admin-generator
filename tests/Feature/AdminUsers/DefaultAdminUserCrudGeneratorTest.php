@@ -25,8 +25,7 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         $exportPath = base_path('app/Exports/AdminUsersExport.php');
         $routesPath = base_path('routes/admin.php');
         $indexPath = resource_path('views/admin/admin-user/index.blade.php');
-        $listingJsPath = resource_path('js/admin/admin-user/Listing.js');
-        $indexJsPath = resource_path('js/admin/admin-user/index.js');
+        $listingVuePath = resource_path('js/admin/admin-user/Listing.vue');
         $formPath = resource_path('views/admin/admin-user/components/form-elements.blade.php');
         $createPath = resource_path('views/admin/admin-user/create.blade.php');
         $editPath = resource_path('views/admin/admin-user/edit.blade.php');
@@ -43,12 +42,11 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertFileDoesNotExist($impersonalLoginRequestPath);
         self::assertFileDoesNotExist($exportPath);
         self::assertFileDoesNotExist($indexPath);
-        self::assertFileDoesNotExist($listingJsPath);
+        self::assertFileDoesNotExist($listingVuePath);
         self::assertFileDoesNotExist($formPath);
         self::assertFileDoesNotExist($createPath);
         self::assertFileDoesNotExist($editPath);
         self::assertFileDoesNotExist($formJsPath);
-        self::assertFileDoesNotExist($indexJsPath);
 
         $this->artisan('admin:generate:admin-user', $options);
 
@@ -69,12 +67,11 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
             self::assertFileDoesNotExist($exportPath);
         }
         self::assertFileExists($indexPath);
-        self::assertFileExists($listingJsPath);
+        self::assertFileExists($listingVuePath);
         self::assertFileExists($formPath);
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
         self::assertFileExists($formJsPath);
-        self::assertFileExists($indexJsPath);
         self::assertFileExists($langPath);
 
         self::assertMatchesFileSnapshot($controllerPath);
@@ -91,12 +88,11 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         }
         self::assertMatchesFileSnapshot($routesPath);
         self::assertMatchesFileSnapshot($indexPath);
-        self::assertMatchesFileSnapshot($listingJsPath);
+        self::assertMatchesFileSnapshot($listingVuePath);
         self::assertMatchesFileSnapshot($formPath);
         self::assertMatchesFileSnapshot($createPath);
         self::assertMatchesFileSnapshot($editPath);
         self::assertMatchesFileSnapshot($formJsPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
         self::assertMatchesFileSnapshot($factoryPath);
         self::assertMatchesFileSnapshot($langPath);
 

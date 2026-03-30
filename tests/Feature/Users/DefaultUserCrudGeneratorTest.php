@@ -24,8 +24,7 @@ class DefaultUserCrudGeneratorTest extends UserTestCase
         $exportPath = base_path('app/Exports/UsersExport.php');
         $routesPath = base_path('routes/admin.php');
         $indexPath = resource_path('views/admin/user/index.blade.php');
-        $listingJsPath = resource_path('js/admin/user/Listing.js');
-        $indexJsPath = resource_path('js/admin/user/index.js');
+        $listingVuePath = resource_path('js/admin/user/Listing.vue');
         $formPath = resource_path('views/admin/user/components/form-elements.blade.php');
         $createPath = resource_path('views/admin/user/create.blade.php');
         $editPath = resource_path('views/admin/user/edit.blade.php');
@@ -41,12 +40,11 @@ class DefaultUserCrudGeneratorTest extends UserTestCase
         self::assertFileDoesNotExist($bulkDestroyRequestPath);
         self::assertFileDoesNotExist($exportPath);
         self::assertFileDoesNotExist($indexPath);
-        self::assertFileDoesNotExist($listingJsPath);
+        self::assertFileDoesNotExist($listingVuePath);
         self::assertFileDoesNotExist($formPath);
         self::assertFileDoesNotExist($createPath);
         self::assertFileDoesNotExist($editPath);
         self::assertFileDoesNotExist($formJsPath);
-        self::assertFileDoesNotExist($indexJsPath);
 
         $this->artisan('admin:generate:user', $options);
 
@@ -66,12 +64,11 @@ class DefaultUserCrudGeneratorTest extends UserTestCase
             self::assertFileDoesNotExist($exportPath);
         }
         self::assertFileExists($indexPath);
-        self::assertFileExists($listingJsPath);
+        self::assertFileExists($listingVuePath);
         self::assertFileExists($formPath);
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
         self::assertFileExists($formJsPath);
-        self::assertFileExists($indexJsPath);
         self::assertFileExists($langPath);
 
         self::assertMatchesFileSnapshot($controllerPath);
@@ -87,12 +84,11 @@ class DefaultUserCrudGeneratorTest extends UserTestCase
         }
         self::assertMatchesFileSnapshot($routesPath);
         self::assertMatchesFileSnapshot($indexPath);
-        self::assertMatchesFileSnapshot($listingJsPath);
+        self::assertMatchesFileSnapshot($listingVuePath);
         self::assertMatchesFileSnapshot($formPath);
         self::assertMatchesFileSnapshot($createPath);
         self::assertMatchesFileSnapshot($editPath);
         self::assertMatchesFileSnapshot($formJsPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
         self::assertMatchesFileSnapshot($factoryPath);
         self::assertMatchesFileSnapshot($langPath);
     }

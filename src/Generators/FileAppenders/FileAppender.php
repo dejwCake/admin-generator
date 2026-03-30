@@ -35,6 +35,11 @@ abstract class FileAppender extends Command
         $this->mediaCollections = new Collection();
     }
 
+    /**
+     * Build the content.
+     */
+    abstract protected function buildContent(): string;
+
     /** @return array<array<string|int>> */
     #[Override]
     protected function getArguments(): array

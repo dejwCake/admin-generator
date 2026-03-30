@@ -76,7 +76,7 @@ final class Lang extends FileAppender
             $this->replaceOrInsertBlock(
                 lang_path($locale . '/admin.php'),
                 $this->modelLangFormat,
-                $this->buildClass() . PHP_EOL,
+                $this->buildContent() . PHP_EOL,
                 $markerText,
                 $defaultContent,
             )
@@ -105,7 +105,7 @@ final class Lang extends FileAppender
         ];
     }
 
-    private function buildClass(): string
+    protected function buildContent(): string
     {
         $columns = $this->readColumnsFromTable($this->tableName);
 

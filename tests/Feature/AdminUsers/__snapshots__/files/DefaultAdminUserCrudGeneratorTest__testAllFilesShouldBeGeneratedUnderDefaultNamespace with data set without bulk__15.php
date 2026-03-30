@@ -2,57 +2,36 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories;
+return [
+    'admin-user' => [
+        'title' => 'Admin Users',
 
-use Brackets\AdminAuth\Models\AdminUser;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Hashing\Hasher;
-use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
-use Illuminate\Database\Eloquent\Factories\Factory;
+        'actions' => [
+            'index' => 'Admin Users',
+            'create' => 'New Admin User',
+            'edit' => 'Edit :name',
+            'edit_profile' => 'Edit Profile',
+            'edit_password' => 'Edit Password',
+        ],
 
-#[UseModel(AdminUser::class)]
-final class AdminUserFactory extends Factory
-{
-    public function definition(): array
-    {
-        $hasher = Container::getInstance()->make(Hasher::class);
+        'columns' => [
+            'id' => 'ID',
+            'first_name' => 'First name',
+            'last_name' => 'Last name',
+            'email' => 'Email',
+            'password' => 'Password',
+            'password_repeat' => 'Password Confirmation',
+            'remember_token' => 'Remember token',
+            'activated' => 'Activated',
+            'forbidden' => 'Forbidden',
+            'language' => 'Language',
+            'deleted_at' => 'Deleted at',
+            'created_at' => 'Created at',
+            'updated_at' => 'Updated at',
+            //Belongs to many relations
+            'roles' => 'Roles',
+        ],
+    ],
 
-        return [
-            'first_name' => $this->faker->firstName,
-            'last_name' => $this->faker->lastName,
-            'email' => $this->faker->email,
-            'password' => $hasher->make($this->faker->password),
-            'remember_token' => null,
-            'activated' => $this->faker->boolean(),
-            'forbidden' => $this->faker->boolean(),
-            'language' => 'en',
-            'deleted_at' => null,
-            'created_at' => $this->faker->dateTime,
-            'updated_at' => $this->faker->dateTime,
-        ];
-    }
-
-    public function activated(): self
-    {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['activated' => true]);
-    }
-
-    public function notActivated(): self
-    {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['activated' => false]);
-    }
-
-    public function forbidden(): self
-    {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['forbidden' => true]);
-    }
-
-    public function notForbidden(): self
-    {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['forbidden' => false]);
-    }
-}
+    // Do not delete me :) I'm used for auto-generation
+];

@@ -96,11 +96,11 @@ final class UsersController extends Controller
                 'destroyUrlTemplate' => $this->urlGenerator->route('admin/users/destroy', ['user' => ':id']),
                 'bulkAllUrl' => $this->urlGenerator->route('admin/users/index'),
                 'bulkDestroyUrl' => $this->urlGenerator->route('admin/users/bulk-destroy'),
+                'exportUrl' => $this->urlGenerator->route('admin/users/export'),
                 'resendVerifyEmailUrlTemplate' => $this->urlGenerator->route(
                     'admin/users/resend-verify-email',
                     ['user' => ':id'],
                 ),
-                'exportUrl' => $this->urlGenerator->route('admin/users/export'),
             ],
         );
     }

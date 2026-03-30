@@ -104,6 +104,7 @@ final class UsersController extends Controller
                 'destroyUrlTemplate' => $this->urlGenerator->route('admin/users/destroy', ['user' => ':id']),
                 'bulkAllUrl' => $this->urlGenerator->route('admin/users/index'),
                 'bulkDestroyUrl' => $this->urlGenerator->route('admin/users/bulk-destroy'),
+                'exportUrl' => $this->urlGenerator->route('admin/users/export'),
                 'resendActivationUrlTemplate' => $this->urlGenerator->route(
                     'admin/users/resend-activation-email',
                     ['user' => ':id'],
@@ -112,7 +113,6 @@ final class UsersController extends Controller
                     'admin/users/impersonal-login',
                     ['user' => ':id'],
                 ),
-                'exportUrl' => $this->urlGenerator->route('admin/users/export'),
                 'activation' => $this->config->get('admin-auth.activation_enabled'),
                 'canImpersonalLogin' => $this->gate->check('admin.user.impersonal-login'),
             ],
