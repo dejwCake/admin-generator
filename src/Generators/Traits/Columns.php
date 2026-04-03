@@ -60,25 +60,6 @@ trait Columns
     /**
      * @param array<string, string|bool> $column
      */
-    protected function getServerStoreRules(array $column, string $tableName, bool $hasSoftDelete): Collection
-    {
-        $serverStoreRules = new Collection([]);
-        $serverStoreRules = $this->getServerStoreRulesByRequire($column['required'], $serverStoreRules);
-        $serverStoreRules = $this->getServerStoreRulesByName($column['name'], $serverStoreRules);
-        $serverStoreRules = $this->getServerStoreRulesByUnique($column, $tableName, $hasSoftDelete, $serverStoreRules);
-        $serverStoreRules = $this->getServerStoreRulesByUniqueJson(
-            $column,
-            $tableName,
-            $hasSoftDelete,
-            $serverStoreRules,
-        );
-
-        return $this->getServerStoreRulesByType($column['type'], $serverStoreRules);
-    }
-
-    /**
-     * @param array<string, string|bool> $column
-     */
     protected function getServerUpdateRules(
         array $column,
         string $tableName,
@@ -118,17 +99,6 @@ trait Columns
         return $this->getFrontendRulesByType($column['type'], $frontendRules);
     }
 
-    protected function getServerStoreRulesByRequire(bool $required, Collection $serverStoreRules): Collection
-    {
-        if ($required) {
-            $serverStoreRules->push('\'required\'');
-        } else {
-            $serverStoreRules->push('\'nullable\'');
-        }
-
-        return $serverStoreRules;
-    }
-
     protected function getServerUpdateRulesByRequire(bool $required, Collection $serverUpdateRules): Collection
     {
         if ($required) {
@@ -150,22 +120,6 @@ trait Columns
         }
 
         return $frontendRules;
-    }
-
-    protected function getServerStoreRulesByName(string $name, Collection $serverStoreRules): Collection
-    {
-        if ($name === 'email') {
-            $serverStoreRules->push('\'email\'');
-        }
-
-        if ($name === 'password') {
-            $serverStoreRules->push('\'confirmed\'');
-            $serverStoreRules->push(
-                "Password::min(8)\n                    ->letters()\n                    ->mixedCase()\n                    ->numbers()\n                    ->symbols()\n                    ->uncompromised()",
-            );
-        }
-
-        return $serverStoreRules;
     }
 
     protected function getServerUpdateRulesByName(string $name, Collection $serverUpdateRules): Collection
@@ -203,30 +157,6 @@ trait Columns
     /**
      * @param array<string, string|bool> $column
      */
-    protected function getServerStoreRulesByUnique(
-        array $column,
-        string $tableName,
-        bool $hasSoftDelete,
-        Collection $serverStoreRules,
-    ): Collection {
-        if (in_array($column['type'], ['json', 'jsonb'], true)) {
-            return $serverStoreRules;
-        }
-
-        if ($column['unique'] || $column['name'] === 'slug') {
-            $storeRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '\')';
-            if ($hasSoftDelete && $column['uniqueDeletedAtCondition']) {
-                $storeRule .= '->whereNull(\'deleted_at\')';
-            }
-            $serverStoreRules->push($storeRule);
-        }
-
-        return $serverStoreRules;
-    }
-
-    /**
-     * @param array<string, string|bool> $column
-     */
     protected function getServerUpdateRulesByUnique(
         array $column,
         string $tableName,
@@ -254,30 +184,6 @@ trait Columns
     /**
      * @param array<string, string|bool> $column
      */
-    protected function getServerStoreRulesByUniqueJson(
-        array $column,
-        string $tableName,
-        bool $hasSoftDelete,
-        Collection $serverStoreRules,
-    ): Collection {
-        if (!in_array($column['type'], ['json', 'jsonb'], true)) {
-            return $serverStoreRules;
-        }
-
-        if ($column['unique'] || $column['name'] === 'slug') {
-            $storeRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '->\'.$locale)';
-            if ($hasSoftDelete && $column['uniqueDeletedAtCondition']) {
-                $storeRule .= '->whereNull(\'deleted_at\')';
-            }
-            $serverStoreRules->push($storeRule);
-        }
-
-        return $serverStoreRules;
-    }
-
-    /**
-     * @param array<string, string|bool> $column
-     */
     protected function getServerUpdateRulesByUniqueJson(
         array $column,
         string $tableName,
@@ -299,11 +205,6 @@ trait Columns
         }
 
         return $serverUpdateRules;
-    }
-
-    protected function getServerStoreRulesByType(string $type, Collection $serverStoreRules): Collection
-    {
-        return $serverStoreRules->push($this->getRuleFromType($type));
     }
 
     protected function getServerUpdateRulesByType(string $type, Collection $serverUpdateRules): Collection
