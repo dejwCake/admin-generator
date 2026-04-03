@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminGenerator\Dtos;
+namespace Brackets\AdminGenerator\Dtos\Media;
 
 enum MediaCollectionType: string
 {
