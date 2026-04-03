@@ -55,7 +55,7 @@
 <script setup>
 import { useAppForm } from '../composables/useAppForm.js';
 import { mediaCollectionProp } from '@@craftable/utils/mediaProps.js';
-import MediaUpload from '@@craftable/components/media/MediaUpload.vue';
+import MediaUpload from '@@craftable/components/form/MediaUpload.vue';
 @if($profileColumns->contains(static fn (array $col): bool => !in_array($col['name'], ['email', 'language'], true) && $col['majorType'] !== 'bool'))
 import FormInput from '@@craftable/components/form/FormInput.vue';
 @endif
