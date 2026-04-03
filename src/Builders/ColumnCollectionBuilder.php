@@ -17,7 +17,7 @@ final class ColumnCollectionBuilder
         $this->columnCollection = new ColumnCollection();
     }
 
-    public function build(string $tableName): ColumnCollection
+    public function build(string $tableName, string $modelVariableName): ColumnCollection
     {
         $this->columnCollection = new ColumnCollection();
         $columns = new Collection($this->schema->getColumns($tableName));
@@ -25,7 +25,7 @@ final class ColumnCollectionBuilder
 
         $hasSoftDelete = $columns->contains(static fn (array $column): bool => $column['name'] === 'deleted_at');
 
-        $columns->each(function (array $column) use ($indexes, $hasSoftDelete, $tableName): void {
+        $columns->each(function (array $column) use ($indexes, $hasSoftDelete, $tableName, $modelVariableName): void {
             $this->columnCollection->push(
                 $this->columnBuilder->build(
                     $column['name'],
@@ -34,6 +34,7 @@ final class ColumnCollectionBuilder
                     $tableName,
                     $indexes,
                     $hasSoftDelete,
+                    $modelVariableName,
                 ),
             );
         });

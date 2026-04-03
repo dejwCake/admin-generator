@@ -49,7 +49,7 @@ trait Helpers
                     'relation_table' => trim($this->getRelationTable($belongsToMany), '_'),
                     'foreign_key' => Str::singular($this->tableName) . '_id',
                     'related_key' => Str::singular($belongsToMany) . '_id',
-                    'related_label' => $this->getRelatedLabelColumn($belongsToMany),
+                    'related_label' => $this->getRelatedLabelColumn($belongsToMany, $this->modelVariableName),
                 ])->keyBy('related_table');
     }
 

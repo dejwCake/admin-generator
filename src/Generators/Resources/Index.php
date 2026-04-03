@@ -132,7 +132,8 @@ final class Index extends ResourceGenerator
 
     private function buildView(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection();
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+            ->toLegacyCollection();
         $indexColumns = $this->getColumnsForIndex($columns);
 
         return view('brackets/admin-generator::' . $this->view, [
@@ -162,7 +163,8 @@ final class Index extends ResourceGenerator
 
     private function buildListingVue(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection();
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+            ->toLegacyCollection();
         $indexColumns = $this->getColumnsForIndex($columns);
 
         $hasPublishedAt = $columns->contains(

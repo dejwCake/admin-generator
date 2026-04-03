@@ -44,20 +44,23 @@ final class IndexRequest extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+            ->toLegacyCollection();
+
         return view('brackets/admin-generator::index-request', [
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,
             'modelDotNotation' => $this->modelDotNotation,
 
-            'columnsToQuery' => $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection()->filter(
+            'columnsToQuery' => $columns->filter(
                 static fn (array $column): bool => !(
-                    $column['majorType'] === 'text'
-                    || in_array(
-                        $column['name'],
-                        ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'],
-                        true,
-                    )
-                ),
+                        $column['majorType'] === 'text'
+                        || in_array(
+                            $column['name'],
+                            ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'],
+                            true,
+                        )
+                    ),
             )->pluck('name')
                 ->toArray(),
         ])->render();

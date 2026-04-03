@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Dtos\Columns;
 
 use Brackets\AdminGenerator\Dtos\Columns\Rules\ServerStoreRule;
+use Brackets\AdminGenerator\Dtos\Columns\Rules\ServerUpdateRule;
 use Illuminate\Support\Collection;
 
 final readonly class Column
 {
-    /** @param Collection<ServerStoreRule> $serverStoreRules */
+    /**
+     * @param Collection<ServerStoreRule> $serverStoreRules
+     * @param Collection<ServerUpdateRule> $serverUpdateRules
+     */
     public function __construct(
         public string $name,
         public string $type,
@@ -21,6 +25,7 @@ final readonly class Column
         public bool $hasUniqueDeleteAtIndex,
         public string $defaultTranslation,
         public Collection $serverStoreRules,
+        public Collection $serverUpdateRules,
     ) {
     }
 
@@ -39,6 +44,9 @@ final readonly class Column
             'defaultTranslation' => $this->defaultTranslation,
             'serverStoreRules' => $this->serverStoreRules
                 ->map(static fn (ServerStoreRule $serverStoreRule) => (string) $serverStoreRule)
+                ->toArray(),
+            'serverUpdateRules' => $this->serverUpdateRules
+                ->map(static fn (ServerUpdateRule $serverUpdateRule) => (string) $serverUpdateRule)
                 ->toArray(),
         ];
     }

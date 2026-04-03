@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Dtos\Columns\Rules;
 
-final readonly class NumericRule implements ServerStoreRule
+final readonly class NumericRule implements ServerStoreRule, ServerUpdateRule
 {
     public function __toString(): string
     {

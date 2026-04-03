@@ -12,24 +12,24 @@ use Brackets\AdminGenerator\Dtos\Columns\Rules\IntegerRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\NullableRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\NumericRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\PasswordRule;
-use Brackets\AdminGenerator\Dtos\Columns\Rules\RequiredRule;
-use Brackets\AdminGenerator\Dtos\Columns\Rules\ServerStoreRule;
+use Brackets\AdminGenerator\Dtos\Columns\Rules\ServerUpdateRule;
+use Brackets\AdminGenerator\Dtos\Columns\Rules\SometimesRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\StringRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\TimeRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\UniqueRule;
 use Illuminate\Support\Collection;
 
-final class ServerStoreRulesBuilder
+final class ServerUpdateRulesBuilder
 {
-    /** @var Collection<int, ServerStoreRule> */
-    private Collection $serverStoreRules;
+    /** @var Collection<int, ServerUpdateRule> */
+    private Collection $serverUpdateRules;
 
     public function __construct()
     {
-        $this->serverStoreRules = new Collection();
+        $this->serverUpdateRules = new Collection();
     }
 
-    /** @return Collection<ServerStoreRule> */
+    /** @return Collection<ServerUpdateRule> */
     public function build(
         string $name,
         string $type,
@@ -38,34 +38,35 @@ final class ServerStoreRulesBuilder
         bool $unique,
         string $tableName,
         bool $excludeDeletedAt,
+        string $modelVariableName,
     ): Collection {
-        $this->serverStoreRules = new Collection();
+        $this->serverUpdateRules = new Collection();
         $this->buildByRequire($required);
         $this->buildByName($name);
-        $this->getByUnique($name, $type, $unique, $tableName, $excludeDeletedAt);
+        $this->getByUnique($name, $type, $unique, $tableName, $excludeDeletedAt, $modelVariableName);
         $this->getByType($majorType);
 
-        return $this->serverStoreRules;
+        return $this->serverUpdateRules;
     }
 
     private function buildByRequire(bool $required): void
     {
         if ($required) {
-            $this->serverStoreRules->push(new RequiredRule());
+            $this->serverUpdateRules->push(new SometimesRule());
         } else {
-            $this->serverStoreRules->push(new NullableRule());
+            $this->serverUpdateRules->push(new NullableRule());
         }
     }
 
     private function buildByName(string $name): void
     {
         if ($name === 'email') {
-            $this->serverStoreRules->push(new EmailRule());
+            $this->serverUpdateRules->push(new EmailRule());
         }
 
         if ($name === 'password') {
-            $this->serverStoreRules->push(new ConfirmedRule());
-            $this->serverStoreRules->push(new PasswordRule(8));
+            $this->serverUpdateRules->push(new ConfirmedRule());
+            $this->serverUpdateRules->push(new PasswordRule(8));
         }
     }
 
@@ -75,16 +76,17 @@ final class ServerStoreRulesBuilder
         bool $unique,
         string $tableName,
         bool $excludeDeletedAt,
+        string $modelVariableName,
     ): void {
         if ($unique || $name === 'slug') {
-            $this->serverStoreRules->push(
+            $this->serverUpdateRules->push(
                 new UniqueRule(
                     $tableName,
                     $name,
-                    null,
+                    $modelVariableName,
                     in_array($type, ['json', 'jsonb'], true),
                     $excludeDeletedAt,
-                    false,
+                    true,
                 ),
             );
         }
@@ -92,10 +94,10 @@ final class ServerStoreRulesBuilder
 
     private function getByType(string $majorType): void
     {
-        $this->serverStoreRules->push($this->getRuleFromType($majorType));
+        $this->serverUpdateRules->push($this->getRuleFromType($majorType));
     }
 
-    private function getRuleFromType(string $majorType): ServerStoreRule
+    private function getRuleFromType(string $majorType): ServerUpdateRule
     {
         return match ($majorType) {
             'datetime',

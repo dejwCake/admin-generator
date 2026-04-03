@@ -2,6 +2,7 @@
 <phpmd-baseline>
   <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="src/AdminGeneratorServiceProvider.php"/>
   <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="src/Builders/ServerStoreRulesBuilder.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="src/Builders/ServerUpdateRulesBuilder.php"/>
   <violation rule="PHPMD\Rule\Design\LongParameterList" file="src/Dtos/Columns/Column.php" method="__construct"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/Generate.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/GenerateAdminUser.php" method="handle"/>

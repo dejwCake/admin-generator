@@ -63,8 +63,9 @@ final class StoreRequest extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
-        $allColumns = $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection();
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+            ->toLegacyCollection();
+        $visibleColumns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
 
         return view(
             'brackets/admin-generator::' . $this->view,
@@ -74,23 +75,23 @@ final class StoreRequest extends ClassGenerator
                 'modelDotNotation' => $this->modelDotNotation,
 
                 'hasBelongsToMany' => count($this->relations) > 0 && count($this->relations['belongsToMany']) > 0,
-                'hasRuleUsage' => $columns->contains(
+                'hasRuleUsage' => $visibleColumns->contains(
                     static fn (array $column): bool => (new Collection($column['serverStoreRules']))
                         ->contains(static fn (string $rule): bool => str_contains($rule, 'Rule::')),
                 ),
-                'hasPassword' => $allColumns->contains(
+                'hasPassword' => $columns->contains(
                     static fn (array $column): bool => $column['name'] === 'password',
                 ),
-                'hasCreatedByAdminUserId' => $allColumns->contains(
+                'hasCreatedByAdminUserId' => $columns->contains(
                     static fn (array $column): bool => $column['name'] === 'created_by_admin_user_id',
                 ),
-                'hasUpdatedByAdminUserId' => $allColumns->contains(
+                'hasUpdatedByAdminUserId' => $columns->contains(
                     static fn (array $column): bool => $column['name'] === 'updated_by_admin_user_id',
                 ),
 
                 // validation in store/update
-                'columns' => $columns,
-                'translatable' => $allColumns
+                'columns' => $visibleColumns,
+                'translatable' => $columns
                     ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
                     ->pluck('name'),
                 'relations' => $this->relations,

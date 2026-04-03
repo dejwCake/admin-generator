@@ -10,8 +10,10 @@ use Illuminate\Support\Str;
 
 final readonly class ColumnBuilder
 {
-    public function __construct(private ServerStoreRulesBuilder $serverStoreRulesBuilder)
-    {
+    public function __construct(
+        private ServerStoreRulesBuilder $serverStoreRulesBuilder,
+        private ServerUpdateRulesBuilder $serverUpdateRulesBuilder,
+    ) {
     }
 
     public function build(
@@ -21,6 +23,7 @@ final readonly class ColumnBuilder
         string $tableName,
         Collection $indexes,
         bool $hasSoftDelete,
+        string $modelVariableName,
     ): Column {
         $hasUniqueIndex = $indexes
             ->contains(static fn (array $index): bool
@@ -52,6 +55,16 @@ final readonly class ColumnBuilder
                 $hasUniqueIndex,
                 $tableName,
                 $hasSoftDelete && $hasUniqueDeleteAtIndex,
+            ),
+            serverUpdateRules: $this->serverUpdateRulesBuilder->build(
+                $name,
+                $type,
+                $majorType,
+                $nullable === false,
+                $hasUniqueIndex,
+                $tableName,
+                $hasSoftDelete && $hasUniqueDeleteAtIndex,
+                $modelVariableName,
             ),
         );
     }

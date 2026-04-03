@@ -54,6 +54,9 @@ final class Export extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+            ->toLegacyCollection();
+
         return view('brackets/admin-generator::' . $this->view, [
             'exportNamespace' => $this->classNamespace,
             'classBaseName' => $this->exportBaseName,
@@ -61,14 +64,14 @@ final class Export extends ClassGenerator
             'modelBaseName' => $this->modelBaseName,
             'modelVariableName' => $this->modelVariableName,
             'modelLangFormat' => $this->modelLangFormat,
-            'columnsToExport' => $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection()->filter(
+            'columnsToExport' => $columns->filter(
                 static fn (array $column): bool => !in_array(
                     $column['name'],
                     ['password', 'remember_token', 'updated_at', 'created_at', 'deleted_at'],
                     true,
                 ),
             )->pluck('name')
-                ->toArray(),
+            ->toArray(),
         ])->render();
     }
 

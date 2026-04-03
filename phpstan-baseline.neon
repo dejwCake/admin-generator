@@ -1,12 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Cannot cast Brackets\\AdminGenerator\\Dtos\\Columns\\Rules\\ServerStoreRule to string\.$#'
-			identifier: cast.string
-			count: 1
-			path: src/Dtos/Columns/Column.php
-
-		-
 			message: '#^Method Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:\:map\(\) should return Illuminate\\Support\\Collection\<int\|string, bool\|Brackets\\AdminGenerator\\Dtos\\Columns\\Column\|string\|null\> but returns Illuminate\\Support\\Collection\<string, mixed\>\.$#'
 			identifier: return.type
 			count: 1
@@ -28,7 +22,7 @@ parameters:
 			path: src/Generators/Classes/ClassGenerator.php
 
 		-
-			message: '#^Method Brackets\\AdminGenerator\\Generators\\Classes\\ClassGenerator\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<int\|string, array\<string, array\<string\>\|string\>\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, majorType\: mixed, serverStoreRules\: mixed, serverUpdateRules\: array\<mixed\>, frontendRules\: array\<mixed\>\}\>\.$#'
+			message: '#^Method Brackets\\AdminGenerator\\Generators\\Classes\\ClassGenerator\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<int\|string, array\<string, array\<string\>\|string\>\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, majorType\: mixed, serverStoreRules\: mixed, serverUpdateRules\: mixed, frontendRules\: array\<mixed\>\}\>\.$#'
 			identifier: return.type
 			count: 1
 			path: src/Generators/Classes/ClassGenerator.php
@@ -142,7 +136,7 @@ parameters:
 			path: src/Generators/FileAppenders/FileAppender.php
 
 		-
-			message: '#^Method Brackets\\AdminGenerator\\Generators\\FileAppenders\\FileAppender\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<int\|string, array\<string, array\<string\>\|string\>\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, majorType\: mixed, serverStoreRules\: mixed, serverUpdateRules\: array\<mixed\>, frontendRules\: array\<mixed\>\}\>\.$#'
+			message: '#^Method Brackets\\AdminGenerator\\Generators\\FileAppenders\\FileAppender\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<int\|string, array\<string, array\<string\>\|string\>\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, majorType\: mixed, serverStoreRules\: mixed, serverUpdateRules\: mixed, frontendRules\: array\<mixed\>\}\>\.$#'
 			identifier: return.type
 			count: 1
 			path: src/Generators/FileAppenders/FileAppender.php
@@ -223,7 +217,7 @@ parameters:
 			path: src/Generators/Resources/ResourceGenerator.php
 
 		-
-			message: '#^Method Brackets\\AdminGenerator\\Generators\\Resources\\ResourceGenerator\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<int\|string, array\<string, array\<string\>\|string\>\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, majorType\: mixed, serverStoreRules\: mixed, serverUpdateRules\: array\<mixed\>, frontendRules\: array\<mixed\>\}\>\.$#'
+			message: '#^Method Brackets\\AdminGenerator\\Generators\\Resources\\ResourceGenerator\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<int\|string, array\<string, array\<string\>\|string\>\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, majorType\: mixed, serverStoreRules\: mixed, serverUpdateRules\: mixed, frontendRules\: array\<mixed\>\}\>\.$#'
 			identifier: return.type
 			count: 1
 			path: src/Generators/Resources/ResourceGenerator.php

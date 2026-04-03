@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Dtos\Columns\Rules;
 
-final readonly class PasswordRule implements ServerStoreRule
+final readonly class PasswordRule implements ServerStoreRule, ServerUpdateRule
 {
     public function __construct(private int $length)
     {

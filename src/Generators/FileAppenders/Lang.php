@@ -107,7 +107,8 @@ final class Lang extends FileAppender
 
     protected function buildContent(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection();
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+            ->toLegacyCollection();
 
         return view('brackets/admin-generator::' . $this->view, [
             'modelLangFormat' => $this->modelLangFormat,

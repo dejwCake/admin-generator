@@ -98,7 +98,8 @@ final class Controller extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection();
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+            ->toLegacyCollection();
 
         return view('brackets/admin-generator::' . $this->view, [
             'controllerBaseName' => $this->classBaseName,

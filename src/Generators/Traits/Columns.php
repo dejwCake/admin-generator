@@ -9,9 +9,9 @@ use Illuminate\Support\Collection;
 
 trait Columns
 {
-    protected function getRelatedLabelColumn(string $tableName): string
+    protected function getRelatedLabelColumn(string $tableName, string $modelVariableName): string
     {
-        $columns = $this->columnCollectionBuilder->build($tableName);
+        $columns = $this->columnCollectionBuilder->build($tableName, $modelVariableName);
         $preferredLabels = ['title', 'name', 'first_name', 'email'];
 
         foreach ($preferredLabels as $label) {
@@ -33,11 +33,8 @@ trait Columns
         string $modelVariableName,
         array $ignoredColumns = ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token', 'last_login_at'],
     ): Collection {
-        $columns = $this->columnCollectionBuilder->build($tableName)->toLegacyCollection();
-        $hasSoftDelete = (
-            $columns->filter(static fn (array $column): bool => $column['name'] === 'deleted_at')
-                ->count() > 0
-        );
+        $columns = $this->columnCollectionBuilder->build($tableName, $modelVariableName)
+            ->toLegacyCollection();
 
         return $columns
             ->filter(static fn (array $column): bool => !in_array($column['name'], $ignoredColumns, true))
@@ -46,13 +43,7 @@ trait Columns
                 'type' => $column['type'],
                 'majorType' => $column['majorType'],
                 'serverStoreRules' => $column['serverStoreRules'],
-                'serverUpdateRules' => $this->getServerUpdateRules(
-                    $column,
-                    $tableName,
-                    $modelVariableName,
-                    $hasSoftDelete,
-                )
-                    ->toArray(),
+                'serverUpdateRules' => $column['serverUpdateRules'],
                 'frontendRules' => $this->getFrontendRules($column)->toArray(),
             ]);
     }

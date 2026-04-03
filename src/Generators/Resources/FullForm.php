@@ -128,7 +128,7 @@ final class FullForm extends ResourceGenerator
             $relatedModel = Str::studly(Str::singular($relatedTable));
             $optionsPropName = Str::camel(Str::singular($relatedTable)) . 'Options';
 
-            $foreignKeyLabel = $this->getRelatedLabelColumn($relatedTable);
+            $foreignKeyLabel = $this->getRelatedLabelColumn($relatedTable, $this->modelVariableName);
 
             return [
                 'column' => $name,
@@ -143,7 +143,8 @@ final class FullForm extends ResourceGenerator
     /** @return array<string, Collection|array<string>|string|bool> */
     private function getCommonViewData(): array
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection();
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+            ->toLegacyCollection();
         $visibleColumns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
         $foreignKeys = $this->detectForeignKeys($visibleColumns);
 
@@ -327,13 +328,14 @@ final class FullForm extends ResourceGenerator
     private function buildForm(): string
     {
         $data = $this->getCommonViewData();
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+            ->toLegacyCollection();
 
-        $data['modelTitle'] = $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection()
-            ->filter(static fn (array $column): bool => in_array(
-                $column['name'],
-                ['title', 'name', 'first_name', 'email'],
-                true,
-            ))->first(null, ['name' => 'id'])['name'];
+        $data['modelTitle'] = $columns->filter(static fn (array $column): bool => in_array(
+            $column['name'],
+            ['title', 'name', 'first_name', 'email'],
+            true,
+        ))->first(null, ['name' => 'id'])['name'];
 
         $data['route'] = $this->route;
 

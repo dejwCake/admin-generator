@@ -72,7 +72,8 @@ final class Factory extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection()
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+            ->toLegacyCollection()
             ->filter(static fn (array $column): bool => $column['name'] !== 'id');
         $translatable = $columns
             ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
