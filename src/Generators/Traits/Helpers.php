@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Traits;
 
-use Brackets\AdminGenerator\Generators\Dtos\MediaCollection;
-use Brackets\AdminGenerator\Generators\Dtos\MediaCollectionDisk;
-use Brackets\AdminGenerator\Generators\Dtos\MediaCollectionType;
+use Brackets\AdminGenerator\Dtos\MediaCollection;
+use Brackets\AdminGenerator\Dtos\MediaCollectionDisk;
+use Brackets\AdminGenerator\Dtos\MediaCollectionType;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Classes;
 
-use Brackets\AdminGenerator\Generators\Dtos\MediaCollection;
+use Brackets\AdminGenerator\Dtos\MediaCollection;
 use Brackets\AdminGenerator\Generators\Traits\Columns;
 use Brackets\AdminGenerator\Generators\Traits\Helpers;
 use Brackets\AdminGenerator\Generators\Traits\Names;
