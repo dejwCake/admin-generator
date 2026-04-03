@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
 final class FullForm extends ResourceGenerator
 {
+    private const array WYSIWYG_COLUMN_NAMES = ['text', 'body', 'description'];
+
     /**
      * The name and signature of the console command.
      *
@@ -26,14 +30,14 @@ final class FullForm extends ResourceGenerator
     protected $description = 'Generate a full-form view template';
 
     /**
-     * Path for view
+     * Path for blade view
      */
     protected string $view = 'full-form';
 
     /**
-     * Path for js view
+     * Path for Vue form component view
      */
-    protected string $viewJs = 'form-js';
+    protected string $formVue = 'form-vue';
 
     /**
      * Name of view, will be used in directory
@@ -47,9 +51,22 @@ final class FullForm extends ResourceGenerator
 
     protected string $formJsRelativePath;
 
+    /** @return array<string, string|bool|array<string>> */
+    private static function enrichWithForeignKey(array $col, Collection $foreignKeys): array
+    {
+        if (in_array($col['name'], $foreignKeys->pluck('column')->toArray(), true)) {
+            $fk = $foreignKeys->keyBy('column')[$col['name']];
+            $col['isForeignKey'] = true;
+            $col['foreignKeyOptionsName'] = $fk['optionsPropName'];
+            $col['foreignKeyLabel'] = $fk['foreignKeyLabel'];
+        }
+
+        return $col;
+    }
+
     public function handle(): void
     {
-        $force = $this->option('force');
+        $force = (bool) $this->option('force');
         $template = $this->option('template');
         $fileName = $this->option('file-name');
         $this->route = $this->option('route');
@@ -59,7 +76,13 @@ final class FullForm extends ResourceGenerator
         //TODO also with prefix
         if ($template !== null) {
             $this->view = 'templates.' . $template . '.full-form';
-            $this->viewJs = 'templates.' . $template . '.form-js';
+            $this->formVue = 'templates.' . $template . '.form-vue';
+        }
+
+        $belongsToMany = $this->option('belongs-to-many');
+
+        if ($belongsToMany !== null) {
+            $this->setBelongToManyRelation($belongsToMany);
         }
 
         $this->fileName = $fileName ?: $this->modelViewsDirectory;
@@ -75,24 +98,8 @@ final class FullForm extends ResourceGenerator
         }
 
         $this->generateBlade($force);
-
-        $formJsPath = resource_path('js/admin/' . $this->formJsRelativePath . '/Form.js');
-        $bootstrapJsPath = resource_path('js/admin/index.js');
-
-        $this->generateFormJs($formJsPath, $force);
-        $indexJsPath = $this->generateIndexJs($force);
-
-        if ($this->appendIfNotAlreadyAppended($indexJsPath, 'import \'./Form\';' . PHP_EOL)) {
-            $this->info('Appending Form to ' . $indexJsPath . ' finished');
-        }
-        if (
-            $this->appendIfNotAlreadyAppended(
-                $bootstrapJsPath,
-                'import \'./' . $this->formJsRelativePath . '\';' . PHP_EOL,
-            )
-        ) {
-            $this->info('Appending ' . $this->formJsRelativePath . '/index.js to ' . $bootstrapJsPath . ' finished');
-        }
+        $this->generateFormVue($force);
+        $this->registerInAdminJs();
     }
 
     /** @return array<array<string|int>> */
@@ -105,97 +112,327 @@ final class FullForm extends ResourceGenerator
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['file-name', 'nm', InputOption::VALUE_OPTIONAL, 'Specify a blade file path'],
             ['route', 'r', InputOption::VALUE_OPTIONAL, 'Specify custom route for form'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
         ];
     }
 
-    private function generateIndexJs(bool $force): string
+    /** @return Collection<int, array<string, string>> */
+    private function detectForeignKeys(Collection $columns): Collection
     {
-        $indexJsPath = resource_path('js/admin/' . $this->formJsRelativePath . '/index.js');
-        if ($this->alreadyExists($indexJsPath) && !$force) {
-            $this->error('File ' . $indexJsPath . ' already exists!');
-        } else {
-            if ($this->alreadyExists($indexJsPath) && $force) {
-                $this->warn('File ' . $indexJsPath . ' already exists! File will be deleted.');
-                $this->files->delete($indexJsPath);
-            }
-            $this->makeDirectory($indexJsPath);
+        return $columns->filter(
+            static fn (array $col): bool => str_ends_with($col['name'], '_id')
+                && !in_array($col['name'], ['created_by_admin_user_id', 'updated_by_admin_user_id'], true),
+        )->map(function (array $col): array {
+            $name = $col['name'];
+            $relatedTable = Str::plural(Str::beforeLast($name, '_id'));
+            $relatedModel = Str::studly(Str::singular($relatedTable));
+            $optionsPropName = Str::camel(Str::singular($relatedTable)) . 'Options';
+
+            $foreignKeyLabel = $this->getRelatedLabelColumn($relatedTable);
+
+            return [
+                'column' => $name,
+                'relatedTable' => $relatedTable,
+                'relatedModel' => $relatedModel,
+                'optionsPropName' => $optionsPropName,
+                'foreignKeyLabel' => $foreignKeyLabel,
+            ];
+        })->values();
+    }
+
+    /** @return array<string, Collection|array<string>|string|bool> */
+    private function getCommonViewData(): array
+    {
+        $columns = $this->readColumnsFromTable($this->tableName);
+        $visibleColumns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
+        $foreignKeys = $this->detectForeignKeys($visibleColumns);
+
+        $hasTranslatable = $columns->contains(
+            static fn (array $column): bool => $column['majorType'] === 'json',
+        );
+
+        $hasPublishedAt = $columns->contains(
+            static fn (array $column): bool => $column['name'] === 'published_at',
+        );
+        $hasCreatedByAdminUser = $columns->contains(
+            static fn (array $column): bool => $column['name'] === 'created_by_admin_user_id',
+        );
+        $hasUpdatedByAdminUser = $columns->contains(
+            static fn (array $column): bool => $column['name'] === 'updated_by_admin_user_id',
+        );
+
+        $rightFormColumns = $visibleColumns->filter(
+            static fn (array $col): bool => $col['name'] === 'published_at',
+        );
+        $leftFormColumns = $visibleColumns->reject(
+            static fn (array $col): bool => in_array(
+                $col['name'],
+                ['published_at', 'created_by_admin_user_id', 'updated_by_admin_user_id'],
+                true,
+            ),
+        )->map(static fn (array $col): array => self::enrichWithForeignKey($col, $foreignKeys));
+
+        $rightMediaCollections = $this->mediaCollections->filter(
+            static fn (object $collection): bool => $collection->collectionName === 'gallery',
+        );
+        $leftMediaCollections = $this->mediaCollections->reject(
+            static fn (object $collection): bool => $collection->collectionName === 'gallery',
+        );
+
+        $isUsedTwoColumnsLayout = $rightFormColumns->isNotEmpty()
+            || $rightMediaCollections->isNotEmpty()
+            || $hasCreatedByAdminUser
+            || $hasUpdatedByAdminUser;
+
+        $hasWysiwyg = $leftFormColumns->contains(
+            static fn (array $col): bool => ($col['majorType'] === 'text'
+                    && in_array($col['name'], self::WYSIWYG_COLUMN_NAMES, true))
+                || ($col['majorType'] === 'json'
+                    && in_array($col['name'], self::WYSIWYG_COLUMN_NAMES, true)),
+        );
+
+        $hasPassword = $leftFormColumns->contains(
+            static fn (array $col): bool => $col['name'] === 'password',
+        );
+
+        $hasEmail = $leftFormColumns->contains(
+            static fn (array $col): bool => $col['name'] === 'email',
+        );
+
+        $hasLanguage = $leftFormColumns->contains(
+            static fn (array $col): bool => $col['name'] === 'language',
+        );
+
+        $hasBoolColumns = $leftFormColumns->contains(
+            static fn (array $col): bool => $col['majorType'] === 'bool',
+        );
+
+        $hasDateColumns = $leftFormColumns->contains(
+            static fn (array $col): bool => $col['majorType'] === 'date',
+        );
+
+        $hasTimeColumns = $leftFormColumns->contains(
+            static fn (array $col): bool => $col['majorType'] === 'time',
+        );
+
+        $hasDatetimeColumns = $leftFormColumns->contains(
+            static fn (array $col): bool => $col['majorType'] === 'datetime',
+        );
+
+        $hasTextarea = $leftFormColumns->contains(
+            static fn (array $col): bool => $col['majorType'] === 'text'
+                && !in_array($col['name'], self::WYSIWYG_COLUMN_NAMES, true),
+        );
+
+        $hasFormInput = $leftFormColumns->contains(
+            static fn (array $col): bool => !in_array($col['name'], ['password', 'email'], true)
+                && !in_array($col['majorType'], ['json', 'text', 'bool', 'date', 'time', 'datetime'], true)
+                && !($col['isForeignKey'] ?? false),
+        );
+
+        $hasLocalizedInput = $leftFormColumns->contains(
+            static fn (array $col): bool => $col['majorType'] === 'json'
+                && !in_array($col['name'], self::WYSIWYG_COLUMN_NAMES, true),
+        );
+
+        $hasLocalizedWysiwyg = $leftFormColumns->contains(
+            static fn (array $col): bool => $col['majorType'] === 'json'
+                && in_array($col['name'], self::WYSIWYG_COLUMN_NAMES, true),
+        );
+
+        $belongsToManyTables = (new Collection($this->relations['belongsToMany'] ?? []))
+            ->pluck('related_table');
+
+        return [
+            'modelBaseName' => $this->modelBaseName,
+            'modelPlural' => $this->modelPlural,
+            'modelVariableName' => $this->modelVariableName,
+            'modelRouteAndViewName' => $this->modelRouteAndViewName,
+            'modelViewsDirectory' => $this->modelViewsDirectory,
+            'modelDotNotation' => $this->modelDotNotation,
+            'modelJSName' => $this->formJsRelativePath,
+            'modelLangFormat' => $this->modelLangFormat,
+            'resource' => $this->resource,
+
+            'columns' => $visibleColumns,
+            'leftFormColumns' => $leftFormColumns,
+            'profileColumns' => $leftFormColumns->reject(
+                static fn (array $col): bool => in_array($col['name'], ['password', 'activated', 'forbidden'], true),
+            ),
+            'rightFormColumns' => $rightFormColumns,
+            'foreignKeys' => $foreignKeys,
+            'belongsToManyTables' => $belongsToManyTables,
+            'relations' => array_merge(['belongsToMany' => []], $this->relations),
+            'mediaCollections' => $this->mediaCollections,
+            'leftMediaCollections' => $leftMediaCollections,
+            'rightMediaCollections' => $rightMediaCollections,
+
+            'hasTranslatable' => $hasTranslatable,
+            'isUsedTwoColumnsLayout' => $isUsedTwoColumnsLayout,
+            'hasCreatedByAdminUser' => $hasCreatedByAdminUser,
+            'hasUpdatedByAdminUser' => $hasUpdatedByAdminUser,
+            'hasWysiwyg' => $hasWysiwyg,
+            'hasPassword' => $hasPassword,
+            'hasEmail' => $hasEmail,
+            'hasLanguage' => $hasLanguage,
+            'hasBoolColumns' => $hasBoolColumns,
+            'hasDateColumns' => $hasDateColumns,
+            'hasTimeColumns' => $hasTimeColumns,
+            'hasDatetimeColumns' => $hasDatetimeColumns,
+            'hasTextarea' => $hasTextarea,
+            'hasFormInput' => $hasFormInput,
+            'hasLocalizedInput' => $hasLocalizedInput,
+            'hasLocalizedWysiwyg' => $hasLocalizedWysiwyg,
+            'hasForeignKeys' => $foreignKeys->isNotEmpty(),
+            'hasPublishedAt' => $hasPublishedAt,
+            'wysiwygTextColumnNames' => self::WYSIWYG_COLUMN_NAMES,
+        ];
+    }
+
+    /** @param array<string, string|bool|array<string>> $col */
+    private function buildFrontendValidationRules(array $col): ?string
+    {
+        if ($col['name'] === 'password') {
+            return null;
         }
 
-        return $indexJsPath;
+        if ($col['name'] === 'email') {
+            return "'required|email'";
+        }
+
+        if ($col['isForeignKey'] ?? false) {
+            if (in_array('required', $col['frontendRules'] ?? [], true)) {
+                return "'required'";
+            }
+
+            return null;
+        }
+
+        $frontendRules = $col['frontendRules'] ?? [];
+
+        $filteredRules = array_filter(
+            $frontendRules,
+            static fn (string $rule): bool => !str_starts_with($rule, 'confirmed:')
+                && !str_starts_with($rule, 'date_format:')
+                && $rule !== '',
+        );
+
+        if ($filteredRules === []) {
+            return null;
+        }
+
+        return "'" . implode('|', $filteredRules) . "'";
     }
 
     private function buildForm(): string
     {
-        $columns = $this->readColumnsFromTable($this->tableName);
+        $data = $this->getCommonViewData();
 
-        return view('brackets/admin-generator::' . $this->view, [
-            'modelBaseName' => $this->modelBaseName,
-            'modelVariableName' => $this->modelVariableName,
-            'modelDotNotation' => $this->modelDotNotation,
-            'modelJSName' => $this->formJsRelativePath,
-            'modelLangFormat' => $this->modelLangFormat,
-            'modelTitle' => $columns
-                ->filter(static fn (array $column): bool => in_array(
-                    $column['name'],
-                    ['title', 'name', 'first_name', 'email'],
-                    true,
-                ))
-                ->first(null, ['name' => 'id'])['name'],
-            'route' => $this->route,
+        $data['modelTitle'] = $this->readColumnsFromTable($this->tableName)
+            ->filter(static fn (array $column): bool => in_array(
+                $column['name'],
+                ['title', 'name', 'first_name', 'email'],
+                true,
+            ))->first(null, ['name' => 'id'])['name'];
 
-            'hasTranslatable' => $columns->contains(
-                static fn (array $column): bool => $column['majorType'] === 'json',
-            ),
-            'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName)
-                ->sortByDesc(static fn (array $column): bool => $column['majorType'] === 'json'),
-            'translatableTextarea' => ['perex', 'text'],
-            'wysiwygTextColumnNames' => ['text', 'body', 'description'],
-            'relations' => $this->relations,
-        ])->render();
+        $data['route'] = $this->route;
+
+        return view('brackets/admin-generator::' . $this->view, $data)->render();
     }
 
-    private function buildFormJs(): string
+    private function buildFormVue(): string
     {
-        return view('brackets/admin-generator::' . $this->viewJs, [
-            'modelJSName' => $this->formJsRelativePath,
+        $data = $this->getCommonViewData();
 
-            'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
-        ])->render();
+        $validationRules = [];
+        foreach ($data['leftFormColumns'] as $col) {
+            $rules = $this->buildFrontendValidationRules($col);
+            if ($rules !== null) {
+                $validationRules[$col['name']] = $rules;
+            }
+        }
+
+        $data['validationRules'] = $validationRules;
+
+        $data['mediaDefaultProp'] = '{' . $this->mediaCollections->keys()
+            ->map(static fn (string $key): string => "$key: {}")
+            ->implode(', ') . '}';
+        $data['mediaCollectionNames'] = $this->mediaCollections->keys()
+            ->map(static fn (string $key): string => "'$key'")
+            ->implode(', ');
+
+        return view('brackets/admin-generator::' . $this->formVue, $data)->render();
     }
 
     private function generateBlade(bool $force): void
     {
         $viewPath = resource_path('views/admin/' . $this->fileName . '.blade.php');
+
         if ($this->alreadyExists($viewPath) && !$force) {
             $this->error('File ' . $viewPath . ' already exists!');
-        } else {
-            if ($this->alreadyExists($viewPath) && $force) {
-                $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
-                $this->files->delete($viewPath);
-            }
 
-            $this->makeDirectory($viewPath);
-
-            $this->files->put($viewPath, $this->buildForm());
-
-            $this->info('Generating ' . $viewPath . ' finished');
+            return;
         }
+
+        if ($this->alreadyExists($viewPath) && $force) {
+            $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
+            $this->files->delete($viewPath);
+        }
+
+        $this->makeDirectory($viewPath);
+
+        $this->files->put($viewPath, $this->buildForm());
+        $this->info('Generating ' . $viewPath . ' finished');
     }
 
-    private function generateFormJs(string $formJsPath, bool $force): void
+    private function generateFormVue(bool $force): void
     {
-        if ($this->alreadyExists($formJsPath) && !$force) {
-            $this->error('File ' . $formJsPath . ' already exists!');
-        } else {
-            if ($this->alreadyExists($formJsPath) && $force) {
-                $this->warn('File ' . $formJsPath . ' already exists! File will be deleted.');
-                $this->files->delete($formJsPath);
-            }
+        $formVuePath = resource_path('js/admin/' . $this->formJsRelativePath . '/Form.vue');
 
-            $this->makeDirectory($formJsPath);
+        if ($this->alreadyExists($formVuePath) && !$force) {
+            $this->error('File ' . $formVuePath . ' already exists!');
 
-            $this->files->put($formJsPath, $this->buildFormJs());
-            $this->info('Generating ' . $formJsPath . ' finished');
+            return;
         }
+
+        if ($this->alreadyExists($formVuePath) && $force) {
+            $this->warn('File ' . $formVuePath . ' already exists! File will be deleted.');
+            $this->files->delete($formVuePath);
+        }
+
+        $this->makeDirectory($formVuePath);
+
+        $this->files->put($formVuePath, $this->buildFormVue());
+        $this->info('Generating ' . $formVuePath . ' finished');
+    }
+
+    private function registerInAdminJs(): void
+    {
+        $adminJsPath = resource_path('js/admin/admin.js');
+
+        if (!$this->files->exists($adminJsPath)) {
+            $this->warn('File ' . $adminJsPath . ' does not exist, skipping component registration.');
+
+            return;
+        }
+
+        $content = $this->files->get($adminJsPath);
+
+        $importMarker = '//-- Do not delete me :) I\'m used for auto-generation js import--';
+        $componentMarker = '//-- Do not delete me :) I\'m used for auto-generation component registration--';
+
+        $componentName = Str::studly($this->formJsRelativePath);
+        $importLine = "import {$componentName}Form from './{$this->formJsRelativePath}/Form.vue';";
+        $componentLine = "app.component('{$componentName}Form', {$componentName}Form);";
+
+        if (!str_contains($content, $importLine)) {
+            $content = str_replace($importMarker, $importLine . PHP_EOL . $importMarker, $content);
+        }
+
+        if (!str_contains($content, $componentLine)) {
+            $content = str_replace($componentMarker, $componentLine . PHP_EOL . $componentMarker, $content);
+        }
+
+        $this->files->put($adminJsPath, $content);
     }
 }

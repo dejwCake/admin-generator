@@ -46,8 +46,8 @@ final class ProfileController extends Controller
             [
                 'user' => $this->user,
                 'action' => $this->urlGenerator->route('admin/update-profile'),
-                'mediaCollection' => $this->user->getCustomMediaCollection('avatar'),
-                'media' => $this->user->getThumbs200ForCollection('avatar'),
+                'avatarCollection' => $this->user->getCustomMediaCollection('avatar'),
+                'avatarMedia' => $this->user->getThumbs200ForCollection('avatar'),
             ],
         );
     }

@@ -17,36 +17,30 @@ class DefaultProfileGeneratorTest extends UserTestCase
         $filePathController = base_path('app/Http/Controllers/Admin/ProfileController.php');
         $filePathRoute = base_path('routes/admin.php');
         $editPathProfile = resource_path('views/admin/profile/edit-profile.blade.php');
-        $formJsPathProfile = resource_path('js/admin/profile-edit-profile/Form.js');
+        $formVuePathProfile = resource_path('js/admin/profile-edit-profile/Form.vue');
         $editPathPassword = resource_path('views/admin/profile/edit-password.blade.php');
-        $formJsPathPassword = resource_path('js/admin/profile-edit-password/Form.js');
-        $indexJsPathPassword = resource_path('js/admin/profile-edit-password/index.js');
-        $bootstrapJsPath = resource_path('js/admin/index.js');
+        $formVuePathPassword = resource_path('js/admin/profile-edit-password/Form.vue');
 
         self::assertFileDoesNotExist($filePathController);
         self::assertFileDoesNotExist($editPathProfile);
-        self::assertFileDoesNotExist($formJsPathProfile);
+        self::assertFileDoesNotExist($formVuePathProfile);
         self::assertFileDoesNotExist($editPathPassword);
-        self::assertFileDoesNotExist($formJsPathPassword);
-        self::assertFileDoesNotExist($indexJsPathPassword);
+        self::assertFileDoesNotExist($formVuePathPassword);
 
         $this->artisan('admin:generate:admin-user:profile', [
         ]);
 
         self::assertFileExists($filePathController);
         self::assertFileExists($editPathProfile);
-        self::assertFileExists($formJsPathProfile);
+        self::assertFileExists($formVuePathProfile);
         self::assertFileExists($editPathPassword);
-        self::assertFileExists($formJsPathPassword);
-        self::assertFileExists($indexJsPathPassword);
+        self::assertFileExists($formVuePathPassword);
 
         self::assertMatchesFileSnapshot($filePathController);
         self::assertMatchesFileSnapshot($filePathRoute);
         self::assertMatchesFileSnapshot($editPathProfile);
-        self::assertMatchesFileSnapshot($formJsPathProfile);
+        self::assertMatchesFileSnapshot($formVuePathProfile);
         self::assertMatchesFileSnapshot($editPathPassword);
-        self::assertMatchesFileSnapshot($formJsPathPassword);
-        self::assertMatchesFileSnapshot($indexJsPathPassword);
-        self::assertMatchesFileSnapshot($bootstrapJsPath);
+        self::assertMatchesFileSnapshot($formVuePathPassword);
     }
 }

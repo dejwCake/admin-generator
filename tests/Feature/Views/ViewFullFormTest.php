@@ -13,37 +13,29 @@ class ViewFullFormTest extends TestCase
 
     public function testViewFullFormGeneratorShouldGenerateViews(): void
     {
-        $this->markTestSkipped('Not working before refactor');
         $formPath = resource_path('views/admin/category/form.blade.php');
-        $formJsPath = resource_path('js/admin/category/Form.js');
-        $indexJsPath = resource_path('js/admin/category/index.js');
+        $formVuePath = resource_path('js/admin/category/Form.vue');
 
         self::assertFileDoesNotExist($formPath);
-        self::assertFileDoesNotExist($formJsPath);
-        self::assertFileDoesNotExist($indexJsPath);
+        self::assertFileDoesNotExist($formVuePath);
 
         $this->artisan('admin:generate:full-form', [
             'table_name' => 'categories',
         ]);
 
         self::assertFileExists($formPath);
-        self::assertFileExists($formJsPath);
-        self::assertFileExists($indexJsPath);
+        self::assertFileExists($formVuePath);
         self::assertMatchesFileSnapshot($formPath);
-        self::assertMatchesFileSnapshot($formJsPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
+        self::assertMatchesFileSnapshot($formVuePath);
     }
 
     public function testViewFullFormGeneratorWithModelNameShouldGenerateViews(): void
     {
-        $this->markTestSkipped('Not working before refactor');
         $formPath = resource_path('views/admin/billing/categ-ory/form.blade.php');
-        $formJsPath = resource_path('js/admin/billing-categ-ory/Form.js');
-        $indexJsPath = resource_path('js/admin/billing-categ-ory/index.js');
+        $formVuePath = resource_path('js/admin/billing-categ-ory/Form.vue');
 
         self::assertFileDoesNotExist($formPath);
-        self::assertFileDoesNotExist($formJsPath);
-        self::assertFileDoesNotExist($indexJsPath);
+        self::assertFileDoesNotExist($formVuePath);
 
         $this->artisan('admin:generate:full-form', [
             'table_name' => 'categories',
@@ -51,23 +43,18 @@ class ViewFullFormTest extends TestCase
         ]);
 
         self::assertFileExists($formPath);
-        self::assertFileExists($formJsPath);
-        self::assertFileExists($indexJsPath);
+        self::assertFileExists($formVuePath);
         self::assertMatchesFileSnapshot($formPath);
-        self::assertMatchesFileSnapshot($formJsPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
+        self::assertMatchesFileSnapshot($formVuePath);
     }
 
     public function testViewFullFormGeneratorWithFullModelNameShouldGenerateViews(): void
     {
-        $this->markTestSkipped('Not working before refactor');
         $formPath = resource_path('views/admin/categ-ory/form.blade.php');
-        $formJsPath = resource_path('js/admin/categ-ory/Form.js');
-        $indexJsPath = resource_path('js/admin/categ-ory/index.js');
+        $formVuePath = resource_path('js/admin/categ-ory/Form.vue');
 
         self::assertFileDoesNotExist($formPath);
-        self::assertFileDoesNotExist($formJsPath);
-        self::assertFileDoesNotExist($indexJsPath);
+        self::assertFileDoesNotExist($formVuePath);
 
         $this->artisan('admin:generate:full-form', [
             'table_name' => 'categories',
@@ -75,23 +62,18 @@ class ViewFullFormTest extends TestCase
         ]);
 
         self::assertFileExists($formPath);
-        self::assertFileExists($formJsPath);
-        self::assertFileExists($indexJsPath);
+        self::assertFileExists($formVuePath);
         self::assertMatchesFileSnapshot($formPath);
-        self::assertMatchesFileSnapshot($formJsPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
+        self::assertMatchesFileSnapshot($formVuePath);
     }
 
     public function testViewFormGeneratorWithFileNameShouldGenerateViews(): void
     {
-        $this->markTestSkipped('Not working before refactor');
         $formPath = resource_path('views/admin/profile/edit-password.blade.php');
-        $formJsPath = resource_path('js/admin/profile-edit-password/Form.js');
-        $indexJsPath = resource_path('js/admin/profile-edit-password/index.js');
+        $formVuePath = resource_path('js/admin/profile-edit-password/Form.vue');
 
         self::assertFileDoesNotExist($formPath);
-        self::assertFileDoesNotExist($formJsPath);
-        self::assertFileDoesNotExist($indexJsPath);
+        self::assertFileDoesNotExist($formVuePath);
 
         $this->artisan('admin:generate:full-form', [
             'table_name' => 'categories',
@@ -99,23 +81,18 @@ class ViewFullFormTest extends TestCase
         ]);
 
         self::assertFileExists($formPath);
-        self::assertFileExists($formJsPath);
-        self::assertFileExists($indexJsPath);
+        self::assertFileExists($formVuePath);
         self::assertMatchesFileSnapshot($formPath);
-        self::assertMatchesFileSnapshot($formJsPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
+        self::assertMatchesFileSnapshot($formVuePath);
     }
 
     public function testViewFullFormGeneratorWithRouteShouldGenerateViews(): void
     {
-        $this->markTestSkipped('Not working before refactor');
         $formPath = resource_path('views/admin/category/form.blade.php');
-        $formJsPath = resource_path('js/admin/category/Form.js');
-        $indexJsPath = resource_path('js/admin/category/index.js');
+        $formVuePath = resource_path('js/admin/category/Form.vue');
 
         self::assertFileDoesNotExist($formPath);
-        self::assertFileDoesNotExist($formJsPath);
-        self::assertFileDoesNotExist($indexJsPath);
+        self::assertFileDoesNotExist($formVuePath);
 
         $this->artisan('admin:generate:full-form', [
             'table_name' => 'categories',
@@ -123,10 +100,8 @@ class ViewFullFormTest extends TestCase
         ]);
 
         self::assertFileExists($formPath);
-        self::assertFileExists($formJsPath);
-        self::assertFileExists($indexJsPath);
+        self::assertFileExists($formVuePath);
         self::assertMatchesFileSnapshot($formPath);
-        self::assertMatchesFileSnapshot($formJsPath);
-        self::assertMatchesFileSnapshot($indexJsPath);
+        self::assertMatchesFileSnapshot($formVuePath);
     }
 }

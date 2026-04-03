@@ -9,6 +9,9 @@
   <violation rule="PHPMD\Rule\Design\WeightedMethodCount" file="src/Generators/Resources/Form.php"/>
   <violation rule="PHPMD\Rule\CyclomaticComplexity" file="src/Generators/Resources/Form.php" method="getCommonViewData"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/Resources/Form.php" method="getCommonViewData"/>
+  <violation rule="PHPMD\Rule\Design\WeightedMethodCount" file="src/Generators/Resources/FullForm.php"/>
+  <violation rule="PHPMD\Rule\CyclomaticComplexity" file="src/Generators/Resources/FullForm.php" method="getCommonViewData"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/Resources/FullForm.php" method="getCommonViewData"/>
   <violation rule="PHPMD\Rule\CyclomaticComplexity" file="tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
   <violation rule="PHPMD\Rule\Design\NpathComplexity" file="tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
   <violation rule="PHPMD\Rule\Design\NumberOfChildren" file="tests/TestCase.php"/>

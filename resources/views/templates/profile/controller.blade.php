@@ -56,8 +56,8 @@ final class {{ $controllerBaseName }} extends Controller
             [
                 '{{ $modelVariableName }}' => $this->{{ $modelVariableName }},
                 'action' => $this->urlGenerator->route('admin/update-profile'),
-                'mediaCollection' => $this->{{ $modelVariableName }}->getCustomMediaCollection('avatar'),
-                'media' => $this->{{ $modelVariableName }}->getThumbs200ForCollection('avatar'),
+                'avatarCollection' => $this->{{ $modelVariableName }}->getCustomMediaCollection('avatar'),
+                'avatarMedia' => $this->{{ $modelVariableName }}->getThumbs200ForCollection('avatar'),
             ],
         );
     }
