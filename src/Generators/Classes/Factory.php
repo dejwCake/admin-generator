@@ -72,38 +72,25 @@ final class Factory extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
-            ->toLegacyCollection()
-            ->filter(static fn (array $column): bool => $column['name'] !== 'id');
-        $translatable = $columns
-            ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
-            ->pluck('name');
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
-        return view(
-            'brackets/admin-generator::' . $this->view,
-            [
-                'namespace' => $this->classNamespace,
-                'modelFullName' => $this->modelFullName,
-                'modelBaseName' => $this->modelBaseName,
-
-                'hasPassword' => $columns->contains(
-                    static fn (array $column): bool => $column['name'] === 'password',
-                ),
-                'hasEmailVerified' => $columns->contains(
-                    static fn (array $column): bool => $column['name'] === 'email_verified_at',
-                ),
-                'hasPublishedAt' => $columns->contains(
-                    static fn (array $column): bool => $column['name'] === 'published_at',
-                ),
-                'translatableColumns' => $columns->filter(
-                    static fn ($column) => in_array($column['name'], $translatable->toArray(), true),
-                ),
-                'standardColumns' => $columns->reject(
-                    static fn ($column) => in_array($column['name'], $translatable->toArray(), true),
-                ),
-                'booleanColumns' => $columns->filter(static fn ($column) => $column['majorType'] === 'bool'),
-            ],
-        )->render();
+        return view('brackets/admin-generator::' . $this->view, [
+            //global
+            'namespace' => $this->classNamespace,
+            'modelFullName' => $this->modelFullName,
+            'modelBaseName' => $this->modelBaseName,
+            //has
+            'hasPassword' => $columns->hasByName('password'),
+            'hasEmailVerified' => $columns->hasByName('email_verified_at'),
+            'hasPublishedAt' => $columns->hasByName('published_at'),
+            //columns
+            'translatableColumns' => $columns->getTranslatable()
+                ->toLegacyCollection(),
+            'standardColumns' => $columns->getNonTranslatable()
+                ->toLegacyCollection(),
+            'booleanColumns' => $columns->getBoolean()
+                ->toLegacyCollection(),
+        ])->render();
     }
 
     /** @return array<array<string|int>> */

@@ -33,8 +33,9 @@
                         <FormInput v-model="form.slug" name="slug"
                             :label="translations.columns.slug" :error="errors.slug" />
 
-                        <FormTextarea v-model="form.perex" name="perex"
-                            :label="translations.columns.perex" :error="errors.perex" />
+                        <FormWysiwyg v-model="form.perex" name="perex"
+                            :label="translations.columns.perex" :error="errors.perex"
+                            :upload-url="wysiwygUploadUrl" />
 
                         <FormDatePicker v-model="form.date_start" name="date_start"
                             :label="translations.columns.date_start" :error="errors.date_start"
@@ -125,7 +126,6 @@ import UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue';
 import {formatDatetime} from '@craftable/utils/dateFormatters.js';
 import LocalizationBar from '@craftable/components/form/LocalizationBar.vue';
 import FormInput from '@craftable/components/form/FormInput.vue';
-import FormTextarea from '@craftable/components/form/FormTextarea.vue';
 import FormCheckbox from '@craftable/components/form/FormCheckbox.vue';
 import FormDatePicker from '@craftable/components/form/FormDatePicker.vue';
 import FormWysiwyg from '@craftable/components/form/FormWysiwyg.vue';

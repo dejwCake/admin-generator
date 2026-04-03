@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Classes;
 
-use Illuminate\Support\Collection;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -63,45 +62,35 @@ final class UpdateRequest extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
-            ->toLegacyCollection();
-        $visibleColumns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
-        return view(
-            'brackets/admin-generator::' . $this->view,
-            [
-                'classBaseName' => $this->classBaseName,
-                'classNamespace' => $this->classNamespace,
-                'modelBaseName' => $this->modelBaseName,
-                'modelFullName' => $this->modelFullName,
-                'modelVariableName' => $this->modelVariableName,
-                'modelDotNotation' => $this->modelDotNotation,
-                'hasPublishedAt' => $columns->contains(
-                    static fn (array $column): bool => $column['name'] === 'published_at',
-                ),
-                'hasPassword' => $columns->contains(
-                    static fn (array $column): bool => $column['name'] === 'password',
-                ),
-                'hasCreatedByAdminUserId' => $columns->contains(
-                    static fn (array $column): bool => $column['name'] === 'created_by_admin_user_id',
-                ),
-                'hasUpdatedByAdminUserId' => $columns->contains(
-                    static fn (array $column): bool => $column['name'] === 'updated_by_admin_user_id',
-                ),
-                'hasBelongsToMany' => count($this->relations) > 0 && count($this->relations['belongsToMany']) > 0,
-                'hasRuleUsage' => $visibleColumns->contains(
-                    static fn (array $column): bool => (new Collection($column['serverUpdateRules']))
-                        ->contains(static fn (string $rule): bool => str_contains($rule, 'Rule::')),
-                ),
-
-                // validation in store/update
-                'columns' => $visibleColumns,
-                'translatable' => $columns
-                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
-                    ->pluck('name'),
-                'relations' => $this->relations,
-            ],
-        )->render();
+        return view('brackets/admin-generator::' . $this->view, [
+            //globals
+            'classBaseName' => $this->classBaseName,
+            'classNamespace' => $this->classNamespace,
+            'modelBaseName' => $this->modelBaseName,
+            'modelFullName' => $this->modelFullName,
+            'modelVariableName' => $this->modelVariableName,
+            'modelDotNotation' => $this->modelDotNotation,
+            'relations' => $this->relations,
+            //has
+            'hasBelongsToMany' => count($this->relations) > 0 && count($this->relations['belongsToMany']) > 0,
+            'hasRuleUsage' => $columns->getVisible()
+                ->hasUpdateRuleUsage(),
+            'hasPasswordUsage' => $columns->getVisible()
+                ->hasUpdatePasswordUsage(),
+            'hasPassword' => $columns->hasByName('password'),
+            'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
+            'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
+            'hasPublishedAt' => $columns->hasByName('published_at'),
+            //columns
+            // validation in store/update
+            'columns' => $columns->getVisible()
+                ->toLegacyCollection(),
+            'translatable' => $columns->getTranslatable()
+                ->toLegacyCollection()
+                ->pluck('name'),
+        ])->render();
     }
 
     /** @return array<array<string|int>> */

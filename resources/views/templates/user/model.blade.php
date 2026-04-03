@@ -137,7 +137,7 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
 @endforeach
     ];
 @endif
-@if (!$timestamps)
+@if (!$hasTimestamps)
 
     public $timestamps = false;
 @endif

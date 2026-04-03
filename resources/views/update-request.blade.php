@@ -18,14 +18,16 @@ namespace {{ $classNamespace }};
         'Illuminate\Contracts\Auth\Access\Gate',
         $modelFullName,
     ];
-    if ($hasPassword || $hasUpdatedByAdminUserId) {
+    if ($hasPassword || $hasUpdatedByAdminUser) {
         $uses[] = 'Illuminate\Container\Container';
     }
-    if ($hasUpdatedByAdminUserId) {
+    if ($hasUpdatedByAdminUser) {
         $uses[] = 'Illuminate\Contracts\Config\Repository as Config';
     }
     if ($hasPassword) {
         $uses[] = 'Illuminate\Contracts\Hashing\Hasher';
+    }
+    if ($hasPasswordUsage) {
         $uses[] = 'Illuminate\Validation\Rules\Password';
     }
     if ($hasRuleUsage) {
@@ -198,7 +200,7 @@ final class {{ $classBaseName }} extends FormRequest
         }
 
 @endif
-@if($hasUpdatedByAdminUserId)
+@if($hasUpdatedByAdminUser)
         $config = Container::getInstance()->make(Config::class);
         assert($config instanceof Config);
         $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');

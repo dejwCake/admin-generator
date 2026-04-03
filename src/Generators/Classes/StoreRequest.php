@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Classes;
 
-use Illuminate\Support\Collection;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -63,40 +62,31 @@ final class StoreRequest extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
-            ->toLegacyCollection();
-        $visibleColumns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
-        return view(
-            'brackets/admin-generator::' . $this->view,
-            [
-                'classBaseName' => $this->classBaseName,
-                'classNamespace' => $this->classNamespace,
-                'modelDotNotation' => $this->modelDotNotation,
-
-                'hasBelongsToMany' => count($this->relations) > 0 && count($this->relations['belongsToMany']) > 0,
-                'hasRuleUsage' => $visibleColumns->contains(
-                    static fn (array $column): bool => (new Collection($column['serverStoreRules']))
-                        ->contains(static fn (string $rule): bool => str_contains($rule, 'Rule::')),
-                ),
-                'hasPassword' => $columns->contains(
-                    static fn (array $column): bool => $column['name'] === 'password',
-                ),
-                'hasCreatedByAdminUserId' => $columns->contains(
-                    static fn (array $column): bool => $column['name'] === 'created_by_admin_user_id',
-                ),
-                'hasUpdatedByAdminUserId' => $columns->contains(
-                    static fn (array $column): bool => $column['name'] === 'updated_by_admin_user_id',
-                ),
-
-                // validation in store/update
-                'columns' => $visibleColumns,
-                'translatable' => $columns
-                    ->filter(static fn (array $column): bool => $column['majorType'] === 'json')
-                    ->pluck('name'),
-                'relations' => $this->relations,
-            ],
-        )->render();
+        return view('brackets/admin-generator::' . $this->view, [
+            //globals
+            'classBaseName' => $this->classBaseName,
+            'classNamespace' => $this->classNamespace,
+            'modelDotNotation' => $this->modelDotNotation,
+            'relations' => $this->relations,
+            //has
+            'hasBelongsToMany' => count($this->relations) > 0 && count($this->relations['belongsToMany']) > 0,
+            'hasRuleUsage' => $columns->getVisible()
+                ->hasStoreRuleUsage(),
+            'hasPasswordUsage' => $columns->getVisible()
+                ->hasStorePasswordUsage(),
+            'hasPassword' => $columns->hasByName('password'),
+            'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
+            'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
+            //columns
+            // validation in store/update
+            'columns' => $columns->getVisible()
+                ->toLegacyCollection(),
+            'translatable' => $columns->getTranslatable()
+                ->toLegacyCollection()
+                ->pluck('name'),
+        ])->render();
     }
 
     /** @return array<array<string|int>> */

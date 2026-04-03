@@ -81,7 +81,7 @@
 @endif
 
 @foreach($columns as $col)
-@if($col['switch'])
+@if(in_array($col['majorType'], ['bool']))
                                 <td v-if="isColumnVisible({{ $col['priority'] }})">
                                     <ToggleSwitch
                                         v-model="collection[index].{{ $col['name'] }}"

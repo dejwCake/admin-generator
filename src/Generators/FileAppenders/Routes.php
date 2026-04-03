@@ -114,6 +114,7 @@ final class Routes extends FileAppender
     protected function buildContent(): string
     {
         return view('brackets/admin-generator::' . $this->view, [
+            //globals
             'controllerBaseName' => class_basename($this->controllerFullName),
             'modelVariableName' => $this->modelVariableName,
             'resource' => $this->resource,

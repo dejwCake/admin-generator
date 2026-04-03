@@ -155,7 +155,7 @@ final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty()
 @endforeach
     ];
 @endif
-@if (!$timestamps)
+@if (!$hasTimestamps)
 
     public $timestamps = false;
 @endif

@@ -6,7 +6,6 @@ namespace Brackets\AdminGenerator\Generators\Classes;
 
 use Brackets\AdminGenerator\Generators\Traits\FileManipulations;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Override;
 use Symfony\Component\Console\Input\InputArgument;
@@ -98,10 +97,10 @@ final class Controller extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
-            ->toLegacyCollection();
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
         return view('brackets/admin-generator::' . $this->view, [
+            //globals
             'controllerBaseName' => $this->classBaseName,
             'controllerNamespace' => $this->classNamespace,
             'exportBaseName' => $this->exportBaseName,
@@ -116,25 +115,24 @@ final class Controller extends ClassGenerator
             'export' => $this->export,
             'withoutBulk' => $this->withoutBulk,
             'resource' => $this->resource,
-            // index
-            'columnsToQuery' => $this->getColumnsToQuery($columns),
-            'columnsToSearchIn' => $columns->filter(
-                static fn (array $column): bool => (
-                    in_array($column['majorType'], ['json', 'text', 'string'], true)
-                    || $column['name'] === 'id')
-                    && !in_array($column['name'], ['password', 'remember_token'], true),
-            )->pluck('name')
-            ->toArray(),
-            //            'filters' => $this->readColumnsFromTable($tableName)->filter(function($column) {
-            //                return in_array($column['majorType'], ['bool', 'date'], true);
-            //            }),
-            // validation in store/update
-            'columns' => $this->getVisibleColumns($this->tableName, $this->modelVariableName),
             'relations' => $this->relations,
             'mediaCollections' => $this->mediaCollections,
-            'hasPublishedAt' => $columns->contains(
-                static fn (array $column): bool => $column['name'] === 'published_at',
-            ),
+            //has
+            'hasPublishedAt' => $columns->hasByName('published_at'),
+            //columns
+            // index
+            'columnsToQuery' => $columns->getToQuery()
+                ->toLegacyCollection()
+                ->pluck('name')
+                ->toArray(),
+            'columnsToSearchIn' => $columns->getToSearchIn()
+                ->toLegacyCollection()
+                ->pluck('name')
+                ->toArray(),
+//            'filters' => $columns->getFilters()
+//                ->toLegacyCollection(),
+            // validation in store/update
+            'columns' => $columns->getVisible()->toLegacyCollection(),
         ])->render();
     }
 
@@ -202,26 +200,5 @@ final class Controller extends ClassGenerator
         ) {
             $this->info('Updating sidebar');
         }
-    }
-
-    /** @return array<string> */
-    private function getColumnsToQuery(Collection $columns): array
-    {
-        $createdByAdminUserIdPresent = $columns->contains('name', 'created_by_admin_user_id');
-        $updatedByAdminUserIdPresent = $columns->contains('name', 'updated_by_admin_user_id');
-
-        return $columns
-            ->filter(static function (array $column) use ($createdByAdminUserIdPresent, $updatedByAdminUserIdPresent) {
-                $haystack = ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'];
-                if ($createdByAdminUserIdPresent && $updatedByAdminUserIdPresent) {
-                    $haystack = ['password', 'remember_token', 'slug', 'deleted_at'];
-                } elseif ($createdByAdminUserIdPresent) {
-                    $haystack = ['password', 'remember_token', 'slug', 'updated_at', 'deleted_at'];
-                } elseif ($updatedByAdminUserIdPresent) {
-                    $haystack = ['password', 'remember_token', 'slug', 'created_at', 'deleted_at'];
-                }
-
-                return !($column['majorType'] === 'text' || in_array($column['name'], $haystack, true));
-            })->pluck('name')->toArray();
     }
 }

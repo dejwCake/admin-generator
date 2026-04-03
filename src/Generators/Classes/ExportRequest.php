@@ -45,6 +45,7 @@ final class ExportRequest extends ClassGenerator
     protected function buildClass(): string
     {
         return view('brackets/admin-generator::export-request', [
+            //globals
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,
             'modelDotNotation' => $this->modelDotNotation,

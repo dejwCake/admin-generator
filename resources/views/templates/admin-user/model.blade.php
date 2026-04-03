@@ -129,7 +129,7 @@ final class {{ $modelBaseName }} extends Authenticatable implements CanActivateC
     protected $appends = [
         'full_name',
     ];
-@if (!$timestamps)
+@if (!$hasTimestamps)
 
     public $timestamps = false;
 @endif

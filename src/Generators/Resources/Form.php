@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
+use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
+use Brackets\AdminGenerator\Dtos\Media\MediaCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Override;
@@ -11,8 +13,6 @@ use Symfony\Component\Console\Input\InputOption;
 
 final class Form extends ResourceGenerator
 {
-    private const array WYSIWYG_COLUMN_NAMES = ['text', 'body', 'description'];
-
     /**
      * The name and signature of the console command.
      *
@@ -105,6 +105,7 @@ final class Form extends ResourceGenerator
         ];
     }
 
+    //TODO move to ColumnCollectionBuilder
     /** @return Collection<int, array<string, string>> */
     private function detectForeignKeys(Collection $columns): Collection
     {
@@ -130,109 +131,41 @@ final class Form extends ResourceGenerator
     }
 
     /** @return array<string, Collection|array<string>|string|bool> */
-    private function getCommonViewData(): array
+    private function getCommonViewData(ColumnCollection $columns): array
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
-            ->toLegacyCollection();
-        $visibleColumns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
-        $foreignKeys = $this->detectForeignKeys($visibleColumns);
+        $visibleColumns = $columns->getVisible();
+        $foreignKeys = $this->detectForeignKeys($visibleColumns->toLegacyCollection());
 
-        $hasTranslatable = $columns->contains(
-            static fn (array $column): bool => $column['majorType'] === 'json',
-        );
-
-        $hasPublishedAt = $columns->contains(
-            static fn (array $column): bool => $column['name'] === 'published_at',
-        );
-        $hasCreatedByAdminUser = $columns->contains(
-            static fn (array $column): bool => $column['name'] === 'created_by_admin_user_id',
-        );
-        $hasUpdatedByAdminUser = $columns->contains(
-            static fn (array $column): bool => $column['name'] === 'updated_by_admin_user_id',
-        );
+        $hasCreatedByAdminUser = $columns->hasByName('created_by_admin_user_id');
+        $hasUpdatedByAdminUser = $columns->hasByName('updated_by_admin_user_id');
 
         // Right column: only published_at
-        $rightFormColumns = $visibleColumns->filter(
-            static fn (array $col): bool => $col['name'] === 'published_at',
-        );
+        $rightFormColumns = $visibleColumns->filterByName('published_at');
         // Columns to display in the main form body (excluding sidebar/system columns)
-        $leftFormColumns = $visibleColumns->reject(
-            static fn (array $col): bool => in_array(
-                $col['name'],
-                ['published_at', 'created_by_admin_user_id', 'updated_by_admin_user_id'],
-                true,
-            ),
-        )->map(static fn (array $col): array => self::enrichWithForeignKey($col, $foreignKeys));
+        $leftFormColumns = $visibleColumns->rejectByName(
+            'published_at',
+            'created_by_admin_user_id',
+            'updated_by_admin_user_id',
+        );
 
         // Split media collections: gallery goes right, rest left
         $rightMediaCollections = $this->mediaCollections->filter(
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
-        $leftMediaCollections = $this->mediaCollections->reject(
-            static fn (object $collection): bool => $collection->collectionName === 'gallery',
+
+        //TODO move to ColumnCollectionBuilder
+        $leftFormColumnsLegacy = $leftFormColumns->toLegacyCollection()->map(
+            static fn (array $col): array => self::enrichWithForeignKey($col, $foreignKeys),
         );
-
-        $isUsedTwoColumnsLayout = $rightFormColumns->isNotEmpty()
-            || $rightMediaCollections->isNotEmpty()
-            || $hasCreatedByAdminUser
-            || $hasUpdatedByAdminUser;
-
-        $hasWysiwyg = $leftFormColumns->contains(
-            static fn (array $col): bool => ($col['majorType'] === 'text'
-                    && in_array($col['name'], self::WYSIWYG_COLUMN_NAMES, true))
-                || ($col['majorType'] === 'json'
-                    && in_array($col['name'], self::WYSIWYG_COLUMN_NAMES, true)),
-        );
-
-        $hasPassword = $leftFormColumns->contains(
-            static fn (array $col): bool => $col['name'] === 'password',
-        );
-
-        $hasEmail = $leftFormColumns->contains(
-            static fn (array $col): bool => $col['name'] === 'email',
-        );
-
-        $hasBoolColumns = $leftFormColumns->contains(
-            static fn (array $col): bool => $col['majorType'] === 'bool',
-        );
-
-        $hasDateColumns = $leftFormColumns->contains(
-            static fn (array $col): bool => $col['majorType'] === 'date',
-        );
-
-        $hasTimeColumns = $leftFormColumns->contains(
-            static fn (array $col): bool => $col['majorType'] === 'time',
-        );
-
-        $hasDatetimeColumns = $leftFormColumns->contains(
-            static fn (array $col): bool => $col['majorType'] === 'datetime',
-        );
-
-        $hasTextarea = $leftFormColumns->contains(
-            static fn (array $col): bool => $col['majorType'] === 'text'
-                && !in_array($col['name'], self::WYSIWYG_COLUMN_NAMES, true),
-        );
-
-        $hasFormInput = $leftFormColumns->contains(
+        //TODO move to ColumnCollection
+        $hasFormInput = $leftFormColumnsLegacy->contains(
             static fn (array $col): bool => !in_array($col['name'], ['password', 'email'], true)
                 && !in_array($col['majorType'], ['json', 'text', 'bool', 'date', 'time', 'datetime'], true)
                 && !($col['isForeignKey'] ?? false),
         );
 
-        $hasLocalizedInput = $leftFormColumns->contains(
-            static fn (array $col): bool => $col['majorType'] === 'json'
-                && !in_array($col['name'], self::WYSIWYG_COLUMN_NAMES, true),
-        );
-
-        $hasLocalizedWysiwyg = $leftFormColumns->contains(
-            static fn (array $col): bool => $col['majorType'] === 'json'
-                && in_array($col['name'], self::WYSIWYG_COLUMN_NAMES, true),
-        );
-
-        $belongsToManyTables = (new Collection($this->relations['belongsToMany'] ?? []))
-            ->pluck('related_table');
-
         return [
+            //globals
             'modelBaseName' => $this->modelBaseName,
             'modelPlural' => $this->modelPlural,
             'modelVariableName' => $this->modelVariableName,
@@ -242,64 +175,69 @@ final class Form extends ResourceGenerator
             'modelJSName' => $this->modelJSName,
             'modelLangFormat' => $this->modelLangFormat,
             'resource' => $this->resource,
-
-            'columns' => $visibleColumns,
-            'leftFormColumns' => $leftFormColumns,
-            'rightFormColumns' => $rightFormColumns,
-            'foreignKeys' => $foreignKeys,
-            'belongsToManyTables' => $belongsToManyTables,
-            'relations' => array_merge(['belongsToMany' => []], $this->relations),
             'mediaCollections' => $this->mediaCollections,
-            'leftMediaCollections' => $leftMediaCollections,
-            'rightMediaCollections' => $rightMediaCollections,
-
-            'hasTranslatable' => $hasTranslatable,
-            'isUsedTwoColumnsLayout' => $isUsedTwoColumnsLayout,
+            'relations' => array_merge(['belongsToMany' => []], $this->relations),
+            //has
             'hasCreatedByAdminUser' => $hasCreatedByAdminUser,
             'hasUpdatedByAdminUser' => $hasUpdatedByAdminUser,
-            'hasWysiwyg' => $hasWysiwyg,
-            'hasPassword' => $hasPassword,
-            'hasEmail' => $hasEmail,
-            'hasBoolColumns' => $hasBoolColumns,
-            'hasDateColumns' => $hasDateColumns,
-            'hasTimeColumns' => $hasTimeColumns,
-            'hasDatetimeColumns' => $hasDatetimeColumns,
-            'hasTextarea' => $hasTextarea,
-            'hasFormInput' => $hasFormInput,
-            'hasLocalizedInput' => $hasLocalizedInput,
-            'hasLocalizedWysiwyg' => $hasLocalizedWysiwyg,
+            'hasTranslatable' => $columns->hasByMajorType('json'),
+            'hasPublishedAt' => $columns->hasByName('published_at'),
+            'hasWysiwyg' => $leftFormColumns->hasWysiwyg(),
+            'hasPassword' => $leftFormColumns->hasByName('password'),
+            'hasEmail' => $leftFormColumns->hasByName('email'),
+            'hasBoolColumns' => $leftFormColumns->hasByMajorType('bool'),
+            'hasDateColumns' => $leftFormColumns->hasByMajorType('date'),
+            'hasTimeColumns' => $leftFormColumns->hasByMajorType('time'),
+            'hasDatetimeColumns' => $leftFormColumns->hasByMajorType('datetime'),
+            'hasTextarea' => $leftFormColumns->hasTextarea(),
+            'hasLocalizedInput' => $leftFormColumns->hasLocalizedInput(),
+            'hasLocalizedWysiwyg' => $leftFormColumns->hasLocalizedWysiwyg(),
             'hasForeignKeys' => $foreignKeys->isNotEmpty(),
-            'hasPublishedAt' => $hasPublishedAt,
-            'wysiwygTextColumnNames' => self::WYSIWYG_COLUMN_NAMES,
+            'hasFormInput' => $hasFormInput,
+            //columns
+            'columns' => $visibleColumns->toLegacyCollection(),
+            'leftFormColumns' => $leftFormColumnsLegacy,
+            'leftMediaCollections' => $this->mediaCollections->reject(
+                static fn (MediaCollection $mediaCollection): bool => $mediaCollection->collectionName === 'gallery',
+            ),
+            'rightFormColumns' => $rightFormColumns->toLegacyCollection(),
+            'rightMediaCollections' => $rightMediaCollections,
+            'foreignKeys' => $foreignKeys,
+            'belongsToManyTables' => (new Collection($this->relations['belongsToMany'] ?? []))
+                ->pluck('related_table'),
+            'wysiwygTextColumnNames' => $columns->getWysiwygColumnNames(),
+
+            'isUsedTwoColumnsLayout' => $rightFormColumns->isNotEmpty()
+                || $rightMediaCollections->isNotEmpty()
+                || $hasCreatedByAdminUser
+                || $hasUpdatedByAdminUser,
         ];
     }
 
     private function buildCreate(): string
     {
-        $data = $this->getCommonViewData();
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $data = $this->getCommonViewData($columns);
 
         return view('brackets/admin-generator::' . $this->create, $data)->render();
     }
 
     private function buildEdit(): string
     {
-        $data = $this->getCommonViewData();
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
-            ->toLegacyCollection();
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $data = $this->getCommonViewData($columns);
 
-        $data['modelTitle'] = $columns->filter(static fn (array $column): bool => in_array(
-            $column['name'],
-            ['title', 'name', 'first_name', 'email'],
-            true,
-        ))->first(null, ['name' => 'id'])['name'];
+        $data['modelTitle'] = $columns->getModelTitle();
 
         return view('brackets/admin-generator::' . $this->edit, $data)->render();
     }
 
     private function buildFormVue(): string
     {
-        $data = $this->getCommonViewData();
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $data = $this->getCommonViewData($columns);
 
+        //TODO move to ColumnCollectionBuilder
         // Build validation schema
         $validationRules = [];
         foreach ($data['leftFormColumns'] as $col) {
@@ -308,7 +246,6 @@ final class Form extends ResourceGenerator
                 $validationRules[$col['name']] = $rules;
             }
         }
-
         $data['validationRules'] = $validationRules;
 
         // Pre-compute media-related strings for the template
@@ -320,48 +257,6 @@ final class Form extends ResourceGenerator
             ->implode(', ');
 
         return view('brackets/admin-generator::' . $this->formVue, $data)->render();
-    }
-
-    /** @param array<string, string|bool|array<string>> $col */
-    private function buildFrontendValidationRules(array $col): ?string
-    {
-        $rules = [];
-
-        if ($col['name'] === 'password') {
-            return null;
-        }
-
-        if ($col['name'] === 'email') {
-            $rules[] = 'required';
-            $rules[] = 'email';
-
-            return "'" . implode('|', $rules) . "'";
-        }
-
-        // For FK columns, check if required
-        if ($col['isForeignKey'] ?? false) {
-            if (in_array('required', $col['frontendRules'] ?? [], true)) {
-                return "'required'";
-            }
-
-            return null;
-        }
-
-        $frontendRules = $col['frontendRules'] ?? [];
-
-        // Filter out rules not suitable for Vue validation
-        $filteredRules = array_filter(
-            $frontendRules,
-            static fn (string $rule): bool => !str_starts_with($rule, 'confirmed:')
-                && !str_starts_with($rule, 'date_format:')
-                && $rule !== '',
-        );
-
-        if ($filteredRules === []) {
-            return null;
-        }
-
-        return "'" . implode('|', $filteredRules) . "'";
     }
 
     private function generateCreate(bool $force): void
@@ -454,5 +349,48 @@ final class Form extends ResourceGenerator
         }
 
         $this->files->put($adminJsPath, $content);
+    }
+
+    //TODO move to ColumnCollectionBuilder
+    /** @param array<string, string|bool|array<string>> $col */
+    private function buildFrontendValidationRules(array $col): ?string
+    {
+        $rules = [];
+
+        if ($col['name'] === 'password') {
+            return null;
+        }
+
+        if ($col['name'] === 'email') {
+            $rules[] = 'required';
+            $rules[] = 'email';
+
+            return "'" . implode('|', $rules) . "'";
+        }
+
+        // For FK columns, check if required
+        if ($col['isForeignKey'] ?? false) {
+            if (in_array('required', $col['frontendRules'] ?? [], true)) {
+                return "'required'";
+            }
+
+            return null;
+        }
+
+        $frontendRules = $col['frontendRules'] ?? [];
+
+        // Filter out rules not suitable for Vue validation
+        $filteredRules = array_filter(
+            $frontendRules,
+            static fn (string $rule): bool => !str_starts_with($rule, 'confirmed:')
+                && !str_starts_with($rule, 'date_format:')
+                && $rule !== '',
+        );
+
+        if ($filteredRules === []) {
+            return null;
+        }
+
+        return "'" . implode('|', $filteredRules) . "'";
     }
 }

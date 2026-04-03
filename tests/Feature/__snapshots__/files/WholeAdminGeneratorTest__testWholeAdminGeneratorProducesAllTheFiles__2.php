@@ -41,6 +41,8 @@ final class IndexCategory extends FormRequest
                     'views',
                     'created_by_admin_user_id',
                     'updated_by_admin_user_id',
+                    'created_at',
+                    'updated_at',
                 ]),
                 'nullable',
             ],

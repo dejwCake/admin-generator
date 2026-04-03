@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
+use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
 use Illuminate\Support\Collection;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
 final class Index extends ResourceGenerator
 {
-    private const array WYSIWYG_COLUMN_NAMES = ['perex', 'text', 'body', 'description'];
-
     /**
      * The name and signature of the console command.
      *
@@ -132,11 +131,12 @@ final class Index extends ResourceGenerator
 
     private function buildView(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
-            ->toLegacyCollection();
-        $indexColumns = $this->getColumnsForIndex($columns);
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $indexColumns = $columns->getForIndex();
+        $indexColumnsWithPriority = $this->getColumnsWithPriority($indexColumns);
 
         return view('brackets/admin-generator::' . $this->view, [
+            //globals
             'modelBaseName' => $this->modelBaseName,
             'modelPlural' => $this->modelPlural,
             'modelRouteAndViewName' => $this->modelRouteAndViewName,
@@ -147,77 +147,56 @@ final class Index extends ResourceGenerator
             'export' => $this->export,
             'withoutBulk' => $this->withoutBulk,
             'resource' => $this->resource,
-            'hasPublishedAt' => $columns->contains(
-                static fn (array $column): bool => $column['name'] === 'published_at',
-            ),
-            'hasCreatedByAdminUser' => $columns->contains(
-                static fn (array $column): bool => $column['name'] === 'created_by_admin_user_id',
-            ),
-            'hasUpdatedByAdminUser' => $columns->contains(
-                static fn (array $column): bool => $column['name'] === 'updated_by_admin_user_id',
-            ),
-
-            'columns' => $indexColumns,
+            //has
+            'hasPublishedAt' => $columns->hasByName('published_at'),
+            'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
+            'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
+            //columns
+            'columns' => $indexColumnsWithPriority,
         ])->render();
     }
 
     private function buildListingVue(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
-            ->toLegacyCollection();
-        $indexColumns = $this->getColumnsForIndex($columns);
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $indexColumns = $columns->getForIndex();
+        $indexColumnsWithPriority = $this->getColumnsWithPriority($indexColumns);
 
-        $hasPublishedAt = $columns->contains(
-            static fn (array $column): bool => $column['name'] === 'published_at',
-        );
-        $hasCreatedByAdminUser = $columns->contains(
-            static fn (array $column): bool => $column['name'] === 'created_by_admin_user_id',
-        );
-        $hasUpdatedByAdminUser = $columns->contains(
-            static fn (array $column): bool => $column['name'] === 'updated_by_admin_user_id',
-        );
-        $hasUserDetailTooltip = $hasCreatedByAdminUser || $hasUpdatedByAdminUser;
-        $hasSwitchColumns = $indexColumns->contains(
-            static fn (array $column): bool => $column['switch'],
-        );
-        $hasDateColumns = $indexColumns->contains(
-            static fn (array $column): bool => in_array($column['majorType'], ['date', 'time', 'datetime'], true),
-        ) || $hasPublishedAt || $hasUserDetailTooltip;
+        $hasPublishedAt = $columns->hasByName('published_at');
+        $hasUserDetailTooltip = $columns->hasByName('created_by_admin_user_id')
+            || $columns->hasByName('updated_by_admin_user_id');
+
+        $hasDateColumns = $indexColumns->hasByMajorType('date', 'time', 'datetime')
+            || $hasPublishedAt
+            || $hasUserDetailTooltip;
 
         $dateImports = new Collection();
-        if ($indexColumns->contains(static fn (array $column): bool => $column['majorType'] === 'date')) {
+        if ($indexColumns->hasByMajorType('date')) {
             $dateImports->push('formatDate');
         }
-        if ($indexColumns->contains(static fn (array $column): bool => $column['majorType'] === 'time')) {
+        if ($indexColumns->hasByMajorType('time')) {
             $dateImports->push('formatTime');
         }
-        if (
-            $indexColumns->contains(static fn (array $column): bool => $column['majorType'] === 'datetime')
-            || $hasPublishedAt
-            || $hasUserDetailTooltip
-        ) {
+        if ($indexColumns->hasByMajorType('datetime') || $hasPublishedAt || $hasUserDetailTooltip) {
             $dateImports->push('formatDatetime');
         }
         $dateImports = $dateImports->sort();
 
         return view('brackets/admin-generator::' . $this->viewVue, [
+            //globasl
             'modelJSName' => $this->modelJSName,
             'modelVariableName' => $this->modelVariableName,
             'export' => $this->export,
             'withoutBulk' => $this->withoutBulk,
+            //has
             'hasPublishedAt' => $hasPublishedAt,
             'hasUserDetailTooltip' => $hasUserDetailTooltip,
-            'hasSwitchColumns' => $hasSwitchColumns,
+            'hasSwitchColumns' => $indexColumns->hasByMajorType('bool'),
             'hasDateColumns' => $hasDateColumns,
+            //columns
+            'columns' => $indexColumnsWithPriority,
             'dateImports' => $dateImports->implode(', '),
-            'columns' => $indexColumns,
         ])->render();
-    }
-
-    /** @param array<string, string|int> $column */
-    private function isSwitch(array $column): bool
-    {
-        return $column['majorType'] === 'bool';
     }
 
     private function registerInAdminJs(): void
@@ -249,21 +228,12 @@ final class Index extends ResourceGenerator
         $this->files->put($adminJsPath, $content);
     }
 
-    private function getColumnsForIndex(Collection $columns): Collection
+    //TODO move to ColumnCollectionBuilder
+    private function getColumnsWithPriority(ColumnCollection $columns): Collection
     {
         $columnsForIndex = $columns
-            ->reject(static fn (array $column): bool => $column['majorType'] === 'text'
-            || in_array(
-                $column['name'],
-                ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'],
-                true,
-            )
-            || ($column['majorType'] === 'json' && in_array(
-                $column['name'],
-                self::WYSIWYG_COLUMN_NAMES,
-                true,
-            )))->map(function (array $column): array {
-                $column['switch'] = $this->isSwitch($column);
+            ->toLegacyCollection()
+            ->map(function (array $column): array {
                 $column['priority'] = $this->getColumnFixedPriority($column['name']);
 
                 return $column;
@@ -272,6 +242,7 @@ final class Index extends ResourceGenerator
         return $this->assignColumnPriorities($columnsForIndex);
     }
 
+    //TODO move to ColumnCollectionBuilder
     private function getColumnFixedPriority(string $name): ?int
     {
         return match (true) {
@@ -283,6 +254,7 @@ final class Index extends ResourceGenerator
         };
     }
 
+    //TODO move to ColumnCollectionBuilder
     private function assignColumnPriorities(Collection $columns): Collection
     {
         $fixedPriorities = $columns

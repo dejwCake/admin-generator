@@ -68,53 +68,41 @@ final class Model extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
-            ->toLegacyCollection();
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
         return view('brackets/admin-generator::' . $this->view, [
+            //globals
             'modelBaseName' => $this->classBaseName,
             'modelNameSpace' => $this->classNamespace,
-
             // if table name differs from the snake case plural form of the classname,
             // then we need to specify the table name
             'tableName' => $this->tableName !== Str::snake(Str::plural($this->classBaseName))
                 ? $this->tableName
                 : null,
-
-            'hasCarbonProperty' => $columns->contains(
-                static fn (array $column): bool => in_array($column['majorType'], ['datetime', 'date'], true),
-            ),
-            'hasSoftDelete' => $columns->contains(
-                static fn (array $column): bool => $column['name'] === 'deleted_at',
-            ),
-            'hasPublishedAt' => $columns->contains(
-                static fn (array $column): bool => $column['name'] === 'published_at',
-            ),
-            'allColumns' => $columns,
-            'dates' => $columns->filter(
-                static fn (array $column): bool => in_array($column['majorType'], ['datetime', 'date'], true),
-            )->pluck('name'),
-            'booleans' => $columns->filter(
-                static fn (array $column): bool => $column['majorType'] === 'bool',
-            )->pluck('name'),
-            'fillable' => $columns->filter(
-                static fn (array $column): bool => !in_array(
-                    $column['name'],
-                    ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token'],
-                    true,
-                ),
-            )->pluck('name'),
-            'hidden' => $columns->filter(
-                static fn (array $column): bool => in_array($column['name'], ['password', 'remember_token'], true),
-            )->pluck('name'),
-            'translatable' => $columns->filter(
-                static fn (array $column): bool => $column['majorType'] === 'json',
-            )->pluck('name'),
-            'timestamps' => $columns->filter(
-                static fn (array $column): bool => in_array($column['name'], ['created_at', 'updated_at'], true),
-            )->count() > 0,
             'relations' => $this->relations,
             'mediaCollections' => $this->mediaCollections,
+            //has
+            'hasCarbonProperty' => $columns->hasByMajorType('datetime', 'date'),
+            'hasSoftDelete' => $columns->hasByName('deleted_at'),
+            'hasPublishedAt' => $columns->hasByName('published_at'),
+            'hasTimestamps' => $columns->hasByName('created_at', 'updated_at'),
+            //columns
+            'allColumns' => $columns->toLegacyCollection(),
+            'dates' => $columns->getDates()
+                ->toLegacyCollection()
+                ->pluck('name'),
+            'booleans' => $columns->getBoolean()
+                ->toLegacyCollection()
+                ->pluck('name'),
+            'fillable' => $columns->getFillable()
+                ->toLegacyCollection()
+                ->pluck('name'),
+            'hidden' => $columns->getHidden()
+                ->toLegacyCollection()
+                ->pluck('name'),
+            'translatable' => $columns->getTranslatable()
+                ->toLegacyCollection()
+                ->pluck('name'),
         ])->render();
     }
 

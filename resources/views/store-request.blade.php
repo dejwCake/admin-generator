@@ -17,14 +17,16 @@ namespace {{ $classNamespace }};
     $uses = [
         'Illuminate\Contracts\Auth\Access\Gate',
     ];
-    if ($hasPassword || $hasCreatedByAdminUserId || $hasUpdatedByAdminUserId) {
+    if ($hasPassword || $hasCreatedByAdminUser || $hasUpdatedByAdminUser) {
         $uses[] = 'Illuminate\Container\Container';
     }
-    if ($hasCreatedByAdminUserId || $hasUpdatedByAdminUserId) {
+    if ($hasCreatedByAdminUser || $hasUpdatedByAdminUser) {
         $uses[] = 'Illuminate\Contracts\Config\Repository as Config';
     }
     if ($hasPassword) {
         $uses[] = 'Illuminate\Contracts\Hashing\Hasher';
+    }
+    if($hasPasswordUsage) {
         $uses[] = 'Illuminate\Validation\Rules\Password';
     }
     if ($hasRuleUsage) {
@@ -143,7 +145,7 @@ final class {{ $classBaseName }} extends FormRequest
 @foreach($relations['belongsToMany'] as $belongsToMany)
         $data['{{ $belongsToMany['related_table'] }}'] = new Collection($data['{{ $belongsToMany['related_table'] }}'] ?? []);
 @endforeach
-@elseif(!$hasPassword && !$hasCreatedByAdminUserId && !$hasUpdatedByAdminUserId)
+@elseif(!$hasPassword && !$hasCreatedByAdminUser && !$hasUpdatedByAdminUser)
         //phpcs:ignore SlevomatCodingStandard.Variables.UselessVariable.UselessVariable
         $data = $this->validated();
 @else
@@ -158,14 +160,14 @@ final class {{ $classBaseName }} extends FormRequest
         }
 
 @endif
-@if($hasCreatedByAdminUserId || $hasUpdatedByAdminUserId)
+@if($hasCreatedByAdminUser || $hasUpdatedByAdminUser)
         $config = Container::getInstance()->make(Config::class);
         assert($config instanceof Config);
         $adminUserGuard = $config->get('admin-auth.defaults.guard', 'admin');
-@if($hasCreatedByAdminUserId)
+@if($hasCreatedByAdminUser)
         $data['created_by_admin_user_id'] = $this->user($adminUserGuard)->id;
 @endif
-@if($hasUpdatedByAdminUserId)
+@if($hasUpdatedByAdminUser)
         $data['updated_by_admin_user_id'] = $this->user($adminUserGuard)->id;
 @endif
 

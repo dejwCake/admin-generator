@@ -19,9 +19,11 @@ namespace {{ $classNamespace }};
         'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Contracts\Config\Repository as Config',
         'Illuminate\Contracts\Hashing\Hasher',
-        'Illuminate\Validation\Rules\Password',
         $modelFullName,
     ];
+    if ($hasPasswordUsage) {
+        $uses[] = 'Illuminate\Validation\Rules\Password';
+    }
     if ($hasRuleUsage) {
         $uses[] = 'Illuminate\Validation\Rule';
     }

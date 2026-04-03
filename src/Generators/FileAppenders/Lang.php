@@ -107,24 +107,23 @@ final class Lang extends FileAppender
 
     protected function buildContent(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
-            ->toLegacyCollection();
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
         return view('brackets/admin-generator::' . $this->view, [
+            //globals
             'modelLangFormat' => $this->modelLangFormat,
             'modelBaseName' => $this->modelBaseName,
             'modelPlural' => $this->modelPlural,
             'titleSingular' => $this->titleSingular,
             'titlePlural' => $this->titlePlural,
             'export' => $this->export,
-            'hasPublishedAt' => $columns->contains(
-                static fn (array $column): bool => $column['name'] === 'published_at',
-            ),
-            'hasProfile' => $this->tableName === 'admin_users',
-
-            'columns' => $columns,
             'relations' => $this->relations,
             'mediaCollections' => $this->mediaCollections,
+            //has
+            'hasPublishedAt' => $columns->hasByName('published_at'),
+            'hasProfile' => $this->tableName === 'admin_users',
+            //columns
+            'columns' => $columns->toLegacyCollection(),
         ])->render();
     }
 }

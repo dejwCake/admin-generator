@@ -4,17 +4,13 @@
   <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="src/Builders/ServerStoreRulesBuilder.php"/>
   <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="src/Builders/ServerUpdateRulesBuilder.php"/>
   <violation rule="PHPMD\Rule\Design\LongParameterList" file="src/Dtos/Columns/Column.php" method="__construct"/>
+  <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="src/Dtos/Columns/ColumnCollection.php"/>
+  <violation rule="PHPMD\Rule\Design\WeightedMethodCount" file="src/Dtos/Columns/ColumnCollection.php"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/Generate.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/GenerateAdminUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\CyclomaticComplexity" file="src/Generators/GenerateUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\NpathComplexity" file="src/Generators/GenerateUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/GenerateUser.php" method="handle"/>
-  <violation rule="PHPMD\Rule\Design\WeightedMethodCount" file="src/Generators/Resources/Form.php"/>
-  <violation rule="PHPMD\Rule\CyclomaticComplexity" file="src/Generators/Resources/Form.php" method="getCommonViewData"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/Resources/Form.php" method="getCommonViewData"/>
-  <violation rule="PHPMD\Rule\Design\WeightedMethodCount" file="src/Generators/Resources/FullForm.php"/>
-  <violation rule="PHPMD\Rule\CyclomaticComplexity" file="src/Generators/Resources/FullForm.php" method="getCommonViewData"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/Resources/FullForm.php" method="getCommonViewData"/>
   <violation rule="PHPMD\Rule\CyclomaticComplexity" file="tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
   <violation rule="PHPMD\Rule\Design\NpathComplexity" file="tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
   <violation rule="PHPMD\Rule\Design\NumberOfChildren" file="tests/TestCase.php"/>

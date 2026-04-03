@@ -22,12 +22,6 @@ parameters:
 			path: src/Generators/Classes/ClassGenerator.php
 
 		-
-			message: '#^Method Brackets\\AdminGenerator\\Generators\\Classes\\ClassGenerator\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<int\|string, array\<string, array\<string\>\|string\>\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, majorType\: mixed, serverStoreRules\: mixed, serverUpdateRules\: mixed, frontendRules\: array\<mixed\>\}\>\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Generators/Classes/ClassGenerator.php
-
-		-
 			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
 			count: 1
@@ -39,7 +33,7 @@ parameters:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
-			count: 1
+			count: 3
 			path: src/Generators/Classes/Controller.php
 
 		-
@@ -69,7 +63,7 @@ parameters:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
-			count: 1
+			count: 3
 			path: src/Generators/Classes/Factory.php
 
 		-
@@ -99,7 +93,7 @@ parameters:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
-			count: 1
+			count: 6
 			path: src/Generators/Classes/Model.php
 
 		-
@@ -114,7 +108,7 @@ parameters:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
-			count: 1
+			count: 2
 			path: src/Generators/Classes/StoreRequest.php
 
 		-
@@ -123,7 +117,7 @@ parameters:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
-			count: 1
+			count: 2
 			path: src/Generators/Classes/UpdateRequest.php
 
 		-
@@ -132,12 +126,6 @@ parameters:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
-			count: 1
-			path: src/Generators/FileAppenders/FileAppender.php
-
-		-
-			message: '#^Method Brackets\\AdminGenerator\\Generators\\FileAppenders\\FileAppender\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<int\|string, array\<string, array\<string\>\|string\>\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, majorType\: mixed, serverStoreRules\: mixed, serverUpdateRules\: mixed, frontendRules\: array\<mixed\>\}\>\.$#'
-			identifier: return.type
 			count: 1
 			path: src/Generators/FileAppenders/FileAppender.php
 
@@ -174,7 +162,7 @@ parameters:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
-			count: 2
+			count: 4
 			path: src/Generators/Resources/Form.php
 
 		-
@@ -189,7 +177,7 @@ parameters:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
-			count: 2
+			count: 5
 			path: src/Generators/Resources/FullForm.php
 
 		-
@@ -204,7 +192,7 @@ parameters:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
-			count: 2
+			count: 1
 			path: src/Generators/Resources/Index.php
 
 		-
@@ -213,12 +201,6 @@ parameters:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
-			count: 1
-			path: src/Generators/Resources/ResourceGenerator.php
-
-		-
-			message: '#^Method Brackets\\AdminGenerator\\Generators\\Resources\\ResourceGenerator\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<int\|string, array\<string, array\<string\>\|string\>\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, majorType\: mixed, serverStoreRules\: mixed, serverUpdateRules\: mixed, frontendRules\: array\<mixed\>\}\>\.$#'
-			identifier: return.type
 			count: 1
 			path: src/Generators/Resources/ResourceGenerator.php
 

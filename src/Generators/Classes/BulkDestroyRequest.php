@@ -45,6 +45,7 @@ final class BulkDestroyRequest extends ClassGenerator
     protected function buildClass(): string
     {
         return view('brackets/admin-generator::bulk-destroy-request', [
+            //globals
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,
             'modelDotNotation' => $this->modelDotNotation,

@@ -28,15 +28,16 @@ trait Columns
     }
 
     /** @return Collection<string|int, array<string, string|array<string>>> */
-    protected function getVisibleColumns(
-        string $tableName,
-        string $modelVariableName,
-        array $ignoredColumns = ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token', 'last_login_at'],
-    ): Collection {
+    protected function getVisibleColumns(string $tableName, string $modelVariableName,): Collection
+    {
         $columns = $this->columnCollectionBuilder->build($tableName, $modelVariableName)
             ->toLegacyCollection();
 
         return $columns
-            ->filter(static fn (array $column): bool => !in_array($column['name'], $ignoredColumns, true));
+            ->filter(static fn (array $column): bool => !in_array(
+                $column['name'],
+                ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token', 'last_login_at'],
+                true,
+            ));
     }
 }

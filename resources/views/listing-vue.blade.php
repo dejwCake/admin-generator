@@ -113,7 +113,7 @@
                                         :datetime-text="translations.updated_on + ' ' + formatDatetime(item.updated_at)"
                                     />
                                 </td>
-@elseif($col['switch'])
+@elseif(in_array($col['majorType'], ['bool']))
                                 <td v-if="isColumnVisible({{ $col['priority'] }})">
                                     <ToggleSwitch
                                         v-model="collection[index].{{ $col['name'] }}"

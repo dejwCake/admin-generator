@@ -18,8 +18,10 @@ namespace {{ $classNamespace }};
         'Illuminate\Container\Container',
         'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Contracts\Hashing\Hasher',
-        'Illuminate\Validation\Rules\Password',
     ];
+    if($hasPasswordUsage) {
+        $uses[] = 'Illuminate\Validation\Rules\Password';
+    }
     if ($hasRuleUsage) {
         $uses[] = 'Illuminate\Validation\Rule';
     }
