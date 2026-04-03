@@ -25,11 +25,23 @@ final readonly class Column
         public bool $unique,
         public bool $hasUniqueDeleteAtIndex,
         public string $defaultTranslation,
+        public bool $isForeignKey,
         public ?int $priority,
         public Collection $serverStoreRules,
         public Collection $serverUpdateRules,
         public Collection $frontendRules,
     ) {
+    }
+
+    public function getFrontendValidationRule(): ?string
+    {
+        $rules = $this->frontendRules->filter()->values();
+
+        if ($rules->isEmpty()) {
+            return null;
+        }
+
+        return "'" . $rules->implode('|') . "'";
     }
 
     public function withPriority(?int $priority): self
@@ -44,6 +56,7 @@ final readonly class Column
             unique: $this->unique,
             hasUniqueDeleteAtIndex: $this->hasUniqueDeleteAtIndex,
             defaultTranslation: $this->defaultTranslation,
+            isForeignKey: $this->isForeignKey,
             priority: $priority,
             serverStoreRules: $this->serverStoreRules,
             serverUpdateRules: $this->serverUpdateRules,
@@ -64,6 +77,7 @@ final readonly class Column
             'unique' => $this->unique,
             'uniqueDeletedAtCondition' => $this->hasUniqueDeleteAtIndex,
             'defaultTranslation' => $this->defaultTranslation,
+            'isForeignKey' => $this->isForeignKey,
             'priority' => $this->priority,
             'serverStoreRules' => $this->serverStoreRules
                 ->map(static fn (ServerStoreRule $serverStoreRule) => (string) $serverStoreRule)

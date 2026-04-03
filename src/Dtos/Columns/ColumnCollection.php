@@ -344,6 +344,15 @@ final class ColumnCollection implements IteratorAggregate, Countable
         );
     }
 
+    /** @return array<string, string> */
+    public function getFrontendValidationRules(): array
+    {
+        return $this->columns
+            ->filter(static fn (Column $column): bool => $column->getFrontendValidationRule() !== null)
+            ->mapWithKeys(static fn (Column $column): array => [$column->name => $column->getFrontendValidationRule()])
+            ->all();
+    }
+
     public function getModelTitle(): string
     {
         $modelTitleColumn = $this->columns

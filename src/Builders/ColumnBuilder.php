@@ -38,6 +38,9 @@ final readonly class ColumnBuilder
 
         $majorType = $this->getMajorTypeFromType($type);
 
+        $isForeignKey = str_ends_with($name, '_id')
+            && !in_array($name, ['created_by_admin_user_id', 'updated_by_admin_user_id'], true);
+
         return new Column(
             name: $name,
             type: $type,
@@ -48,6 +51,7 @@ final readonly class ColumnBuilder
             unique: $hasUniqueIndex,
             hasUniqueDeleteAtIndex: $hasUniqueDeleteAtIndex,
             defaultTranslation: $this->getDefaultTranslation($name),
+            isForeignKey: $isForeignKey,
             priority: $this->getFixedPriority($name),
             serverStoreRules: $this->serverStoreRulesBuilder->build(
                 $name,
@@ -68,7 +72,7 @@ final readonly class ColumnBuilder
                 $hasSoftDelete && $hasUniqueDeleteAtIndex,
                 $modelVariableName,
             ),
-            frontendRules: $this->frontendRulesBuilder->build($name, $majorType, $nullable === false),
+            frontendRules: $this->frontendRulesBuilder->build($name, $majorType, $nullable === false, $isForeignKey),
         );
     }
 

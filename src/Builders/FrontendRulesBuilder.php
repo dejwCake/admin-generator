@@ -17,15 +17,15 @@ final class FrontendRulesBuilder
     }
 
     /** @return Collection<int, string> */
-    public function build(string $name, string $majorType, bool $required,): Collection
+    public function build(string $name, string $majorType, bool $required, bool $isForeignKey): Collection
     {
         $this->frontendRules = new Collection();
+
         $this->buildByRequire($name, $majorType, $required);
         $this->buildByName($name);
+        $this->buildByMajorType($majorType, $isForeignKey);
 
-        $this->buildByMajorType($majorType);
-
-        return $this->frontendRules;
+        return $this->frontendRules->unique();
     }
 
     private function buildByRequire(string $name, string $majorType, bool $required): void
@@ -40,21 +40,15 @@ final class FrontendRulesBuilder
         if ($name === 'email') {
             $this->frontendRules->push('email');
         }
-
-        if ($name === 'password') {
-            $this->frontendRules->push('confirmed:password');
-            $this->frontendRules->push('min:8');
-            //TODO not working, need fixing
-//            $this->frontendRules->push('regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!$#%]).*$/g');
-        }
     }
 
-    private function buildByMajorType(string $majorType): void
+    private function buildByMajorType(string $majorType, bool $isForeignKey): void
     {
+        if ($isForeignKey) {
+            return;
+        }
+
         $rule = match ($majorType) {
-            'datetime',
-            'date' => 'date_format:yyyy-MM-dd HH:mm:ss',
-            'time' => 'date_format:HH:mm:ss',
             'integer' => 'integer',
             'float' => 'numeric',
             'bool' => '',

@@ -47,11 +47,12 @@ final class Form extends ResourceGenerator
     /** @return array<string, string|bool|array<string>> */
     private static function enrichWithForeignKey(array $col, Collection $foreignKeys): array
     {
-        if (in_array($col['name'], $foreignKeys->pluck('column')->toArray(), true)) {
-            $fk = $foreignKeys->keyBy('column')[$col['name']];
-            $col['isForeignKey'] = true;
-            $col['foreignKeyOptionsName'] = $fk['optionsPropName'];
-            $col['foreignKeyLabel'] = $fk['foreignKeyLabel'];
+        if ($col['isForeignKey'] ?? false) {
+            $fk = $foreignKeys->keyBy('column')[$col['name']] ?? null;
+            if ($fk !== null) {
+                $col['foreignKeyOptionsName'] = $fk['optionsPropName'];
+                $col['foreignKeyLabel'] = $fk['foreignKeyLabel'];
+            }
         }
 
         return $col;
@@ -235,18 +236,14 @@ final class Form extends ResourceGenerator
     private function buildFormVue(): string
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $leftFormColumns = $columns->getVisible()->rejectByName(
+            'published_at',
+            'created_by_admin_user_id',
+            'updated_by_admin_user_id',
+        );
         $data = $this->getCommonViewData($columns);
 
-        //TODO move to ColumnCollectionBuilder
-        // Build validation schema
-        $validationRules = [];
-        foreach ($data['leftFormColumns'] as $col) {
-            $rules = $this->buildFrontendValidationRules($col);
-            if ($rules !== null) {
-                $validationRules[$col['name']] = $rules;
-            }
-        }
-        $data['validationRules'] = $validationRules;
+        $data['validationRules'] = $leftFormColumns->getFrontendValidationRules();
 
         // Pre-compute media-related strings for the template
         $data['mediaDefaultProp'] = '{' . $this->mediaCollections->keys()
@@ -349,48 +346,5 @@ final class Form extends ResourceGenerator
         }
 
         $this->files->put($adminJsPath, $content);
-    }
-
-    //TODO move to ColumnCollectionBuilder
-    /** @param array<string, string|bool|array<string>> $col */
-    private function buildFrontendValidationRules(array $col): ?string
-    {
-        $rules = [];
-
-        if ($col['name'] === 'password') {
-            return null;
-        }
-
-        if ($col['name'] === 'email') {
-            $rules[] = 'required';
-            $rules[] = 'email';
-
-            return "'" . implode('|', $rules) . "'";
-        }
-
-        // For FK columns, check if required
-        if ($col['isForeignKey'] ?? false) {
-            if (in_array('required', $col['frontendRules'] ?? [], true)) {
-                return "'required'";
-            }
-
-            return null;
-        }
-
-        $frontendRules = $col['frontendRules'] ?? [];
-
-        // Filter out rules not suitable for Vue validation
-        $filteredRules = array_filter(
-            $frontendRules,
-            static fn (string $rule): bool => !str_starts_with($rule, 'confirmed:')
-                && !str_starts_with($rule, 'date_format:')
-                && $rule !== '',
-        );
-
-        if ($filteredRules === []) {
-            return null;
-        }
-
-        return "'" . implode('|', $filteredRules) . "'";
     }
 }
