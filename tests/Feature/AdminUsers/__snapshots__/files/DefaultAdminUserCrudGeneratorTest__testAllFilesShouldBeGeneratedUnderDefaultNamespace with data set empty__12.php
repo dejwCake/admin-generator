@@ -1,42 +1,37 @@
 @extends('brackets/admin-ui::admin.layout.default')
 
-@section('title', trans('admin.admin-user.actions.create'))
+@section('title', trans('admin.admin-user.actions.edit', ['name' => $adminUser->first_name]))
 
 @section('body')
 
     <div class="container-xl">
 
-        <div class="card">
-
-            <admin-user-form
-                :action="'{{ $action }}'"
-                :activation="!!'{{ $activation }}'"
-                inline-template>
-
-                <form class="form-horizontal form-create" method="post" @submit.prevent="onSubmit" :action="action">
-
-                    <div class="card-header">
-                        <i class="fa fa-plus"></i> {{ trans('admin.admin-user.actions.create') }}
-                    </div>
-
-                    <div class="card-body">
-
-                        @include('admin.admin-user.components.form-elements')
-
-                    </div>
-
-                    <div class="card-footer">
-	                    <button type="submit" class="btn btn-primary" :disabled="submiting">
-		                    <i class="fa" :class="submiting ? 'fa-spinner' : 'fa-download'"></i>
-                            {{ trans('brackets/admin-ui::admin.btn.save') }}
-	                    </button>
-                    </div>
-
-                </form>
-
-            </admin-user-form>
-
-        </div>
+        <admin-user-form
+            :action="'{{ $action }}'"
+            :data="{{ $adminUser->toJson() }}"
+            :activation="!!'{{ $activation }}'"
+            :language-options="{{ $locales->toJson() }}"
+            :role-options="{{ $roles->toJson() }}"
+            :translations="{{ json_encode([
+                'form_title' => trans('admin.admin-user.actions.edit', ['name' => $adminUser->first_name . ' ' . $adminUser->last_name]),
+                'columns' => [
+                    'first_name' => trans('admin.admin-user.columns.first_name'),
+                    'last_name' => trans('admin.admin-user.columns.last_name'),
+                    'email' => trans('admin.admin-user.columns.email'),
+                    'password' => trans('admin.admin-user.columns.password'),
+                    'password_repeat' => trans('admin.admin-user.columns.password_repeat'),
+                    'activated' => trans('admin.admin-user.columns.activated'),
+                    'forbidden' => trans('admin.admin-user.columns.forbidden'),
+                    'language' => trans('admin.admin-user.columns.language'),
+                ],
+                'relations' => [
+                    'roles' => trans('admin.admin-user.columns.roles'),
+                ],
+                'select_options' => trans('brackets/admin-ui::admin.forms.select_options'),
+                'save' => trans('brackets/admin-ui::admin.btn.save'),
+            ]) }}"
+            v-cloak
+        ></admin-user-form>
 
     </div>
 

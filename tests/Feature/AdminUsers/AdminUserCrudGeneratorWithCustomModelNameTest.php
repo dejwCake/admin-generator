@@ -24,10 +24,9 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         $routesPath = base_path('routes/admin.php');
         $indexPath = resource_path('views/admin/user/index.blade.php');
         $listingVuePath = resource_path('js/admin/user/Listing.vue');
-        $formPath = resource_path('views/admin/user/components/form-elements.blade.php');
         $createPath = resource_path('views/admin/user/create.blade.php');
         $editPath = resource_path('views/admin/user/edit.blade.php');
-        $formJsPath = resource_path('js/admin/user/Form.js');
+        $formVuePath = resource_path('js/admin/user/Form.vue');
         $factoryPath = base_path('database/factories/UserFactory.php');
         $langPath = lang_path('en/admin.php');
 
@@ -41,10 +40,9 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         self::assertFileDoesNotExist($exportPath);
         self::assertFileDoesNotExist($listingVuePath);
         self::assertFileDoesNotExist($indexPath);
-        self::assertFileDoesNotExist($formPath);
         self::assertFileDoesNotExist($createPath);
         self::assertFileDoesNotExist($editPath);
-        self::assertFileDoesNotExist($formJsPath);
+        self::assertFileDoesNotExist($formVuePath);
         self::assertFileDoesNotExist($langPath);
 
         $this->artisan('admin:generate:admin-user', [
@@ -64,10 +62,9 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         self::assertFileExists($routesPath);
         self::assertFileExists($listingVuePath);
         self::assertFileExists($indexPath);
-        self::assertFileExists($formPath);
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
-        self::assertFileExists($formJsPath);
+        self::assertFileExists($formVuePath);
         self::assertFileExists($factoryPath);
         self::assertFileExists($langPath);
 
@@ -82,10 +79,9 @@ class AdminUserCrudGeneratorWithCustomModelNameTest extends UserTestCase
         self::assertMatchesFileSnapshot($routesPath);
         self::assertMatchesFileSnapshot($listingVuePath);
         self::assertMatchesFileSnapshot($indexPath);
-        self::assertMatchesFileSnapshot($formPath);
         self::assertMatchesFileSnapshot($createPath);
         self::assertMatchesFileSnapshot($editPath);
-        self::assertMatchesFileSnapshot($formJsPath);
+        self::assertMatchesFileSnapshot($formVuePath);
         self::assertMatchesFileSnapshot($factoryPath);
         self::assertMatchesFileSnapshot($langPath);
     }

@@ -61,10 +61,10 @@ parameters:
 			path: src/Generators/GenerateUser.php
 
 		-
-			message: '#^Call to method Illuminate\\Support\\Collection\<\*NEVER\*,\*NEVER\*\>\:\:isNotEmpty\(\) will always evaluate to false\.$#'
-			identifier: method.impossibleType
+			message: '#^Method Brackets\\AdminGenerator\\Generators\\Resources\\Form\:\:detectForeignKeys\(\) should return Illuminate\\Support\\Collection\<int, array\<string, string\>\> but returns Illuminate\\Support\\Collection\<int, array\{column\: mixed, relatedTable\: string, relatedModel\: string, optionsPropName\: string, foreignKeyLabel\: string\}\>\.$#'
+			identifier: return.type
 			count: 1
-			path: src/Generators/Resources/Index.php
+			path: src/Generators/Resources/Form.php
 
 		-
 			message: '#^Method Brackets\\AdminGenerator\\Generators\\Resources\\ResourceGenerator\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<int\|string, array\<string, array\<string\>\|string\>\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, majorType\: mixed, serverStoreRules\: array\<mixed\>, serverUpdateRules\: array\<mixed\>, frontendRules\: array\<mixed\>\}\>\.$#'
@@ -83,6 +83,12 @@ parameters:
 			identifier: deadCode.unreachable
 			count: 1
 			path: tests/Feature/Classes/FactoryTest.php
+
+		-
+			message: '#^Unreachable statement \- code above always terminates\.$#'
+			identifier: deadCode.unreachable
+			count: 5
+			path: tests/Feature/Views/ViewFullFormTest.php
 
 		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'

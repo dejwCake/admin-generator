@@ -47,6 +47,23 @@ trait Columns
         );
     }
 
+    protected function getRelatedLabelColumn(string $tableName): string
+    {
+        $columns = $this->readColumnsFromTable($tableName);
+        $preferredLabels = ['title', 'name', 'first_name', 'email'];
+
+        $knownLabel = (new Collection($preferredLabels))
+            ->map(static fn (string $label) => $columns->firstWhere('name', $label))
+            ->filter()
+            ->first();
+
+        $firstString = $columns->first(
+            static fn (array $column): bool => $column['majorType'] === 'string',
+        );
+
+        return ($knownLabel ?? $firstString ?? ['name' => 'id'])['name'];
+    }
+
     /** @return Collection<string|int, array<string, string|array<string>>> */
     protected function getVisibleColumns(
         string $tableName,

@@ -134,6 +134,7 @@ final class Generate extends Command
             '--model-name' => $modelName,
             '--force' => $force,
             '--belongs-to-many' => $belongsToMany,
+            '--media' => $media,
         ]);
 
         $this->call('admin:generate:lang', [

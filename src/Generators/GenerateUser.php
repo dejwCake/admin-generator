@@ -164,6 +164,7 @@ final class GenerateUser extends Command
             '--force' => $force,
             '--template' => 'user',
             '--belongs-to-many' => 'roles',
+            '--media' => $media,
         ]);
 
         $this->call('admin:generate:lang', [

@@ -26,10 +26,9 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         $routesPath = base_path('routes/admin.php');
         $indexPath = resource_path('views/admin/admin-user/index.blade.php');
         $listingVuePath = resource_path('js/admin/admin-user/Listing.vue');
-        $formPath = resource_path('views/admin/admin-user/components/form-elements.blade.php');
         $createPath = resource_path('views/admin/admin-user/create.blade.php');
         $editPath = resource_path('views/admin/admin-user/edit.blade.php');
-        $formJsPath = resource_path('js/admin/admin-user/Form.js');
+        $formVuePath = resource_path('js/admin/admin-user/Form.vue');
         $factoryPath = base_path('database/factories/AdminUserFactory.php');
         $langPath = lang_path('en/admin.php');
 
@@ -43,10 +42,9 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertFileDoesNotExist($exportPath);
         self::assertFileDoesNotExist($indexPath);
         self::assertFileDoesNotExist($listingVuePath);
-        self::assertFileDoesNotExist($formPath);
         self::assertFileDoesNotExist($createPath);
         self::assertFileDoesNotExist($editPath);
-        self::assertFileDoesNotExist($formJsPath);
+        self::assertFileDoesNotExist($formVuePath);
 
         $this->artisan('admin:generate:admin-user', $options);
 
@@ -68,10 +66,9 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         }
         self::assertFileExists($indexPath);
         self::assertFileExists($listingVuePath);
-        self::assertFileExists($formPath);
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
-        self::assertFileExists($formJsPath);
+        self::assertFileExists($formVuePath);
         self::assertFileExists($langPath);
 
         self::assertMatchesFileSnapshot($controllerPath);
@@ -89,10 +86,9 @@ class DefaultAdminUserCrudGeneratorTest extends UserTestCase
         self::assertMatchesFileSnapshot($routesPath);
         self::assertMatchesFileSnapshot($indexPath);
         self::assertMatchesFileSnapshot($listingVuePath);
-        self::assertMatchesFileSnapshot($formPath);
         self::assertMatchesFileSnapshot($createPath);
         self::assertMatchesFileSnapshot($editPath);
-        self::assertMatchesFileSnapshot($formJsPath);
+        self::assertMatchesFileSnapshot($formVuePath);
         self::assertMatchesFileSnapshot($factoryPath);
         self::assertMatchesFileSnapshot($langPath);
 

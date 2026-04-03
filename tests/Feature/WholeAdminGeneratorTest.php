@@ -24,10 +24,9 @@ class WholeAdminGeneratorTest extends TestCase
         $routesPath = base_path('routes/admin.php');
         $indexPath = resource_path('views/admin/category/index.blade.php');
         $listingVuePath = resource_path('js/admin/category/Listing.vue');
-        $formPath = resource_path('views/admin/category/components/form-elements.blade.php');
         $createPath = resource_path('views/admin/category/create.blade.php');
         $editPath = resource_path('views/admin/category/edit.blade.php');
-        $formJsPath = resource_path('js/admin/category/Form.js');
+        $formVuePath = resource_path('js/admin/category/Form.vue');
         $factoryPath = base_path('database/factories/CategoryFactory.php');
         $langPath = lang_path('en/admin.php');
 
@@ -40,10 +39,9 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertFileDoesNotExist($exportPath);
         self::assertFileDoesNotExist($indexPath);
         self::assertFileDoesNotExist($listingVuePath);
-        self::assertFileDoesNotExist($formPath);
         self::assertFileDoesNotExist($createPath);
         self::assertFileDoesNotExist($editPath);
-        self::assertFileDoesNotExist($formJsPath);
+        self::assertFileDoesNotExist($formVuePath);
         self::assertFileDoesNotExist($modelPath);
         self::assertFileDoesNotExist($routesPath);
         self::assertFileDoesNotExist($factoryPath);
@@ -64,10 +62,9 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertFileExists($exportPath);
         self::assertFileExists($indexPath);
         self::assertFileExists($listingVuePath);
-        self::assertFileExists($formPath);
         self::assertFileExists($createPath);
         self::assertFileExists($editPath);
-        self::assertFileExists($formJsPath);
+        self::assertFileExists($formVuePath);
         self::assertFileExists($modelPath);
         self::assertFileExists($routesPath);
         self::assertFileExists($factoryPath);
@@ -82,10 +79,9 @@ class WholeAdminGeneratorTest extends TestCase
         self::assertMatchesFileSnapshot($exportPath);
         self::assertMatchesFileSnapshot($indexPath);
         self::assertMatchesFileSnapshot($listingVuePath);
-        self::assertMatchesFileSnapshot($formPath);
         self::assertMatchesFileSnapshot($createPath);
         self::assertMatchesFileSnapshot($editPath);
-        self::assertMatchesFileSnapshot($formJsPath);
+        self::assertMatchesFileSnapshot($formVuePath);
         self::assertMatchesFileSnapshot($modelPath);
         self::assertMatchesFileSnapshot($routesPath);
         self::assertMatchesFileSnapshot($factoryPath);

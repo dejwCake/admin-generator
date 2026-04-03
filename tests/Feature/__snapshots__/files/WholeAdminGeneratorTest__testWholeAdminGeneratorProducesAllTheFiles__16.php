@@ -2,67 +2,41 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories;
+return [
+    'category' => [
+        'title' => 'Categories',
 
-use App\Models\Category;
-use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
-use Illuminate\Database\Eloquent\Factories\Factory;
+        'actions' => [
+            'index' => 'Categories',
+            'create' => 'New Category',
+            'edit' => 'Edit :name',
+            'export' => 'Export',
+            'will_be_published' => 'Category will be published at',
+        ],
 
-#[UseModel(Category::class)]
-final class CategoryFactory extends Factory
-{
-    public function definition(): array
-    {
-        return [
-            'user_id' => $this->faker->randomNumber(5),
-            'title' => $this->faker->sentence,
-            'slug' => $this->faker->unique()->slug,
-            'perex' => $this->faker->text(),
-            'published_at' => $this->faker->date(),
-            'date_start' => $this->faker->date(),
-            'time_start' => $this->faker->time(),
-            'date_time_end' => $this->faker->dateTime,
-            'enabled' => $this->faker->boolean(),
-            'send' => $this->faker->boolean(),
-            'price' => $this->faker->randomFloat(2, max: 10000),
-            'views' => $this->faker->randomNumber(5),
-            'created_by_admin_user_id' => $this->faker->randomNumber(5),
-            'updated_by_admin_user_id' => $this->faker->randomNumber(5),
-            'created_at' => $this->faker->dateTime,
-            'updated_at' => $this->faker->dateTime,
-            'deleted_at' => null,
-            'text' => ['en' => $this->faker->sentence],
-            'description' => ['en' => $this->faker->sentence],
-        ];
-    }
+        'columns' => [
+            'id' => 'ID',
+            'user_id' => 'User',
+            'title' => 'Title',
+            'slug' => 'Slug',
+            'perex' => 'Perex',
+            'published_at' => 'Published at',
+            'date_start' => 'Date start',
+            'time_start' => 'Time start',
+            'date_time_end' => 'Date time end',
+            'text' => 'Text',
+            'description' => 'Description',
+            'enabled' => 'Enabled',
+            'send' => 'Send',
+            'price' => 'Price',
+            'views' => 'Views',
+            'created_by_admin_user_id' => 'Created by admin user',
+            'updated_by_admin_user_id' => 'Updated by admin user',
+            'created_at' => 'Created at',
+            'updated_at' => 'Updated at',
+            'deleted_at' => 'Deleted at',
+        ],
+    ],
 
-    public function enabled(): self
-    {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['enabled' => true]);
-    }
-
-    public function notEnabled(): self
-    {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['enabled' => false]);
-    }
-
-    public function send(): self
-    {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['send' => true]);
-    }
-
-    public function notSend(): self
-    {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['send' => false]);
-    }
-
-    public function notPublished(): self
-    {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['published_at' => null]);
-    }
-}
+    // Do not delete me :) I'm used for auto-generation
+];
