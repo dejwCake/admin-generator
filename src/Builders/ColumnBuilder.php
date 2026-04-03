@@ -10,8 +10,18 @@ use Illuminate\Support\Str;
 
 final readonly class ColumnBuilder
 {
-    public function build(Collection $indexes, string $name, string $type, bool $nullable,): Column
+    public function __construct(private ServerStoreRulesBuilder $serverStoreRulesBuilder)
     {
+    }
+
+    public function build(
+        string $name,
+        string $type,
+        bool $nullable,
+        string $tableName,
+        Collection $indexes,
+        bool $hasSoftDelete,
+    ): Column {
         $hasUniqueIndex = $indexes
             ->contains(static fn (array $index): bool
                 => in_array($name, $index['columns'], true) && ($index['unique'] && !$index['primary']));
@@ -32,8 +42,17 @@ final readonly class ColumnBuilder
             faker: $this->getFaker($name, $majorType),
             required: $nullable === false,
             unique: $hasUniqueIndex,
-            uniqueDeletedAtCondition: $hasUniqueDeleteAtIndex,
+            hasUniqueDeleteAtIndex: $hasUniqueDeleteAtIndex,
             defaultTranslation: $this->getDefaultTranslation($name),
+            serverStoreRules: $this->serverStoreRulesBuilder->build(
+                $name,
+                $type,
+                $majorType,
+                $nullable === false,
+                $hasUniqueIndex,
+                $tableName,
+                $hasSoftDelete && $hasUniqueDeleteAtIndex,
+            ),
         );
     }
 

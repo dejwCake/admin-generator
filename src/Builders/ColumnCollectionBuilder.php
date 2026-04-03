@@ -8,30 +8,36 @@ use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
 use Illuminate\Database\Schema\Builder as Schema;
 use Illuminate\Support\Collection;
 
-final readonly class ColumnCollectionBuilder
+final class ColumnCollectionBuilder
 {
+    private ColumnCollection $columnCollection;
+
     public function __construct(private Schema $schema, private ColumnBuilder $columnBuilder,)
     {
+        $this->columnCollection = new ColumnCollection();
     }
 
     public function build(string $tableName): ColumnCollection
     {
-        $columnCollection = new ColumnCollection();
-
+        $this->columnCollection = new ColumnCollection();
+        $columns = new Collection($this->schema->getColumns($tableName));
         $indexes = new Collection($this->schema->getIndexes($tableName));
 
-        (new Collection($this->schema->getColumns($tableName)))
-            ->each(function (array $column) use ($indexes, $columnCollection): void {
-                $columnCollection->push(
-                    $this->columnBuilder->build(
-                        $indexes,
-                        $column['name'],
-                        $column['type_name'],
-                        $column['nullable'],
-                    ),
-                );
-            });
+        $hasSoftDelete = $columns->contains(static fn (array $column): bool => $column['name'] === 'deleted_at');
 
-        return $columnCollection;
+        $columns->each(function (array $column) use ($indexes, $hasSoftDelete, $tableName): void {
+            $this->columnCollection->push(
+                $this->columnBuilder->build(
+                    $column['name'],
+                    $column['type_name'],
+                    $column['nullable'],
+                    $tableName,
+                    $indexes,
+                    $hasSoftDelete,
+                ),
+            );
+        });
+
+        return $this->columnCollection;
     }
 }

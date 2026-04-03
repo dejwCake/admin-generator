@@ -45,7 +45,7 @@ trait Columns
                 'name' => $column['name'],
                 'type' => $column['type'],
                 'majorType' => $column['majorType'],
-                'serverStoreRules' => $this->getServerStoreRules($column, $tableName, $hasSoftDelete)->toArray(),
+                'serverStoreRules' => $column['serverStoreRules'],
                 'serverUpdateRules' => $this->getServerUpdateRules(
                     $column,
                     $tableName,
