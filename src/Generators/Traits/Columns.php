@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Generators\Traits;
 
 use Brackets\AdminGenerator\Dtos\Columns\Column;
-use Illuminate\Support\Collection;
 
 trait Columns
 {

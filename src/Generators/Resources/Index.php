@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
-use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
 use Illuminate\Support\Collection;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
@@ -131,9 +130,8 @@ final class Index extends ResourceGenerator
 
     private function buildView(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
-        $indexColumns = $columns->getForIndex();
-        $indexColumnsWithPriority = $this->getColumnsWithPriority($indexColumns);
+        $indexColumns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+            ->getForIndex();
 
         return view('brackets/admin-generator::' . $this->view, [
             //globals
@@ -148,23 +146,22 @@ final class Index extends ResourceGenerator
             'withoutBulk' => $this->withoutBulk,
             'resource' => $this->resource,
             //has
-            'hasPublishedAt' => $columns->hasByName('published_at'),
-            'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
-            'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
+            'hasPublishedAt' => $indexColumns->hasByName('published_at'),
+            'hasCreatedByAdminUser' => $indexColumns->hasByName('created_by_admin_user_id'),
+            'hasUpdatedByAdminUser' => $indexColumns->hasByName('updated_by_admin_user_id'),
             //columns
-            'columns' => $indexColumnsWithPriority,
+            'columns' => $indexColumns->toLegacyCollection(),
         ])->render();
     }
 
     private function buildListingVue(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
-        $indexColumns = $columns->getForIndex();
-        $indexColumnsWithPriority = $this->getColumnsWithPriority($indexColumns);
+        $indexColumns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+            ->getForIndex();
 
-        $hasPublishedAt = $columns->hasByName('published_at');
-        $hasUserDetailTooltip = $columns->hasByName('created_by_admin_user_id')
-            || $columns->hasByName('updated_by_admin_user_id');
+        $hasPublishedAt = $indexColumns->hasByName('published_at');
+        $hasUserDetailTooltip = $indexColumns->hasByName('created_by_admin_user_id')
+            || $indexColumns->hasByName('updated_by_admin_user_id');
 
         $hasDateColumns = $indexColumns->hasByMajorType('date', 'time', 'datetime')
             || $hasPublishedAt
@@ -183,7 +180,7 @@ final class Index extends ResourceGenerator
         $dateImports = $dateImports->sort();
 
         return view('brackets/admin-generator::' . $this->viewVue, [
-            //globasl
+            //globals
             'modelJSName' => $this->modelJSName,
             'modelVariableName' => $this->modelVariableName,
             'export' => $this->export,
@@ -194,7 +191,7 @@ final class Index extends ResourceGenerator
             'hasSwitchColumns' => $indexColumns->hasByMajorType('bool'),
             'hasDateColumns' => $hasDateColumns,
             //columns
-            'columns' => $indexColumnsWithPriority,
+            'columns' => $indexColumns->toLegacyCollection(),
             'dateImports' => $dateImports->implode(', '),
         ])->render();
     }
@@ -226,63 +223,5 @@ final class Index extends ResourceGenerator
         }
 
         $this->files->put($adminJsPath, $content);
-    }
-
-    //TODO move to ColumnCollectionBuilder
-    private function getColumnsWithPriority(ColumnCollection $columns): Collection
-    {
-        $columnsForIndex = $columns
-            ->toLegacyCollection()
-            ->map(function (array $column): array {
-                $column['priority'] = $this->getColumnFixedPriority($column['name']);
-
-                return $column;
-            });
-
-        return $this->assignColumnPriorities($columnsForIndex);
-    }
-
-    //TODO move to ColumnCollectionBuilder
-    private function getColumnFixedPriority(string $name): ?int
-    {
-        return match (true) {
-            in_array($name, ['name', 'title', 'last_name', 'subject'], true) => 0,
-            in_array($name, ['first_name', 'email', 'author'], true) => 1,
-            $name === 'id' => 2,
-            $name === 'published_at' => 3,
-            default => null,
-        };
-    }
-
-    //TODO move to ColumnCollectionBuilder
-    private function assignColumnPriorities(Collection $columns): Collection
-    {
-        $fixedPriorities = $columns
-            ->pluck('priority')
-            ->filter(static fn (?int $priority): bool => $priority !== null)
-            ->unique()
-            ->sort()
-            ->values();
-
-        $priorityMap = $fixedPriorities
-            ->mapWithKeys(static fn (int $priority, int $index): array => [$priority => $index])
-            ->all();
-
-        $nextPriority = count($priorityMap);
-
-        $result = [];
-
-        foreach ($columns as $column) {
-            if ($column['priority'] !== null) {
-                $column['priority'] = $priorityMap[$column['priority']];
-            } else {
-                $column['priority'] = min($nextPriority, 10);
-                $nextPriority++;
-            }
-
-            $result[] = $column;
-        }
-
-        return new Collection($result);
     }
 }

@@ -1,6 +1,18 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,bool\|string\>\:\:filter\(\) expects \(callable\(bool\|string, int\)\: bool\)\|null, Closure\(int\|null\)\: bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Builders/ColumnCollectionBuilder.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection\<int,bool\|string\>\:\:mapWithKeys\(\) expects callable\(bool\|string, int\)\: array\<int, int\>, Closure\(int, int\)\: non\-empty\-array\<int, int\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Builders/ColumnCollectionBuilder.php
+
+		-
 			message: '#^Method Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:\:map\(\) should return Illuminate\\Support\\Collection\<int\|string, bool\|Brackets\\AdminGenerator\\Dtos\\Columns\\Column\|string\|null\> but returns Illuminate\\Support\\Collection\<string, mixed\>\.$#'
 			identifier: return.type
 			count: 1
@@ -11,15 +23,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: src/Generators/Classes/BulkDestroyRequest.php
-
-		-
-			message: '''
-				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
-				just for compatibility with old code$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: src/Generators/Classes/ClassGenerator.php
 
 		-
 			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
@@ -121,15 +124,6 @@ parameters:
 			path: src/Generators/Classes/UpdateRequest.php
 
 		-
-			message: '''
-				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
-				just for compatibility with old code$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: src/Generators/FileAppenders/FileAppender.php
-
-		-
 			message: '#^Property Brackets\\AdminGenerator\\Generators\\FileAppenders\\FileAppender\:\:\$relations \(array\<string, string\>\) does not accept array\<string, Illuminate\\Support\\Collection\<\(int\|string\), array\<string, string\>\>\|string\>\.$#'
 			identifier: assign.propertyType
 			count: 1
@@ -192,17 +186,8 @@ parameters:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
-			count: 1
+			count: 2
 			path: src/Generators/Resources/Index.php
-
-		-
-			message: '''
-				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
-				just for compatibility with old code$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: src/Generators/Resources/ResourceGenerator.php
 
 		-
 			message: '#^Property Brackets\\AdminGenerator\\Generators\\Resources\\ResourceGenerator\:\:\$relations \(array\<string, string\>\) does not accept array\<string, Illuminate\\Support\\Collection\<\(int\|string\), array\<string, string\>\>\|string\>\.$#'

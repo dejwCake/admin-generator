@@ -19,7 +19,7 @@ use Traversable;
 /** @implements IteratorAggregate<string, Column> */
 final class ColumnCollection implements IteratorAggregate, Countable
 {
-    private const array WYSIWYG_COLUMN_NAMES = ['perex', 'text', 'body', 'description'];
+    public const array WYSIWYG_COLUMN_NAMES = ['perex', 'text', 'body', 'description'];
 
     private const array WYSIWYG_COLUMN_MAJOR_TYPES = ['text', 'json'];
 
@@ -178,20 +178,8 @@ final class ColumnCollection implements IteratorAggregate, Countable
     public function getForIndex(): self
     {
         return new self(
-            $this->columns->reject(
-                static fn (Column $column): bool => $column->majorType === 'text',
-            )->reject(
-                static fn (Column $column): bool => in_array(
-                    $column->name,
-                    ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'],
-                    true,
-                ),
-            )->reject(
-                static fn (Column $column): bool => $column->majorType === 'json' && in_array(
-                    $column->name,
-                    self::WYSIWYG_COLUMN_NAMES,
-                    true,
-                ),
+            $this->columns->filter(
+                static fn (Column $column): bool => $column->priority !== null,
             ),
         );
     }

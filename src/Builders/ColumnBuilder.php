@@ -48,6 +48,7 @@ final readonly class ColumnBuilder
             unique: $hasUniqueIndex,
             hasUniqueDeleteAtIndex: $hasUniqueDeleteAtIndex,
             defaultTranslation: $this->getDefaultTranslation($name),
+            priority: $this->getFixedPriority($name),
             serverStoreRules: $this->serverStoreRulesBuilder->build(
                 $name,
                 $type,
@@ -181,16 +182,27 @@ final readonly class ColumnBuilder
         };
     }
 
-    private function getDefaultTranslation(string $string): string
+    private function getFixedPriority(string $name): ?int
     {
-        if ($string === 'id') {
+        return match (true) {
+            in_array($name, ['name', 'title', 'last_name', 'subject'], true) => 0,
+            in_array($name, ['first_name', 'email', 'author'], true) => 1,
+            $name === 'id' => 2,
+            $name === 'published_at' => 3,
+            default => null,
+        };
+    }
+
+    private function getDefaultTranslation(string $name): string
+    {
+        if ($name === 'id') {
             return 'ID';
         }
 
-        if (Str::endsWith(Str::lower($string), '_id')) {
-            $string = Str::substr($string, 0, -3);
+        if (Str::endsWith(Str::lower($name), '_id')) {
+            $name = Str::substr($name, 0, -3);
         }
 
-        return Str::ucfirst(str_replace('_', ' ', $string));
+        return Str::ucfirst(str_replace('_', ' ', $name));
     }
 }
