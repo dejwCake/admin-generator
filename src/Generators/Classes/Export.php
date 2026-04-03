@@ -61,7 +61,7 @@ final class Export extends ClassGenerator
             'modelBaseName' => $this->modelBaseName,
             'modelVariableName' => $this->modelVariableName,
             'modelLangFormat' => $this->modelLangFormat,
-            'columnsToExport' => $this->readColumnsFromTable($this->tableName)->filter(
+            'columnsToExport' => $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection()->filter(
                 static fn (array $column): bool => !in_array(
                     $column['name'],
                     ['password', 'remember_token', 'updated_at', 'created_at', 'deleted_at'],

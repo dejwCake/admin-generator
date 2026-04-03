@@ -68,7 +68,7 @@ final class Model extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->readColumnsFromTable($this->tableName);
+        $columns = $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection();
 
         return view('brackets/admin-generator::' . $this->view, [
             'modelBaseName' => $this->classBaseName,

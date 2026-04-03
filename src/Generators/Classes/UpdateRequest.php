@@ -64,7 +64,7 @@ final class UpdateRequest extends ClassGenerator
     protected function buildClass(): string
     {
         $visibleColumns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
-        $columns = $this->readColumnsFromTable($this->tableName);
+        $columns = $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection();
 
         return view(
             'brackets/admin-generator::' . $this->view,

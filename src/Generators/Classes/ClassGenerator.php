@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Classes;
 
+use Brackets\AdminGenerator\Builders\ColumnCollectionBuilder;
 use Brackets\AdminGenerator\Dtos\Media\MediaCollection;
 use Brackets\AdminGenerator\Generators\Traits\Columns;
 use Brackets\AdminGenerator\Generators\Traits\Helpers;
@@ -36,8 +37,10 @@ abstract class ClassGenerator extends Command
     /**
      * Create a new controller creator command instance.
      */
-    public function __construct(protected readonly Filesystem $files)
-    {
+    public function __construct(
+        protected readonly Filesystem $files,
+        protected readonly ColumnCollectionBuilder $columnCollectionBuilder,
+    ) {
         parent::__construct();
 
         $this->mediaCollections = new Collection();

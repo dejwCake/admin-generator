@@ -1,16 +1,37 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Method Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:\:map\(\) should return Illuminate\\Support\\Collection\<int\|string, bool\|Brackets\\AdminGenerator\\Dtos\\Columns\\Column\|string\|null\> but returns Illuminate\\Support\\Collection\<string, mixed\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Dtos/Columns/ColumnCollection.php
+
+		-
 			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/Generators/Classes/BulkDestroyRequest.php
 
 		-
-			message: '#^Method Brackets\\AdminGenerator\\Generators\\Classes\\ClassGenerator\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<int\|string, array\<string, array\<string\>\|string\>\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, majorType\: mixed, serverStoreRules\: array\<mixed\>, serverUpdateRules\: array\<mixed\>, frontendRules\: array\<mixed\>\}\>\.$#'
-			identifier: return.type
+			message: '#^Call to an undefined method Brackets\\AdminGenerator\\Generators\\Classes\\ClassGenerator\:\:readColumnsFromTable\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Generators/Classes/ClassGenerator.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: src/Generators/Classes/ClassGenerator.php
+
+		-
+			message: '''
+				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/Classes/Controller.php
 
 		-
 			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
@@ -19,10 +40,28 @@ parameters:
 			path: src/Generators/Classes/DestroyRequest.php
 
 		-
+			message: '''
+				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/Classes/Export.php
+
+		-
 			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/Generators/Classes/ExportRequest.php
+
+		-
+			message: '''
+				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/Classes/Factory.php
 
 		-
 			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
@@ -31,10 +70,28 @@ parameters:
 			path: src/Generators/Classes/ImpersonalLoginRequest.php
 
 		-
+			message: '''
+				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/Classes/IndexRequest.php
+
+		-
 			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/Generators/Classes/IndexRequest.php
+
+		-
+			message: '''
+				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/Classes/Model.php
 
 		-
 			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
@@ -43,8 +100,26 @@ parameters:
 			path: src/Generators/Classes/Permissions.php
 
 		-
-			message: '#^Method Brackets\\AdminGenerator\\Generators\\FileAppenders\\FileAppender\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<int\|string, array\<string, array\<string\>\|string\>\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, majorType\: mixed, serverStoreRules\: array\<mixed\>, serverUpdateRules\: array\<mixed\>, frontendRules\: array\<mixed\>\}\>\.$#'
-			identifier: return.type
+			message: '''
+				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/Classes/StoreRequest.php
+
+		-
+			message: '''
+				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/Classes/UpdateRequest.php
+
+		-
+			message: '#^Call to an undefined method Brackets\\AdminGenerator\\Generators\\FileAppenders\\FileAppender\:\:readColumnsFromTable\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Generators/FileAppenders/FileAppender.php
 
@@ -55,10 +130,34 @@ parameters:
 			path: src/Generators/FileAppenders/FileAppender.php
 
 		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: src/Generators/FileAppenders/FileAppender.php
+
+		-
+			message: '''
+				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/FileAppenders/Lang.php
+
+		-
 			message: '#^Cannot call static method factory\(\) on array\|bool\|float\|int\|string\.$#'
 			identifier: staticMethod.nonObject
 			count: 1
 			path: src/Generators/GenerateUser.php
+
+		-
+			message: '''
+				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: src/Generators/Resources/Form.php
 
 		-
 			message: '#^Method Brackets\\AdminGenerator\\Generators\\Resources\\Form\:\:detectForeignKeys\(\) should return Illuminate\\Support\\Collection\<int, array\<string, string\>\> but returns Illuminate\\Support\\Collection\<int, array\{column\: mixed, relatedTable\: string, relatedModel\: string, optionsPropName\: string, foreignKeyLabel\: string\}\>\.$#'
@@ -67,20 +166,44 @@ parameters:
 			path: src/Generators/Resources/Form.php
 
 		-
+			message: '''
+				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: src/Generators/Resources/FullForm.php
+
+		-
 			message: '#^Method Brackets\\AdminGenerator\\Generators\\Resources\\FullForm\:\:detectForeignKeys\(\) should return Illuminate\\Support\\Collection\<int, array\<string, string\>\> but returns Illuminate\\Support\\Collection\<int, array\{column\: mixed, relatedTable\: string, relatedModel\: string, optionsPropName\: string, foreignKeyLabel\: string\}\>\.$#'
 			identifier: return.type
 			count: 1
 			path: src/Generators/Resources/FullForm.php
 
 		-
-			message: '#^Method Brackets\\AdminGenerator\\Generators\\Resources\\ResourceGenerator\:\:getVisibleColumns\(\) should return Illuminate\\Support\\Collection\<int\|string, array\<string, array\<string\>\|string\>\> but returns Illuminate\\Support\\Collection\<\(int\|string\), array\{name\: mixed, type\: mixed, majorType\: mixed, serverStoreRules\: array\<mixed\>, serverUpdateRules\: array\<mixed\>, frontendRules\: array\<mixed\>\}\>\.$#'
-			identifier: return.type
+			message: '''
+				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: src/Generators/Resources/Index.php
+
+		-
+			message: '#^Call to an undefined method Brackets\\AdminGenerator\\Generators\\Resources\\ResourceGenerator\:\:readColumnsFromTable\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Generators/Resources/ResourceGenerator.php
 
 		-
 			message: '#^Property Brackets\\AdminGenerator\\Generators\\Resources\\ResourceGenerator\:\:\$relations \(array\<string, string\>\) does not accept array\<string, Illuminate\\Support\\Collection\<\(int\|string\), array\<string, string\>\>\|string\>\.$#'
 			identifier: assign.propertyType
+			count: 1
+			path: src/Generators/Resources/ResourceGenerator.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
 			count: 1
 			path: src/Generators/Resources/ResourceGenerator.php
 

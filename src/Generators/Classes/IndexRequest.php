@@ -49,7 +49,7 @@ final class IndexRequest extends ClassGenerator
             'classNamespace' => $this->classNamespace,
             'modelDotNotation' => $this->modelDotNotation,
 
-            'columnsToQuery' => $this->readColumnsFromTable($this->tableName)->filter(
+            'columnsToQuery' => $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection()->filter(
                 static fn (array $column): bool => !(
                     $column['majorType'] === 'text'
                     || in_array(

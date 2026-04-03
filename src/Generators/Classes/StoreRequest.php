@@ -64,7 +64,7 @@ final class StoreRequest extends ClassGenerator
     protected function buildClass(): string
     {
         $columns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
-        $allColumns = $this->readColumnsFromTable($this->tableName);
+        $allColumns = $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection();
 
         return view(
             'brackets/admin-generator::' . $this->view,

@@ -132,7 +132,7 @@ final class Form extends ResourceGenerator
     /** @return array<string, Collection|array<string>|string|bool> */
     private function getCommonViewData(): array
     {
-        $columns = $this->readColumnsFromTable($this->tableName);
+        $columns = $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection();
         $visibleColumns = $this->getVisibleColumns($this->tableName, $this->modelVariableName);
         $foreignKeys = $this->detectForeignKeys($visibleColumns);
 
@@ -284,7 +284,7 @@ final class Form extends ResourceGenerator
     {
         $data = $this->getCommonViewData();
 
-        $data['modelTitle'] = $this->readColumnsFromTable($this->tableName)
+        $data['modelTitle'] = $this->columnCollectionBuilder->build($this->tableName)->toLegacyCollection()
             ->filter(static fn (array $column): bool => in_array(
                 $column['name'],
                 ['title', 'name', 'first_name', 'email'],

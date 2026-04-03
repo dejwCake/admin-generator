@@ -19,7 +19,7 @@ final readonly class Column
     ) {
     }
 
-    /** @deprecated */
+    /** @deprecated just for compatibility with old code */
     public function toLegacyArray(): array
     {
         return [
@@ -29,7 +29,7 @@ final readonly class Column
             'phpType' => $this->phpType,
             'faker' => $this->faker,
             'required' => $this->required,
-            'unique' => $this->faker,
+            'unique' => $this->unique,
             'uniqueDeletedAtCondition' => $this->uniqueDeletedAtCondition,
             'defaultTranslation' => $this->defaultTranslation,
         ];

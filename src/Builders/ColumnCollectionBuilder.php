@@ -10,18 +10,17 @@ use Illuminate\Support\Collection;
 
 final readonly class ColumnCollectionBuilder
 {
-    public function __construct(
-        private Schema $schema,
-        private ColumnBuilder $columnBuilder,
-    ) {
+    public function __construct(private Schema $schema, private ColumnBuilder $columnBuilder,)
+    {
     }
 
-    public function build(string $tableName) {
+    public function build(string $tableName): ColumnCollection
+    {
         $columnCollection = new ColumnCollection();
 
         $indexes = new Collection($this->schema->getIndexes($tableName));
 
-        return new Collection($this->schema->getColumns($tableName))
+        (new Collection($this->schema->getColumns($tableName)))
             ->each(function (array $column) use ($indexes, $columnCollection): void {
                 $columnCollection->push(
                     $this->columnBuilder->build(
@@ -29,9 +28,10 @@ final readonly class ColumnCollectionBuilder
                         $column['name'],
                         $column['type_name'],
                         $column['nullable'],
-                    )
+                    ),
                 );
-            }
-        );
+            });
+
+        return $columnCollection;
     }
 }

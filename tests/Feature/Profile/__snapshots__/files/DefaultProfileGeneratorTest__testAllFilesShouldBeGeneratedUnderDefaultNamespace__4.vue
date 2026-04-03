@@ -48,7 +48,7 @@
 <script setup>
 import { useAppForm } from '../composables/useAppForm.js';
 import { mediaCollectionProp } from '@craftable/utils/mediaProps.js';
-import MediaUpload from '@craftable/components/media/MediaUpload.vue';
+import MediaUpload from '@craftable/components/form/MediaUpload.vue';
 import FormInput from '@craftable/components/form/FormInput.vue';
 import FormEmail from '@craftable/components/form/FormEmail.vue';
 import FormSelect from '@craftable/components/form/FormSelect.vue';

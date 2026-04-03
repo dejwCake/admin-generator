@@ -4,64 +4,27 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Traits;
 
-use Illuminate\Database\Schema\Builder as Schema;
+use Brackets\AdminGenerator\Dtos\Columns\Column;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 trait Columns
 {
-    /** @return Collection<array<string, string|bool>> */
-    protected function readColumnsFromTable(string $tableName): Collection
-    {
-        $schema = app(Schema::class);
-        // TODO how to process jsonb & json translatable columns? need to figure it out
-
-        $indexes = new Collection($schema->getIndexes($tableName));
-
-        return (new Collection(
-            $schema->getColumns($tableName),
-        ))->map(
-            function (array $column) use ($indexes): array {
-                //Checked unique index
-                $columnUniqueIndexes = $indexes->filter(static fn (array $index): bool
-                => in_array($column['name'], $index['columns'], true) && ($index['unique'] && !$index['primary']));
-                $columnUniqueDeleteAtCondition = $columnUniqueIndexes->filter(
-                    static fn (array $index): bool => str_contains($index['name'], 'null_deleted_at'),
-                );
-                // TODO add foreign key
-
-                $majorType = $this->getMajorTypeFromType($column['type_name']);
-
-                return [
-                    'name' => $column['name'],
-                    'type' => $column['type_name'],
-                    'majorType' => $majorType,
-                    'phpType' => $this->getPhpType($majorType),
-                    'faker' => $this->getFaker($column['name'], $majorType),
-                    'required' => $column['nullable'] === false,
-                    'unique' => $columnUniqueIndexes->count() > 0,
-                    'uniqueDeletedAtCondition' => $columnUniqueDeleteAtCondition->count() > 0,
-                    'defaultTranslation' => $this->getDefaultTranslation($column['name']),
-                ];
-            },
-        );
-    }
-
     protected function getRelatedLabelColumn(string $tableName): string
     {
-        $columns = $this->readColumnsFromTable($tableName);
+        $columns = $this->columnCollectionBuilder->build($tableName);
         $preferredLabels = ['title', 'name', 'first_name', 'email'];
 
-        $knownLabel = (new Collection($preferredLabels))
-            ->map(static fn (string $label) => $columns->firstWhere('name', $label))
-            ->filter()
-            ->first();
+        foreach ($preferredLabels as $label) {
+            if ($columns->has($label)) {
+                return $label;
+            }
+        }
 
         $firstString = $columns->first(
-            static fn (array $column): bool => $column['majorType'] === 'string',
+            static fn (Column $column): bool => $column->majorType === 'string',
         );
 
-        return ($knownLabel ?? $firstString ?? ['name' => 'id'])['name'];
+        return $firstString?->name ?? 'id';
     }
 
     /** @return Collection<string|int, array<string, string|array<string>>> */
@@ -70,7 +33,7 @@ trait Columns
         string $modelVariableName,
         array $ignoredColumns = ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token', 'last_login_at'],
     ): Collection {
-        $columns = $this->readColumnsFromTable($tableName);
+        $columns = $this->columnCollectionBuilder->build($tableName)->toLegacyCollection();
         $hasSoftDelete = (
             $columns->filter(static fn (array $column): bool => $column['name'] === 'deleted_at')
                 ->count() > 0
@@ -384,18 +347,6 @@ trait Columns
         };
     }
 
-    private function getPhpType(string $majorType): string
-    {
-        return match ($majorType) {
-            'integer' => 'int',
-            'float' => 'float',
-            'bool' => 'bool',
-            'datetime', 'date' => 'CarbonInterface',
-            'json' => 'array',
-            default => 'string',
-        };
-    }
-
     private function getMajorTypeFromType(string $type): string
     {
         return match ($type) {
@@ -453,57 +404,5 @@ trait Columns
             'string' => 'string',
             default => 'text',
         };
-    }
-
-    private function getFaker(string $name, string $majorType): string
-    {
-        if ($name === 'deleted_at') {
-            return 'null';
-        }
-
-        if ($name === 'remember_token') {
-            return 'null';
-        }
-
-        $faker = match ($name) {
-            'email' => '$this->faker->email',
-            'name',
-            'first_name' => '$this->faker->firstName',
-            'surname',
-            'last_name' => '$this->faker->lastName',
-            'slug' => '$this->faker->unique()->slug',
-            'password' => '$hasher->make($this->faker->password)',
-            'language' => '\'en\'',
-            'price' => '$this->faker->randomFloat(2, max: 10000)',
-            default => null,
-        };
-
-        if ($faker !== null) {
-            return $faker;
-        }
-
-        return match ($majorType) {
-            'date' => '$this->faker->date()',
-            'time' => '$this->faker->time()',
-            'datetime' => '$this->faker->dateTime',
-            'text' => '$this->faker->text()',
-            'bool' => '$this->faker->boolean()',
-            'integer' => '$this->faker->randomNumber(5)',
-            'float' => '$this->faker->randomFloat(2)',
-            default => '$this->faker->sentence',
-        };
-    }
-
-    private function getDefaultTranslation(string $string): string
-    {
-        if ($string === 'id') {
-            return 'ID';
-        }
-
-        if (Str::endsWith(Str::lower($string), '_id')) {
-            $string = Str::substr($string, 0, -3);
-        }
-
-        return Str::ucfirst(str_replace('_', ' ', $string));
     }
 }

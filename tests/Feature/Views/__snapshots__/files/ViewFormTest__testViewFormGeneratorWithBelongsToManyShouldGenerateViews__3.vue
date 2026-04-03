@@ -166,7 +166,7 @@ const {
         slug: 'required',
         text: 'required',
         description: 'required',
-        price: 'decimal',
+        price: 'numeric',
         views: 'required|integer',
     },
     transformData: (data) => {
