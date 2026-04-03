@@ -29,7 +29,7 @@ final class ServerUpdateRulesBuilder
         $this->serverUpdateRules = new Collection();
     }
 
-    /** @return Collection<ServerUpdateRule> */
+    /** @return Collection<int, ServerUpdateRule> */
     public function build(
         string $name,
         string $type,
@@ -44,7 +44,7 @@ final class ServerUpdateRulesBuilder
         $this->buildByRequire($required);
         $this->buildByName($name);
         $this->getByUnique($name, $type, $unique, $tableName, $excludeDeletedAt, $modelVariableName);
-        $this->getByType($majorType);
+        $this->getByMajorType($majorType);
 
         return $this->serverUpdateRules;
     }
@@ -92,7 +92,7 @@ final class ServerUpdateRulesBuilder
         }
     }
 
-    private function getByType(string $majorType): void
+    private function getByMajorType(string $majorType): void
     {
         $this->serverUpdateRules->push($this->getRuleFromType($majorType));
     }

@@ -11,8 +11,9 @@ use Illuminate\Support\Collection;
 final readonly class Column
 {
     /**
-     * @param Collection<ServerStoreRule> $serverStoreRules
-     * @param Collection<ServerUpdateRule> $serverUpdateRules
+     * @param Collection<int, ServerStoreRule> $serverStoreRules
+     * @param Collection<int, ServerUpdateRule> $serverUpdateRules
+     * @param Collection<int, string> $frontendRules
      */
     public function __construct(
         public string $name,
@@ -26,6 +27,7 @@ final readonly class Column
         public string $defaultTranslation,
         public Collection $serverStoreRules,
         public Collection $serverUpdateRules,
+        public Collection $frontendRules,
     ) {
     }
 
@@ -47,6 +49,8 @@ final readonly class Column
                 ->toArray(),
             'serverUpdateRules' => $this->serverUpdateRules
                 ->map(static fn (ServerUpdateRule $serverUpdateRule) => (string) $serverUpdateRule)
+                ->toArray(),
+            'frontendRules' => $this->frontendRules
                 ->toArray(),
         ];
     }

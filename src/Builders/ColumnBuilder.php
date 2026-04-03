@@ -13,6 +13,7 @@ final readonly class ColumnBuilder
     public function __construct(
         private ServerStoreRulesBuilder $serverStoreRulesBuilder,
         private ServerUpdateRulesBuilder $serverUpdateRulesBuilder,
+        private FrontendRulesBuilder $frontendRulesBuilder,
     ) {
     }
 
@@ -66,6 +67,7 @@ final readonly class ColumnBuilder
                 $hasSoftDelete && $hasUniqueDeleteAtIndex,
                 $modelVariableName,
             ),
+            frontendRules: $this->frontendRulesBuilder->build($name, $majorType, $nullable === false),
         );
     }
 
