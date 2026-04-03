@@ -1,0 +1,168 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Brackets\AdminGenerator\Builders;
+
+use Brackets\AdminGenerator\Dtos\Columns\Column;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+
+final readonly class ColumnBuilder
+{
+    public function build(
+        Collection $indexes,
+        string $name,
+        string $type,
+        bool $nullable,
+    ): Column {
+        $hasUniqueIndex = $indexes
+            ->contains(static fn (array $index): bool
+                => in_array($name, $index['columns'], true) && ($index['unique'] && !$index['primary'])
+            );
+        $hasUniqueDeleteAtIndex = $indexes
+            ->contains(static fn (array $index): bool
+                => in_array($name, $index['columns'], true)
+                    && ($index['unique'] && !$index['primary'])
+                    && str_contains($index['name'], 'null_deleted_at')
+            );
+        // TODO add foreign key
+
+        $majorType = $this->getMajorTypeFromType($name);
+
+        return new Column(
+            name: $name,
+            type: $type,
+            majorType: $majorType,
+            phpType: $this->getPhpType($majorType),
+            faker: $this->getFaker($name, $majorType),
+            required: $nullable === false,
+            unique: $hasUniqueIndex,
+            uniqueDeletedAtCondition: $hasUniqueDeleteAtIndex,
+            defaultTranslation: $this->getDefaultTranslation($name),
+        );
+    }
+
+    private function getMajorTypeFromType(string $type): string
+    {
+        return match ($type) {
+            'datetime',
+            'timestamp',
+            'timestamptz' => 'datetime',
+            'date' => 'date',
+            'timetz',
+            'time' => 'time',
+            'int2',
+            'smallint',
+            'smallinteger',
+            'unsignedsmallint',
+            'unsignedsmallinteger',
+            'int3',
+            'mediumint',
+            'mediuminteger',
+            'unsignedmediumint',
+            'unsignedmediuminteger',
+            'int4',
+            'int',
+            'integer',
+            'unsignedinteger',
+            'int8',
+            'bigint',
+            'biginteger',
+            'unsignedbigint',
+            'unsignedbiginteger' => 'integer',
+            'decimal',
+            'dec',
+            'number',
+            'numeric',
+            'float',
+            'float8',
+            'double',
+            'real',
+            'float4' => 'float',
+            'bit',
+            'int1',
+            'tinyint',
+            'tinyinteger',
+            'unsignedtinyinteger',
+            'bool',
+            'boolean' => 'bool',
+            'longtext',
+            'json',
+            'jsonb' => 'json',
+            'char',
+            'enum',
+            'inet4',
+            'inet6',
+            'tinytext',
+            'varchar',
+            'uuid',
+            'string' => 'string',
+            default => 'text',
+        };
+    }
+
+    private function getPhpType(string $majorType): string
+    {
+        return match ($majorType) {
+            'integer' => 'int',
+            'float' => 'float',
+            'bool' => 'bool',
+            'datetime', 'date' => 'CarbonInterface',
+            'json' => 'array',
+            default => 'string',
+        };
+    }
+
+    private function getFaker(string $name, string $majorType): string
+    {
+        if ($name === 'deleted_at') {
+            return 'null';
+        }
+
+        if ($name === 'remember_token') {
+            return 'null';
+        }
+
+        $faker = match ($name) {
+            'email' => '$this->faker->email',
+            'name',
+            'first_name' => '$this->faker->firstName',
+            'surname',
+            'last_name' => '$this->faker->lastName',
+            'slug' => '$this->faker->unique()->slug',
+            'password' => '$hasher->make($this->faker->password)',
+            'language' => '\'en\'',
+            'price' => '$this->faker->randomFloat(2, max: 10000)',
+            default => null,
+        };
+
+        if ($faker !== null) {
+            return $faker;
+        }
+
+        return match ($majorType) {
+            'date' => '$this->faker->date()',
+            'time' => '$this->faker->time()',
+            'datetime' => '$this->faker->dateTime',
+            'text' => '$this->faker->text()',
+            'bool' => '$this->faker->boolean()',
+            'integer' => '$this->faker->randomNumber(5)',
+            'float' => '$this->faker->randomFloat(2)',
+            default => '$this->faker->sentence',
+        };
+    }
+
+    private function getDefaultTranslation(string $string): string
+    {
+        if ($string === 'id') {
+            return 'ID';
+        }
+
+        if (Str::endsWith(Str::lower($string), '_id')) {
+            $string = Str::substr($string, 0, -3);
+        }
+
+        return Str::ucfirst(str_replace('_', ' ', $string));
+    }
+}
