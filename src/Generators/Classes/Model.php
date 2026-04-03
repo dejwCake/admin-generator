@@ -51,7 +51,7 @@ final class Model extends ClassGenerator
         }
 
         if ($media !== null && $media !== []) {
-            $this->setMediaCollections($media);
+            $this->mediaCollections = $this->mediaCollectionBuilder->build($media);
         }
 
         if ($this->generateClass($force)) {

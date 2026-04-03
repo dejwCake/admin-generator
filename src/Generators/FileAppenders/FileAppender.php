@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Generators\FileAppenders;
 
 use Brackets\AdminGenerator\Builders\ColumnCollectionBuilder;
+use Brackets\AdminGenerator\Builders\MediaCollectionBuilder;
 use Brackets\AdminGenerator\Dtos\Media\MediaCollection;
 use Brackets\AdminGenerator\Generators\Traits\Columns;
 use Brackets\AdminGenerator\Generators\Traits\Helpers;
@@ -32,6 +33,7 @@ abstract class FileAppender extends Command
     public function __construct(
         protected readonly Filesystem $files,
         protected readonly ColumnCollectionBuilder $columnCollectionBuilder,
+        protected readonly MediaCollectionBuilder $mediaCollectionBuilder,
     ) {
         parent::__construct();
 

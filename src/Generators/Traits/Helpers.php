@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Traits;
 
-use Brackets\AdminGenerator\Dtos\Media\MediaCollection;
-use Brackets\AdminGenerator\Dtos\Media\MediaCollectionDisk;
-use Brackets\AdminGenerator\Dtos\Media\MediaCollectionType;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -54,22 +51,6 @@ trait Helpers
                     'related_key' => Str::singular($belongsToMany) . '_id',
                     'related_label' => $this->getRelatedLabelColumn($belongsToMany),
                 ])->keyBy('related_table');
-    }
-
-    /** @param array<string> $mediaOptions */
-    public function setMediaCollections(array $mediaOptions): void
-    {
-        $this->mediaCollections = (new Collection($mediaOptions))
-            ->map(static function (string $media): MediaCollection {
-                $parts = explode(':', $media);
-
-                return new MediaCollection(
-                    collectionName: $parts[0],
-                    type: MediaCollectionType::from($parts[1]),
-                    disk: MediaCollectionDisk::from($parts[2]),
-                    maxFiles: (int) $parts[3],
-                );
-            })->keyBy('collectionName');
     }
 
     /**

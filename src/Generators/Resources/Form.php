@@ -77,8 +77,8 @@ final class Form extends ResourceGenerator
             $this->setBelongToManyRelation($belongsToMany);
         }
 
-        if ($media !== null) {
-            $this->setMediaCollections($media);
+        if ($media !== null && $media !== []) {
+            $this->mediaCollections = $this->mediaCollectionBuilder->build($media);
         }
 
         $this->generateCreate($force);

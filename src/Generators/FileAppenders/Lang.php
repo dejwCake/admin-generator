@@ -59,7 +59,7 @@ final class Lang extends FileAppender
         }
 
         if ($media !== null && $media !== []) {
-            $this->setMediaCollections($media);
+            $this->mediaCollections = $this->mediaCollectionBuilder->build($media);
         }
 
         if ($locale === null) {
