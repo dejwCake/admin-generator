@@ -26,18 +26,4 @@ trait Columns
 
         return $firstString?->name ?? 'id';
     }
-
-    /** @return Collection<string|int, array<string, string|array<string>>> */
-    protected function getVisibleColumns(string $tableName, string $modelVariableName,): Collection
-    {
-        $columns = $this->columnCollectionBuilder->build($tableName, $modelVariableName)
-            ->toLegacyCollection();
-
-        return $columns
-            ->filter(static fn (array $column): bool => !in_array(
-                $column['name'],
-                ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token', 'last_login_at'],
-                true,
-            ));
-    }
 }
