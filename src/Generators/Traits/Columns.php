@@ -51,36 +51,6 @@ trait Columns
     /**
      * @param array<string, string|bool> $column
      */
-    protected function getServerUpdateRules(
-        array $column,
-        string $tableName,
-        string $modelVariableName,
-        bool $hasSoftDelete,
-    ): Collection {
-        $serverUpdateRules = new Collection([]);
-        $serverUpdateRules = $this->getServerUpdateRulesByRequire($column['required'], $serverUpdateRules);
-        $serverUpdateRules = $this->getServerUpdateRulesByName($column['name'], $serverUpdateRules);
-        $serverUpdateRules = $this->getServerUpdateRulesByUnique(
-            $column,
-            $tableName,
-            $modelVariableName,
-            $hasSoftDelete,
-            $serverUpdateRules,
-        );
-        $serverUpdateRules = $this->getServerUpdateRulesByUniqueJson(
-            $column,
-            $tableName,
-            $modelVariableName,
-            $hasSoftDelete,
-            $serverUpdateRules,
-        );
-
-        return $this->getServerUpdateRulesByType($column['type'], $serverUpdateRules);
-    }
-
-    /**
-     * @param array<string, string|bool> $column
-     */
     protected function getFrontendRules(array $column): Collection
     {
         $frontendRules = new Collection([]);
@@ -88,17 +58,6 @@ trait Columns
         $frontendRules = $this->getFrontendRulesByName($column['name'], $frontendRules);
 
         return $this->getFrontendRulesByType($column['type'], $frontendRules);
-    }
-
-    protected function getServerUpdateRulesByRequire(bool $required, Collection $serverUpdateRules): Collection
-    {
-        if ($required) {
-            $serverUpdateRules->push('\'sometimes\'');
-        } else {
-            $serverUpdateRules->push('\'nullable\'');
-        }
-
-        return $serverUpdateRules;
     }
 
     /**
@@ -111,22 +70,6 @@ trait Columns
         }
 
         return $frontendRules;
-    }
-
-    protected function getServerUpdateRulesByName(string $name, Collection $serverUpdateRules): Collection
-    {
-        if ($name === 'email') {
-            $serverUpdateRules->push('\'email\'');
-        }
-
-        if ($name === 'password') {
-            $serverUpdateRules->push('\'confirmed\'');
-            $serverUpdateRules->push(
-                "Password::min(8)\n                    ->letters()\n                    ->mixedCase()\n                    ->numbers()\n                    ->symbols()\n                    ->uncompromised()",
-            );
-        }
-
-        return $serverUpdateRules;
     }
 
     protected function getFrontendRulesByName(string $name, Collection $frontendRules): Collection
@@ -143,64 +86,6 @@ trait Columns
         }
 
         return $frontendRules;
-    }
-
-    /**
-     * @param array<string, string|bool> $column
-     */
-    protected function getServerUpdateRulesByUnique(
-        array $column,
-        string $tableName,
-        string $modelVariableName,
-        bool $hasSoftDelete,
-        Collection $serverUpdateRules,
-    ): Collection {
-        if (in_array($column['type'], ['json', 'jsonb'], true)) {
-            return $serverUpdateRules;
-        }
-
-        if ($column['unique'] || $column['name'] === 'slug') {
-            $updateRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '\')
-                    ->ignore($this->' . $modelVariableName . '->getKey(), $this->' . $modelVariableName . '->getKeyName())';
-            if ($hasSoftDelete && $column['uniqueDeletedAtCondition']) {
-                $updateRule .= '
-                    ->whereNull(\'deleted_at\')';
-            }
-            $serverUpdateRules->push($updateRule);
-        }
-
-        return $serverUpdateRules;
-    }
-
-    /**
-     * @param array<string, string|bool> $column
-     */
-    protected function getServerUpdateRulesByUniqueJson(
-        array $column,
-        string $tableName,
-        string $modelVariableName,
-        bool $hasSoftDelete,
-        Collection $serverUpdateRules,
-    ): Collection {
-        if (!in_array($column['type'], ['json', 'jsonb'], true)) {
-            return $serverUpdateRules;
-        }
-
-        if ($column['unique'] || $column['name'] === 'slug') {
-            $updateRule = 'Rule::unique(\'' . $tableName . '\', \'' . $column['name'] . '->\'.$locale)->ignore($this->'
-                . $modelVariableName . '->getKey(), $this->' . $modelVariableName . '->getKeyName())';
-            if ($hasSoftDelete && $column['uniqueDeletedAtCondition']) {
-                $updateRule .= '->whereNull(\'deleted_at\')';
-            }
-            $serverUpdateRules->push($updateRule);
-        }
-
-        return $serverUpdateRules;
-    }
-
-    protected function getServerUpdateRulesByType(string $type, Collection $serverUpdateRules): Collection
-    {
-        return $serverUpdateRules->push($this->getRuleFromType($type));
     }
 
     protected function getFrontendRulesByType(string $type, Collection $frontendRules): Collection
@@ -222,21 +107,6 @@ trait Columns
         }
 
         return $frontendRules;
-    }
-
-    private function getRuleFromType(string $type): string
-    {
-        $majorType = $this->getMajorTypeFromType($type);
-
-        return match ($majorType) {
-            'datetime',
-            'date' => '\'date\'',
-            'time' => 'Rule::date()->format(\'H:i:s\')',
-            'integer' => '\'integer\'',
-            'float' => '\'numeric\'',
-            'bool' => '\'boolean\'',
-            default => '\'string\'',
-        };
     }
 
     private function getMajorTypeFromType(string $type): string
