@@ -357,7 +357,7 @@ trait Columns
             'date' => 'date_format:yyyy-MM-dd HH:mm:ss',
             'time' => 'date_format:HH:mm:ss',
             'integer' => 'integer',
-            'float' => 'decimal',
+            'float' => 'numeric',
             'bool' => '',
             default => null,
         };
