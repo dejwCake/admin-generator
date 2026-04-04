@@ -303,6 +303,15 @@ final class ColumnCollection implements IteratorAggregate, Countable
         );
     }
 
+    public function hasFormInput(): bool
+    {
+        return $this->columns->contains(
+            static fn (Column $column): bool => !in_array($column->name, ['password', 'email'], true)
+                && !in_array($column->majorType, ['json', 'text', 'bool', 'date', 'time', 'datetime'], true)
+                && !$column->isForeignKey,
+        );
+    }
+
     public function hasStoreRuleUsage(): bool
     {
         return $this->columns->contains(

@@ -158,12 +158,6 @@ final class Form extends ResourceGenerator
         $leftFormColumnsLegacy = $leftFormColumns->toLegacyCollection()->map(
             static fn (array $col): array => self::enrichWithForeignKey($col, $foreignKeys),
         );
-        //TODO move to ColumnCollection
-        $hasFormInput = $leftFormColumnsLegacy->contains(
-            static fn (array $col): bool => !in_array($col['name'], ['password', 'email'], true)
-                && !in_array($col['majorType'], ['json', 'text', 'bool', 'date', 'time', 'datetime'], true)
-                && !($col['isForeignKey'] ?? false),
-        );
 
         return [
             //globals
@@ -183,18 +177,18 @@ final class Form extends ResourceGenerator
             'hasUpdatedByAdminUser' => $hasUpdatedByAdminUser,
             'hasTranslatable' => $columns->hasByMajorType('json'),
             'hasPublishedAt' => $columns->hasByName('published_at'),
-            'hasWysiwyg' => $leftFormColumns->hasWysiwyg(),
             'hasPassword' => $leftFormColumns->hasByName('password'),
             'hasEmail' => $leftFormColumns->hasByName('email'),
+            'hasWysiwyg' => $leftFormColumns->hasWysiwyg(),
             'hasBoolColumns' => $leftFormColumns->hasByMajorType('bool'),
             'hasDateColumns' => $leftFormColumns->hasByMajorType('date'),
             'hasTimeColumns' => $leftFormColumns->hasByMajorType('time'),
             'hasDatetimeColumns' => $leftFormColumns->hasByMajorType('datetime'),
+            'hasFormInput' => $leftFormColumns->hasFormInput(),
             'hasTextarea' => $leftFormColumns->hasTextarea(),
             'hasLocalizedInput' => $leftFormColumns->hasLocalizedInput(),
             'hasLocalizedWysiwyg' => $leftFormColumns->hasLocalizedWysiwyg(),
             'hasForeignKeys' => $foreignKeys->isNotEmpty(),
-            'hasFormInput' => $hasFormInput,
             //columns
             'columns' => $visibleColumns->toLegacyCollection(),
             'leftFormColumns' => $leftFormColumnsLegacy,
