@@ -74,9 +74,7 @@ final class Form extends ResourceGenerator
             $this->formVue = 'templates.' . $template . '.form-vue';
         }
 
-        $this->relations = $belongsToMany !== null
-            ? $this->belongsToManyRelationBuilder->build($belongsToMany, $this->tableName)
-            : $this->belongsToManyRelationBuilder->detectForTable($this->tableName);
+        $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);
 
         if ($media !== null && $media !== []) {
             $this->mediaCollections = $this->mediaCollectionBuilder->build($media);

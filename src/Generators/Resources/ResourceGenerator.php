@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
-use Brackets\AdminGenerator\Builders\BelongsToManyRelationBuilder;
 use Brackets\AdminGenerator\Builders\ColumnCollectionBuilder;
 use Brackets\AdminGenerator\Builders\MediaCollectionBuilder;
+use Brackets\AdminGenerator\Builders\RelationBuilder;
 use Brackets\AdminGenerator\Dtos\Media\MediaCollection;
 use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
 use Brackets\AdminGenerator\Generators\Traits\Columns;
@@ -35,7 +35,7 @@ abstract class ResourceGenerator extends Command
         protected readonly Filesystem $files,
         protected readonly ColumnCollectionBuilder $columnCollectionBuilder,
         protected readonly MediaCollectionBuilder $mediaCollectionBuilder,
-        protected readonly BelongsToManyRelationBuilder $belongsToManyRelationBuilder,
+        protected readonly RelationBuilder $relationBuilder,
     ) {
         parent::__construct();
 

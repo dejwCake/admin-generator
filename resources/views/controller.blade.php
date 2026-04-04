@@ -1,4 +1,10 @@
-@php use Illuminate\Support\Arr;use Illuminate\Support\Str;echo "<?php";
+@php echo "<?php";
+@endphp
+@php
+    use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
+    use Illuminate\Support\Arr;
+    use Illuminate\Support\Str;
+    assert($relations instanceof RelationCollection);
 @endphp
 
 
@@ -32,11 +38,9 @@ namespace {{ $controllerNamespace }};
         $uses[] = sprintf('App\Http\Requests\Admin\%s\Export%s', $modelWithNamespaceFromDefault, $modelBaseName);
     }
 
-    $belongsToManyRelations = [];
-    if (count($relations) > 0 && count($relations['belongsToMany']) > 0) {
-        $belongsToManyRelations = $relations['belongsToMany'];
-        foreach ($belongsToManyRelations as $belongsToMany) {
-            $uses[] = $belongsToMany['related_model'];
+    if ($relations->hasBelongsToMany()) {
+        foreach ($relations->getBelongsToMany() as $belongsToMany) {
+            $uses[] = $belongsToMany->relatedModel;
         }
     }
     if (!$withoutBulk) {
@@ -154,8 +158,8 @@ final class {{ $controllerBaseName }} extends Controller
             'admin.{{ $modelDotNotation }}.create',
             [
                 'action' => $this->urlGenerator->route('admin/{{ $resource }}/store'),
-@foreach($belongsToManyRelations as $belongsToMany)
-                '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+                '{{ $belongsToMany->relatedTable }}' => {{ $belongsToMany->relatedModelName }}::all(),
 @endforeach
 @foreach($mediaCollections as $collection)
                 '{{ $collection->collectionName }}Collection' => ${{ $modelVariableName }}Model->getCustomMediaCollection('{{ $collection->collectionName }}'),
@@ -171,10 +175,10 @@ final class {{ $controllerBaseName }} extends Controller
     {
         $data = $request->getModifiedData();
 
-@if(count($belongsToManyRelations) > 0)
+@if($relations->hasBelongsToMany())
         ${{ $modelVariableName }} = {{ $modelBaseName }}::create($data);
-@foreach($belongsToManyRelations as $belongsToMany)
-        ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync($request->get{{ $belongsToMany['related_model_name'] }}Ids());
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+        ${{ $modelVariableName }}->{{ $belongsToMany->relatedTable }}()->sync($request->get{{ $belongsToMany->relatedModelName }}Ids());
 @endforeach
 @else
         {{ $modelBaseName }}::create($data);
@@ -209,9 +213,9 @@ final class {{ $controllerBaseName }} extends Controller
 @endif
 
 @endif
-@if(count($belongsToManyRelations) > 0)
-@foreach($belongsToManyRelations as $belongsToMany)
-        ${{ $modelVariableName }}->load('{{ $belongsToMany['related_table'] }}');
+@if($relations->hasBelongsToMany())
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+        ${{ $modelVariableName }}->load('{{ $belongsToMany->relatedTable }}');
 @endforeach
 
 @endif
@@ -220,8 +224,8 @@ final class {{ $controllerBaseName }} extends Controller
             [
                 '{{ $modelVariableName }}' => ${{ $modelVariableName }},
                 'action' => $this->urlGenerator->route('admin/{{ $resource }}/update', [${{ $modelVariableName }}]),
-@foreach($belongsToManyRelations as $belongsToMany)
-                '{{ $belongsToMany['related_table'] }}' => {{ $belongsToMany['related_model_name'] }}::all(),
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+                '{{ $belongsToMany->relatedTable }}' => {{ $belongsToMany->relatedModelName }}::all(),
 @endforeach
 @foreach($mediaCollections as $collection)
                 '{{ $collection->collectionName }}Collection' => ${{ $modelVariableName }}->getCustomMediaCollection('{{ $collection->collectionName }}'),
@@ -243,10 +247,10 @@ final class {{ $controllerBaseName }} extends Controller
         $data = $request->getModifiedData();
 
         ${{ $modelVariableName }}->update($data);
-@if(count($belongsToManyRelations) > 0)
-@foreach($belongsToManyRelations as $belongsToMany)
-        if ($request->get{{ $belongsToMany['related_model_name'] }}Ids() !== null) {
-            ${{ $modelVariableName }}->{{ $belongsToMany['related_table'] }}()->sync($request->get{{ $belongsToMany['related_model_name'] }}Ids());
+@if($relations->hasBelongsToMany())
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+        if ($request->get{{ $belongsToMany->relatedModelName }}Ids() !== null) {
+            ${{ $modelVariableName }}->{{ $belongsToMany->relatedTable }}()->sync($request->get{{ $belongsToMany->relatedModelName }}Ids());
         }
 @endforeach
 @endif

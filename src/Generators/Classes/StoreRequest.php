@@ -43,9 +43,7 @@ final class StoreRequest extends ClassGenerator
             $this->view = 'templates.' . $template . '.store-request';
         }
 
-        $this->relations = $belongsToMany !== null
-            ? $this->belongsToManyRelationBuilder->build($belongsToMany, $this->tableName)
-            : $this->belongsToManyRelationBuilder->detectForTable($this->tableName);
+        $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);
 
         if ($this->generateClass($force)) {
             $this->info('Generating ' . $this->classFullName . ' finished');

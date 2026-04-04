@@ -83,9 +83,7 @@ final class FullForm extends ResourceGenerator
 
         $belongsToMany = $this->option('belongs-to-many');
 
-        $this->relations = $belongsToMany !== null
-            ? $this->belongsToManyRelationBuilder->build($belongsToMany, $this->tableName)
-            : $this->belongsToManyRelationBuilder->detectForTable($this->tableName);
+        $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);
 
         $this->fileName = $fileName ?: $this->modelViewsDirectory;
         $this->formJsRelativePath = str_replace([DIRECTORY_SEPARATOR, '/', '\\'], '-', $this->fileName);

@@ -46,9 +46,7 @@ final class Model extends ClassGenerator
             $this->view = 'templates.' . $template . '.model';
         }
 
-        $this->relations = $belongsToMany !== null
-            ? $this->belongsToManyRelationBuilder->build($belongsToMany, $this->tableName)
-            : $this->belongsToManyRelationBuilder->detectForTable($this->tableName);
+        $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);
 
         if ($media !== null && $media !== []) {
             $this->mediaCollections = $this->mediaCollectionBuilder->build($media);

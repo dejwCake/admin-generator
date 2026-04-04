@@ -8,10 +8,10 @@ use Illuminate\Support\Collection;
 
 final class RelationCollection
 {
-    /** @var Collection<string, BelongsToRelation> */
+    /** @var Collection<string, BelongsTo> */
     private Collection $belongsTo;
 
-    /** @var Collection<string, BelongsToManyRelation> */
+    /** @var Collection<string, BelongsToMany> */
     private Collection $belongsToMany;
 
     public function __construct()
@@ -20,12 +20,12 @@ final class RelationCollection
         $this->belongsToMany = new Collection();
     }
 
-    public function pushBelongsToMany(BelongsToManyRelation $belongsToManyRelation): void
+    public function pushBelongsToMany(BelongsToMany $belongsToManyRelation): void
     {
         $this->belongsToMany->put($belongsToManyRelation->relatedTable, $belongsToManyRelation);
     }
 
-    public function pushBelongsTo(BelongsToRelation $belongsToRelation): void
+    public function pushBelongsTo(BelongsTo $belongsToRelation): void
     {
         $this->belongsTo->put($belongsToRelation->relatedTable, $belongsToRelation);
     }
@@ -35,7 +35,7 @@ final class RelationCollection
         return $this->belongsToMany->isNotEmpty();
     }
 
-    /** @return Collection<string, BelongsToManyRelation> */
+    /** @return Collection<string, BelongsToMany> */
     public function getBelongsToMany(): Collection
     {
         return $this->belongsToMany;
@@ -52,7 +52,7 @@ final class RelationCollection
     {
         return [
             'belongsToMany' => $this->belongsToMany
-                ->map(static fn (BelongsToManyRelation $relation) => $relation->toLegacyArray()),
+                ->map(static fn (BelongsToMany $relation) => $relation->toLegacyArray()),
         ];
     }
 }
