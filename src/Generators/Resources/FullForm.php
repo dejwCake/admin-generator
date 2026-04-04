@@ -83,9 +83,9 @@ final class FullForm extends ResourceGenerator
 
         $belongsToMany = $this->option('belongs-to-many');
 
-        if ($belongsToMany !== null) {
-            $this->setBelongToManyRelation($belongsToMany);
-        }
+        $this->relations = $belongsToMany !== null
+            ? $this->belongsToManyRelationBuilder->build($belongsToMany, $this->tableName)
+            : $this->belongsToManyRelationBuilder->detectForTable($this->tableName);
 
         $this->fileName = $fileName ?: $this->modelViewsDirectory;
         $this->formJsRelativePath = str_replace([DIRECTORY_SEPARATOR, '/', '\\'], '-', $this->fileName);
@@ -131,7 +131,8 @@ final class FullForm extends ResourceGenerator
             $relatedModel = Str::studly(Str::singular($relatedTable));
             $optionsPropName = Str::camel(Str::singular($relatedTable)) . 'Options';
 
-            $foreignKeyLabel = $this->getRelatedLabelColumn($relatedTable, $this->modelVariableName);
+            $foreignKeyLabel = $this->columnCollectionBuilder->build($relatedTable)
+                ->getLabelColumn();
 
             return [
                 'column' => $name,
@@ -183,7 +184,7 @@ final class FullForm extends ResourceGenerator
             'modelLangFormat' => $this->modelLangFormat,
             'resource' => $this->resource,
             'mediaCollections' => $this->mediaCollections,
-            'relations' => array_merge(['belongsToMany' => []], $this->relations),
+            'relations' => $this->relations->toLegacyArray(),
             //has
             'hasCreatedByAdminUser' => $hasCreatedByAdminUser,
             'hasUpdatedByAdminUser' => $hasUpdatedByAdminUser,
@@ -211,8 +212,7 @@ final class FullForm extends ResourceGenerator
             'rightFormColumns' => $rightFormColumns->toLegacyCollection(),
             'rightMediaCollections' => $rightMediaCollections,
             'foreignKeys' => $foreignKeys,
-            'belongsToManyTables' => (new Collection($this->relations['belongsToMany'] ?? []))
-                ->pluck('related_table'),
+            'belongsToManyTables' => $this->relations->getBelongsToManyTables(),
             'wysiwygTextColumnNames' => $columns->getWysiwygColumnNames(),
 
             'isUsedTwoColumnsLayout' => $rightFormColumns->isNotEmpty()
@@ -230,7 +230,7 @@ final class FullForm extends ResourceGenerator
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
         $data = $this->getCommonViewData($columns);
 
-        $data['modelTitle'] = $columns->getModelTitle();
+        $data['modelLabelColumn'] = $columns->getLabelColumn();
 
         $data['route'] = $this->route;
 

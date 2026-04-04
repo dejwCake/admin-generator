@@ -50,9 +50,9 @@ final class Lang extends FileAppender
             $this->view = 'templates.' . $template . '.lang';
         }
 
-        if ($belongsToMany !== null) {
-            $this->setBelongToManyRelation($belongsToMany);
-        }
+        $this->relations = $belongsToMany !== null
+            ? $this->belongsToManyRelationBuilder->build($belongsToMany, $this->tableName)
+            : $this->belongsToManyRelationBuilder->detectForTable($this->tableName);
 
         if ($withExport) {
             $this->export = true;
@@ -117,7 +117,7 @@ final class Lang extends FileAppender
             'titleSingular' => $this->titleSingular,
             'titlePlural' => $this->titlePlural,
             'export' => $this->export,
-            'relations' => $this->relations,
+            'relations' => $this->relations->toLegacyArray(),
             'mediaCollections' => $this->mediaCollections,
             //has
             'hasPublishedAt' => $columns->hasByName('published_at'),

@@ -6,6 +6,7 @@ namespace Brackets\AdminGenerator\Builders;
 
 use Brackets\AdminGenerator\Dtos\Columns\Column;
 use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
+use Brackets\AdminGenerator\Naming;
 use Illuminate\Database\Schema\Builder as Schema;
 use Illuminate\Support\Collection;
 
@@ -18,8 +19,9 @@ final class ColumnCollectionBuilder
         $this->columnCollection = new ColumnCollection();
     }
 
-    public function build(string $tableName, string $modelVariableName): ColumnCollection
+    public function build(string $tableName, ?string $modelVariableName = null): ColumnCollection
     {
+        $modelVariableName ??= Naming::variableName($tableName);
         $this->columnCollection = new ColumnCollection();
         $columns = new Collection($this->schema->getColumns($tableName));
         $indexes = new Collection($this->schema->getIndexes($tableName));

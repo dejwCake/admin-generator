@@ -65,9 +65,9 @@ final class Controller extends ClassGenerator
             $this->view = 'templates.' . $template . '.controller';
         }
 
-        if ($belongsToMany !== null) {
-            $this->setBelongToManyRelation($belongsToMany);
-        }
+        $this->relations = $belongsToMany !== null
+            ? $this->belongsToManyRelationBuilder->build($belongsToMany, $this->tableName)
+            : $this->belongsToManyRelationBuilder->detectForTable($this->tableName);
 
         if ($withExport) {
             $this->export = true;
@@ -115,7 +115,7 @@ final class Controller extends ClassGenerator
             'export' => $this->export,
             'withoutBulk' => $this->withoutBulk,
             'resource' => $this->resource,
-            'relations' => $this->relations,
+            'relations' => $this->relations->toLegacyArray(),
             'mediaCollections' => $this->mediaCollections,
             //has
             'hasPublishedAt' => $columns->hasByName('published_at'),

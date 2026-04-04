@@ -13,6 +13,7 @@ use App\Http\Requests\Admin\Category\IndexCategory;
 use App\Http\Requests\Admin\Category\StoreCategory;
 use App\Http\Requests\Admin\Category\UpdateCategory;
 use App\Models\Category;
+use App\Models\Post;
 use Brackets\AdminListing\Builders\ListingBuilder;
 use Brackets\AdminListing\Builders\ListingQueryBuilder;
 use Carbon\CarbonImmutable;
@@ -125,6 +126,7 @@ final class CategoriesController extends Controller
             'admin.category.create',
             [
                 'action' => $this->urlGenerator->route('admin/categories/store'),
+                'posts' => Post::all(),
             ],
         );
     }
@@ -136,7 +138,8 @@ final class CategoriesController extends Controller
     {
         $data = $request->getModifiedData();
 
-        Category::create($data);
+        $category = Category::create($data);
+        $category->posts()->sync($request->getPostIds());
 
         if ($request->ajax()) {
             return [
@@ -159,11 +162,14 @@ final class CategoriesController extends Controller
 
         $category->load(['createdByAdminUser', 'updatedByAdminUser']);
 
+        $category->load('posts');
+
         return $this->viewFactory->make(
             'admin.category.edit',
             [
                 'category' => $category,
                 'action' => $this->urlGenerator->route('admin/categories/update', [$category]),
+                'posts' => Post::all(),
             ],
         );
     }
@@ -176,6 +182,9 @@ final class CategoriesController extends Controller
         $data = $request->getModifiedData();
 
         $category->update($data);
+        if ($request->getPostIds() !== null) {
+            $category->posts()->sync($request->getPostIds());
+        }
 
         if ($request->ajax()) {
             return [

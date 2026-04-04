@@ -8,9 +8,9 @@ use Brackets\AdminGenerator\Dtos\Columns\Column;
 
 trait Columns
 {
-    protected function getRelatedLabelColumn(string $tableName, string $modelVariableName): string
+    protected function getRelatedLabelColumn(string $tableName): string
     {
-        $columns = $this->columnCollectionBuilder->build($tableName, $modelVariableName);
+        $columns = $this->columnCollectionBuilder->build($tableName);
         $preferredLabels = ['title', 'name', 'first_name', 'email'];
 
         foreach ($preferredLabels as $label) {

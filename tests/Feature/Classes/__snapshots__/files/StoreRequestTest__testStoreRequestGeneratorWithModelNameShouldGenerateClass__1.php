@@ -8,6 +8,7 @@ use Brackets\Translatable\Http\Requests\TranslatableFormRequest;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 
 final class StoreCat extends TranslatableFormRequest
@@ -75,6 +76,14 @@ final class StoreCat extends TranslatableFormRequest
                 'required',
                 'integer',
             ],
+
+            'posts' => [
+                'array',
+            ],
+            'posts.*.id' => [
+                'required',
+                'integer',
+            ],
         ];
     }
 
@@ -103,6 +112,7 @@ final class StoreCat extends TranslatableFormRequest
     public function getModifiedData(): array
     {
         $data = $this->validated();
+        $data['posts'] = new Collection($data['posts'] ?? []);
 
         $config = Container::getInstance()->make(Config::class);
         assert($config instanceof Config);
@@ -113,5 +123,12 @@ final class StoreCat extends TranslatableFormRequest
         //Add your code for manipulation with request data here
 
         return $data;
+    }
+
+    public function getPostIds(): Collection
+    {
+        $data = $this->getModifiedData();
+
+        return $data['posts']->pluck('id');
     }
 }

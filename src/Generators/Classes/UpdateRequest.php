@@ -43,9 +43,9 @@ final class UpdateRequest extends ClassGenerator
             $this->view = 'templates.' . $template . '.update-request';
         }
 
-        if ($belongsToMany !== null) {
-            $this->setBelongToManyRelation($belongsToMany);
-        }
+        $this->relations = $belongsToMany !== null
+            ? $this->belongsToManyRelationBuilder->build($belongsToMany, $this->tableName)
+            : $this->belongsToManyRelationBuilder->detectForTable($this->tableName);
 
         if ($this->generateClass($force)) {
             $this->info('Generating ' . $this->classFullName . ' finished');
@@ -72,9 +72,9 @@ final class UpdateRequest extends ClassGenerator
             'modelFullName' => $this->modelFullName,
             'modelVariableName' => $this->modelVariableName,
             'modelDotNotation' => $this->modelDotNotation,
-            'relations' => $this->relations,
+            'relations' => $this->relations->toLegacyArray(),
             //has
-            'hasBelongsToMany' => count($this->relations) > 0 && count($this->relations['belongsToMany']) > 0,
+            'hasBelongsToMany' => $this->relations->hasBelongsToMany(),
             'hasRuleUsage' => $columns->getVisible()
                 ->hasUpdateRuleUsage(),
             'hasPasswordUsage' => $columns->getVisible()

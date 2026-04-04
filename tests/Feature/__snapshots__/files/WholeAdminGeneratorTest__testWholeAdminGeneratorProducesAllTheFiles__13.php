@@ -11,6 +11,7 @@ use Brackets\Translatable\Traits\HasTranslations;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -76,6 +77,11 @@ final class Category extends Model
         'text',
         'description',
     ];
+
+    public function posts(): BelongsToMany
+    {
+        return $this->belongsToMany(Post::class, 'category_post', 'category_id', 'post_id');
+    }
 
     /**
      * @return array<string>

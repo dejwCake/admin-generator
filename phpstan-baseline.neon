@@ -32,6 +32,15 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated method toLegacyArray\(\) of class Brackets\\AdminGenerator\\Dtos\\Relations\\RelationCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/Classes/Controller.php
+
+		-
+			message: '''
 				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
 				just for compatibility with old code$#
 			'''
@@ -92,6 +101,15 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated method toLegacyArray\(\) of class Brackets\\AdminGenerator\\Dtos\\Relations\\RelationCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/Classes/Model.php
+
+		-
+			message: '''
 				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
 				just for compatibility with old code$#
 			'''
@@ -107,12 +125,30 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated method toLegacyArray\(\) of class Brackets\\AdminGenerator\\Dtos\\Relations\\RelationCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/Classes/StoreRequest.php
+
+		-
+			message: '''
 				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
 			count: 2
 			path: src/Generators/Classes/StoreRequest.php
+
+		-
+			message: '''
+				#^Call to deprecated method toLegacyArray\(\) of class Brackets\\AdminGenerator\\Dtos\\Relations\\RelationCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/Classes/UpdateRequest.php
 
 		-
 			message: '''
@@ -124,16 +160,19 @@ parameters:
 			path: src/Generators/Classes/UpdateRequest.php
 
 		-
-			message: '#^Property Brackets\\AdminGenerator\\Generators\\FileAppenders\\FileAppender\:\:\$relations \(array\<string, string\>\) does not accept array\<string, Illuminate\\Support\\Collection\<\(int\|string\), array\<string, string\>\>\|string\>\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Generators/FileAppenders/FileAppender.php
-
-		-
 			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
 			count: 1
 			path: src/Generators/FileAppenders/FileAppender.php
+
+		-
+			message: '''
+				#^Call to deprecated method toLegacyArray\(\) of class Brackets\\AdminGenerator\\Dtos\\Relations\\RelationCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/FileAppenders/Lang.php
 
 		-
 			message: '''
@@ -152,6 +191,15 @@ parameters:
 
 		-
 			message: '''
+				#^Call to deprecated method toLegacyArray\(\) of class Brackets\\AdminGenerator\\Dtos\\Relations\\RelationCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/Resources/Form.php
+
+		-
+			message: '''
 				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
 				just for compatibility with old code$#
 			'''
@@ -164,6 +212,15 @@ parameters:
 			identifier: return.type
 			count: 1
 			path: src/Generators/Resources/Form.php
+
+		-
+			message: '''
+				#^Call to deprecated method toLegacyArray\(\) of class Brackets\\AdminGenerator\\Dtos\\Relations\\RelationCollection\:
+				just for compatibility with old code$#
+			'''
+			identifier: method.deprecated
+			count: 1
+			path: src/Generators/Resources/FullForm.php
 
 		-
 			message: '''
@@ -188,12 +245,6 @@ parameters:
 			identifier: method.deprecated
 			count: 2
 			path: src/Generators/Resources/Index.php
-
-		-
-			message: '#^Property Brackets\\AdminGenerator\\Generators\\Resources\\ResourceGenerator\:\:\$relations \(array\<string, string\>\) does not accept array\<string, Illuminate\\Support\\Collection\<\(int\|string\), array\<string, string\>\>\|string\>\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: src/Generators/Resources/ResourceGenerator.php
 
 		-
 			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'

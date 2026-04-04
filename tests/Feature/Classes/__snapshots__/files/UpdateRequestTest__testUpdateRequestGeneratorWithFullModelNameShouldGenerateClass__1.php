@@ -10,6 +10,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 
 /**
@@ -90,6 +91,15 @@ final class UpdateCat extends TranslatableFormRequest
                 'nullable',
                 'boolean',
             ],
+
+            'posts' => [
+                'sometimes',
+                'array',
+            ],
+            'posts.*.id' => [
+                'required',
+                'integer',
+            ],
         ];
     }
 
@@ -118,6 +128,9 @@ final class UpdateCat extends TranslatableFormRequest
     public function getModifiedData(): array
     {
         $data = $this->validated();
+        if (isset($data['posts'])) {
+            $data['posts'] = new Collection($data['posts'] ?? []);
+        }
 
         if (isset($data['publish_now']) && $data['publish_now'] === true) {
             $data['published_at'] = CarbonImmutable::now();
@@ -135,5 +148,15 @@ final class UpdateCat extends TranslatableFormRequest
         //Add your code for manipulation with request data here
 
         return $data;
+    }
+
+    public function getPostIds(): ?Collection
+    {
+        $data = $this->getModifiedData();
+        if (!isset($data['posts'])) {
+            return null;
+        }
+
+        return $data['posts']->pluck('id');
     }
 }

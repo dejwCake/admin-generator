@@ -46,9 +46,9 @@ final class Model extends ClassGenerator
             $this->view = 'templates.' . $template . '.model';
         }
 
-        if ($belongsToMany !== null) {
-            $this->setBelongToManyRelation($belongsToMany);
-        }
+        $this->relations = $belongsToMany !== null
+            ? $this->belongsToManyRelationBuilder->build($belongsToMany, $this->tableName)
+            : $this->belongsToManyRelationBuilder->detectForTable($this->tableName);
 
         if ($media !== null && $media !== []) {
             $this->mediaCollections = $this->mediaCollectionBuilder->build($media);
@@ -79,7 +79,7 @@ final class Model extends ClassGenerator
             'tableName' => $this->tableName !== Str::snake(Str::plural($this->classBaseName))
                 ? $this->tableName
                 : null,
-            'relations' => $this->relations,
+            'relations' => $this->relations->toLegacyArray(),
             'mediaCollections' => $this->mediaCollections,
             //has
             'hasCarbonProperty' => $columns->hasByMajorType('datetime', 'date'),

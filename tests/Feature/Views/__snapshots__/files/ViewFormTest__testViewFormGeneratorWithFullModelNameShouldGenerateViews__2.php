@@ -13,6 +13,7 @@
             :send-empty-locales="false"
             :wysiwyg-upload-url="'{{ $wysiwygUploadUrl }}'"
             :show-history="true"
+            :post-options="{{ $posts->toJson() }}"
             :user-options="{{ $users->toJson() }}"
             :translations="{{ json_encode([
                 'form_title' => trans('admin.categ-ory.actions.edit', ['name' => $categOry->title]),
@@ -31,6 +32,9 @@
                     'send' => trans('admin.categ-ory.columns.send'),
                     'price' => trans('admin.categ-ory.columns.price'),
                     'views' => trans('admin.categ-ory.columns.views'),
+                ],
+                'relations' => [
+                    'posts' => trans('admin.categ-ory.columns.posts'),
                 ],
                 'publish' => trans('brackets/admin-ui::admin.forms.publish'),
                 'history' => trans('brackets/admin-ui::admin.forms.history'),

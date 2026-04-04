@@ -74,6 +74,11 @@
                         <FormInput v-model="form.views" name="views"
                             :label="translations.columns.views" :error="errors.views" />
 
+                        <FormMultiSelect v-model="form.posts" name="posts"
+                            :label="translations.relations.posts" :error="errors.posts"
+                            :options="postOptions" trackBy="id" optionLabel="title"
+                            :placeholder="translations.select_options" />
+
                         <FormSubmit :submitting="submitting" :label="translations.save" />
                     </div>
                 </div>
@@ -130,6 +135,7 @@ import FormCheckbox from '@craftable/components/form/FormCheckbox.vue';
 import FormDatePicker from '@craftable/components/form/FormDatePicker.vue';
 import FormWysiwyg from '@craftable/components/form/FormWysiwyg.vue';
 import FormSelect from '@craftable/components/form/FormSelect.vue';
+import FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue';
 import FormLocalizedWysiwyg from '@craftable/components/form/FormLocalizedWysiwyg.vue';
 import FormSubmit from '@craftable/components/form/FormSubmit.vue';
 
@@ -137,6 +143,7 @@ const props = defineProps({
     action: {type: String, required: true},
     data: {type: Object, default: () => ({})},
     translations: {type: Object, default: () => ({})},
+    postOptions: {type: Array, default: () => []},
     userOptions: {type: Array, default: () => []},
     locales: {type: Array, default: () => []},
     defaultLocale: {type: String, default: ''},
@@ -188,6 +195,7 @@ if (!props.data || Object.keys(props.data).length === 0) {
         published_at: '',
         created_by_admin_user_id: '',
         updated_by_admin_user_id: '',
+        posts: [],
     };
 } else {
     if (form.value.user_id) {

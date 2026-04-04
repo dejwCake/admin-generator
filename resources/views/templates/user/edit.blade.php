@@ -2,7 +2,7 @@
 @endphp
 {{'@'}}extends('brackets/admin-ui::admin.layout.default')
 
-{{'@'}}section('title', trans('admin.{{ $modelLangFormat }}.actions.edit', ['name' => ${{ $modelVariableName }}->{{ $modelTitle }}]))
+{{'@'}}section('title', trans('admin.{{ $modelLangFormat }}.actions.edit', ['name' => ${{ $modelVariableName }}->{{ $modelLabelColumn }}]))
 
 {{'@'}}section('body')
 
@@ -32,7 +32,7 @@
 @endif
 @endforeach
             :translations="{{'{{'}} json_encode([
-                'form_title' => trans('admin.{{ $modelLangFormat }}.actions.edit', ['name' => ${{ $modelVariableName }}->{{ $modelTitle }}]),
+                'form_title' => trans('admin.{{ $modelLangFormat }}.actions.edit', ['name' => ${{ $modelVariableName }}->{{ $modelLabelColumn }}]),
                 'columns' => [
 @foreach($columns as $col)
 @if(!in_array($col['name'], ['created_by_admin_user_id', 'updated_by_admin_user_id'], true))

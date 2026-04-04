@@ -11,6 +11,7 @@ use App\Http\Requests\Admin\Cat\DestroyCat;
 use App\Http\Requests\Admin\Cat\IndexCat;
 use App\Http\Requests\Admin\Cat\StoreCat;
 use App\Http\Requests\Admin\Cat\UpdateCat;
+use App\Models\Post;
 use Brackets\AdminListing\Builders\ListingBuilder;
 use Brackets\AdminListing\Builders\ListingQueryBuilder;
 use Exception;
@@ -119,6 +120,7 @@ final class CategoriesController extends Controller
             'admin.cat.create',
             [
                 'action' => $this->urlGenerator->route('admin/cats/store'),
+                'posts' => Post::all(),
             ],
         );
     }
@@ -130,7 +132,8 @@ final class CategoriesController extends Controller
     {
         $data = $request->getModifiedData();
 
-        Cat::create($data);
+        $cat = Cat::create($data);
+        $cat->posts()->sync($request->getPostIds());
 
         if ($request->ajax()) {
             return [
@@ -153,11 +156,14 @@ final class CategoriesController extends Controller
 
         $cat->load(['createdByAdminUser', 'updatedByAdminUser']);
 
+        $cat->load('posts');
+
         return $this->viewFactory->make(
             'admin.cat.edit',
             [
                 'cat' => $cat,
                 'action' => $this->urlGenerator->route('admin/cats/update', [$cat]),
+                'posts' => Post::all(),
             ],
         );
     }
@@ -170,6 +176,9 @@ final class CategoriesController extends Controller
         $data = $request->getModifiedData();
 
         $cat->update($data);
+        if ($request->getPostIds() !== null) {
+            $cat->posts()->sync($request->getPostIds());
+        }
 
         if ($request->ajax()) {
             return [

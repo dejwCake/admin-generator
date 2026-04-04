@@ -2,7 +2,7 @@
 @endphp
 {{'@'}}extends('brackets/admin-ui::admin.layout.default')
 
-{{'@'}}section('title', trans('admin.{{ $modelLangFormat }}.actions.edit', ['name' => ${{ $modelVariableName }}->{{ $modelTitle }}]))
+{{'@'}}section('title', trans('admin.{{ $modelLangFormat }}.actions.edit', ['name' => ${{ $modelVariableName }}->{{ $modelLabelColumn }}]))
 
 {{'@'}}section('body')
 

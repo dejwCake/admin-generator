@@ -43,9 +43,9 @@ final class StoreRequest extends ClassGenerator
             $this->view = 'templates.' . $template . '.store-request';
         }
 
-        if ($belongsToMany !== null) {
-            $this->setBelongToManyRelation($belongsToMany);
-        }
+        $this->relations = $belongsToMany !== null
+            ? $this->belongsToManyRelationBuilder->build($belongsToMany, $this->tableName)
+            : $this->belongsToManyRelationBuilder->detectForTable($this->tableName);
 
         if ($this->generateClass($force)) {
             $this->info('Generating ' . $this->classFullName . ' finished');
@@ -69,9 +69,9 @@ final class StoreRequest extends ClassGenerator
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,
             'modelDotNotation' => $this->modelDotNotation,
-            'relations' => $this->relations,
+            'relations' => $this->relations->toLegacyArray(),
             //has
-            'hasBelongsToMany' => count($this->relations) > 0 && count($this->relations['belongsToMany']) > 0,
+            'hasBelongsToMany' => $this->relations->hasBelongsToMany(),
             'hasRuleUsage' => $columns->getVisible()
                 ->hasStoreRuleUsage(),
             'hasPasswordUsage' => $columns->getVisible()

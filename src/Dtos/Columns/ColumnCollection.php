@@ -22,6 +22,7 @@ final class ColumnCollection implements IteratorAggregate, Countable
     public const array WYSIWYG_COLUMN_NAMES = ['perex', 'text', 'body', 'description'];
 
     private const array WYSIWYG_COLUMN_MAJOR_TYPES = ['text', 'json'];
+    private const array PREFFERED_LABEL_COLUMNS = ['title', 'name', 'first_name', 'email'];
 
     /** @var Collection<string, Column> */
     private Collection $columns;
@@ -362,16 +363,19 @@ final class ColumnCollection implements IteratorAggregate, Countable
             ->all();
     }
 
-    public function getModelTitle(): string
+    public function getLabelColumn(): string
     {
-        $modelTitleColumn = $this->columns
-            ->filter(static fn (Column $column): bool => in_array(
-                $column->name,
-                ['title', 'name', 'first_name', 'email'],
-                true,
-            ))->first();
+        foreach (self::PREFFERED_LABEL_COLUMNS as $label) {
+            if ($this->columns->has($label)) {
+                return $label;
+            }
+        }
 
-        return $modelTitleColumn ? $modelTitleColumn->name : 'id';
+        $firstString = $this->columns->first(
+            static fn (Column $column): bool => $column->majorType === 'string',
+        );
+
+        return $firstString->name ?? 'id';
     }
 
     /** @deprecated just for compatibility with old code */

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
+use Brackets\AdminGenerator\Builders\BelongsToManyRelationBuilder;
 use Brackets\AdminGenerator\Builders\ColumnCollectionBuilder;
 use Brackets\AdminGenerator\Builders\MediaCollectionBuilder;
 use Brackets\AdminGenerator\Dtos\Media\MediaCollection;
+use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
 use Brackets\AdminGenerator\Generators\Traits\Columns;
 use Brackets\AdminGenerator\Generators\Traits\Helpers;
 use Brackets\AdminGenerator\Generators\Traits\Names;
@@ -24,8 +26,7 @@ abstract class ResourceGenerator extends Command
     use Columns;
     use Names;
 
-    /** @var array<string, string> */
-    protected array $relations = [];
+    protected RelationCollection $relations;
 
     /** @var Collection<string, MediaCollection> */
     protected Collection $mediaCollections;
@@ -34,9 +35,11 @@ abstract class ResourceGenerator extends Command
         protected readonly Filesystem $files,
         protected readonly ColumnCollectionBuilder $columnCollectionBuilder,
         protected readonly MediaCollectionBuilder $mediaCollectionBuilder,
+        protected readonly BelongsToManyRelationBuilder $belongsToManyRelationBuilder,
     ) {
         parent::__construct();
 
+        $this->relations = new RelationCollection();
         $this->mediaCollections = new Collection();
     }
 
