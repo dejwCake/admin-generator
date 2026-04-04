@@ -15,20 +15,20 @@ final readonly class RelationBuilder
     {
     }
 
-    public function build(string $tableName, ?string $belongsToManyTables): RelationCollection
+    public function build(string $tableName, ?string $belongsToManyTableList): RelationCollection
     {
-        if ($belongsToManyTables === null) {
+        if ($belongsToManyTableList === null) {
             return $this->detectForTable($tableName);
         }
 
-        return $this->buildFromString($tableName, $belongsToManyTables);
+        return $this->buildFromString($tableName, $belongsToManyTableList);
     }
 
-    private function buildFromString(string $tableName, ?string $belongsToManyTables): RelationCollection
+    private function buildFromString(string $tableName, ?string $belongsToManyTableList): RelationCollection
     {
         $relationCollection = new RelationCollection();
 
-        (new Collection(explode(',', $belongsToManyTables)))
+        (new Collection(explode(',', $belongsToManyTableList)))
             ->filter(fn (string $relatedTable): bool => $this->schema->hasTable($relatedTable))
             ->each(function (string $relatedTable) use ($relationCollection, $tableName): void {
                 $relationCollection->pushBelongsToMany(

@@ -70,9 +70,8 @@ final class UpdateRequest extends ClassGenerator
             'modelFullName' => $this->modelFullName,
             'modelVariableName' => $this->modelVariableName,
             'modelDotNotation' => $this->modelDotNotation,
-            'relations' => $this->relations->toLegacyArray(),
+            'relations' => $this->relations,
             //has
-            'hasBelongsToMany' => $this->relations->hasBelongsToMany(),
             'hasRuleUsage' => $columns->getVisible()
                 ->hasUpdateRuleUsage(),
             'hasPasswordUsage' => $columns->getVisible()

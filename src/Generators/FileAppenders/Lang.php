@@ -115,7 +115,7 @@ final class Lang extends FileAppender
             'titleSingular' => $this->titleSingular,
             'titlePlural' => $this->titlePlural,
             'export' => $this->export,
-            'relations' => $this->relations->toLegacyArray(),
+            'relations' => $this->relations,
             'mediaCollections' => $this->mediaCollections,
             //has
             'hasPublishedAt' => $columns->hasByName('published_at'),

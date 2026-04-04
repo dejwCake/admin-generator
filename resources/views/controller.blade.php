@@ -1,10 +1,10 @@
-@php echo "<?php";
-@endphp
 @php
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
     use Illuminate\Support\Arr;
     use Illuminate\Support\Str;
     assert($relations instanceof RelationCollection);
+@endphp
+@php echo "<?php";
 @endphp
 
 

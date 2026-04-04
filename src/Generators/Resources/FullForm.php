@@ -6,6 +6,7 @@ namespace Brackets\AdminGenerator\Generators\Resources;
 
 use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
 use Brackets\AdminGenerator\Dtos\Media\MediaCollection;
+use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Override;
@@ -142,7 +143,7 @@ final class FullForm extends ResourceGenerator
         })->values();
     }
 
-    /** @return array<string, Collection|array<string>|string|bool> */
+    /** @return array<string, Collection|RelationCollection|array<string>|string|bool> */
     private function getCommonViewData(ColumnCollection $columns): array
     {
         $visibleColumns = $columns->getVisible();
@@ -182,7 +183,7 @@ final class FullForm extends ResourceGenerator
             'modelLangFormat' => $this->modelLangFormat,
             'resource' => $this->resource,
             'mediaCollections' => $this->mediaCollections,
-            'relations' => $this->relations->toLegacyArray(),
+            'relations' => $this->relations,
             //has
             'hasCreatedByAdminUser' => $hasCreatedByAdminUser,
             'hasUpdatedByAdminUser' => $hasUpdatedByAdminUser,
@@ -210,7 +211,6 @@ final class FullForm extends ResourceGenerator
             'rightFormColumns' => $rightFormColumns->toLegacyCollection(),
             'rightMediaCollections' => $rightMediaCollections,
             'foreignKeys' => $foreignKeys,
-            'belongsToManyTables' => $this->relations->getBelongsToManyTables(),
             'wysiwygTextColumnNames' => $columns->getWysiwygColumnNames(),
 
             'isUsedTwoColumnsLayout' => $rightFormColumns->isNotEmpty()

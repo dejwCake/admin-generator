@@ -1,4 +1,7 @@
-@php use Illuminate\Support\Str;
+@php
+    use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
+    use Illuminate\Support\Str;
+    assert($relations instanceof RelationCollection);
 @endphp
 {{'@'}}extends('brackets/admin-ui::admin.layout.default')
 
@@ -23,11 +26,11 @@
 @if($hasCreatedByAdminUser || $hasUpdatedByAdminUser)
             :show-history="true"
 @endif
-@foreach($relations['belongsToMany'] as $belongsToMany)
-            :{{ Str::singular(str_replace('_', '-', $belongsToMany['related_table'])) }}-options="{{'{{'}} ${{ $belongsToMany['related_table'] }}->toJson() }}"
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+            :{{ Str::singular(str_replace('_', '-', $belongsToMany->relatedTable)) }}-options="{{'{{'}} ${{ $belongsToMany->relatedTable }}->toJson() }}"
 @endforeach
 @foreach($foreignKeys as $foreignKey)
-@if(!$belongsToManyTables->contains($foreignKey['relatedTable']))
+@if(!$relations->hasRelatedTableInBelongsToMany($foreignKey['relatedTable']))
             :{{ Str::singular(str_replace('_', '-', $foreignKey['relatedTable'])) }}-options="{{'{{'}} ${{ $foreignKey['relatedTable'] }}->toJson() }}"
 @endif
 @endforeach
@@ -43,10 +46,10 @@
 @endif
 @endforeach
                 ],
-@if(count($relations['belongsToMany']) > 0)
+@if(count($relations->getBelongsToMany()) > 0)
                 'relations' => [
-@foreach($relations['belongsToMany'] as $belongsToMany)
-                    '{{ Str::lcfirst($belongsToMany['related_model_name_plural']) }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ Str::lcfirst($belongsToMany['related_model_name_plural']) }}'),
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+                    '{{ Str::lcfirst($belongsToMany->relatedModelNamePlural) }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ Str::lcfirst($belongsToMany->relatedModelNamePlural) }}'),
 @endforeach
                 ],
 @endif
@@ -72,7 +75,7 @@
 @if($hasDatetimeColumns || $rightFormColumns->isNotEmpty())
                 'select_date_and_time' => trans('brackets/admin-ui::admin.forms.select_date_and_time'),
 @endif
-@if($hasForeignKeys || count($relations['belongsToMany']) > 0)
+@if($hasForeignKeys || count($relations->getBelongsToMany()) > 0)
                 'select_options' => trans('brackets/admin-ui::admin.forms.select_options'),
 @endif
 @if($hasForeignKeys)

@@ -41,18 +41,23 @@ final class RelationCollection
         return $this->belongsToMany;
     }
 
-    /** @return Collection<int, string> */
-    public function getBelongsToManyTables(): Collection
+    public function hasBelongsToManyWithoutRoles(): bool
     {
-        return $this->belongsToMany->pluck('relatedTable');
+        return $this->getBelongsToManyWithoutRoles()->isNotEmpty();
     }
 
-    /** @deprecated just for compatibility with old code */
-    public function toLegacyArray(): array
+    /** @return Collection<string, BelongsToMany> */
+    public function getBelongsToManyWithoutRoles(): Collection
     {
-        return [
-            'belongsToMany' => $this->belongsToMany
-                ->map(static fn (BelongsToMany $relation) => $relation->toLegacyArray()),
-        ];
+        return $this->belongsToMany->reject(
+            static fn (BelongsToMany $belongsToMany) => $belongsToMany->relatedTable === 'roles',
+        );
+    }
+
+    public function hasRelatedTableInBelongsToMany(string $relatedTable): bool
+    {
+        return $this->belongsToMany->contains(
+            static fn (BelongsToMany $belongsToMany) => $belongsToMany->relatedTable === $relatedTable,
+        );
     }
 }

@@ -1,4 +1,7 @@
-@php use Illuminate\Support\Str;
+@php
+    use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
+    use Illuminate\Support\Str;
+    assert($relations instanceof RelationCollection);
 @endphp
     '{{ $modelLangFormat }}' => [
         'title' => '{{ $titlePlural }}',
@@ -26,10 +29,10 @@
             '{{ $column['name'] }}_repeat' => '{{ $column['defaultTranslation'] }} Confirmation',
 @endif
 @endforeach
-@if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
+@if ($relations->hasBelongsToMany())
             //Belongs to many relations
-@foreach($relations['belongsToMany'] as $belongsToMany)
-            '{{ Str::lcfirst($belongsToMany['related_model_name_plural']) }}' => '{{ Str::ucfirst(str_replace('_', ' ', $belongsToMany['related_model_name_plural'])) }}',
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+            '{{ Str::lcfirst($belongsToMany->relatedModelNamePlural) }}' => '{{ Str::ucfirst(str_replace('_', ' ', $belongsToMany->relatedModelNamePlural)) }}',
 @endforeach
 @endif
         ],

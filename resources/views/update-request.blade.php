@@ -1,4 +1,9 @@
-@php use Illuminate\Support\Arr;echo "<?php"
+@php
+    use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
+    use Illuminate\Support\Arr;
+    assert($relations instanceof RelationCollection);
+@endphp
+@php echo "<?php";
 @endphp
 
 
@@ -33,7 +38,7 @@ namespace {{ $classNamespace }};
     if ($hasRuleUsage) {
         $uses[] = 'Illuminate\Validation\Rule';
     }
-    if ($hasBelongsToMany) {
+    if ($relations->hasBelongsToMany()) {
         $uses[] = 'Illuminate\Support\Collection';
     }
     if ($translatable->count() > 0) {
@@ -93,14 +98,14 @@ final class {{ $classBaseName }} extends FormRequest
                 'boolean',
             ],
 @endif
-@if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
+@if ($relations->hasBelongsToMany())
 
-@foreach($relations['belongsToMany'] as $belongsToMany)
-            '{{ $belongsToMany['related_table'] }}' => [
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+            '{{ $belongsToMany->relatedTable }}' => [
                 'sometimes',
                 'array',
             ],
-            '{{ $belongsToMany['related_table'] }}.*.id' => [
+            '{{ $belongsToMany->relatedTable }}.*.id' => [
                 'required',
                 'integer',
             ],
@@ -138,14 +143,14 @@ final class {{ $classBaseName }} extends FormRequest
             ],
 @endif
 @endforeach
-@if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
+@if ($relations->hasBelongsToMany())
 
-@foreach($relations['belongsToMany'] as $belongsToMany)
-            '{{ $belongsToMany['related_table'] }}' => [
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+            '{{ $belongsToMany->relatedTable }}' => [
                 'sometimes',
                 'array',
             ],
-            '{{ $belongsToMany['related_table'] }}.*.id' => [
+            '{{ $belongsToMany->relatedTable }}.*.id' => [
                 'required',
                 'integer',
             ],
@@ -171,10 +176,10 @@ final class {{ $classBaseName }} extends FormRequest
     public function getModifiedData(): array
     {
         $data = $this->validated();
-@if($hasBelongsToMany)
-@foreach($relations['belongsToMany'] as $belongsToMany)
-        if (isset($data['{{ $belongsToMany['related_table'] }}'])) {
-            $data['{{ $belongsToMany['related_table'] }}'] = new Collection($data['{{ $belongsToMany['related_table'] }}'] ?? []);
+@if($relations->hasBelongsToMany())
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+        if (isset($data['{{ $belongsToMany->relatedTable }}'])) {
+            $data['{{ $belongsToMany->relatedTable }}'] = new Collection($data['{{ $belongsToMany->relatedTable }}'] ?? []);
         }
 @endforeach
 @endif
@@ -211,17 +216,17 @@ final class {{ $classBaseName }} extends FormRequest
 
         return $data;
     }
-@if($hasBelongsToMany)
+@if($relations->hasBelongsToMany())
 
-@foreach($relations['belongsToMany'] as $belongsToMany)
-    public function get{{ $belongsToMany['related_model_name'] }}Ids(): ?Collection
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+    public function get{{ $belongsToMany->relatedModelName }}Ids(): ?Collection
     {
         $data = $this->getModifiedData();
-        if (!isset($data['{{ $belongsToMany['related_table'] }}'])) {
+        if (!isset($data['{{ $belongsToMany->relatedTable }}'])) {
             return null;
         }
 
-        return $data['{{ $belongsToMany['related_table'] }}']->pluck('id');
+        return $data['{{ $belongsToMany->relatedTable }}']->pluck('id');
     }
 @if(!$loop->last)
 

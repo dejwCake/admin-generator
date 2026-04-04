@@ -1,3 +1,8 @@
+@php
+    use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
+    use Illuminate\Support\Str;
+    assert($relations instanceof RelationCollection);
+@endphp
 <template>
     <form class="form-horizontal" method="post" @@submit.prevent="onSubmit" :action="action" novalidate>
 @if($isUsedTwoColumnsLayout)
@@ -93,10 +98,10 @@
 
 @endif
 @endforeach
-@foreach($relations['belongsToMany'] as $belongsToMany)
-                        <FormMultiSelect v-model="form.{{ $belongsToMany['related_table'] }}" name="{{ $belongsToMany['related_table'] }}"
-                            :label="translations.relations.{{ Str::lcfirst($belongsToMany['related_model_name_plural']) }}" :error="errors.{{ $belongsToMany['related_table'] }}"
-                            :options="{{ Str::camel(Str::singular($belongsToMany['related_table'])) }}Options" trackBy="id" optionLabel="{{ $belongsToMany['related_label'] }}"
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+                        <FormMultiSelect v-model="form.{{ $belongsToMany->relatedTable }}" name="{{ $belongsToMany->relatedTable }}"
+                            :label="translations.relations.{{ Str::lcfirst($belongsToMany->relatedModelNamePlural) }}" :error="errors.{{ $belongsToMany->relatedTable }}"
+                            :options="{{ Str::camel(Str::singular($belongsToMany->relatedTable)) }}Options" trackBy="id" optionLabel="{{ $belongsToMany->relatedLabel }}"
                             :placeholder="translations.select_options" />
 
 @endforeach
@@ -228,7 +233,7 @@ import FormWysiwyg from '@craftable/components/form/FormWysiwyg.vue';
 @if($hasForeignKeys)
 import FormSelect from '@craftable/components/form/FormSelect.vue';
 @endif
-@if(count($relations['belongsToMany']) > 0)
+@if($relations->hasBelongsToMany())
 import FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue';
 @endif
 @if($hasLocalizedInput)
@@ -249,11 +254,11 @@ const props = defineProps({
     action: {type: String, required: true},
     data: {type: Object, default: () => ({})},
     translations: {type: Object, default: () => ({})},
-@foreach($relations['belongsToMany'] as $belongsToMany)
-    {{ Str::camel(Str::singular($belongsToMany['related_table'])) }}Options: {type: Array, default: () => []},
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+    {{ Str::camel(Str::singular($belongsToMany->relatedTable)) }}Options: {type: Array, default: () => []},
 @endforeach
 @foreach($foreignKeys as $foreignKey)
-@if(!$belongsToManyTables->contains($foreignKey['relatedTable']))
+@if(!$relations->hasRelatedTableInBelongsToMany($foreignKey['relatedTable']))
     {{ $foreignKey['optionsPropName'] }}: {type: Array, default: () => []},
 @endif
 @endforeach
@@ -325,8 +330,8 @@ if (!props.data || Object.keys(props.data).length === 0) {
         created_by_admin_user_id: '',
         updated_by_admin_user_id: '',
 @endif
-@foreach($relations['belongsToMany'] as $belongsToMany)
-        {{ $belongsToMany['related_table'] }}: [],
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+        {{ $belongsToMany->relatedTable }}: [],
 @endforeach
     };
 @if($hasForeignKeys)

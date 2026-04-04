@@ -77,7 +77,7 @@ final class Model extends ClassGenerator
             'tableName' => $this->tableName !== Str::snake(Str::plural($this->classBaseName))
                 ? $this->tableName
                 : null,
-            'relations' => $this->relations->toLegacyArray(),
+            'relations' => $this->relations,
             'mediaCollections' => $this->mediaCollections,
             //has
             'hasCarbonProperty' => $columns->hasByMajorType('datetime', 'date'),

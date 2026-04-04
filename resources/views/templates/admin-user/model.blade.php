@@ -1,4 +1,9 @@
-@php use Illuminate\Support\Arr;echo "<?php"
+@php
+    use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
+    use Illuminate\Support\Arr;
+    assert($relations instanceof RelationCollection);
+@endphp
+@php echo "<?php";
 @endphp
 
 
@@ -7,13 +12,8 @@ declare(strict_types=1);
 namespace {{ $modelNameSpace }};
 @php
     $hasRoles = false;
-    if(count($relations) && count($relations['belongsToMany'])) {
-        $hasRoles = $relations['belongsToMany']->filter(function($belongsToMany) {
-            return $belongsToMany['related_table'] === 'roles';
-        })->count() > 0;
-        $relations['belongsToMany'] = $relations['belongsToMany']->reject(function($belongsToMany) {
-            return $belongsToMany['related_table'] === 'roles';
-        });
+    if($relations->hasBelongsToMany()) {
+        $hasRoles = $relations->hasRelatedTableInBelongsToMany('roles');
     }
     $uses = [
         'Brackets\AdminAuth\Activation\Traits\CanActivate',
@@ -35,12 +35,12 @@ namespace {{ $modelNameSpace }};
     if (count($dates) > 0 || $hasCarbonProperty) {
         $uses[] = 'Carbon\CarbonInterface';
     }
-    if (isset($relations['belongsToMany']) && count($relations['belongsToMany'])) {
+    if ($relations->hasBelongsToManyWithoutRoles()) {
         $uses[] = 'Illuminate\Database\Eloquent\Relations\BelongsToMany';
-        foreach ($relations['belongsToMany'] as $belongsToMany) {
-            $relatedNamespace = implode('\\', array_slice(explode('\\', $belongsToMany['related_model']), 0, -1));
+        foreach ($relations->getBelongsToManyWithoutRoles() as $belongsToMany) {
+            $relatedNamespace = implode('\\', array_slice(explode('\\', $belongsToMany->relatedModel), 0, -1));
             if ($relatedNamespace !== $modelNameSpace) {
-                $uses[] = $belongsToMany['related_model'];
+                $uses[] = $belongsToMany->relatedModel;
             }
         }
     }
@@ -149,12 +149,12 @@ final class {{ $modelBaseName }} extends Authenticatable implements CanActivateC
     {
         $this->notify(app(ResetPassword::class, ['token' => $token]));
     }
-@if (count($relations) > 0 && count($relations['belongsToMany']) > 0)
+@if ($relations->hasBelongsToManyWithoutRoles())
 
-@foreach($relations['belongsToMany'] as $belongsToMany)
-    public function {{ $belongsToMany['related_table'] }}(): BelongsToMany
+@foreach($relations->getBelongsToManyWithoutRoles() as $belongsToMany)
+    public function {{ $belongsToMany->relatedTable }}(): BelongsToMany
     {
-        return $this->belongsToMany({{ $belongsToMany['related_model_name'] }}::class, '{{ $belongsToMany['relation_table'] }}', '{{ $belongsToMany['foreign_key'] }}', '{{ $belongsToMany['related_key'] }}');
+        return $this->belongsToMany({{ $belongsToMany->relatedModelName }}::class, '{{ $belongsToMany->relationTable }}', '{{ $belongsToMany->foreignKey }}', '{{ $belongsToMany->relatedKey }}');
     }
 @endforeach
 @endif

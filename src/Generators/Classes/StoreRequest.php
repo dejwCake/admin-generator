@@ -67,9 +67,8 @@ final class StoreRequest extends ClassGenerator
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,
             'modelDotNotation' => $this->modelDotNotation,
-            'relations' => $this->relations->toLegacyArray(),
+            'relations' => $this->relations,
             //has
-            'hasBelongsToMany' => $this->relations->hasBelongsToMany(),
             'hasRuleUsage' => $columns->getVisible()
                 ->hasStoreRuleUsage(),
             'hasPasswordUsage' => $columns->getVisible()
