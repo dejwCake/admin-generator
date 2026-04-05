@@ -8,13 +8,13 @@ use Illuminate\Support\Str;
 
 final class Naming
 {
-    public static function baseName(string $tableName): string
+    public static function modelName(string $tableName): string
     {
         return Str::studly(Str::singular($tableName));
     }
 
     public static function variableName(string $tableName): string
     {
-        return Str::lcfirst(self::baseName($tableName));
+        return Str::lcfirst(self::modelName($tableName));
     }
 }

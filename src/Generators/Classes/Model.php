@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Classes;
 
+use Brackets\AdminGenerator\Naming;
 use Illuminate\Support\Str;
 use Override;
 use Symfony\Component\Console\Input\InputArgument;
@@ -60,7 +61,7 @@ final class Model extends ClassGenerator
     #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
-        return Str::studly(Str::singular($tableName));
+        return Naming::modelName($tableName);
     }
 
     #[Override]

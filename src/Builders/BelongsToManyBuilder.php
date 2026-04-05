@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Builders;
 
 use Brackets\AdminGenerator\Dtos\Relations\BelongsToMany;
+use Brackets\AdminGenerator\Naming;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -20,8 +21,8 @@ final readonly class BelongsToManyBuilder
             relatedTable: $relatedTable,
             relatedModel: $relatedTable === 'roles'
                 ? 'Spatie\\Permission\\Models\\Role'
-                : 'App\\Models\\' . Str::studly(Str::singular($relatedTable)),
-            relatedModelName: Str::studly(Str::singular($relatedTable)),
+                : 'App\\Models\\' . Naming::modelName($relatedTable),
+            relatedModelName: Naming::modelName($relatedTable),
             relatedLabel: $this->columnCollectionBuilder->build($relatedTable)->getLabelColumn(),
             relationTable: trim($this->getRelationTable($tableName, $relatedTable), '_'),
             relationMethodName: $relatedTable,

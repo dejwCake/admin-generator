@@ -52,10 +52,7 @@ final class IndexRequest extends ClassGenerator
             'classNamespace' => $this->classNamespace,
             'modelDotNotation' => $this->modelDotNotation,
             //columns
-            'columnsToQuery' => $columns->getToQuery()
-                ->toLegacyCollection()
-                ->pluck('name')
-                ->toArray(),
+            'columns' => $columns->getToQuery(),
         ])->render();
     }
 

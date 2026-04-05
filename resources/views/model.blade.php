@@ -71,6 +71,18 @@ namespace {{ $modelNameSpace }};
             }
         }
     }
+    if ($relations->hasHasMany()) {
+        foreach ($relations->getHasMany() as $hasMany) {
+            if($relations->hasRelationMethodNameInBelongsToMany($hasMany->relationMethodName)) {
+                continue;
+            }
+            $uses->push('Illuminate\Database\Eloquent\Relations\HasMany');
+            $relatedNamespace = implode('\\', array_slice(explode('\\', $hasMany->relatedModel), 0, -1));
+            if ($relatedNamespace !== $modelNameSpace) {
+                $uses->push($hasMany->relatedModel);
+            }
+        }
+    }
     $uses = $uses->unique()->sort();
 @endphp
 
@@ -187,6 +199,20 @@ final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty()
     {
         return $this->belongsTo({{ $belongsTo->relatedModelName }}::class);
     }
+@if(!$loop->last)
+
+@endif
+@endforeach
+@endif
+@if($relations->hasHasMany())
+@foreach($relations->getHasMany() as $hasMany)
+@if(!$relations->hasRelationMethodNameInBelongsToMany($hasMany->relationMethodName))
+
+    public function {{ $hasMany->relationMethodName }}(): HasMany
+    {
+        return $this->hasMany({{ $hasMany->relatedModelName }}::class);
+    }
+@endif
 @if(!$loop->last)
 
 @endif

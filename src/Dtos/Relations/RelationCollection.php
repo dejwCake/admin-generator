@@ -14,10 +14,14 @@ final class RelationCollection
     /** @var Collection<string, BelongsToMany> */
     private Collection $belongsToMany;
 
+    /** @var Collection<string, HasMany> */
+    private Collection $hasMany;
+
     public function __construct()
     {
         $this->belongsTo = new Collection();
         $this->belongsToMany = new Collection();
+        $this->hasMany = new Collection();
     }
 
     public function pushBelongsToMany(BelongsToMany $belongsToManyRelation): void
@@ -30,9 +34,14 @@ final class RelationCollection
         $this->belongsTo->put($belongsToRelation->foreignKeyColumn, $belongsToRelation);
     }
 
+    public function pushHasMany(HasMany $hasManyRelation): void
+    {
+        $this->hasMany->put($hasManyRelation->relatedTable, $hasManyRelation);
+    }
+
     public function hasRelation(): bool
     {
-        return $this->belongsToMany->isNotEmpty() || $this->belongsToMany->isNotEmpty();
+        return $this->belongsTo->isNotEmpty() || $this->belongsToMany->isNotEmpty() || $this->hasMany->isNotEmpty();
     }
 
     public function hasBelongsTo(): bool
@@ -87,5 +96,30 @@ final class RelationCollection
         return $this->belongsToMany->contains(
             static fn (BelongsToMany $belongsToMany) => $belongsToMany->relatedTable === $relatedTable,
         );
+    }
+
+    public function hasRelationMethodNameInBelongsToMany(string $relationMethodName): bool
+    {
+        return $this->belongsToMany->contains(
+            static fn (BelongsToMany $belongsToMany) => $belongsToMany->relationMethodName === $relationMethodName,
+        );
+    }
+
+    public function isPivotTable(string $tableName): bool
+    {
+        return $this->belongsToMany->contains(
+            static fn (BelongsToMany $belongsToMany) => $belongsToMany->relationTable === $tableName,
+        );
+    }
+
+    public function hasHasMany(): bool
+    {
+        return $this->hasMany->isNotEmpty();
+    }
+
+    /** @return Collection<string, HasMany> */
+    public function getHasMany(): Collection
+    {
+        return $this->hasMany;
     }
 }

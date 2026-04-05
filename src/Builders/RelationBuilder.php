@@ -20,6 +20,7 @@ final class RelationBuilder
         private Schema $schema,
         private BelongsToManyBuilder $belongsToManyRelationBuilder,
         private BelongsToBuilder $belongsToBuilder,
+        private HasManyBuilder $hasManyBuilder,
     ) {
         $this->allTables = (new Collection($this->schema->getTables()))
             ->pluck('name');
@@ -31,6 +32,7 @@ final class RelationBuilder
 
         $this->buildBelongsToMany($tableName, $belongsToManyTableList);
         $this->buildBelongsTo($tableName);
+        $this->buildHasMany($tableName);
 
         return $this->relationCollection;
     }
@@ -92,6 +94,40 @@ final class RelationBuilder
 
             $this->relationCollection->pushBelongsTo(
                 $this->belongsToBuilder->build($column['name'], $relatedTable),
+            );
+        });
+    }
+
+    private function buildHasMany(string $tableName): void
+    {
+        $this->detectHasMany($tableName);
+    }
+
+    private function detectHasMany(string $tableName): void
+    {
+        $expectedForeignKey = Str::singular($tableName) . '_id';
+
+        $this->allTables->each(function (string $candidateTable) use ($tableName, $expectedForeignKey): void {
+            if ($candidateTable === $tableName) {
+                return;
+            }
+
+            if ($this->relationCollection->isPivotTable($candidateTable)) {
+                return;
+            }
+
+            $columns = new Collection($this->schema->getColumns($candidateTable));
+
+            $hasForeignKey = $columns->contains(
+                static fn (array $column): bool => $column['name'] === $expectedForeignKey,
+            );
+
+            if (!$hasForeignKey) {
+                return;
+            }
+
+            $this->relationCollection->pushHasMany(
+                $this->hasManyBuilder->build($expectedForeignKey, $candidateTable),
             );
         });
     }

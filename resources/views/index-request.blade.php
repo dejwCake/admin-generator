@@ -1,3 +1,7 @@
+@php
+    use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
+    assert($columns instanceof ColumnCollection)
+@endphp
 @php echo "<?php"
 @endphp
 
@@ -28,7 +32,9 @@ final class {{ $classBaseName }} extends FormRequest
         return [
             'orderBy' => [
                 Rule::in([
-                    '{!! implode("',\n                    '", $columnsToQuery) !!}',
+@foreach($columns as $column)
+                    '{{ $column->name }}',
+@endforeach
                 ]),
                 'nullable',
             ],
