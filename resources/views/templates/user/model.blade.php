@@ -44,9 +44,9 @@ namespace {{ $modelNameSpace }};
     if (count($dates) > 0 || $hasCarbonProperty) {
         $uses[] = 'Carbon\CarbonInterface';
     }
-    if ($relations->hasBelongsToManyWithoutRoles()) {
+    if ($relations->hasBelongsToManyWithoutRelatedTable('roles')) {
         $uses[] = 'Illuminate\Database\Eloquent\Relations\BelongsToMany';
-        foreach ($relations->getBelongsToManyWithoutRoles() as $belongsToMany) {
+        foreach ($relations->getBelongsToManyWithoutRelatedTable('roles') as $belongsToMany) {
             $relatedNamespace = implode('\\', array_slice(explode('\\', $belongsToMany->relatedModel), 0, -1));
             if ($relatedNamespace !== $modelNameSpace) {
                 $uses[] = $belongsToMany->relatedModel;
@@ -152,9 +152,9 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
     {
         $this->notify(app(ResetPassword::class, ['token' => $token]));
     }
-@if ($relations->hasBelongsToManyWithoutRoles())
+@if ($relations->hasBelongsToManyWithoutRelatedTable('roles'))
 
-@foreach($relations->getBelongsToManyWithoutRoles() as $belongsToMany)
+@foreach($relations->getBelongsToManyWithoutRelatedTable('roles') as $belongsToMany)
     public function {{ $belongsToMany->relatedTable }}(): BelongsToMany
     {
         return $this->belongsToMany({{ $belongsToMany->relatedModelName }}::class, '{{ $belongsToMany->relationTable }}', '{{ $belongsToMany->foreignKey }}', '{{ $belongsToMany->relatedKey }}');

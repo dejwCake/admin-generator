@@ -41,16 +41,16 @@ final class RelationCollection
         return $this->belongsToMany;
     }
 
-    public function hasBelongsToManyWithoutRoles(): bool
+    public function hasBelongsToManyWithoutRelatedTable(string $relatedTable): bool
     {
-        return $this->getBelongsToManyWithoutRoles()->isNotEmpty();
+        return $this->getBelongsToManyWithoutRelatedTable($relatedTable)->isNotEmpty();
     }
 
     /** @return Collection<string, BelongsToMany> */
-    public function getBelongsToManyWithoutRoles(): Collection
+    public function getBelongsToManyWithoutRelatedTable(string $relatedTable): Collection
     {
         return $this->belongsToMany->reject(
-            static fn (BelongsToMany $belongsToMany) => $belongsToMany->relatedTable === 'roles',
+            static fn (BelongsToMany $belongsToMany) => $belongsToMany->relatedTable === $relatedTable,
         );
     }
 
