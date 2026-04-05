@@ -7,21 +7,13 @@ namespace Brackets\AdminGenerator\Dtos\Relations;
 final readonly class BelongsTo
 {
     public function __construct(
+        public string $foreignKeyColumn,
         public string $relatedTable,
         public string $relatedModel,
+        public string $relatedModelName,
         public string $optionsPropName,
         public string $foreignKeyLabel,
+        public string $relationMethodName,
     ) {
-    }
-
-    /** @deprecated just for compatibility with old code */
-    public function toLegacyArray(): array
-    {
-        return [
-            'relatedTable' => $this->relatedTable,
-            'relatedModel' => $this->relatedModel,
-            'optionsPropName' => $this->optionsPropName,
-            'foreignKeyLabel' => $this->foreignKeyLabel,
-        ];
     }
 }

@@ -1,6 +1,6 @@
 @php
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
-    use Illuminate\Support\Arr;
+    use Illuminate\Support\Collection;
     use Illuminate\Support\Str;
     assert($relations instanceof RelationCollection);
 @endphp
@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 namespace {{ $controllerNamespace }};
 @php
-    $uses = [
+    $uses = new Collection([
         'App\Http\Controllers\Controller',
         'Brackets\AdminListing\Builders\ListingBuilder',
         'Brackets\AdminListing\Builders\ListingQueryBuilder',
@@ -29,28 +29,29 @@ namespace {{ $controllerNamespace }};
         sprintf('App\Http\Requests\Admin\%s\Store%s', $modelWithNamespaceFromDefault, $modelBaseName),
         sprintf('App\Http\Requests\Admin\%s\Update%s', $modelWithNamespaceFromDefault, $modelBaseName),
         $modelFullName,
-    ];
+    ]);
     if ($export) {
-        $uses[] = sprintf('App\Exports\%s', $exportBaseName);
-        $uses[] = 'Maatwebsite\Excel\Excel';
-        $uses[] = 'Symfony\Component\HttpFoundation\BinaryFileResponse';
-        $uses[] = 'Carbon\CarbonImmutable';
-        $uses[] = sprintf('App\Http\Requests\Admin\%s\Export%s', $modelWithNamespaceFromDefault, $modelBaseName);
+        $uses->push(sprintf('App\Exports\%s', $exportBaseName));
+        $uses->push('Maatwebsite\Excel\Excel');
+        $uses->push('Symfony\Component\HttpFoundation\BinaryFileResponse');
+        $uses->push('Carbon\CarbonImmutable');
+        $uses->push(sprintf('App\Http\Requests\Admin\%s\Export%s', $modelWithNamespaceFromDefault, $modelBaseName));
     }
 
-    if ($relations->hasBelongsToMany()) {
-        foreach ($relations->getBelongsToMany() as $belongsToMany) {
-            $uses[] = $belongsToMany->relatedModel;
-        }
+    foreach ($relations->getBelongsToMany() as $belongsToMany) {
+        $uses->push($belongsToMany->relatedModel);
+    }
+    foreach ($relations->getBelongsTo() as $belongsTo) {
+        $uses->push($belongsTo->relatedModel);
     }
     if (!$withoutBulk) {
-        $uses[] = sprintf('App\Http\Requests\Admin\%s\BulkDestroy%s', $modelWithNamespaceFromDefault, $modelBaseName);
-        $uses[] = 'Illuminate\Database\DatabaseManager';
+        $uses->push(sprintf('App\Http\Requests\Admin\%s\BulkDestroy%s', $modelWithNamespaceFromDefault, $modelBaseName));
+        $uses->push('Illuminate\Database\DatabaseManager');
     }
-    if (in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery)) {
-        $uses[] = 'Illuminate\Database\Eloquent\Builder';
+    if (in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery) || $relations->hasBelongsTo()) {
+        $uses->push('Illuminate\Database\Eloquent\Builder');
     }
-    $uses = Arr::sort($uses);
+    $uses = $uses->unique()->sort();
 @endphp
 
 @foreach($uses as $use)
@@ -90,20 +91,26 @@ final class {{ $controllerBaseName }} extends Controller
 @endforeach
                     ],
                 ),
-@if(in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery))
-@if(in_array('created_by_admin_user_id', $columnsToQuery) && in_array('updated_by_admin_user_id', $columnsToQuery))
+@php
+    $eagerLoads = new Collection([]);
+    if (in_array('created_by_admin_user_id', $columnsToQuery)) {
+        $eagerLoads->push('createdByAdminUser');
+    }
+    if (in_array('updated_by_admin_user_id', $columnsToQuery)) {
+        $eagerLoads->push('updatedByAdminUser');
+    }
+    foreach ($relations->getBelongsTo() as $belongsTo) {
+        $eagerLoads->push($belongsTo->relationMethodName);
+    }
+@endphp
+@if($eagerLoads->isNotEmpty())
                 static function (Builder $query): void {
-                    $query->with(['createdByAdminUser', 'updatedByAdminUser']);
+                    $query->with([
+@foreach($eagerLoads as $eagerLoad)
+                        '{{ $eagerLoad }}',
+@endforeach
+                    ]);
                 },
-@elseif(in_array('created_by_admin_user_id', $columnsToQuery))
-                static function (Builder $query): void {
-                    $query->with(['createdByAdminUser']);
-                },
-@elseif(in_array('updated_by_admin_user_id', $columnsToQuery))
-                static function (Builder $query): void {
-                    $query->with(['updatedByAdminUser']);
-                },
-@endif
 @endif
             );
 
@@ -161,6 +168,11 @@ final class {{ $controllerBaseName }} extends Controller
 @foreach($relations->getBelongsToMany() as $belongsToMany)
                 '{{ $belongsToMany->relatedTable }}' => {{ $belongsToMany->relatedModelName }}::all(),
 @endforeach
+@foreach($relations->getBelongsTo() as $belongsTo)
+@if(!$relations->hasRelatedTableInBelongsToMany($belongsTo->relatedTable))
+                '{{ $belongsTo->relatedTable }}' => {{ $belongsTo->relatedModelName }}::all(),
+@endif
+@endforeach
 @foreach($mediaCollections as $collection)
                 '{{ $collection->collectionName }}Collection' => ${{ $modelVariableName }}Model->getCustomMediaCollection('{{ $collection->collectionName }}'),
 @endforeach
@@ -203,20 +215,27 @@ final class {{ $controllerBaseName }} extends Controller
     {
         $this->gate->authorize('admin.{{ $modelDotNotation }}.edit', ${{ $modelVariableName }});
 
-@if(in_array('created_by_admin_user_id', $columnsToQuery) || in_array('updated_by_admin_user_id', $columnsToQuery))
-@if(in_array('created_by_admin_user_id', $columnsToQuery) && in_array('updated_by_admin_user_id', $columnsToQuery))
-        ${{ $modelVariableName }}->load(['createdByAdminUser', 'updatedByAdminUser']);
-@elseif(in_array('created_by_admin_user_id', $columnsToQuery))
-        ${{ $modelVariableName }}->load('createdByAdminUser');
-@elseif(in_array('updated_by_admin_user_id', $columnsToQuery))
-        ${{ $modelVariableName }}->load('updatedByAdminUser');
-@endif
-
-@endif
-@if($relations->hasBelongsToMany())
-@foreach($relations->getBelongsToMany() as $belongsToMany)
-        ${{ $modelVariableName }}->load('{{ $belongsToMany->relatedTable }}');
+@php
+    $eagerLoads = new Collection([]);
+    if (in_array('created_by_admin_user_id', $columnsToQuery)) {
+        $eagerLoads->push('createdByAdminUser');
+    }
+    if (in_array('updated_by_admin_user_id', $columnsToQuery)) {
+        $eagerLoads->push('updatedByAdminUser');
+    }
+    foreach ($relations->getBelongsToMany() as $belongsToMany) {
+        $eagerLoads->push($belongsToMany->relationMethodName);
+    }
+    foreach ($relations->getBelongsTo() as $belongsTo) {
+        $eagerLoads->push($belongsTo->relationMethodName);
+    }
+@endphp
+@if($eagerLoads->isNotEmpty())
+        ${{ $modelVariableName }}->load([
+@foreach($eagerLoads as $eagerLoad)
+            '{{ $eagerLoad }}',
 @endforeach
+        ]);
 
 @endif
         return $this->viewFactory->make(
@@ -226,6 +245,11 @@ final class {{ $controllerBaseName }} extends Controller
                 'action' => $this->urlGenerator->route('admin/{{ $resource }}/update', [${{ $modelVariableName }}]),
 @foreach($relations->getBelongsToMany() as $belongsToMany)
                 '{{ $belongsToMany->relatedTable }}' => {{ $belongsToMany->relatedModelName }}::all(),
+@endforeach
+@foreach($relations->getBelongsTo() as $belongsTo)
+@if(!$relations->hasRelatedTableInBelongsToMany($belongsTo->relatedTable))
+                '{{ $belongsTo->relatedTable }}' => {{ $belongsTo->relatedModelName }}::all(),
+@endif
 @endforeach
 @foreach($mediaCollections as $collection)
                 '{{ $collection->collectionName }}Collection' => ${{ $modelVariableName }}->getCustomMediaCollection('{{ $collection->collectionName }}'),

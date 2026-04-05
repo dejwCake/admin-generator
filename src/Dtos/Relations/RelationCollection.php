@@ -27,7 +27,35 @@ final class RelationCollection
 
     public function pushBelongsTo(BelongsTo $belongsToRelation): void
     {
-        $this->belongsTo->put($belongsToRelation->relatedTable, $belongsToRelation);
+        $this->belongsTo->put($belongsToRelation->foreignKeyColumn, $belongsToRelation);
+    }
+
+    public function hasRelation(): bool
+    {
+        return $this->belongsToMany->isNotEmpty() || $this->belongsToMany->isNotEmpty();
+    }
+
+    public function hasBelongsTo(): bool
+    {
+        return $this->belongsTo->isNotEmpty();
+    }
+
+    /** @return Collection<string, BelongsTo> */
+    public function getBelongsTo(): Collection
+    {
+        return $this->belongsTo;
+    }
+
+    public function hasBelongsToByColumn(string $columnName): bool
+    {
+        return $this->belongsTo->contains(
+            static fn (BelongsTo $belongsTo) => $belongsTo->foreignKeyColumn === $columnName,
+        );
+    }
+
+    public function getBelongsToByColumn(string $columnName): ?BelongsTo
+    {
+        return $this->belongsTo->get($columnName);
     }
 
     public function hasBelongsToMany(): bool

@@ -1,6 +1,6 @@
 @php
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
-    use Illuminate\Support\Arr;
+    use Illuminate\Support\Collection;
     assert($relations instanceof RelationCollection);
 @endphp
 @php echo "<?php";
@@ -15,45 +15,54 @@ namespace {{ $modelNameSpace }};
     if($relations->hasBelongsToMany()) {
         $hasRoles = $relations->hasRelatedTableInBelongsToMany('roles');
     }
-    $uses = [
+    $uses = new Collection([
         'Brackets\AdminAuth\Notifications\ResetPassword',
         'Illuminate\Contracts\Auth\MustVerifyEmail',
         'Illuminate\Database\Eloquent\Factories\HasFactory',
         'Illuminate\Foundation\Auth\User as Authenticatable',
         'Illuminate\Notifications\Notifiable',
-    ];
+    ]);
     if ($hasSoftDelete) {
-        $uses[] = 'Illuminate\Database\Eloquent\SoftDeletes';
+        $uses->push('Illuminate\Database\Eloquent\SoftDeletes');
     }
     if ($hasRoles) {
         $uses[] = 'Spatie\Permission\Traits\HasRoles';
     }
     if ($translatable->count() > 0) {
-        $uses[] = 'Brackets\Translatable\Traits\HasTranslations';
+        $uses->push('Brackets\Translatable\Traits\HasTranslations');
     }
     if ($mediaCollections->isNotEmpty()) {
-        $uses[] = 'Brackets\Media\HasMedia\AutoProcessMediaTrait';
-        $uses[] = 'Brackets\Media\HasMedia\HasMediaCollectionsTrait';
-        $uses[] = 'Brackets\Media\HasMedia\HasMediaThumbsTrait';
-        $uses[] = 'Brackets\Media\HasMedia\ProcessMediaTrait';
-        $uses[] = 'Spatie\MediaLibrary\HasMedia';
+        $uses->push('Brackets\Media\HasMedia\AutoProcessMediaTrait');
+        $uses->push('Brackets\Media\HasMedia\HasMediaCollectionsTrait');
+        $uses->push('Brackets\Media\HasMedia\HasMediaThumbsTrait');
+        $uses->push('Brackets\Media\HasMedia\ProcessMediaTrait');
+        $uses->push('Spatie\MediaLibrary\HasMedia');
         if ($mediaCollections->contains(fn ($collection) => $collection->isImage())) {
-            $uses[] = 'Spatie\MediaLibrary\MediaCollections\Models\Media';
+            $uses->push('Spatie\MediaLibrary\MediaCollections\Models\Media');
         }
     }
     if (count($dates) > 0 || $hasCarbonProperty) {
-        $uses[] = 'Carbon\CarbonInterface';
+        $uses->push('Carbon\CarbonInterface');
     }
     if ($relations->hasBelongsToManyWithoutRelatedTable('roles')) {
-        $uses[] = 'Illuminate\Database\Eloquent\Relations\BelongsToMany';
-        foreach ($relations->getBelongsToManyWithoutRelatedTable('roles') as $belongsToMany) {
+        $uses->push('Illuminate\Database\Eloquent\Relations\BelongsToMany');
+        foreach ($relations->getBelongsToMany('roles') as $belongsToMany) {
             $relatedNamespace = implode('\\', array_slice(explode('\\', $belongsToMany->relatedModel), 0, -1));
             if ($relatedNamespace !== $modelNameSpace) {
-                $uses[] = $belongsToMany->relatedModel;
+                $uses->push($belongsToMany->relatedModel);
             }
         }
     }
-    $uses = Arr::sort($uses);
+    if ($relations->hasBelongsTo()) {
+        $uses->push('Illuminate\Database\Eloquent\Relations\BelongsTo');
+        foreach ($relations->getBelongsTo() as $belongsTo) {
+            $relatedNamespace = implode('\\', array_slice(explode('\\', $belongsTo->relatedModel), 0, -1));
+            if ($relatedNamespace !== $modelNameSpace) {
+                $uses->push($belongsTo->relatedModel);
+            }
+        }
+    }
+    $uses = $uses->unique()->sort();
 @endphp
 
 @foreach($uses as $use)
@@ -155,10 +164,25 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
 @if ($relations->hasBelongsToManyWithoutRelatedTable('roles'))
 
 @foreach($relations->getBelongsToManyWithoutRelatedTable('roles') as $belongsToMany)
-    public function {{ $belongsToMany->relatedTable }}(): BelongsToMany
+    public function {{ $belongsToMany->relationMethodName }}(): BelongsToMany
     {
         return $this->belongsToMany({{ $belongsToMany->relatedModelName }}::class, '{{ $belongsToMany->relationTable }}', '{{ $belongsToMany->foreignKey }}', '{{ $belongsToMany->relatedKey }}');
     }
+@if(!$loop->last)
+
+@endif
+@endforeach
+@endif
+@if($relations->hasBelongsTo())
+
+@foreach($relations->getBelongsTo() as $belongsTo)
+    public function {{ $belongsTo->relationMethodName }}(): BelongsTo
+    {
+        return $this->belongsTo({{ $belongsTo->relatedModelName }}::class);
+    }
+@if(!$loop->last)
+
+@endif
 @endforeach
 @endif
 @if($mediaCollections->isNotEmpty())

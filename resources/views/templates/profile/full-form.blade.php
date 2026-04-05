@@ -19,7 +19,7 @@
                     '{{ $col['name'] }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ $col['name'] }}'),
 @endforeach
                 ],
-@if($hasForeignKeys || $hasLanguage)
+@if($hasLanguage)
                 'select_an_option' => trans('brackets/admin-ui::admin.forms.select_an_option'),
 @endif
                 'save' => trans('brackets/admin-ui::admin.btn.save'),

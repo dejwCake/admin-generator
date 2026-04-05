@@ -150,13 +150,7 @@ parameters:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
-			count: 4
-			path: src/Generators/Resources/Form.php
-
-		-
-			message: '#^Method Brackets\\AdminGenerator\\Generators\\Resources\\Form\:\:detectForeignKeys\(\) should return Illuminate\\Support\\Collection\<int, array\<string, string\>\> but returns Illuminate\\Support\\Collection\<int, array\{column\: mixed, relatedTable\: string, relatedModel\: string, optionsPropName\: string, foreignKeyLabel\: string\}\>\.$#'
-			identifier: return.type
-			count: 1
+			count: 3
 			path: src/Generators/Resources/Form.php
 
 		-
@@ -165,13 +159,7 @@ parameters:
 				just for compatibility with old code$#
 			'''
 			identifier: method.deprecated
-			count: 5
-			path: src/Generators/Resources/FullForm.php
-
-		-
-			message: '#^Method Brackets\\AdminGenerator\\Generators\\Resources\\FullForm\:\:detectForeignKeys\(\) should return Illuminate\\Support\\Collection\<int, array\<string, string\>\> but returns Illuminate\\Support\\Collection\<int, array\{column\: mixed, relatedTable\: string, relatedModel\: string, optionsPropName\: string, foreignKeyLabel\: string\}\>\.$#'
-			identifier: return.type
-			count: 1
+			count: 4
 			path: src/Generators/Resources/FullForm.php
 
 		-

@@ -29,9 +29,9 @@
 @foreach($relations->getBelongsToMany() as $belongsToMany)
             :{{ Str::singular(str_replace('_', '-', $belongsToMany->relatedTable)) }}-options="{{'{{'}} ${{ $belongsToMany->relatedTable }}->toJson() }}"
 @endforeach
-@foreach($foreignKeys as $foreignKey)
-@if(!$relations->hasRelatedTableInBelongsToMany($foreignKey['relatedTable']))
-            :{{ Str::singular(str_replace('_', '-', $foreignKey['relatedTable'])) }}-options="{{'{{'}} ${{ $foreignKey['relatedTable'] }}->toJson() }}"
+@foreach($relations->getBelongsTo() as $belongsTo)
+@if(!$relations->hasRelatedTableInBelongsToMany($belongsTo->relatedTable))
+            :{{ Str::singular(str_replace('_', '-', $belongsTo->relatedTable)) }}-options="{{'{{'}} ${{ $belongsTo->relatedTable }}->toJson() }}"
 @endif
 @endforeach
             :translations="{{'{{'}} json_encode([
@@ -81,7 +81,7 @@
 @if($relations->hasBelongsToMany())
                 'select_options' => trans('brackets/admin-ui::admin.forms.select_options'),
 @endif
-@if($hasForeignKeys)
+@if($relations->hasBelongsTo())
                 'select_an_option' => trans('brackets/admin-ui::admin.forms.select_an_option'),
 @endif
 @if($hasCreatedByAdminUser)

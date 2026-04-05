@@ -1,6 +1,6 @@
 @php
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
-    use Illuminate\Support\Arr;
+    use Illuminate\Support\Collection;
     assert($relations instanceof RelationCollection);
 @endphp
 @php echo "<?php";
@@ -15,36 +15,45 @@ namespace {{ $modelNameSpace }};
     if($relations->hasBelongsToMany()) {
         $hasRoles = $relations->hasRelatedTableInBelongsToMany('roles');
     }
-    $uses = [
+    $uses = new Collection([
         'Brackets\AdminAuth\Activation\Traits\CanActivate',
         'Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract',
         'Brackets\AdminAuth\Notifications\ResetPassword',
         'Illuminate\Database\Eloquent\Factories\HasFactory',
         'Illuminate\Foundation\Auth\User as Authenticatable',
         'Illuminate\Notifications\Notifiable',
-    ];
+    ]);
     if ($hasSoftDelete) {
-        $uses[] = 'Illuminate\Database\Eloquent\SoftDeletes';
+        $uses->push('Illuminate\Database\Eloquent\SoftDeletes');
     }
     if ($hasRoles) {
-        $uses[] = 'Spatie\Permission\Traits\HasRoles';
+        $uses->push('Spatie\Permission\Traits\HasRoles');
     }
     if ($translatable->count() > 0) {
-        $uses[] = 'Brackets\Translatable\Traits\HasTranslations';
+        $uses->push('Brackets\Translatable\Traits\HasTranslations');
     }
     if (count($dates) > 0 || $hasCarbonProperty) {
-        $uses[] = 'Carbon\CarbonInterface';
+        $uses->push('Carbon\CarbonInterface');
     }
     if ($relations->hasBelongsToManyWithoutRelatedTable('roles')) {
-        $uses[] = 'Illuminate\Database\Eloquent\Relations\BelongsToMany';
+        $uses->push('Illuminate\Database\Eloquent\Relations\BelongsToMany');
         foreach ($relations->getBelongsToManyWithoutRelatedTable('roles') as $belongsToMany) {
             $relatedNamespace = implode('\\', array_slice(explode('\\', $belongsToMany->relatedModel), 0, -1));
             if ($relatedNamespace !== $modelNameSpace) {
-                $uses[] = $belongsToMany->relatedModel;
+                $uses->push($belongsToMany->relatedModel);
             }
         }
     }
-    $uses = Arr::sort($uses);
+    if ($relations->hasBelongsTo()) {
+        $uses->push('Illuminate\Database\Eloquent\Relations\BelongsTo');
+        foreach ($relations->getBelongsTo() as $belongsTo) {
+            $relatedNamespace = implode('\\', array_slice(explode('\\', $belongsTo->relatedModel), 0, -1));
+            if ($relatedNamespace !== $modelNameSpace) {
+                $uses->push($belongsTo->relatedModel);
+            }
+        }
+    }
+    $uses = $uses->unique()->sort();
 @endphp
 
 @foreach($uses as $use)
@@ -152,11 +161,100 @@ final class {{ $modelBaseName }} extends Authenticatable implements CanActivateC
 @if ($relations->hasBelongsToManyWithoutRelatedTable('roles'))
 
 @foreach($relations->getBelongsToManyWithoutRelatedTable('roles') as $belongsToMany)
-    public function {{ $belongsToMany->relatedTable }}(): BelongsToMany
+    public function {{ $belongsToMany->relationMethodName }}(): BelongsToMany
     {
         return $this->belongsToMany({{ $belongsToMany->relatedModelName }}::class, '{{ $belongsToMany->relationTable }}', '{{ $belongsToMany->foreignKey }}', '{{ $belongsToMany->relatedKey }}');
     }
+@if(!$loop->last)
+
+@endif
 @endforeach
+@endif
+@if($relations->hasBelongsTo())
+
+@foreach($relations->getBelongsTo() as $belongsTo)
+    public function {{ $belongsTo->relationMethodName }}(): BelongsTo
+    {
+        return $this->belongsTo({{ $belongsTo->relatedModelName }}::class);
+    }
+@if(!$loop->last)
+
+@endif
+@endforeach
+@endif
+@if($mediaCollections->isNotEmpty())
+
+    public function registerMediaCollections(): void
+    {
+@foreach($mediaCollections as $collection)
+        $this->addMediaCollection('{{ $collection->collectionName }}')
+@if($collection->isPrivate())
+            ->private()
+@endif
+            ->maxFilesize(10 * 1024 * 1024)
+            ->maxNumberOfFiles({{ $collection->maxFiles }})
+@if($collection->isImage())
+            ->accepts('image/*');
+@else
+            ->accepts('application/pdf', 'application/zip', 'application/x-zip');
+@endif
+@if(!$loop->last)
+
+@endif
+@endforeach
+    }
+@endif
+@if($mediaCollections->contains(fn ($collection) => $collection->isImage()))
+
+    /**
+    * {{'@'}}phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+    */
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->autoRegisterThumb200();
+@foreach($mediaCollections as $collection)
+@if($collection->isImage())
+
+        $converted = [
+            'name' => 'converted',
+            'collection' => '{{ $collection->collectionName }}',
+            'width' => 960,
+            'height' => 360,
+        ];
+
+        $this->addMediaConversion($converted['name'])
+            ->width($converted['width'])
+            ->height($converted['height'])
+            ->crop($converted['width'], $converted['height'])
+            ->performOnCollections($converted['collection'])
+            ->keepOriginalImageFormat()
+            ->nonQueued();
+
+        $this->addMediaConversion($converted['name'] . 'Retina')
+            ->width(2 * $converted['width'])
+            ->height(2 * $converted['height'])
+            ->crop(2 * $converted['width'], 2 * $converted['height'])
+            ->performOnCollections($converted['collection'])
+            ->keepOriginalImageFormat()
+            ->nonQueued();
+
+        $original = [
+            'name' => 'original',
+            'collection' => '{{ $collection->collectionName }}',
+        ];
+
+        $this->addMediaConversion($original['name'])
+            ->performOnCollections($original['collection'])
+            ->keepOriginalImageFormat()
+            ->nonQueued();
+
+        $this->addMediaConversion($original['name'] . 'Retina')
+            ->performOnCollections($original['collection'])
+            ->keepOriginalImageFormat()
+            ->nonQueued();
+@endif
+@endforeach
+    }
 @endif
 @if (count($dates) > 0 || count($booleans) > 0)
 

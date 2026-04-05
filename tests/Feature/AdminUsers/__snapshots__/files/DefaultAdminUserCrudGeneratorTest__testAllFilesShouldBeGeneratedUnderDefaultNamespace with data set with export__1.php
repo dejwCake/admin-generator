@@ -167,7 +167,9 @@ final class AdminUsersController extends Controller
     {
         $this->gate->authorize('admin.admin-user.edit', $adminUser);
 
-        $adminUser->load('roles');
+        $adminUser->load([
+            'roles',
+        ]);
 
         return $this->viewFactory->make(
             'admin.admin-user.edit',

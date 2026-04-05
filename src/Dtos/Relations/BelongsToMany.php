@@ -11,10 +11,12 @@ final readonly class BelongsToMany
         public string $relatedTable,
         public string $relatedModel,
         public string $relatedModelName,
-        public string $relationTable,
         public string $foreignKey,
         public string $relatedKey,
         public string $relatedLabel,
+        public string $relationTable,
+        public string $relationMethodName,
+        public string $optionsPropName,
     ) {
     }
 }

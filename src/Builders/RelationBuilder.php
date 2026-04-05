@@ -9,66 +9,104 @@ use Illuminate\Database\Schema\Builder as Schema;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-final readonly class RelationBuilder
+final class RelationBuilder
 {
-    public function __construct(private Schema $schema, private BelongsToManyBuilder $belongsToManyRelationBuilder,)
-    {
+    private RelationCollection $relationCollection;
+
+    /** @var Collection<int, string> */
+    private Collection $allTables;
+
+    public function __construct(
+        private Schema $schema,
+        private BelongsToManyBuilder $belongsToManyRelationBuilder,
+        private BelongsToBuilder $belongsToBuilder,
+    ) {
+        $this->allTables = (new Collection($this->schema->getTables()))
+            ->pluck('name');
     }
 
     public function build(string $tableName, ?string $belongsToManyTableList): RelationCollection
     {
-        if ($belongsToManyTableList === null) {
-            return $this->detectForTable($tableName);
-        }
+        $this->relationCollection = new RelationCollection();
 
-        return $this->buildFromString($tableName, $belongsToManyTableList);
+        $this->buildBelongsToMany($tableName, $belongsToManyTableList);
+        $this->buildBelongsTo($tableName);
+
+        return $this->relationCollection;
     }
 
-    private function buildFromString(string $tableName, ?string $belongsToManyTableList): RelationCollection
+    private function buildBelongsToMany(string $tableName, ?string $belongsToManyTableList): void
     {
-        $relationCollection = new RelationCollection();
+        if ($belongsToManyTableList === null) {
+            $this->detectBelongsToManyForTable($tableName);
 
+            return;
+        }
+
+        $this->buildBelongsToManyFromString($tableName, $belongsToManyTableList);
+    }
+
+    private function buildBelongsTo(string $tableName): void
+    {
+        $this->detectBelongsTo($tableName);
+    }
+
+    private function buildBelongsToManyFromString(string $tableName, ?string $belongsToManyTableList): void
+    {
         (new Collection(explode(',', $belongsToManyTableList)))
             ->filter(fn (string $relatedTable): bool => $this->schema->hasTable($relatedTable))
-            ->each(function (string $relatedTable) use ($relationCollection, $tableName): void {
-                $relationCollection->pushBelongsToMany(
+            ->each(function (string $relatedTable) use ($tableName): void {
+                $this->relationCollection->pushBelongsToMany(
                     $this->belongsToManyRelationBuilder->build($relatedTable, $tableName),
                 );
             });
-
-        return $relationCollection;
     }
 
-    private function detectForTable(string $tableName): RelationCollection
+    private function detectBelongsToManyForTable(string $tableName): void
     {
-        $relationCollection = new RelationCollection();
-        $allTables = $this->schema->getTableListing();
-
-        foreach ($allTables as $candidateTable) {
-            $relatedTable = $this->detectPivotRelation($candidateTable, $tableName, $allTables);
+        $this->allTables->each(function (string $candidateTable) use ($tableName): void {
+            $relatedTable = $this->detectPivotRelation($candidateTable, $tableName);
             if ($relatedTable === null) {
-                continue;
+                return;
             }
 
-            $relationCollection->pushBelongsToMany(
+            $this->relationCollection->pushBelongsToMany(
                 $this->belongsToManyRelationBuilder->build($relatedTable, $tableName),
             );
-        }
-
-        return $relationCollection;
+        });
     }
 
-    private function detectPivotRelation(string $candidateTable, string $tableName, array $allTables): ?string
+    private function detectBelongsTo(string $tableName): void
     {
-        $relatedTable = $this->detectViaForeignKeys($candidateTable, $tableName);
+        $columns = new Collection($this->schema->getColumns($tableName));
+
+        $columns->filter(
+            static fn (array $column): bool => str_ends_with($column['name'], '_id')
+                && !in_array($column['name'], ['created_by_admin_user_id', 'updated_by_admin_user_id'], true),
+        )->each(function (array $column): void {
+            $relatedTable = Str::plural(Str::beforeLast($column['name'], '_id'));
+
+            if (!$this->allTables->contains($relatedTable)) {
+                return;
+            }
+
+            $this->relationCollection->pushBelongsTo(
+                $this->belongsToBuilder->build($column['name'], $relatedTable),
+            );
+        });
+    }
+
+    private function detectPivotRelation(string $candidateTable, string $tableName): ?string
+    {
+        $relatedTable = $this->detectPivotViaForeignKeys($candidateTable, $tableName);
         if ($relatedTable !== null) {
             return $relatedTable;
         }
 
-        return $this->detectViaNamingConvention($candidateTable, $tableName, $allTables);
+        return $this->detectPivotViaNamingConvention($candidateTable, $tableName);
     }
 
-    private function detectViaForeignKeys(string $candidateTable, string $tableName): ?string
+    private function detectPivotViaForeignKeys(string $candidateTable, string $tableName): ?string
     {
         $foreignKeys = $this->schema->getForeignKeys($candidateTable);
 
@@ -80,6 +118,7 @@ final readonly class RelationBuilder
             static fn (array $foreignKey): string => $foreignKey['foreign_table'],
             $foreignKeys,
         );
+
 
         if (!in_array($tableName, $referencedTables, true)) {
             return null;
@@ -94,11 +133,11 @@ final readonly class RelationBuilder
         return null;
     }
 
-    private function detectViaNamingConvention(string $candidateTable, string $tableName, array $allTables): ?string
+    private function detectPivotViaNamingConvention(string $candidateTable, string $tableName): ?string
     {
         $columns = new Collection($this->schema->getColumns($candidateTable));
         $idColumns = $columns->filter(
-            static fn (array $col): bool => str_ends_with($col['name'], '_id'),
+            static fn (array $column): bool => str_ends_with($column['name'], '_id'),
         );
 
         if ($idColumns->count() !== 2) {
@@ -106,8 +145,8 @@ final readonly class RelationBuilder
         }
 
         $otherColumns = $columns->reject(
-            static fn (array $col): bool => str_ends_with($col['name'], '_id')
-                || in_array($col['name'], ['id', 'created_at', 'updated_at'], true),
+            static fn (array $column): bool => str_ends_with($column['name'], '_id')
+                || in_array($column['name'], ['id', 'created_at', 'updated_at'], true),
         );
         if ($otherColumns->isNotEmpty()) {
             return null;
@@ -121,7 +160,7 @@ final readonly class RelationBuilder
         $otherFk = $idColumns->first(static fn (array $column): bool => $column['name'] !== $currentTableFk);
         $relatedTable = Str::plural(Str::beforeLast($otherFk['name'], '_id'));
 
-        if (!in_array($relatedTable, $allTables, true)) {
+        if (!$this->allTables->contains($relatedTable)) {
             return null;
         }
 

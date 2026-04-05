@@ -52,21 +52,6 @@ final class FullForm extends ResourceGenerator
 
     protected string $formJsRelativePath;
 
-    //TODO move to ColumnCollectionBuilder
-    /** @return array<string, string|bool|array<string>> */
-    private static function enrichWithForeignKey(array $col, Collection $foreignKeys): array
-    {
-        if ($col['isForeignKey'] ?? false) {
-            $fk = $foreignKeys->keyBy('column')[$col['name']] ?? null;
-            if ($fk !== null) {
-                $col['foreignKeyOptionsName'] = $fk['optionsPropName'];
-                $col['foreignKeyLabel'] = $fk['foreignKeyLabel'];
-            }
-        }
-
-        return $col;
-    }
-
     public function handle(): void
     {
         $force = (bool) $this->option('force');
@@ -117,37 +102,10 @@ final class FullForm extends ResourceGenerator
         ];
     }
 
-    //TODO move to ColumnCollectionBuilder
-    /** @return Collection<int, array<string, string>> */
-    private function detectForeignKeys(Collection $columns): Collection
-    {
-        return $columns->filter(
-            static fn (array $col): bool => str_ends_with($col['name'], '_id')
-                && !in_array($col['name'], ['created_by_admin_user_id', 'updated_by_admin_user_id'], true),
-        )->map(function (array $col): array {
-            $name = $col['name'];
-            $relatedTable = Str::plural(Str::beforeLast($name, '_id'));
-            $relatedModel = Str::studly(Str::singular($relatedTable));
-            $optionsPropName = Str::camel(Str::singular($relatedTable)) . 'Options';
-
-            $foreignKeyLabel = $this->columnCollectionBuilder->build($relatedTable)
-                ->getLabelColumn();
-
-            return [
-                'column' => $name,
-                'relatedTable' => $relatedTable,
-                'relatedModel' => $relatedModel,
-                'optionsPropName' => $optionsPropName,
-                'foreignKeyLabel' => $foreignKeyLabel,
-            ];
-        })->values();
-    }
-
     /** @return array<string, Collection|RelationCollection|array<string>|string|bool> */
     private function getCommonViewData(ColumnCollection $columns): array
     {
         $visibleColumns = $columns->getVisible();
-        $foreignKeys = $this->detectForeignKeys($visibleColumns->toLegacyCollection());
 
         $hasCreatedByAdminUser = $columns->hasByName('created_by_admin_user_id');
         $hasUpdatedByAdminUser = $columns->hasByName('updated_by_admin_user_id');
@@ -164,11 +122,6 @@ final class FullForm extends ResourceGenerator
         // Split media collections: gallery goes right, rest left
         $rightMediaCollections = $this->mediaCollections->filter(
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
-        );
-
-        //TODO move to ColumnCollectionBuilder
-        $leftFormColumnsLegacy = $leftFormColumns->toLegacyCollection()->map(
-            static fn (array $col): array => self::enrichWithForeignKey($col, $foreignKeys),
         );
 
         return [
@@ -201,16 +154,14 @@ final class FullForm extends ResourceGenerator
             'hasTextarea' => $leftFormColumns->hasTextarea(),
             'hasLocalizedInput' => $leftFormColumns->hasLocalizedInput(),
             'hasLocalizedWysiwyg' => $leftFormColumns->hasLocalizedWysiwyg(),
-            'hasForeignKeys' => $foreignKeys->isNotEmpty(),
             //columns
             'columns' => $visibleColumns->toLegacyCollection(),
-            'leftFormColumns' => $leftFormColumnsLegacy,
+            'leftFormColumns' => $leftFormColumns->toLegacyCollection(),
             'leftMediaCollections' => $this->mediaCollections->reject(
                 static fn (MediaCollection $mediaCollection): bool => $mediaCollection->collectionName === 'gallery',
             ),
             'rightFormColumns' => $rightFormColumns->toLegacyCollection(),
             'rightMediaCollections' => $rightMediaCollections,
-            'foreignKeys' => $foreignKeys,
             'wysiwygTextColumnNames' => $columns->getWysiwygColumnNames(),
 
             'isUsedTwoColumnsLayout' => $rightFormColumns->isNotEmpty()

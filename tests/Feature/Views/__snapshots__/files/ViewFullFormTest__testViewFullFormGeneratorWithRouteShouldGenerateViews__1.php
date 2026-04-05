@@ -14,7 +14,6 @@
             :wysiwyg-upload-url="'{{ $wysiwygUploadUrl }}'"
             :show-history="true"
             :post-options="{{ $posts->toJson() }}"
-            :user-options="{{ $users->toJson() }}"
             :translations="{{ json_encode([
                 'form_title' => trans('admin.category.actions.edit', ['name' => $category->title]),
                 'columns' => [
@@ -47,7 +46,6 @@
                 'select_a_time' => trans('brackets/admin-ui::admin.forms.select_a_time'),
                 'select_date_and_time' => trans('brackets/admin-ui::admin.forms.select_date_and_time'),
                 'select_options' => trans('brackets/admin-ui::admin.forms.select_options'),
-                'select_an_option' => trans('brackets/admin-ui::admin.forms.select_an_option'),
                 'created_by' => trans('brackets/admin-ui::admin.forms.created_by'),
                 'created_on' => trans('brackets/admin-ui::admin.forms.created_on'),
                 'updated_by' => trans('brackets/admin-ui::admin.forms.updated_by'),

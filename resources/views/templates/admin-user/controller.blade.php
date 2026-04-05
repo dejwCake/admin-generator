@@ -1,6 +1,6 @@
 @php
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
-    use Illuminate\Support\Arr;
+    use Illuminate\Support\Collection;
     use Illuminate\Support\Str;
     assert($relations instanceof RelationCollection);
 @endphp
@@ -15,7 +15,7 @@ namespace {{ $controllerNamespace }};
     $activation = $columns->search(function ($column, $key) {
             return $column['name'] === 'activated';
         }) !== false;
-    $uses = [
+    $uses = new Collection([
         'App\Http\Controllers\Controller',
         'Brackets\AdminListing\Builders\ListingBuilder',
         'Brackets\AdminListing\Builders\ListingQueryBuilder',
@@ -37,29 +37,29 @@ namespace {{ $controllerNamespace }};
         sprintf('App\Http\Requests\Admin\%s\Store%s', $modelWithNamespaceFromDefault, $modelBaseName),
         sprintf('App\Http\Requests\Admin\%s\Update%s', $modelWithNamespaceFromDefault, $modelBaseName),
         $modelFullName,
-    ];
+    ]);
     if ($export) {
-        $uses[] = sprintf('App\Exports\%s', $exportBaseName);
-        $uses[] = 'Maatwebsite\Excel\Excel';
-        $uses[] = 'Symfony\Component\HttpFoundation\BinaryFileResponse';
-        $uses[] = 'Carbon\CarbonImmutable';
-        $uses[] = sprintf('App\Http\Requests\Admin\%s\Export%s', $modelWithNamespaceFromDefault, $modelBaseName);
+        $uses->push(sprintf('App\Exports\%s', $exportBaseName));
+        $uses->push('Maatwebsite\Excel\Excel');
+        $uses->push('Symfony\Component\HttpFoundation\BinaryFileResponse');
+        $uses->push('Carbon\CarbonImmutable');
+        $uses->push(sprintf('App\Http\Requests\Admin\%s\Export%s', $modelWithNamespaceFromDefault, $modelBaseName));
     }
     if ($activation) {
-        $uses[] = 'Brackets\AdminAuth\Activation\Contracts\ActivationBroker';
-        $uses[] = 'Brackets\AdminAuth\Services\ActivationService';
+        $uses->push('Brackets\AdminAuth\Activation\Contracts\ActivationBroker');
+        $uses->push('Brackets\AdminAuth\Services\ActivationService');
     }
 
     if ($relations->hasBelongsToMany()) {
         foreach ($relations->getBelongsToMany() as $belongsToMany) {
-            $uses[] = $belongsToMany->relatedModel;
+            $uses->push($belongsToMany->relatedModel);
         }
     }
     if (!$withoutBulk) {
-        $uses[] = sprintf('App\Http\Requests\Admin\%s\BulkDestroy%s', $modelWithNamespaceFromDefault, $modelBaseName);
-        $uses[] = 'Illuminate\Database\DatabaseManager';
+        $uses->push(sprintf('App\Http\Requests\Admin\%s\BulkDestroy%s', $modelWithNamespaceFromDefault, $modelBaseName));
+        $uses->push('Illuminate\Database\DatabaseManager');
     }
-    $uses = Arr::sort($uses);
+    $uses = $uses->unique()->sort();
 @endphp
 
 @foreach($uses as $use)
@@ -103,6 +103,21 @@ final class {{ $controllerBaseName }} extends Controller
 @endforeach
                     ],
                 ),
+@php
+    $eagerLoads = new Collection([]);
+    foreach ($relations->getBelongsTo() as $belongsTo) {
+        $eagerLoads->push($belongsTo->relationMethodName);
+    }
+@endphp
+@if($eagerLoads->isNotEmpty())
+                static function (Builder $query): void {
+                    $query->with([
+@foreach($eagerLoads as $eagerLoad)
+                        '{{ $eagerLoad }}',
+@endforeach
+                    ]);
+                },
+@endif
             );
 
         if ($request->ajax()) {
@@ -176,6 +191,11 @@ final class {{ $controllerBaseName }} extends Controller
                 '{{ $belongsToMany->relatedTable }}' => {{ $belongsToMany->relatedModelName }}::all(),
 @endif
 @endforeach
+@foreach($relations->getBelongsTo() as $belongsTo)
+@if(!$relations->hasRelatedTableInBelongsToMany($belongsTo->relatedTable))
+                '{{ $belongsTo->relatedTable }}' => {{ $belongsTo->relatedModelName }}::all(),
+@endif
+@endforeach
 @foreach($mediaCollections as $collection)
                 '{{ $collection->collectionName }}Collection' => ${{ $modelVariableName }}Model->getCustomMediaCollection('{{ $collection->collectionName }}'),
 @endforeach
@@ -218,10 +238,21 @@ final class {{ $controllerBaseName }} extends Controller
     {
         $this->gate->authorize('admin.{{ $modelDotNotation }}.edit', ${{ $modelVariableName }});
 
-@if($relations->hasBelongsToMany())
-@foreach($relations->getBelongsToMany() as $belongsToMany)
-        ${{ $modelVariableName }}->load('{{ $belongsToMany->relatedTable }}');
+@php
+    $eagerLoads = new Collection([]);
+    foreach ($relations->getBelongsToMany() as $belongsToMany) {
+        $eagerLoads->push($belongsToMany->relationMethodName);
+    }
+    foreach ($relations->getBelongsTo() as $belongsTo) {
+        $eagerLoads->push($belongsTo->relationMethodName);
+    }
+@endphp
+@if($eagerLoads->isNotEmpty())
+        ${{ $modelVariableName }}->load([
+@foreach($eagerLoads as $eagerLoad)
+            '{{ $eagerLoad }}',
 @endforeach
+        ]);
 
 @endif
         return $this->viewFactory->make(
@@ -235,6 +266,11 @@ final class {{ $controllerBaseName }} extends Controller
                 '{{ $belongsToMany->relatedTable }}' => {{ $belongsToMany->relatedModelName }}::where('guard_name', $this->guard)->get(),
 @else
                 '{{ $belongsToMany->relatedTable }}' => {{ $belongsToMany->relatedModelName }}::all(),
+@endif
+@endforeach
+@foreach($relations->getBelongsTo() as $belongsTo)
+@if(!$relations->hasRelatedTableInBelongsToMany($belongsTo->relatedTable))
+                '{{ $belongsTo->relatedTable }}' => {{ $belongsTo->relatedModelName }}::all(),
 @endif
 @endforeach
 @foreach($mediaCollections as $collection)

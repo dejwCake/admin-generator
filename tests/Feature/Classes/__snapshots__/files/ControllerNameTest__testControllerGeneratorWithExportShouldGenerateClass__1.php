@@ -81,7 +81,10 @@ final class CategoriesController extends Controller
                     ],
                 ),
                 static function (Builder $query): void {
-                    $query->with(['createdByAdminUser', 'updatedByAdminUser']);
+                    $query->with([
+                        'createdByAdminUser',
+                        'updatedByAdminUser',
+                    ]);
                 },
             );
 
@@ -160,9 +163,11 @@ final class CategoriesController extends Controller
     {
         $this->gate->authorize('admin.category.edit', $category);
 
-        $category->load(['createdByAdminUser', 'updatedByAdminUser']);
-
-        $category->load('posts');
+        $category->load([
+            'createdByAdminUser',
+            'updatedByAdminUser',
+            'posts',
+        ]);
 
         return $this->viewFactory->make(
             'admin.category.edit',

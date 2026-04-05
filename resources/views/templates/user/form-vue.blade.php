@@ -86,10 +86,11 @@
                             :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}"
                             :config="datetimePickerConfig" :placeholder="translations.select_date_and_time" />
 
-@elseif(isset($col['isForeignKey']) && $col['isForeignKey'])
+@elseif(isset($col['isForeignKey']) && $col['isForeignKey'] && $relations->hasBelongsToByColumn($col['name']))
+@php $belongsToRelation = $relations->getBelongsToByColumn($col['name']); @endphp
                         <FormSelect v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
                             :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}"
-                            :options="{{ $col['foreignKeyOptionsName'] }}" trackBy="id" optionLabel="{{ $col['foreignKeyLabel'] }}"
+                            :options="{{ $belongsToRelation->optionsPropName }}" trackBy="id" optionLabel="{{ $belongsToRelation->foreignKeyLabel }}"
                             :placeholder="translations.select_an_option" />
 
 @else
@@ -230,7 +231,7 @@ import FormDatePicker from '@craftable/components/form/FormDatePicker.vue';
 @if($hasWysiwyg)
 import FormWysiwyg from '@craftable/components/form/FormWysiwyg.vue';
 @endif
-@if($hasForeignKeys)
+@if($relations->hasBelongsTo())
 import FormSelect from '@craftable/components/form/FormSelect.vue';
 @endif
 @if($relations->hasBelongsToMany())
@@ -255,11 +256,11 @@ const props = defineProps({
     data: {type: Object, default: () => ({})},
     translations: {type: Object, default: () => ({})},
 @foreach($relations->getBelongsToMany() as $belongsToMany)
-    {{ Str::camel(Str::singular($belongsToMany->relatedTable)) }}Options: {type: Array, default: () => []},
+    {{ $belongsToMany->optionsPropName }}: {type: Array, default: () => []},
 @endforeach
-@foreach($foreignKeys as $foreignKey)
-@if(!$relations->hasRelatedTableInBelongsToMany($foreignKey['relatedTable']))
-    {{ $foreignKey['optionsPropName'] }}: {type: Array, default: () => []},
+@foreach($relations->getBelongsTo() as $belongsTo)
+@if(!$relations->hasRelatedTableInBelongsToMany($belongsTo->relatedTable))
+    {{ $belongsTo->optionsPropName }}: {type: Array, default: () => []},
 @endif
 @endforeach
 @if($mediaCollections->isNotEmpty())
@@ -286,7 +287,7 @@ const {
     showLocalizedValidationError, getPostData, onSubmit, onSuccess, onFail,
     getLocalizedFormDefaults, showLocalization, hideLocalization,
     shouldShowLangGroup,
-@php $hasUseAppFormOptions = !empty($validationRules) || $hasForeignKeys; @endphp
+@php $hasUseAppFormOptions = !empty($validationRules) || $relations->hasBelongsTo(); @endphp
 } = useAppForm(props{!! $hasUseAppFormOptions ? ', {' : '' !!}
 @if(!empty($validationRules))
     validationSchema: {
@@ -295,11 +296,11 @@ const {
 @endforeach
     },
 @endif
-@if($hasForeignKeys)
+@if($relations->hasBelongsTo())
     transformData: (data) => {
-@foreach($foreignKeys as $fk)
-        if (data.{{ $fk['column'] }} && typeof data.{{ $fk['column'] }} === 'object') {
-            data.{{ $fk['column'] }} = data.{{ $fk['column'] }}.id;
+@foreach($relations->getBelongsTo() as $belongsTo)
+        if (data.{{ $belongsTo->foreignKeyColumn }} && typeof data.{{ $belongsTo->foreignKeyColumn }} === 'object') {
+            data.{{ $belongsTo->foreignKeyColumn }} = data.{{ $belongsTo->foreignKeyColumn }}.id;
         }
 @endforeach
         return data;
@@ -334,12 +335,12 @@ if (!props.data || Object.keys(props.data).length === 0) {
         {{ $belongsToMany->relatedTable }}: [],
 @endforeach
     };
-@if($hasForeignKeys)
+@if($relations->hasBelongsTo())
 } else {
-@foreach($foreignKeys as $fk)
-    if (form.value.{{ $fk['column'] }}) {
-        const match = props.{{ $fk['optionsPropName'] }}.find(p => p.id === form.value.{{ $fk['column'] }});
-        if (match) form.value.{{ $fk['column'] }} = match;
+@foreach($relations->getBelongsTo() as $belongsTo)
+    if (form.value.{{ $belongsTo->foreignKeyColumn }}) {
+        const match = props.{{ $belongsTo->optionsPropName }}.find(p => p.id === form.value.{{ $belongsTo->foreignKeyColumn }});
+        if (match) form.value.{{ $belongsTo->foreignKeyColumn }} = match;
     }
 @endforeach
 @endif

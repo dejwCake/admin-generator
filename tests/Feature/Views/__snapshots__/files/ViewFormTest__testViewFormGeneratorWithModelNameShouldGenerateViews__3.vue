@@ -22,10 +22,8 @@
                             @update:current-locale="currentLocale = $event"
                         />
 
-                        <FormSelect v-model="form.user_id" name="user_id"
-                            :label="translations.columns.user_id" :error="errors.user_id"
-                            :options="userOptions" trackBy="id" optionLabel="id"
-                            :placeholder="translations.select_an_option" />
+                        <FormInput v-model="form.user_id" name="user_id"
+                            :label="translations.columns.user_id" :error="errors.user_id" />
 
                         <FormInput v-model="form.title" name="title"
                             :label="translations.columns.title" :error="errors.title" />
@@ -134,7 +132,6 @@ import FormInput from '@craftable/components/form/FormInput.vue';
 import FormCheckbox from '@craftable/components/form/FormCheckbox.vue';
 import FormDatePicker from '@craftable/components/form/FormDatePicker.vue';
 import FormWysiwyg from '@craftable/components/form/FormWysiwyg.vue';
-import FormSelect from '@craftable/components/form/FormSelect.vue';
 import FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue';
 import FormLocalizedWysiwyg from '@craftable/components/form/FormLocalizedWysiwyg.vue';
 import FormSubmit from '@craftable/components/form/FormSubmit.vue';
@@ -144,7 +141,6 @@ const props = defineProps({
     data: {type: Object, default: () => ({})},
     translations: {type: Object, default: () => ({})},
     postOptions: {type: Array, default: () => []},
-    userOptions: {type: Array, default: () => []},
     locales: {type: Array, default: () => []},
     defaultLocale: {type: String, default: ''},
     sendEmptyLocales: {type: Boolean, default: true},
@@ -169,12 +165,6 @@ const {
         price: 'numeric',
         views: 'required|integer',
     },
-    transformData: (data) => {
-        if (data.user_id && typeof data.user_id === 'object') {
-            data.user_id = data.user_id.id;
-        }
-        return data;
-    },
 });
 
 if (!props.data || Object.keys(props.data).length === 0) {
@@ -197,10 +187,5 @@ if (!props.data || Object.keys(props.data).length === 0) {
         updated_by_admin_user_id: '',
         posts: [],
     };
-} else {
-    if (form.value.user_id) {
-        const match = props.userOptions.find(p => p.id === form.value.user_id);
-        if (match) form.value.user_id = match;
-    }
 }
 </script>

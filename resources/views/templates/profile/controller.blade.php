@@ -1,5 +1,5 @@
 @php
-    use Illuminate\Support\Arr;
+    use Illuminate\Support\Collection;
 @endphp
 @php echo "<?php";
 @endphp
@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace {{ $controllerNamespace }};
 @php
-    $uses = [
+    $uses = new Collection([
         'App\Http\Controllers\Controller',
         'Brackets\AdminAuth\Models\AdminUser',
         'Illuminate\Contracts\Config\Repository as Config',
@@ -24,8 +24,8 @@ namespace {{ $controllerNamespace }};
         'Illuminate\Validation\Rules\Password',
         'Illuminate\Validation\ValidationException',
         'Symfony\Component\HttpKernel\Exception\NotFoundHttpException',
-    ];
-    $uses = Arr::sort($uses);
+    ]);
+    $uses = $uses->unique()->sort();
 @endphp
 
 @foreach($uses as $use)
