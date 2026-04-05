@@ -1,5 +1,5 @@
 @php
-    use Illuminate\Support\Arr;
+    use Illuminate\Support\Collection;
     use Illuminate\Support\Str;
 @endphp
 @php echo "<?php";
@@ -10,14 +10,16 @@ declare(strict_types=1);
 
 namespace {{ $namespace }};
 @php
-    $uses[] = $modelFullName;
-    $uses[] = 'Illuminate\Database\Eloquent\Factories\Attributes\UseModel';
-    $uses[] = 'Illuminate\Database\Eloquent\Factories\Factory';
+    $uses = new Collection([
+        $modelFullName,
+        'Illuminate\Database\Eloquent\Factories\Attributes\UseModel',
+        'Illuminate\Database\Eloquent\Factories\Factory',
+    ]);
     if ($hasPassword) {
-        $uses[] = 'Illuminate\Container\Container';
-        $uses[] = 'Illuminate\Contracts\Hashing\Hasher';
+        $uses->push('Illuminate\Container\Container');
+        $uses->push('Illuminate\Contracts\Hashing\Hasher');
     }
-    $uses = Arr::sort($uses);
+    $uses = $uses->unique()->sort();
 @endphp
 
 @foreach($uses as $use)

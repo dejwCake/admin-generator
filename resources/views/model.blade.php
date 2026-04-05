@@ -86,37 +86,37 @@ use {{ $use }};
 final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty() ? ' implements HasMedia' : '' }}
 {
 @php
-    $traitUses = [
+    $traitUses = new Collection([
         'HasFactory'
-    ];
+    ]);
     if($hasSoftDelete) {
-        $traitUses[] = 'SoftDeletes';
+        $traitUses->push('SoftDeletes');
     }
     if($hasPublishedAt) {
-        $traitUses[] = 'PublishableTrait';
+        $traitUses->push('PublishableTrait');
     }
     if($hasRoles) {
-        $traitUses[] = 'HasRoles';
+        $traitUses->push('HasRoles');
     }
     if($translatable->count() > 0) {
-        $traitUses[] = 'HasTranslations';
+        $traitUses->push('HasTranslations');
     }
     if ($fillable) {
         foreach ($fillable as $fillableColumn) {
             if ($fillableColumn === "created_by_admin_user_id") {
-                $traitUses[] = 'CreatedByAdminUserTrait';
+                $traitUses->push('CreatedByAdminUserTrait');
             } elseif ($fillableColumn === "updated_by_admin_user_id") {
-                $traitUses[] = 'UpdatedByAdminUserTrait';
+                $traitUses->push('UpdatedByAdminUserTrait');
             }
         }
     }
     if ($mediaCollections->isNotEmpty()) {
-        $traitUses[] = 'AutoProcessMediaTrait';
-        $traitUses[] = 'HasMediaCollectionsTrait';
-        $traitUses[] = 'HasMediaThumbsTrait';
-        $traitUses[] = 'ProcessMediaTrait';
+        $traitUses->push('AutoProcessMediaTrait');
+        $traitUses->push('HasMediaCollectionsTrait');
+        $traitUses->push('HasMediaThumbsTrait');
+        $traitUses->push('ProcessMediaTrait');
     }
-    $traitUses = Arr::sort($traitUses);
+    $traitUses = $traitUses->unique()->sort();
 @endphp
 @if(count($traitUses) > 0)
 @foreach($traitUses as $traitUse)

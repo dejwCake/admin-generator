@@ -77,26 +77,26 @@ use {{ $use }};
 final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEmail{{ $mediaCollections->isNotEmpty() ? ', HasMedia' : '' }}
 {
 @php
-    $traitUses = [
+    $traitUses = new Collection([
         'HasFactory',
         'Notifiable',
-    ];
+    ]);
     if($hasSoftDelete) {
-        $traitUses[] = 'SoftDeletes';
+        $traitUses->push('SoftDeletes');
     }
     if($hasRoles) {
-        $traitUses[] = 'HasRoles';
+        $traitUses->push('HasRoles');
     }
     if($translatable->count() > 0) {
-        $traitUses[] = 'HasTranslations';
+        $traitUses->push('HasTranslations');
     }
     if ($mediaCollections->isNotEmpty()) {
-        $traitUses[] = 'AutoProcessMediaTrait';
-        $traitUses[] = 'HasMediaCollectionsTrait';
-        $traitUses[] = 'HasMediaThumbsTrait';
-        $traitUses[] = 'ProcessMediaTrait';
+        $traitUses->push('AutoProcessMediaTrait');
+        $traitUses->push('HasMediaCollectionsTrait');
+        $traitUses->push('HasMediaThumbsTrait');
+        $traitUses->push('ProcessMediaTrait');
     }
-    $traitUses = Arr::sort($traitUses);
+    $traitUses = $traitUses->unique()->sort();
 @endphp
 @if(count($traitUses) > 0)
 @foreach($traitUses as $traitUse)

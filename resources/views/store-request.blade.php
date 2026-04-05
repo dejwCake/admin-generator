@@ -1,6 +1,6 @@
 @php
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
-    use Illuminate\Support\Arr;
+    use Illuminate\Support\Collection;
     assert($relations instanceof RelationCollection);
 @endphp
 @php echo "<?php";
@@ -19,33 +19,33 @@ namespace {{ $classNamespace }};
             return in_array($column['name'], $translatable->toArray());
         });
     }
-    $uses = [
+    $uses = new Collection([
         'Illuminate\Contracts\Auth\Access\Gate',
-    ];
+    ]);
     if ($hasPassword || $hasCreatedByAdminUser || $hasUpdatedByAdminUser) {
-        $uses[] = 'Illuminate\Container\Container';
+        $uses->push('Illuminate\Container\Container');
     }
     if ($hasCreatedByAdminUser || $hasUpdatedByAdminUser) {
-        $uses[] = 'Illuminate\Contracts\Config\Repository as Config';
+        $uses->push('Illuminate\Contracts\Config\Repository as Config');
     }
     if ($hasPassword) {
-        $uses[] = 'Illuminate\Contracts\Hashing\Hasher';
+        $uses->push('Illuminate\Contracts\Hashing\Hasher');
     }
     if($hasPasswordUsage) {
-        $uses[] = 'Illuminate\Validation\Rules\Password';
+        $uses->push('Illuminate\Validation\Rules\Password');
     }
     if ($hasRuleUsage) {
-        $uses[] = 'Illuminate\Validation\Rule';
+        $uses->push('Illuminate\Validation\Rule');
     }
     if ($relations->hasBelongsToMany()) {
-        $uses[] = 'Illuminate\Support\Collection';
+        $uses->push('Illuminate\Support\Collection');
     }
     if ($translatable->count() > 0) {
-        $uses[] = 'Brackets\Translatable\Http\Requests\TranslatableFormRequest';
+        $uses->push('Brackets\Translatable\Http\Requests\TranslatableFormRequest');
     } else {
-        $uses[] = 'Illuminate\Foundation\Http\FormRequest';
+        $uses->push('Illuminate\Foundation\Http\FormRequest');
     }
-    $uses = Arr::sort($uses);
+    $uses = $uses->unique()->sort();
 @endphp
 
 @foreach($uses as $use)

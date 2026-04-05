@@ -68,21 +68,21 @@ use {{ $use }};
 final class {{ $modelBaseName }} extends Authenticatable implements CanActivateContract
 {
 @php
-    $traitUses = [
+    $traitUses = new Collection([
         'CanActivate',
         'HasFactory',
         'Notifiable',
-    ];
+    ]);
     if($hasSoftDelete) {
-        $traitUses[] = 'SoftDeletes';
+        $traitUses->push('SoftDeletes');
     }
     if($hasRoles) {
-        $traitUses[] = 'HasRoles';
+        $traitUses->push('HasRoles');
     }
     if($translatable->count() > 0) {
-        $traitUses[] = 'HasTranslations';
+        $traitUses->push('HasTranslations');
     }
-    $traitUses = Arr::sort($traitUses);
+    $traitUses = $traitUses->unique()->sort();
 @endphp
 @if(count($traitUses) > 0)
 @foreach($traitUses as $traitUse)

@@ -1,5 +1,5 @@
 @php
-    use Illuminate\Support\Arr;
+    use Illuminate\Support\Collection;
 @endphp
 @php echo "<?php";
 @endphp
@@ -9,12 +9,12 @@ declare(strict_types=1);
 
 namespace {{ $classNamespace }};
 @php
-    $uses = [
+    $uses = new Collection([
         'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Foundation\Http\FormRequest',
         $modelFullName,
-    ];
-    $uses = Arr::sort($uses);
+    ]);
+    $uses = $uses->unique()->sort();
 @endphp
 
 @foreach($uses as $use)
