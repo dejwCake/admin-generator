@@ -25,12 +25,6 @@ parameters:
 			path: src/Generators/Classes/BulkDestroyRequest.php
 
 		-
-			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 1
-			path: src/Generators/Classes/ClassGenerator.php
-
-		-
 			message: '''
 				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
 				just for compatibility with old code$#
@@ -124,12 +118,6 @@ parameters:
 			path: src/Generators/Classes/UpdateRequest.php
 
 		-
-			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 1
-			path: src/Generators/FileAppenders/FileAppender.php
-
-		-
 			message: '''
 				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
 				just for compatibility with old code$#
@@ -170,12 +158,6 @@ parameters:
 			identifier: method.deprecated
 			count: 2
 			path: src/Generators/Resources/Index.php
-
-		-
-			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
-			identifier: nullsafe.neverNull
-			count: 1
-			path: src/Generators/Resources/ResourceGenerator.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
