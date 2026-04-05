@@ -1,3 +1,7 @@
+@php
+    use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
+    assert($columns instanceof ColumnCollection)
+@endphp
 @php echo "<?php";
 @endphp
 
@@ -20,27 +24,27 @@ class {{ $classBaseName }} implements FromCollection, WithMapping, WithHeadings
      */
     public function collection()
     {
-        return {{$modelBaseName}}::all();
+        return {{ $modelBaseName }}::all();
     }
 
     public function headings(): array
     {
         return [
-@foreach($columnsToExport as $column)
-            trans('admin.{{ $modelLangFormat }}.columns.{{ $column }}'),
+@foreach($columns as $column)
+            trans('admin.{{ $modelLangFormat }}.columns.{{ $column->name }}'),
 @endforeach
         ];
     }
 
     /**
-     * {{'@'}}param {{$modelBaseName}} ${{ $modelVariableName }}
+     * {{'@'}}param {{ $modelBaseName }} ${{ $modelVariableName }}
      * {{'@'}}phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     public function map(${{ $modelVariableName }}): array
     {
         return [
-@foreach($columnsToExport as $column)
-            ${{$modelVariableName}}->{{$column}},
+@foreach($columns as $column)
+            ${{ $modelVariableName }}->{{ $column->name }},
 @endforeach
         ];
     }

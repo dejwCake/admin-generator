@@ -40,28 +40,10 @@ parameters:
 			path: src/Generators/Classes/DestroyRequest.php
 
 		-
-			message: '''
-				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
-				just for compatibility with old code$#
-			'''
-			identifier: method.deprecated
-			count: 1
-			path: src/Generators/Classes/Export.php
-
-		-
 			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/Generators/Classes/ExportRequest.php
-
-		-
-			message: '''
-				#^Call to deprecated method toLegacyCollection\(\) of class Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:
-				just for compatibility with old code$#
-			'''
-			identifier: method.deprecated
-			count: 3
-			path: src/Generators/Classes/Factory.php
 
 		-
 			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'

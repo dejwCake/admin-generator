@@ -1,6 +1,8 @@
 @php
+    use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Illuminate\Support\Collection;
     use Illuminate\Support\Str;
+    assert($columns instanceof ColumnCollection)
 @endphp
 @php echo "<?php";
 @endphp
@@ -15,7 +17,7 @@ namespace {{ $namespace }};
         'Illuminate\Database\Eloquent\Factories\Attributes\UseModel',
         'Illuminate\Database\Eloquent\Factories\Factory',
     ]);
-    if ($hasPassword) {
+    if ($columns->hasByName('password')) {
         $uses->push('Illuminate\Container\Container');
         $uses->push('Illuminate\Contracts\Hashing\Hasher');
     }
@@ -31,34 +33,34 @@ final class {{ $modelBaseName }}Factory extends Factory
 {
     public function definition(): array
     {
-@if($hasPassword)
+@if($columns->hasByName('password'))
         $hasher = Container::getInstance()->make(Hasher::class);
 
 @endif
         return [
-@foreach($standardColumns as $col)
-            '{{ $col['name'] }}' => {!! $col['faker'] !!},
+@foreach($columns->getNonTranslatable() as $column)
+            '{{ $column->name }}' => {!! $column->faker !!},
 @endforeach
-@foreach($translatableColumns as $col)
-            '{{ $col['name'] }}' => ['en' => {!! $col['faker'] !!}],
+@foreach($columns->getTranslatable() as $column)
+            '{{ $column->name }}' => ['en' => {!! $column->faker !!}],
 @endforeach
         ];
     }
-@foreach($booleanColumns as $col)
+@foreach($columns->getBoolean() as $column)
 
-    public function {{ $col['name'] }}(): self
+    public function {{ $column->name }}(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['{{ $col['name'] }}' => true]);
+        return $this->state(static fn (array $attributes) => ['{{ $column->name }}' => true]);
     }
 
-    public function not{{ Str::ucfirst($col['name']) }}(): self
+    public function not{{ Str::ucfirst($column->name) }}(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['{{ $col['name'] }}' => false]);
+        return $this->state(static fn (array $attributes) => ['{{ $column->name }}' => false]);
     }
 @endforeach
-@if($hasEmailVerified)
+@if($columns->hasByName('email_verified_at'))
 
     public function unverified(): self
     {
@@ -66,7 +68,7 @@ final class {{ $modelBaseName }}Factory extends Factory
         return $this->state(static fn (array $attributes) => ['email_verified_at' => null]);
     }
 @endif
-@if($hasPublishedAt)
+@if($columns->hasByName('published_at'))
 
     public function notPublished(): self
     {

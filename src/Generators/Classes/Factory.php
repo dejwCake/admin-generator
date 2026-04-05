@@ -79,17 +79,8 @@ final class Factory extends ClassGenerator
             'namespace' => $this->classNamespace,
             'modelFullName' => $this->modelFullName,
             'modelBaseName' => $this->modelBaseName,
-            //has
-            'hasPassword' => $columns->hasByName('password'),
-            'hasEmailVerified' => $columns->hasByName('email_verified_at'),
-            'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns
-            'translatableColumns' => $columns->getTranslatable()
-                ->toLegacyCollection(),
-            'standardColumns' => $columns->getNonTranslatable()
-                ->toLegacyCollection(),
-            'booleanColumns' => $columns->getBoolean()
-                ->toLegacyCollection(),
+            'columns' => $columns,
         ])->render();
     }
 

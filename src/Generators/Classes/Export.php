@@ -65,10 +65,7 @@ final class Export extends ClassGenerator
             'modelVariableName' => $this->modelVariableName,
             'modelLangFormat' => $this->modelLangFormat,
             //columns
-            'columnsToExport' => $columns->getToExport()
-                ->toLegacyCollection()
-                ->pluck('name')
-                ->toArray(),
+            'columns' => $columns->getToExport(),
         ])->render();
     }
 
