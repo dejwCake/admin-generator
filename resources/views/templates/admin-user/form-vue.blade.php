@@ -109,7 +109,7 @@
 @endforeach
 @foreach($relations->getBelongsToMany() as $belongsToMany)
                         <FormMultiSelect v-model="form.{{ $belongsToMany->relatedTable }}" name="{{ $belongsToMany->relatedTable }}"
-                            :label="translations.relations.{{ Str::lcfirst($belongsToMany->relatedModelNamePlural) }}" :error="errors.{{ $belongsToMany->relatedTable }}"
+                            :label="translations.relations.{{ Str::lcfirst(Str::plural($belongsToMany->relatedModelName)) }}" :error="errors.{{ $belongsToMany->relatedTable }}"
                             :options="{{ Str::camel(Str::singular($belongsToMany->relatedTable)) }}Options" trackBy="id" optionLabel="{{ $belongsToMany->relatedLabel }}"
                             :placeholder="translations.select_options" />
 

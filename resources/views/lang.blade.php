@@ -32,7 +32,7 @@
 @if ($relations->hasBelongsToMany())
             //Belongs to many relations
 @foreach($relations->getBelongsToMany() as $belongsToMany)
-            '{{ Str::lcfirst($belongsToMany->relatedModelNamePlural) }}' => '{{ Str::ucfirst(str_replace('_', ' ', $belongsToMany->relatedModelNamePlural)) }}',
+            '{{ Str::lcfirst(Str::plural($belongsToMany->relatedModelName)) }}' => '{{ Str::ucfirst(str_replace('_', ' ', Str::plural($belongsToMany->relatedModelName))) }}',
 @endforeach
 @endif
         ],

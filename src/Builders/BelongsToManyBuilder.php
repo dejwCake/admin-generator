@@ -23,8 +23,6 @@ final readonly class BelongsToManyBuilder
                 ? 'Spatie\\Permission\\Models\\Role'
                 : 'App\\Models\\' . Str::studly(Str::singular($relatedTable)),
             relatedModelName: Str::studly(Str::singular($relatedTable)),
-            relatedModelNamePlural: Str::studly($relatedTable),
-            relatedModelVariableName: lcfirst(Str::singular(class_basename($relatedTable))),
             relationTable: trim($this->getRelationTable($tableName, $relatedTable), '_'),
             foreignKey: Str::singular($tableName) . '_id',
             relatedKey: Str::singular($relatedTable) . '_id',

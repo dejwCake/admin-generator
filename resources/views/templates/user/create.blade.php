@@ -43,7 +43,7 @@
 @if($relations->hasBelongsToMany())
                 'relations' => [
 @foreach($relations->getBelongsToMany() as $belongsToMany)
-                    '{{ Str::lcfirst($belongsToMany->relatedModelNamePlural) }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ Str::lcfirst($belongsToMany->relatedModelNamePlural) }}'),
+                    '{{ Str::lcfirst(Str::plural($belongsToMany->relatedModelName)) }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ Str::lcfirst(Str::plural($belongsToMany->relatedModelName)) }}'),
 @endforeach
                 ],
 @endif
