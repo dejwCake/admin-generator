@@ -11,9 +11,9 @@ final readonly class BelongsTo
         public string $relatedTable,
         public string $relatedModel,
         public string $relatedModelName,
-        public string $optionsPropName,
-        public string $foreignKeyLabel,
+        public string $relatedLabel,
         public string $relationMethodName,
+        public string $optionsPropName,
     ) {
     }
 }

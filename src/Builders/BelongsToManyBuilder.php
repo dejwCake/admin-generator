@@ -17,18 +17,17 @@ final readonly class BelongsToManyBuilder
     public function build(string $relatedTable, string $tableName,): BelongsToMany
     {
         return new BelongsToMany(
-            currentTable: $tableName,
             relatedTable: $relatedTable,
             relatedModel: $relatedTable === 'roles'
                 ? 'Spatie\\Permission\\Models\\Role'
                 : 'App\\Models\\' . Str::studly(Str::singular($relatedTable)),
             relatedModelName: Str::studly(Str::singular($relatedTable)),
-            foreignKey: Str::singular($tableName) . '_id',
-            relatedKey: Str::singular($relatedTable) . '_id',
             relatedLabel: $this->columnCollectionBuilder->build($relatedTable)->getLabelColumn(),
             relationTable: trim($this->getRelationTable($tableName, $relatedTable), '_'),
             relationMethodName: $relatedTable,
             optionsPropName: Str::camel(Str::singular($relatedTable)) . 'Options',
+            foreignKey: Str::singular($tableName) . '_id',
+            relatedKey: Str::singular($relatedTable) . '_id',
         );
     }
 

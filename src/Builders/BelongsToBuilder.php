@@ -22,9 +22,9 @@ final readonly class BelongsToBuilder
             relatedTable: $relatedTable,
             relatedModel: 'App\\Models\\' . $relatedModelName,
             relatedModelName: $relatedModelName,
-            optionsPropName: Str::camel(Str::singular($relatedTable)) . 'Options',
-            foreignKeyLabel: $this->columnCollectionBuilder->build($relatedTable)->getLabelColumn(),
+            relatedLabel: $this->columnCollectionBuilder->build($relatedTable)->getLabelColumn(),
             relationMethodName: Str::camel(Str::beforeLast($foreignKeyColumn, '_id')),
+            optionsPropName: Str::camel(Str::singular($relatedTable)) . 'Options',
         );
     }
 }

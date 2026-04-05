@@ -90,7 +90,7 @@
 @php $belongsToRelation = $relations->getBelongsToByColumn($col['name']); @endphp
                         <FormSelect v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
                             :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}"
-                            :options="{{ $belongsToRelation->optionsPropName }}" trackBy="id" optionLabel="{{ $belongsToRelation->foreignKeyLabel }}"
+                            :options="{{ $belongsToRelation->optionsPropName }}" trackBy="id" optionLabel="{{ $belongsToRelation->relatedLabel }}"
                             :placeholder="translations.select_an_option" />
 
 @else
