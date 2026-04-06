@@ -69,6 +69,8 @@ final class Index extends ResourceGenerator
             $this->withoutBulk = true;
         }
 
+        $this->relations = $this->relationBuilder->build($this->tableName, null);
+
         $viewPath = resource_path('views/admin/' . $this->modelViewsDirectory . '/index.blade.php');
         $listingVuePath = resource_path('js/admin/' . $this->modelJSName . '/Listing.vue');
 
@@ -183,6 +185,7 @@ final class Index extends ResourceGenerator
             //globals
             'modelJSName' => $this->modelJSName,
             'modelVariableName' => $this->modelVariableName,
+            'relations' => $this->relations,
             //has
             'hasExport' => $this->export,
             'hasBulk' => !$this->withoutBulk,
@@ -193,6 +196,7 @@ final class Index extends ResourceGenerator
             //columns
             'columns' => $indexColumns->toLegacyCollection(),
             'dateImports' => $dateImports->implode(', '),
+            //relations
         ])->render();
     }
 

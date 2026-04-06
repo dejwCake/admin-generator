@@ -1,3 +1,7 @@
+@php
+    use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
+    assert($relations instanceof RelationCollection);
+@endphp
 <template>
     <div class="row">
         <div class="col">
@@ -122,6 +126,9 @@
                                 <td v-if="isColumnVisible({{ $col['priority'] }})">{{ '{{' }} formatTime(item.{{ $col['name'] }}) }}</td>
 @elseif(in_array($col['majorType'], ['datetime']))
                                 <td v-if="isColumnVisible({{ $col['priority'] }})">{{ '{{' }} formatDatetime(item.{{ $col['name'] }}) }}</td>
+@elseif(isset($col['isForeignKey']) && $col['isForeignKey'] && $relations->hasBelongsToByColumn($col['name']))
+@php $belongsTo = $relations->getBelongsToByColumn($col['name']); @endphp
+                                <td v-if="isColumnVisible({{ $col['priority'] }})">{{ '{{' }} item.{{ $belongsTo->relationMethodName }}?.{{ $belongsTo->relatedLabel }} }}</td>
 @else
                                 <td v-if="isColumnVisible({{ $col['priority'] }})">{{ '{{' }} item.{{ $col['name'] }} }}</td>
 @endif
