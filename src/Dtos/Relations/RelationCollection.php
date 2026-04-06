@@ -39,11 +39,6 @@ final class RelationCollection
         $this->hasMany->put($hasManyRelation->relatedTable, $hasManyRelation);
     }
 
-    public function hasRelation(): bool
-    {
-        return $this->belongsTo->isNotEmpty() || $this->belongsToMany->isNotEmpty() || $this->hasMany->isNotEmpty();
-    }
-
     public function hasBelongsTo(): bool
     {
         return $this->belongsTo->isNotEmpty();

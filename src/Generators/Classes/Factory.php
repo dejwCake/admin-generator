@@ -79,6 +79,10 @@ final class Factory extends ClassGenerator
             'namespace' => $this->classNamespace,
             'modelFullName' => $this->modelFullName,
             'modelBaseName' => $this->modelBaseName,
+            //has
+            'hasPassword' => $columns->hasByName('password'),
+            'hasEmailVerifiedAt' => $columns->hasByName('email_verified_at'),
+            'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns
             'columns' => $columns,
         ])->render();

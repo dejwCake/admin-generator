@@ -17,7 +17,7 @@ namespace {{ $namespace }};
         'Illuminate\Database\Eloquent\Factories\Attributes\UseModel',
         'Illuminate\Database\Eloquent\Factories\Factory',
     ]);
-    if ($columns->hasByName('password')) {
+    if ($hasPassword) {
         $uses->push('Illuminate\Container\Container');
         $uses->push('Illuminate\Contracts\Hashing\Hasher');
     }
@@ -33,7 +33,7 @@ final class {{ $modelBaseName }}Factory extends Factory
 {
     public function definition(): array
     {
-@if($columns->hasByName('password'))
+@if($hasPassword)
         $hasher = Container::getInstance()->make(Hasher::class);
 
 @endif
@@ -60,7 +60,7 @@ final class {{ $modelBaseName }}Factory extends Factory
         return $this->state(static fn (array $attributes) => ['{{ $column->name }}' => false]);
     }
 @endforeach
-@if($columns->hasByName('email_verified_at'))
+@if($hasEmailVerifiedAt)
 
     public function unverified(): self
     {
@@ -68,7 +68,7 @@ final class {{ $modelBaseName }}Factory extends Factory
         return $this->state(static fn (array $attributes) => ['email_verified_at' => null]);
     }
 @endif
-@if($columns->hasByName('published_at'))
+@if($hasPublishedAt)
 
     public function notPublished(): self
     {

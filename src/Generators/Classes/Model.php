@@ -85,23 +85,14 @@ final class Model extends ClassGenerator
             'hasSoftDelete' => $columns->hasByName('deleted_at'),
             'hasPublishedAt' => $columns->hasByName('published_at'),
             'hasTimestamps' => $columns->hasByName('created_at', 'updated_at'),
+            'hasRoles' => $this->relations->hasRelatedTableInBelongsToMany('roles'),
             //columns
-            'allColumns' => $columns->toLegacyCollection(),
-            'dates' => $columns->getDates()
-                ->toLegacyCollection()
-                ->pluck('name'),
-            'booleans' => $columns->getBoolean()
-                ->toLegacyCollection()
-                ->pluck('name'),
-            'fillable' => $columns->getFillable()
-                ->toLegacyCollection()
-                ->pluck('name'),
-            'hidden' => $columns->getHidden()
-                ->toLegacyCollection()
-                ->pluck('name'),
-            'translatable' => $columns->getTranslatable()
-                ->toLegacyCollection()
-                ->pluck('name'),
+            'columns' => $columns,
+            'dateColumns' => $columns->getDates(),
+            'booleanColumns' => $columns->getBoolean(),
+            'fillableColumns' => $columns->getFillable(),
+            'hiddenColumns' => $columns->getHidden(),
+            'translatableColumns' => $columns->getTranslatable(),
         ])->render();
     }
 

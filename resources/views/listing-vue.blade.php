@@ -182,36 +182,46 @@
     </div>
 </template>
 
+@php
+    use Illuminate\Support\Collection;
+@endphp
+@php
+    $imports = new Collection([
+        "{ref} from 'vue'",
+        "{useAppListing} from '../composables/useAppListing.js'",
+        "{useResponsiveColumns} from '@craftable/composables/useResponsiveColumns.js'",
+    ]);
+    if ($hasDateColumns) {
+        $imports->push('{' . $dateImports . "} from '@craftable/utils/dateFormatters.js'");
+    }
+    $imports->push("Sortable from '@craftable/components/listing/Sortable.vue'");
+    $imports->push("Pagination from '@craftable/components/listing/Pagination.vue'");
+    $imports->push("Search from '@craftable/components/listing/Search.vue'");
+    $imports->push("PerPage from '@craftable/components/listing/PerPage.vue'");
+    $imports->push("EmptyState from '@craftable/components/listing/EmptyState.vue'");
+    if (!$withoutBulk) {
+        $imports->push("BulkCheckboxHeader from '@craftable/components/listing/BulkCheckboxHeader.vue'");
+        $imports->push("BulkCheckboxRow from '@craftable/components/listing/BulkCheckboxRow.vue'");
+        $imports->push("BulkOperationsBar from '@craftable/components/listing/BulkOperationsBar.vue'");
+    }
+    if ($hasPublishedAt) {
+        $imports->push("PublishedAtColumn from '@craftable/components/listing/PublishedAtColumn.vue'");
+    }
+    $imports->push("ListingHeader from '@craftable/components/listing/ListingHeader.vue'");
+    $imports->push("EditButton from '@craftable/components/listing/EditButton.vue'");
+    $imports->push("DeleteButton from '@craftable/components/listing/DeleteButton.vue'");
+    if ($hasUserDetailTooltip) {
+        $imports->push("UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue'");
+    }
+    if ($hasSwitchColumns) {
+        $imports->push("ToggleSwitch from '@craftable/components/listing/ToggleSwitch.vue'");
+    }
+    $imports->push("ConfirmModal from '@craftable/components/ConfirmModal.vue'");
+@endphp
 <script setup>
-import {ref} from 'vue';
-import {useAppListing} from '../composables/useAppListing.js';
-import {useResponsiveColumns} from '@craftable/composables/useResponsiveColumns.js';
-@if($hasDateColumns)
-import {!! '{' . $dateImports . '}' !!} from '@craftable/utils/dateFormatters.js';
-@endif
-import Sortable from '@craftable/components/listing/Sortable.vue';
-import Pagination from '@craftable/components/listing/Pagination.vue';
-import Search from '@craftable/components/listing/Search.vue';
-import PerPage from '@craftable/components/listing/PerPage.vue';
-import EmptyState from '@craftable/components/listing/EmptyState.vue';
-@if(!$withoutBulk)
-import BulkCheckboxHeader from '@craftable/components/listing/BulkCheckboxHeader.vue';
-import BulkCheckboxRow from '@craftable/components/listing/BulkCheckboxRow.vue';
-import BulkOperationsBar from '@craftable/components/listing/BulkOperationsBar.vue';
-@endif
-@if($hasPublishedAt)
-import PublishedAtColumn from '@craftable/components/listing/PublishedAtColumn.vue';
-@endif
-import ListingHeader from '@craftable/components/listing/ListingHeader.vue';
-import EditButton from '@craftable/components/listing/EditButton.vue';
-import DeleteButton from '@craftable/components/listing/DeleteButton.vue';
-@if($hasUserDetailTooltip)
-import UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue';
-@endif
-@if($hasSwitchColumns)
-import ToggleSwitch from '@craftable/components/listing/ToggleSwitch.vue';
-@endif
-import ConfirmModal from '@craftable/components/ConfirmModal.vue';
+@foreach($imports as $import)
+import {!! $import !!};
+@endforeach
 
 const props = defineProps({
     url: {type: String, required: true},

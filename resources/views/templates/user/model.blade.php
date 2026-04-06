@@ -1,7 +1,15 @@
 @php
+    use Brackets\AdminGenerator\Dtos\Columns\Column;
+    use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
     use Illuminate\Support\Collection;
     assert($relations instanceof RelationCollection);
+    assert($columns instanceof ColumnCollection);
+    assert($fillableColumns instanceof ColumnCollection);
+    assert($dateColumns instanceof ColumnCollection);
+    assert($booleanColumns instanceof ColumnCollection);
+    assert($hiddenColumns instanceof ColumnCollection);
+    assert($translatableColumns instanceof ColumnCollection);
 @endphp
 @php echo "<?php";
 @endphp
@@ -11,10 +19,6 @@ declare(strict_types=1);
 
 namespace {{ $modelNameSpace }};
 @php
-    $hasRoles = false;
-    if($relations->hasBelongsToMany()) {
-        $hasRoles = $relations->hasRelatedTableInBelongsToMany('roles');
-    }
     $uses = new Collection([
         'Brackets\AdminAuth\Notifications\ResetPassword',
         'Illuminate\Contracts\Auth\MustVerifyEmail',
@@ -28,8 +32,14 @@ namespace {{ $modelNameSpace }};
     if ($hasRoles) {
         $uses[] = 'Spatie\Permission\Traits\HasRoles';
     }
-    if ($translatable->count() > 0) {
+    if ($translatableColumns->isNotEmpty()) {
         $uses->push('Brackets\Translatable\Traits\HasTranslations');
+    }
+    if ($fillableColumns->hasByName('created_by_admin_user_id')) {
+        $uses->push('Brackets\Craftable\Traits\CreatedByAdminUserTrait');
+    }
+    if ($fillableColumns->hasByName('updated_by_admin_user_id')) {
+        $uses->push('Brackets\Craftable\Traits\UpdatedByAdminUserTrait');
     }
     if ($mediaCollections->isNotEmpty()) {
         $uses->push('Brackets\Media\HasMedia\AutoProcessMediaTrait');
@@ -41,7 +51,7 @@ namespace {{ $modelNameSpace }};
             $uses->push('Spatie\MediaLibrary\MediaCollections\Models\Media');
         }
     }
-    if (count($dates) > 0 || $hasCarbonProperty) {
+    if ($dateColumns->isNotEmpty() || $hasCarbonProperty) {
         $uses->push('Carbon\CarbonInterface');
     }
     if ($relations->hasBelongsToManyWithoutRelatedTable('roles')) {
@@ -70,8 +80,10 @@ use {{ $use }};
 @endforeach
 
 /**
-@foreach($allColumns as $column)
- * @property {{ !$column['required'] ? $column['phpType'] . '|null' : $column['phpType'] }} ${{ $column['name'] }}
+@foreach($columns as $column)
+@php assert($column instanceof Column);
+@endphp
+ * @property {{ !$column->required ? $column->phpType . '|null' : $column->phpType }} ${{ $column->name }}
 @endforeach
  */
 final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEmail{{ $mediaCollections->isNotEmpty() ? ', HasMedia' : '' }}
@@ -87,8 +99,14 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
     if($hasRoles) {
         $traitUses->push('HasRoles');
     }
-    if($translatable->count() > 0) {
+    if($translatableColumns->isNotEmpty()) {
         $traitUses->push('HasTranslations');
+    }
+    if ($fillableColumns->hasByName('created_by_admin_user_id')) {
+        $traitUses->push('CreatedByAdminUserTrait');
+    }
+    if ($fillableColumns->hasByName('updated_by_admin_user_id')) {
+        $traitUses->push('UpdatedByAdminUserTrait');
     }
     if ($mediaCollections->isNotEmpty()) {
         $traitUses->push('AutoProcessMediaTrait');
@@ -107,7 +125,7 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
 
     protected $table = '{{ $tableName }}';
 @endif
-@if (count($fillable) > 0)
+@if ($fillableColumns->isNotEmpty())
 
     /**
      * The attributes that are mass assignable.
@@ -116,24 +134,24 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
      * {{'@'}}phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $fillable = [
-@foreach($fillable as $fillableField)
-        '{{ $fillableField }}',
+@foreach($fillableColumns as $column)
+        '{{ $column->name }}',
 @endforeach
     ];
 @endif
-@if (count($hidden) > 0)
+@if ($hiddenColumns->isNotEmpty())
 
     /**
      * @var array<int, string>
      * {{'@'}}phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $hidden = [
-@foreach($hidden as $hiddenField)
-        '{{ $hiddenField }}',
+@foreach($hiddenColumns as $column)
+        '{{ $column->name }}',
 @endforeach
     ];
 @endif
-@if ($translatable->count() > 0)
+@if ($translatableColumns->isNotEmpty())
 
     /**
      * These attributes are translatable
@@ -141,8 +159,8 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
      * @var array<int, string>
      */
     protected array $translatable = [
-@foreach($translatable as $translatableField)
-        '{{ $translatableField }}',
+@foreach($translatableColumns as $column)
+        '{{ $column->name }}',
 @endforeach
     ];
 @endif
@@ -259,7 +277,7 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
 @endforeach
     }
 @endif
-@if (count($dates) > 0 || count($booleans) > 0)
+@if ($dateColumns->isNotEmpty() || $booleanColumns->isNotEmpty())
 
     /**
      * @return array<string>
@@ -267,11 +285,11 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
     protected function casts(): array
     {
         return [
-@foreach($booleans as $boolean)
-            '{{ $boolean }}' => 'boolean',
+@foreach($booleanColumns as $column)
+            '{{ $column->name }}' => 'boolean',
 @endforeach
-@foreach($dates as $date)
-            '{{ $date }}' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
+@foreach($dateColumns as $column)
+            '{{ $column->name }}' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
 @endforeach
             'password' => 'hashed',
         ];
