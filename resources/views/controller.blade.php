@@ -30,7 +30,7 @@ namespace {{ $controllerNamespace }};
         sprintf('App\Http\Requests\Admin\%s\Update%s', $modelWithNamespaceFromDefault, $modelBaseName),
         $modelFullName,
     ]);
-    if ($export) {
+    if ($hasExport) {
         $uses->push(sprintf('App\Exports\%s', $exportBaseName));
         $uses->push('Maatwebsite\Excel\Excel');
         $uses->push('Symfony\Component\HttpFoundation\BinaryFileResponse');
@@ -44,7 +44,7 @@ namespace {{ $controllerNamespace }};
     foreach ($relations->getBelongsTo() as $belongsTo) {
         $uses->push($belongsTo->relatedModel);
     }
-    if (!$withoutBulk) {
+    if ($hasBulk) {
         $uses->push(sprintf('App\Http\Requests\Admin\%s\BulkDestroy%s', $modelWithNamespaceFromDefault, $modelBaseName));
         $uses->push('Illuminate\Database\DatabaseManager');
     }
@@ -115,7 +115,7 @@ final class {{ $controllerBaseName }} extends Controller
             );
 
         if ($request->ajax()) {
-@if(!$withoutBulk)
+@if($hasBulk)
             if ($request->has('bulk')) {
                 return [
                     'bulkItems' => $data->pluck('id'),
@@ -137,11 +137,11 @@ final class {{ $controllerBaseName }} extends Controller
                 'editUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/edit', ['{{ $modelVariableName }}' => ':id']),
                 'updateUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/update', ['{{ $modelVariableName }}' => ':id']),
                 'destroyUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/destroy', ['{{ $modelVariableName }}' => ':id']),
-@if(!$withoutBulk)
+@if($hasBulk)
                 'bulkAllUrl' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
                 'bulkDestroyUrl' => $this->urlGenerator->route('admin/{{ $resource }}/bulk-destroy'),
 @endif
-@if($export)
+@if($hasExport)
                 'exportUrl' => $this->urlGenerator->route('admin/{{ $resource }}/export'),
 @endif
             ],
@@ -309,7 +309,7 @@ final class {{ $controllerBaseName }} extends Controller
 
         return $this->redirector->back();
     }
-@if(!$withoutBulk)
+@if($hasBulk)
 
     /**
      * Remove the specified resources from storage.
@@ -336,7 +336,7 @@ final class {{ $controllerBaseName }} extends Controller
         return $this->redirector->back();
     }
 @endif
-@if($export)
+@if($hasExport)
 
     /**
      * Export entities

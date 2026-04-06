@@ -114,14 +114,14 @@ final class Lang extends FileAppender
             'modelPlural' => $this->modelPlural,
             'titleSingular' => $this->titleSingular,
             'titlePlural' => $this->titlePlural,
-            'export' => $this->export,
             'relations' => $this->relations,
             'mediaCollections' => $this->mediaCollections,
             //has
-            'hasPublishedAt' => $columns->hasByName('published_at'),
+            'hasExport' => $this->export,
             'hasProfile' => $this->tableName === 'admin_users',
+            'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns
-            'columns' => $columns->toLegacyCollection(),
+            'columns' => $columns,
         ])->render();
     }
 }

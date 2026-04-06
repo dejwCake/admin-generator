@@ -110,12 +110,12 @@ final class Controller extends ClassGenerator
             'modelViewsDirectory' => $this->modelViewsDirectory,
             'modelDotNotation' => $this->modelDotNotation,
             'modelWithNamespaceFromDefault' => $this->modelWithNamespaceFromDefault,
-            'export' => $this->export,
-            'withoutBulk' => $this->withoutBulk,
             'resource' => $this->resource,
             'relations' => $this->relations,
             'mediaCollections' => $this->mediaCollections,
             //has
+            'hasExport' => $this->export,
+            'hasBulk' => !$this->withoutBulk,
             'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns
             // index

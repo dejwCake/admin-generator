@@ -118,8 +118,9 @@ final class Routes extends FileAppender
             'controllerBaseName' => class_basename($this->controllerFullName),
             'modelVariableName' => $this->modelVariableName,
             'resource' => $this->resource,
-            'export' => $this->export,
-            'withoutBulk' => $this->withoutBulk,
+            //has
+            'hasExport' => $this->export,
+            'hasBulk' => !$this->withoutBulk,
         ])->render();
     }
 }

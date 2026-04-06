@@ -103,7 +103,8 @@ final class Permissions extends ClassGenerator
             'modelBaseName' => $this->modelBaseName,
             'modelDotNotation' => $this->modelDotNotation,
             'className' => $this->generateClassNameFromTable($this->tableName),
-            'withoutBulk' => $this->withoutBulk,
+            //has
+            'hasBulk' => !$this->withoutBulk,
         ])->render();
     }
 

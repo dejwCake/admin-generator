@@ -11,11 +11,11 @@
         :edit-url-template="'{{'{{'}} $editUrlTemplate }}'"
         :update-url-template="'{{'{{'}} $updateUrlTemplate }}'"
         :destroy-url-template="'{{'{{'}} $destroyUrlTemplate }}'"
-@if(!$withoutBulk)
+@if($hasBulk)
         :bulk-all-url="'{{'{{'}} $bulkAllUrl }}'"
         :bulk-destroy-url="'{{'{{'}} $bulkDestroyUrl }}'"
 @endif
-@if($export)
+@if($hasExport)
         :export-url="'{{'{{'}} $exportUrl }}'"
 @endif
         :resend-activation-url-template="'{{'{{'}} $resendActivationUrlTemplate }}'"
@@ -25,7 +25,7 @@
         :translations="{{'{{'}} json_encode([
             'listing_title' => trans('admin.{{ $modelLangFormat }}.actions.index'),
             'create_btn' => trans('admin.{{ $modelLangFormat }}.actions.create'),
-@if($export)
+@if($hasExport)
             'export_btn' => trans('admin.{{ $modelLangFormat }}.actions.export'),
 @endif
             'columns' => [

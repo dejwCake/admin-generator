@@ -12,7 +12,7 @@
                     ->name('store');
                 Route::get('/{{ '{' }}{{ $modelVariableName }}}/edit', 'edit')
                     ->name('edit');
-@if(!$withoutBulk)
+@if($hasBulk)
                 Route::post('/bulk-destroy', 'bulkDestroy')
                     ->name('bulk-destroy');
 @endif
@@ -20,7 +20,7 @@
                     ->name('update');
                 Route::delete('/{{ '{' }}{{ $modelVariableName }}}', 'destroy')
                     ->name('destroy');
-@if($export)
+@if($hasExport)
                 Route::get('/export', 'export')
                     ->name('export');
 @endif

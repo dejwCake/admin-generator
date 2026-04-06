@@ -5,7 +5,7 @@
                 <div class="card-header">
                     <ListingHeader
                         :createUrl="createUrl"
-@if($export)
+@if($hasExport)
                         :exportUrl="exportUrl"
 @endif
                         :translations="translations"
@@ -29,7 +29,7 @@
                         <table class="table table-hover table-listing">
                             <thead>
                             <tr>
-@if(!$withoutBulk)
+@if($hasBulk)
                                 <th class="bulk-checkbox">
                                     <BulkCheckboxHeader :isClickedAll="isClickedAll"
                                                         :onToggleAll="onBulkItemsClickedAllWithPagination"/>
@@ -44,7 +44,7 @@
 
                                 <th></th>
                             </tr>
-@if(!$withoutBulk)
+@if($hasBulk)
                             <tr v-show="clickedBulkItemsCount > 0 || isClickedAll">
                                 <td class="bg-bulk-info d-table-cell text-center" :colspan="99">
                                     <BulkOperationsBar
@@ -69,11 +69,11 @@
                             <tr
                                 v-for="(item, index) in collection"
                                 :key="item.id"
-@if(!$withoutBulk)
+@if($hasBulk)
                                 :class="bulkItems[item.id] ? 'bg-bulk' : ''"
 @endif
                             >
-@if(!$withoutBulk)
+@if($hasBulk)
                                 <td class="bulk-checkbox">
                                     <BulkCheckboxRow :itemId="item.id" :checked="!!bulkItems[item.id]"
                                                      :disabled="bulkCheckingAllLoader" :onToggle="onBulkItemClicked"/>
@@ -171,7 +171,7 @@ import Pagination from '@craftable/components/listing/Pagination.vue';
 import Search from '@craftable/components/listing/Search.vue';
 import PerPage from '@craftable/components/listing/PerPage.vue';
 import EmptyState from '@craftable/components/listing/EmptyState.vue';
-@if(!$withoutBulk)
+@if($hasBulk)
 import BulkCheckboxHeader from '@craftable/components/listing/BulkCheckboxHeader.vue';
 import BulkCheckboxRow from '@craftable/components/listing/BulkCheckboxRow.vue';
 import BulkOperationsBar from '@craftable/components/listing/BulkOperationsBar.vue';
@@ -190,13 +190,13 @@ const props = defineProps({
     timezone: {type: String, default: 'UTC'},
     translations: {type: Object, default: () => ({})},
     createUrl: {type: String, default: ''},
-@if($export)
+@if($hasExport)
     exportUrl: {type: String, default: ''},
 @endif
     editUrlTemplate: {type: String, required: true},
     updateUrlTemplate: {type: String, required: true},
     destroyUrlTemplate: {type: String, required: true},
-@if(!$withoutBulk)
+@if($hasBulk)
     bulkAllUrl: {type: String, default: ''},
     bulkDestroyUrl: {type: String, default: ''},
 @endif
@@ -208,7 +208,7 @@ const {isColumnVisible} = useResponsiveColumns(cardBody);
 
 const {
     pagination, orderBy, filters, search, collection, now,
-@if(!$withoutBulk)
+@if($hasBulk)
     bulkItems, bulkCheckingAllLoader,
     isClickedAll, clickedBulkItemsCount, loadData, filter, resolveUrl,
     onBulkItemClicked,

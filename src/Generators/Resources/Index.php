@@ -142,10 +142,10 @@ final class Index extends ResourceGenerator
             'modelJSName' => $this->modelJSName,
             'modelDotNotation' => $this->modelDotNotation,
             'modelLangFormat' => $this->modelLangFormat,
-            'export' => $this->export,
-            'withoutBulk' => $this->withoutBulk,
             'resource' => $this->resource,
             //has
+            'hasExport' => $this->export,
+            'hasBulk' => !$this->withoutBulk,
             'hasPublishedAt' => $indexColumns->hasByName('published_at'),
             'hasCreatedByAdminUser' => $indexColumns->hasByName('created_by_admin_user_id'),
             'hasUpdatedByAdminUser' => $indexColumns->hasByName('updated_by_admin_user_id'),
@@ -183,9 +183,9 @@ final class Index extends ResourceGenerator
             //globals
             'modelJSName' => $this->modelJSName,
             'modelVariableName' => $this->modelVariableName,
-            'export' => $this->export,
-            'withoutBulk' => $this->withoutBulk,
             //has
+            'hasExport' => $this->export,
+            'hasBulk' => !$this->withoutBulk,
             'hasPublishedAt' => $hasPublishedAt,
             'hasUserDetailTooltip' => $hasUserDetailTooltip,
             'hasSwitchColumns' => $indexColumns->hasByMajorType('bool'),
