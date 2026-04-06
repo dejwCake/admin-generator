@@ -82,11 +82,8 @@ final class UpdateRequest extends ClassGenerator
             'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns
             // validation in store/update
-            'columns' => $columns->getVisible()
-                ->toLegacyCollection(),
-            'translatable' => $columns->getTranslatable()
-                ->toLegacyCollection()
-                ->pluck('name'),
+            'columns' => $columns->getVisible(),
+            'translatableColumns' => $columns->getTranslatable(),
         ])->render();
     }
 

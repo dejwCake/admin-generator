@@ -1,7 +1,10 @@
 @php
+    use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
     use Illuminate\Support\Collection;
     assert($relations instanceof RelationCollection);
+    assert($columns instanceof ColumnCollection);
+    assert($translatableColumns instanceof ColumnCollection);
 @endphp
 @php echo "<?php";
 @endphp
@@ -11,14 +14,6 @@ declare(strict_types=1);
 
 namespace {{ $classNamespace }};
 @php
-    if($translatable->count() > 0) {
-        $translatableColumns = $columns->filter(function($column) use ($translatable) {
-            return in_array($column['name'], $translatable->toArray());
-        });
-        $standardColumn = $columns->reject(function($column) use ($translatable) {
-            return in_array($column['name'], $translatable->toArray());
-        });
-    }
     $uses = new Collection([
         'Illuminate\Container\Container',
         'Illuminate\Contracts\Auth\Access\Gate',
@@ -33,7 +28,7 @@ namespace {{ $classNamespace }};
     if ($relations->hasBelongsToMany()) {
         $uses->push('Illuminate\Support\Collection');
     }
-    if ($translatable->count() > 0) {
+    if ($translatableColumns->isNotEmpty()) {
         $uses->push('Brackets\Translatable\Http\Requests\TranslatableFormRequest');
     } else {
         $uses->push('Illuminate\Foundation\Http\FormRequest');
@@ -45,7 +40,7 @@ namespace {{ $classNamespace }};
 use {{ $use }};
 @endforeach
 
-@if($translatable->count() > 0)
+@if($translatableColumns->isNotEmpty())
 final class {{ $classBaseName }} extends TranslatableFormRequest
 @else
 final class {{ $classBaseName }} extends FormRequest
@@ -59,17 +54,21 @@ final class {{ $classBaseName }} extends FormRequest
         return $gate->allows('admin.{{ $modelDotNotation }}.create');
     }
 
-@if($translatable->count() > 0)
+@if($translatableColumns->isNotEmpty())
     /**
      * Get the validation rules that apply to the requests untranslatable fields.
      */
     public function untranslatableRules(): array
     {
         return [
-@foreach($standardColumn as $column)
-            '{{ $column['name'] }}' => [
-                {!! implode(",\n                ", (array) $column['serverStoreRules']) !!},
+@foreach($columns->getNonTranslatable() as $column)
+@if(!($column->name === "updated_by_admin_user_id" || $column->name === "created_by_admin_user_id" ))
+            '{{ $column->name }}' => [
+@foreach($column->serverStoreRules as $rule)
+                {!! (string) $rule !!},
+@endforeach
             ],
+@endif
 @endforeach
 @if ($relations->hasBelongsToMany())
 
@@ -95,8 +94,10 @@ final class {{ $classBaseName }} extends FormRequest
     {
         return [
 @foreach($translatableColumns as $column)
-            '{{ $column['name'] }}' => [
-                {!! implode(",\n                ", (array) $column['serverStoreRules']) !!},
+            '{{ $column->name }}' => [
+@foreach($column->serverStoreRules as $rule)
+                {!! (string) $rule !!},
+@endforeach
             ],
 @endforeach
         ];
@@ -109,9 +110,13 @@ final class {{ $classBaseName }} extends FormRequest
     {
         return [
 @foreach($columns as $column)
-            '{{ $column['name'] }}' => [
-                {!! implode(",\n                ", (array) $column['serverStoreRules']) !!},
+@if(!($column->name === "updated_by_admin_user_id" || $column->name === "created_by_admin_user_id" ))
+            '{{ $column->name }}' => [
+@foreach($column->serverStoreRules as $rule)
+                {!! (string) $rule !!},
+@endforeach
             ],
+@endif
 @endforeach
 @if ($relations->hasBelongsToMany())
 

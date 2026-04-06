@@ -78,11 +78,8 @@ final class StoreRequest extends ClassGenerator
             'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
             //columns
             // validation in store/update
-            'columns' => $columns->getVisible()
-                ->toLegacyCollection(),
-            'translatable' => $columns->getTranslatable()
-                ->toLegacyCollection()
-                ->pluck('name'),
+            'columns' => $columns->getVisible(),
+            'translatableColumns' => $columns->getTranslatable(),
         ])->render();
     }
 
