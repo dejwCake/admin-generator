@@ -1,8 +1,12 @@
 @php
+    use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
     use Illuminate\Support\Collection;
     use Illuminate\Support\Str;
     assert($relations instanceof RelationCollection);
+    assert($queryColumns instanceof ColumnCollection);
+    assert($searchInColumns instanceof ColumnCollection);
+    assert($visibleColumns instanceof ColumnCollection);
 @endphp
 @php echo "<?php";
 @endphp
@@ -85,22 +89,22 @@ final class {{ $controllerBaseName }} extends Controller
                 $this->listingQueryBuilder->fromRequest(
                     $request,
                     [
-@foreach($columnsToQuery as $column)
-                        '{{ $column }}',
+@foreach($queryColumns as $column)
+                        '{{ $column->name }}',
 @endforeach
                     ],
                     [
-@foreach($columnsToSearchIn as $column)
-                        '{{ $column }}',
+@foreach($searchInColumns as $column)
+                        '{{ $column->name }}',
 @endforeach
                     ],
                 ),
 @php
     $eagerLoads = new Collection([]);
-    if (in_array('created_by_admin_user_id', $columnsToQuery)) {
+    if ($visibleColumns->hasByName('created_by_admin_user_id')) {
         $eagerLoads->push('createdByAdminUser');
     }
-    if (in_array('updated_by_admin_user_id', $columnsToQuery)) {
+    if ($visibleColumns->hasByName('updated_by_admin_user_id')) {
         $eagerLoads->push('updatedByAdminUser');
     }
     foreach ($relations->getBelongsTo() as $belongsTo) {
@@ -229,10 +233,10 @@ final class {{ $controllerBaseName }} extends Controller
 
 @php
     $eagerLoads = new Collection([]);
-    if (in_array('created_by_admin_user_id', $columnsToQuery)) {
+    if ($visibleColumns->hasByName('created_by_admin_user_id')) {
         $eagerLoads->push('createdByAdminUser');
     }
-    if (in_array('updated_by_admin_user_id', $columnsToQuery)) {
+    if ($visibleColumns->hasByName('updated_by_admin_user_id')) {
         $eagerLoads->push('updatedByAdminUser');
     }
     foreach ($relations->getBelongsToMany() as $belongsToMany) {

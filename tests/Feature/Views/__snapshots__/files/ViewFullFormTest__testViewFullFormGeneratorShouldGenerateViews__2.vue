@@ -22,60 +22,123 @@
                             @update:current-locale="currentLocale = $event"
                         />
 
-                        <FormInput v-model="form.user_id" name="user_id"
-                            :label="translations.columns.user_id" :error="errors.user_id" />
+                        <FormInput
+                            v-model="form.user_id"
+                            name="user_id"
+                            :label="translations.columns.user_id"
+                            :error="errors.user_id"
+                        />
 
-                        <FormInput v-model="form.title" name="title"
-                            :label="translations.columns.title" :error="errors.title" />
+                        <FormInput
+                            v-model="form.title"
+                            name="title"
+                            :label="translations.columns.title"
+                            :error="errors.title"
+                        />
 
-                        <FormInput v-model="form.slug" name="slug"
-                            :label="translations.columns.slug" :error="errors.slug" />
+                        <FormInput
+                            v-model="form.slug"
+                            name="slug"
+                            :label="translations.columns.slug"
+                            :error="errors.slug"
+                        />
 
-                        <FormWysiwyg v-model="form.perex" name="perex"
-                            :label="translations.columns.perex" :error="errors.perex"
-                            :upload-url="wysiwygUploadUrl" />
+                        <FormWysiwyg
+                            v-model="form.perex"
+                            name="perex"
+                            :label="translations.columns.perex"
+                            :error="errors.perex"
+                            :upload-url="wysiwygUploadUrl"
+                        />
 
-                        <FormDatePicker v-model="form.date_start" name="date_start"
-                            :label="translations.columns.date_start" :error="errors.date_start"
-                            :config="datePickerConfig" :placeholder="translations.select_a_date" />
+                        <FormDatePicker
+                            v-model="form.date_start"
+                            name="date_start"
+                            :label="translations.columns.date_start"
+                            :error="errors.date_start"
+                            :config="datePickerConfig"
+                            :placeholder="translations.select_a_date"
+                        />
 
-                        <FormDatePicker v-model="form.time_start" name="time_start"
-                            :label="translations.columns.time_start" :error="errors.time_start"
-                            :config="timePickerConfig" icon="fa-clock"
-                            :placeholder="translations.select_a_time" />
+                        <FormDatePicker
+                            v-model="form.time_start"
+                            name="time_start"
+                            :label="translations.columns.time_start"
+                            :error="errors.time_start"
+                            :config="timePickerConfig"
+                            icon="fa-clock"
+                            :placeholder="translations.select_a_time"
+                        />
 
-                        <FormDatePicker v-model="form.date_time_end" name="date_time_end"
-                            :label="translations.columns.date_time_end" :error="errors.date_time_end"
-                            :config="datetimePickerConfig" :placeholder="translations.select_date_and_time" />
+                        <FormDatePicker
+                            v-model="form.date_time_end"
+                            name="date_time_end"
+                            :label="translations.columns.date_time_end"
+                            :error="errors.date_time_end"
+                            :config="datetimePickerConfig"
+                            :placeholder="translations.select_date_and_time"
+                        />
 
-                        <FormLocalizedWysiwyg v-model="form.text" name="text"
-                            :label="translations.columns.text" :errors="errors"
-                            :locales="locales" :shouldShowLangGroup="shouldShowLangGroup"
+                        <FormLocalizedWysiwyg
+                            v-model="form.text"
+                            name="text"
+                            :label="translations.columns.text"
+                            :errors="errors"
+                            :locales="locales"
+                            :shouldShowLangGroup="shouldShowLangGroup"
                             :isFormLocalized="isFormLocalized"
-                            :upload-url="wysiwygUploadUrl" />
+                            :upload-url="wysiwygUploadUrl"
+                        />
 
-                        <FormLocalizedWysiwyg v-model="form.description" name="description"
-                            :label="translations.columns.description" :errors="errors"
-                            :locales="locales" :shouldShowLangGroup="shouldShowLangGroup"
+                        <FormLocalizedWysiwyg
+                            v-model="form.description"
+                            name="description"
+                            :label="translations.columns.description"
+                            :errors="errors"
+                            :locales="locales"
+                            :shouldShowLangGroup="shouldShowLangGroup"
                             :isFormLocalized="isFormLocalized"
-                            :upload-url="wysiwygUploadUrl" />
+                            :upload-url="wysiwygUploadUrl"
+                        />
 
-                        <FormCheckbox v-model="form.enabled" name="enabled"
-                            :label="translations.columns.enabled" :error="errors.enabled" />
+                        <FormCheckbox
+                            v-model="form.enabled"
+                            name="enabled"
+                            :label="translations.columns.enabled"
+                            :error="errors.enabled"
+                        />
 
-                        <FormCheckbox v-model="form.send" name="send"
-                            :label="translations.columns.send" :error="errors.send" />
+                        <FormCheckbox
+                            v-model="form.send"
+                            name="send"
+                            :label="translations.columns.send"
+                            :error="errors.send"
+                        />
 
-                        <FormInput v-model="form.price" name="price"
-                            :label="translations.columns.price" :error="errors.price" />
+                        <FormInput
+                            v-model="form.price"
+                            name="price"
+                            :label="translations.columns.price"
+                            :error="errors.price"
+                        />
 
-                        <FormInput v-model="form.views" name="views"
-                            :label="translations.columns.views" :error="errors.views" />
+                        <FormInput
+                            v-model="form.views"
+                            name="views"
+                            :label="translations.columns.views"
+                            :error="errors.views"
+                        />
 
-                        <FormMultiSelect v-model="form.posts" name="posts"
-                            :label="translations.relations.posts" :error="errors.posts"
-                            :options="postOptions" trackBy="id" optionLabel="title"
-                            :placeholder="translations.select_options" />
+                        <FormMultiSelect
+                            v-model="form.posts"
+                            name="posts"
+                            :label="translations.relations.posts"
+                            :error="errors.posts"
+                            :options="postOptions"
+                            trackBy="id"
+                            optionLabel="title"
+                            :placeholder="translations.select_options"
+                        />
 
                         <FormSubmit :submitting="submitting" :label="translations.save" />
                     </div>
@@ -88,9 +151,14 @@
                         <i class="fa fa-check"></i> {{ translations.publish }}
                     </div>
                     <div class="card-body">
-                        <FormDatePicker v-model="form.published_at" name="published_at"
-                            :label="translations.columns.published_at" :error="errors.published_at"
-                            :config="datetimePickerConfig" :placeholder="translations.select_date_and_time" />
+                        <FormDatePicker
+                            v-model="form.published_at"
+                            name="published_at"
+                            :label="translations.columns.published_at"
+                            :error="errors.published_at"
+                            :config="datetimePickerConfig"
+                            :placeholder="translations.select_date_and_time"
+                        />
                     </div>
                 </div>
 

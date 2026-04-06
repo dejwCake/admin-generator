@@ -1,3 +1,8 @@
+@php
+    use Brackets\AdminGenerator\Dtos\Columns\Column;
+    use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
+    assert($profileColumns instanceof ColumnCollection);
+@endphp
 {{'@'}}extends('brackets/admin-ui::admin.layout.default')
 
 {{'@'}}section('title', trans('admin.{{ $modelLangFormat }}.actions.edit_profile'))
@@ -9,17 +14,17 @@
         <{{ $modelJSName }}-form
             :action="'{{'{{'}} $action }}'"
             :data="{{'{{'}} ${{ $modelVariableName }}->toJson() }}"
-@if($hasLanguage)
+@if($profileColumns->hasByName('language'))
             :language-options="{{'{{'}} $locales->toJson() }}"
 @endif
             :translations="{{'{{'}} json_encode([
                 'form_title' => trans('admin.{{ $modelLangFormat }}.actions.edit_profile'),
                 'columns' => [
-@foreach($profileColumns as $col)
-                    '{{ $col['name'] }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ $col['name'] }}'),
+@foreach($profileColumns as $column)
+                    '{{ $column->name }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ $column->name }}'),
 @endforeach
                 ],
-@if($hasLanguage)
+@if($profileColumns->hasByName('language'))
                 'select_an_option' => trans('brackets/admin-ui::admin.forms.select_an_option'),
 @endif
                 'save' => trans('brackets/admin-ui::admin.btn.save'),

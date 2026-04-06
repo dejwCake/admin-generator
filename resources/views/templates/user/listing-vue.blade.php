@@ -40,9 +40,9 @@
                                 </th>
 @endif
 
-@foreach($columns as $col)
-                                <Sortable v-if="isColumnVisible({{ $col['priority'] }})" :column="'{{ $col['name'] }}'" :orderBy="orderBy" @sort="onSort">
-                                    {{ '{{' }} translations.columns.{{ $col['name'] }} }}
+@foreach($columns as $column)
+                                <Sortable v-if="isColumnVisible({{ $column->priority }})" :column="'{{ $column->name }}'" :orderBy="orderBy" @sort="onSort">
+                                    {{ '{{' }} translations.columns.{{ $column->name }} }}
                                 </Sortable>
 @endforeach
 
@@ -84,27 +84,53 @@
                                 </td>
 @endif
 
-@foreach($columns as $col)
-@if(in_array($col['majorType'], ['bool']))
-                                <td v-if="isColumnVisible({{ $col['priority'] }})">
-                                    <ToggleSwitch
-                                        v-model="collection[index].{{ $col['name'] }}"
+@foreach($columns as $column)
+@if($column->name === 'published_at')
+                                <td v-if="isColumnVisible({{ $column->priority }})" class="text-center text-nowrap" style="position: relative;">
+                                    <PublishedAtColumn
+                                        :item="item"
                                         :url="resolveUrl(updateUrlTemplate, item)"
-                                        column="{{ $col['name'] }}"
+                                        :now="now"
+                                        :translations="translations"
+                                        @update:item="onUpdateItem"
+                                    />
+                                </td>
+@elseif($column->name === 'created_by_admin_user_id')
+                                <td v-if="isColumnVisible({{ $column->priority }})">
+                                    <UserDetailTooltip
+                                        v-if="item.created_by_admin_user"
+                                        :user="item.created_by_admin_user"
+                                        :datetime-text="translations.created_on + ' ' + formatDatetime(item.created_at)"
+                                    />
+                                </td>
+@elseif($column->name === 'updated_by_admin_user_id')
+                                <td v-if="isColumnVisible({{ $column->priority }})">
+                                    <UserDetailTooltip
+                                        v-if="item.updated_by_admin_user"
+                                        :user="item.updated_by_admin_user"
+                                        :datetime-text="translations.updated_on + ' ' + formatDatetime(item.updated_at)"
+                                    />
+                                </td>
+@elseif(in_array($column->majorType, ['bool'], true))
+                                <td v-if="isColumnVisible({{ $column->priority }})">
+                                    <ToggleSwitch
+                                        v-model="collection[index].{{ $column->name }}"
+                                        :url="resolveUrl(updateUrlTemplate, item)"
+                                        column="{{ $column->name }}"
                                         :row="collection[index]"
                                     />
                                 </td>
-@elseif(in_array($col['majorType'], ['date']))
-                                <td v-if="isColumnVisible({{ $col['priority'] }})">{{ '{{' }} formatDate(item.{{ $col['name'] }}) }}</td>
-@elseif(in_array($col['majorType'], ['time']))
-                                <td v-if="isColumnVisible({{ $col['priority'] }})">{{ '{{' }} formatTime(item.{{ $col['name'] }}) }}</td>
-@elseif(in_array($col['majorType'], ['datetime']))
-                                <td v-if="isColumnVisible({{ $col['priority'] }})">{{ '{{' }} formatDatetime(item.{{ $col['name'] }}) }}</td>
-@elseif(isset($col['isForeignKey']) && $col['isForeignKey'] && $relations->hasBelongsToByColumn($col['name']))
-@php $belongsTo = $relations->getBelongsToByColumn($col['name']); @endphp
-                                <td v-if="isColumnVisible({{ $col['priority'] }})">{{ '{{' }} item.{{ $belongsTo->relationMethodName }}?.{{ $belongsTo->relatedLabel }} }}</td>
+@elseif(in_array($column->majorType, ['date'], true))
+                                <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} formatDate(item.{{ $column->name }}) }}</td>
+@elseif(in_array($column->majorType, ['time'], true))
+                                <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} formatTime(item.{{ $column->name }}) }}</td>
+@elseif(in_array($column->majorType, ['datetime'], true))
+                                <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} formatDatetime(item.{{ $column->name }}) }}</td>
+@elseif($column->isForeignKey && $relations->hasBelongsToByColumn($column->name))
+@php $belongsTo = $relations->getBelongsToByColumn($column->name); @endphp
+                                <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} item.{{ $belongsTo->relationMethodName }}?.{{ $belongsTo->relatedLabel }} }}</td>
 @else
-                                <td v-if="isColumnVisible({{ $col['priority'] }})">{{ '{{' }} item.{{ $col['name'] }} }}</td>
+                                <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} item.{{ $column->name }} }}</td>
 @endif
 @endforeach
 
@@ -171,7 +197,7 @@ import {ref} from 'vue';
 import {useAppListing} from '../composables/useAppListing.js';
 import {useResponsiveColumns} from '@craftable/composables/useResponsiveColumns.js';
 @if($hasDateColumns)
-import {!! '{' . $dateImports . '}' !!} from '@craftable/utils/dateFormatters.js';
+import {!! '{' . $dateImports->implode(', ') . '}' !!} from '@craftable/utils/dateFormatters.js';
 @endif
 import Sortable from '@craftable/components/listing/Sortable.vue';
 import Pagination from '@craftable/components/listing/Pagination.vue';

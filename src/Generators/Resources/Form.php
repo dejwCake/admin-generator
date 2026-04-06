@@ -90,7 +90,7 @@ final class Form extends ResourceGenerator
         ];
     }
 
-    /** @return array<string, Collection|RelationCollection|array<string>|string|bool> */
+    /** @return array<string, Collection|RelationCollection|ColumnCollection|array<string>|string|bool> */
     private function getCommonViewData(ColumnCollection $columns): array
     {
         $visibleColumns = $columns->getVisible();
@@ -98,17 +98,17 @@ final class Form extends ResourceGenerator
         $hasCreatedByAdminUser = $columns->hasByName('created_by_admin_user_id');
         $hasUpdatedByAdminUser = $columns->hasByName('updated_by_admin_user_id');
 
-        // Right column: only published_at
-        $rightFormColumns = $visibleColumns->filterByName('published_at');
         // Columns to display in the main form body (excluding sidebar/system columns)
         $leftFormColumns = $visibleColumns->rejectByName(
             'published_at',
             'created_by_admin_user_id',
             'updated_by_admin_user_id',
         );
+        // Right column: only published_at
+        $publishedColumns = $visibleColumns->filterByName('published_at');
 
         // Split media collections: gallery goes right, rest left
-        $rightMediaCollections = $this->mediaCollections->filter(
+        $galleryCollections = $this->mediaCollections->filter(
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
 
@@ -142,17 +142,17 @@ final class Form extends ResourceGenerator
             'hasLocalizedInput' => $leftFormColumns->hasLocalizedInput(),
             'hasLocalizedWysiwyg' => $leftFormColumns->hasLocalizedWysiwyg(),
             //columns
-            'columns' => $visibleColumns->toLegacyCollection(),
-            'leftFormColumns' => $leftFormColumns->toLegacyCollection(),
+            'columns' => $visibleColumns,
+            'leftFormColumns' => $leftFormColumns,
             'leftMediaCollections' => $this->mediaCollections->reject(
                 static fn (MediaCollection $mediaCollection): bool => $mediaCollection->collectionName === 'gallery',
             ),
-            'rightFormColumns' => $rightFormColumns->toLegacyCollection(),
-            'rightMediaCollections' => $rightMediaCollections,
-            'wysiwygTextColumnNames' => $columns->getWysiwygColumnNames(),
+            'publishedColumns' => $publishedColumns,
+            'galleryCollections' => $galleryCollections,
 
-            'isUsedTwoColumnsLayout' => $rightFormColumns->isNotEmpty()
-                || $rightMediaCollections->isNotEmpty()
+            'wysiwygTextColumnNames' => $columns->getWysiwygColumnNames(),
+            'isUsedTwoColumnsLayout' => $publishedColumns->isNotEmpty()
+                || $galleryCollections->isNotEmpty()
                 || $hasCreatedByAdminUser
                 || $hasUpdatedByAdminUser,
         ];
@@ -179,14 +179,13 @@ final class Form extends ResourceGenerator
     private function buildFormVue(): string
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
-        $leftFormColumns = $columns->getVisible()->rejectByName(
+        $data = $this->getCommonViewData($columns);
+
+        $data['validationRules'] = $columns->getVisible()->rejectByName(
             'published_at',
             'created_by_admin_user_id',
             'updated_by_admin_user_id',
-        );
-        $data = $this->getCommonViewData($columns);
-
-        $data['validationRules'] = $leftFormColumns->getFrontendValidationRules();
+        )->getFrontendValidationRules();
 
         // Pre-compute media-related strings for the template
         $data['mediaDefaultProp'] = '{' . $this->mediaCollections->keys()

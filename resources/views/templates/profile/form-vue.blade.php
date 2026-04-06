@@ -1,3 +1,8 @@
+@php
+    use Brackets\AdminGenerator\Dtos\Columns\Column;
+    use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
+    assert($profileColumns instanceof ColumnCollection);
+@endphp
 <template>
     <form class="form-horizontal" method="post" @@submit.prevent="onSubmit" :action="action" novalidate>
         <div class="card">
@@ -21,23 +26,40 @@
                         </div>
                     </div>
                     <div class="col-md-8">
-@foreach($profileColumns as $col)
-@if($col['name'] === 'email')
-                        <FormEmail v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}" />
+@foreach($profileColumns as $column)
+@if($column->name === 'email')
+                        <FormEmail
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                        />
 
-@elseif($col['name'] === 'language')
-                        <FormSelect v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}"
-                            :options="languageOptions" :placeholder="translations.select_an_option" />
+@elseif($column->name === 'language')
+                        <FormSelect
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                            :options="languageOptions"
+                            :placeholder="translations.select_an_option"
+                        />
 
-@elseif($col['majorType'] === 'bool')
-                        <FormCheckbox v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}" />
+@elseif($column->majorType === 'bool')
+                        <FormCheckbox
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                        />
 
 @else
-                        <FormInput v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}" />
+                        <FormInput
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                        />
 
 @endif
 @endforeach
@@ -56,16 +78,16 @@
 import { useAppForm } from '../composables/useAppForm.js';
 import { mediaCollectionProp } from '@@craftable/utils/mediaProps.js';
 import MediaUpload from '@@craftable/components/form/MediaUpload.vue';
-@if($profileColumns->contains(static fn (array $col): bool => !in_array($col['name'], ['email', 'language'], true) && $col['majorType'] !== 'bool'))
+@if($profileColumns->hasFormInput())
 import FormInput from '@@craftable/components/form/FormInput.vue';
 @endif
-@if($hasEmail)
+@if($profileColumns->hasByName('email'))
 import FormEmail from '@@craftable/components/form/FormEmail.vue';
 @endif
-@if($hasLanguage)
+@if($profileColumns->hasByName('language'))
 import FormSelect from '@@craftable/components/form/FormSelect.vue';
 @endif
-@if($profileColumns->contains(static fn (array $col): bool => $col['majorType'] === 'bool'))
+@if($profileColumns->hasByMajorType('bool'))
 import FormCheckbox from '@@craftable/components/form/FormCheckbox.vue';
 @endif
 import FormSubmit from '@@craftable/components/form/FormSubmit.vue';
@@ -74,7 +96,7 @@ const props = defineProps({
     action: { type: String, required: true },
     data: { type: Object, default: () => ({}) },
     translations: { type: Object, default: () => ({}) },
-@if($hasLanguage)
+@if($profileColumns->hasByName('language'))
     languageOptions: { type: Array, default: () => [] },
 @endif
     media: mediaCollectionProp,
@@ -93,10 +115,10 @@ const {
     shouldShowLangGroup,
 } = useAppForm(props, {
     validationSchema: {
-@if($hasEmail)
+@if($profileColumns->hasByName('email'))
         email: 'required|email',
 @endif
-@if($hasLanguage)
+@if($profileColumns->hasByName('language'))
         language: 'required',
 @endif
     },
@@ -106,13 +128,13 @@ mediaCollections.value = ['avatar'];
 
 if (!props.data || Object.keys(props.data).length === 0) {
     form.value = {
-@foreach($profileColumns as $col)
-@if($col['majorType'] === 'json')
-        {{ $col['name'] }}: getLocalizedFormDefaults(),
-@elseif($col['majorType'] === 'bool')
-        {{ $col['name'] }}: false,
+@foreach($profileColumns as $column)
+@if($column->majorType === 'json')
+        {{ $column->name }}: getLocalizedFormDefaults(),
+@elseif($column->majorType === 'bool')
+        {{ $column->name }}: false,
 @else
-        {{ $col['name'] }}: '',
+        {{ $column->name }}: '',
 @endif
 @endforeach
     };

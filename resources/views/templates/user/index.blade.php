@@ -26,8 +26,8 @@
             'export_btn' => trans('admin.{{ $modelLangFormat }}.actions.export'),
 @endif
             'columns' => [
-@foreach($columns as $col)
-                '{{ $col['name'] }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ $col['name'] }}'),
+@foreach($columns as $column)
+                '{{ $column->name }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ $column->name }}'),
 @endforeach
             ],
             'resend_verify_email_btn' => trans('admin.{{ $modelLangFormat }}.actions.resend_verify_email'),

@@ -1,7 +1,10 @@
 @php
+    use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
     use Illuminate\Support\Str;
     assert($relations instanceof RelationCollection);
+    assert($columns instanceof ColumnCollection);
+    assert($publishedColumns instanceof ColumnCollection);
 @endphp
 {{'@'}}extends('brackets/admin-ui::admin.layout.default')
 
@@ -39,11 +42,11 @@
             :translations="{{'{{'}} json_encode([
                 'form_title' => trans('admin.{{ $modelLangFormat }}.actions.edit', ['name' => ${{ $modelVariableName }}->first_name . ' ' . ${{ $modelVariableName }}->last_name]),
                 'columns' => [
-@foreach($columns as $col)
-@if(!in_array($col['name'], ['created_by_admin_user_id', 'updated_by_admin_user_id'], true))
-                    '{{ $col['name'] }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ $col['name'] }}'),
-@if($col['name'] === 'password')
-                    '{{ $col['name'] }}_repeat' => trans('admin.{{ $modelLangFormat }}.columns.{{ $col['name'] }}_repeat'),
+@foreach($columns as $column)
+@if(!in_array($column->name, ['created_by_admin_user_id', 'updated_by_admin_user_id'], true))
+                    '{{ $column->name }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ $column->name }}'),
+@if($column->name === 'password')
+                    '{{ $column->name }}_repeat' => trans('admin.{{ $modelLangFormat }}.columns.{{ $column->name }}_repeat'),
 @endif
 @endif
 @endforeach
@@ -55,7 +58,7 @@
 @endforeach
                 ],
 @endif
-@if($rightMediaCollections->isNotEmpty())
+@if($galleryCollections->isNotEmpty())
                 'gallery' => trans('brackets/admin-ui::admin.forms.gallery'),
 @endif
 @if($hasCreatedByAdminUser || $hasUpdatedByAdminUser)
@@ -74,7 +77,7 @@
 @if($hasTimeColumns)
                 'select_a_time' => trans('brackets/admin-ui::admin.forms.select_a_time'),
 @endif
-@if($hasDatetimeColumns || $rightFormColumns->isNotEmpty())
+@if($hasDatetimeColumns || $publishedColumns->isNotEmpty())
                 'select_date_and_time' => trans('brackets/admin-ui::admin.forms.select_date_and_time'),
 @endif
 @if($relations->hasBelongsToMany())

@@ -63,30 +63,4 @@ final readonly class Column
             frontendRules: $this->frontendRules,
         );
     }
-
-    /** @deprecated just for compatibility with old code */
-    public function toLegacyArray(): array
-    {
-        return [
-            'name' => $this->name,
-            'type' => $this->type,
-            'majorType' => $this->majorType,
-            'phpType' => $this->phpType,
-            'faker' => $this->faker,
-            'required' => $this->required,
-            'unique' => $this->unique,
-            'uniqueDeletedAtCondition' => $this->hasUniqueDeleteAtIndex,
-            'defaultTranslation' => $this->defaultTranslation,
-            'isForeignKey' => $this->isForeignKey,
-            'priority' => $this->priority,
-            'serverStoreRules' => $this->serverStoreRules
-                ->map(static fn (ServerStoreRule $serverStoreRule) => (string) $serverStoreRule)
-                ->toArray(),
-            'serverUpdateRules' => $this->serverUpdateRules
-                ->map(static fn (ServerUpdateRule $serverUpdateRule) => (string) $serverUpdateRule)
-                ->toArray(),
-            'frontendRules' => $this->frontendRules
-                ->toArray(),
-        ];
-    }
 }

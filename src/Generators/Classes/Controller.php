@@ -118,19 +118,9 @@ final class Controller extends ClassGenerator
             'hasBulk' => !$this->withoutBulk,
             'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns
-            // index
-            'columnsToQuery' => $columns->getToQuery()
-                ->toLegacyCollection()
-                ->pluck('name')
-                ->toArray(),
-            'columnsToSearchIn' => $columns->getToSearchIn()
-                ->toLegacyCollection()
-                ->pluck('name')
-                ->toArray(),
-//            'filters' => $columns->getFilters()
-//                ->toLegacyCollection(),
-            // validation in store/update
-            'columns' => $columns->getVisible()->toLegacyCollection(),
+            'queryColumns' => $columns->getToQuery(),
+            'searchInColumns' => $columns->getToSearchIn(),
+            'visibleColumns' => $columns->getVisible(),
         ])->render();
     }
 

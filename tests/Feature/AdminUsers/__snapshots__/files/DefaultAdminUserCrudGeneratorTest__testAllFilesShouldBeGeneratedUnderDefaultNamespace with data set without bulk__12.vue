@@ -6,36 +6,70 @@
                         {{ translations.form_title }}
                     </div>
                     <div class="card-body">
-                        <FormInput v-model="form.first_name" name="first_name"
-                            :label="translations.columns.first_name" :error="errors.first_name" />
+                        <FormInput
+                            v-model="form.first_name"
+                            name="first_name"
+                            :label="translations.columns.first_name"
+                            :error="errors.first_name"
+                        />
 
-                        <FormInput v-model="form.last_name" name="last_name"
-                            :label="translations.columns.last_name" :error="errors.last_name" />
+                        <FormInput
+                            v-model="form.last_name"
+                            name="last_name"
+                            :label="translations.columns.last_name"
+                            :error="errors.last_name"
+                        />
 
-                        <FormEmail v-model="form.email" name="email"
-                            :label="translations.columns.email" :error="errors.email" />
+                        <FormEmail
+                            v-model="form.email"
+                            name="email"
+                            :label="translations.columns.email"
+                            :error="errors.email"
+                        />
 
                         <FormPasswordConfirm
                             v-model:password="form.password"
                             v-model:passwordConfirmation="form.password_confirmation"
                             :passwordError="errors.password"
                             :confirmationError="errors.password_confirmation"
-                            :translations="{ password: translations.columns.password, password_repeat: translations.columns.password_repeat }" />
+                            :translations="{
+                                password: translations.columns.password,
+                                password_repeat: translations.columns.password_repeat
+                            }"
+                        />
 
-                        <FormCheckbox v-model="form.activated" name="activated"
-                            :label="translations.columns.activated" :error="errors.activated" />
+                        <FormCheckbox
+                            v-model="form.activated"
+                            name="activated"
+                            :label="translations.columns.activated"
+                            :error="errors.activated"
+                        />
 
-                        <FormCheckbox v-model="form.forbidden" name="forbidden"
-                            :label="translations.columns.forbidden" :error="errors.forbidden" />
+                        <FormCheckbox
+                            v-model="form.forbidden"
+                            name="forbidden"
+                            :label="translations.columns.forbidden"
+                            :error="errors.forbidden"
+                        />
 
-                        <FormSelect v-model="form.language" name="language"
-                            :label="translations.columns.language" :error="errors.language"
-                            :options="languageOptions" :placeholder="translations.select_an_option" />
+                        <FormSelect
+                            v-model="form.language"
+                            name="language"
+                            :label="translations.columns.language"
+                            :error="errors.language"
+                            :options="languageOptions"
+                            :placeholder="translations.select_an_option"
+                        />
 
-                        <FormMultiSelect v-model="form.roles" name="roles"
-                            :label="translations.relations.roles" :error="errors.roles"
-                            :options="roleOptions" trackBy="id" optionLabel="name"
-                            :placeholder="translations.select_options" />
+                        <FormMultiSelect
+                            v-model="form.roles"
+                            name="roles"
+                            :label="translations.relations.roles"
+                            :error="errors.roles"
+                            :options="roleOptions"
+                            trackBy="id" optionLabel="name"
+                            :placeholder="translations.select_options"
+                        />
 
                     </div>
 

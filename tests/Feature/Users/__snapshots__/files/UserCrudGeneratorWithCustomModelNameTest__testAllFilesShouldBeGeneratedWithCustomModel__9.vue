@@ -6,27 +6,50 @@
                         {{ translations.form_title }}
                     </div>
                     <div class="card-body">
-                        <FormInput v-model="form.name" name="name"
-                            :label="translations.columns.name" :error="errors.name" />
+                        <FormInput
+                            v-model="form.name"
+                            name="name"
+                            :label="translations.columns.name"
+                            :error="errors.name"
+                        />
 
-                        <FormEmail v-model="form.email" name="email"
-                            :label="translations.columns.email" :error="errors.email" />
+                        <FormEmail
+                            v-model="form.email"
+                            name="email"
+                            :label="translations.columns.email"
+                            :error="errors.email"
+                        />
 
-                        <FormDatePicker v-model="form.email_verified_at" name="email_verified_at"
-                            :label="translations.columns.email_verified_at" :error="errors.email_verified_at"
-                            :config="datetimePickerConfig" :placeholder="translations.select_date_and_time" />
+                        <FormDatePicker
+                            v-model="form.email_verified_at"
+                            name="email_verified_at"
+                            :label="translations.columns.email_verified_at"
+                            :error="errors.email_verified_at"
+                            :config="datetimePickerConfig"
+                            :placeholder="translations.select_date_and_time"
+                        />
 
                         <FormPasswordConfirm
                             v-model:password="form.password"
                             v-model:passwordConfirmation="form.password_confirmation"
                             :passwordError="errors.password"
                             :confirmationError="errors.password_confirmation"
-                            :translations="{ password: translations.columns.password, password_repeat: translations.columns.password_repeat }" />
+                            :translations="{
+                                password: translations.columns.password,
+                                password_repeat: translations.columns.password_repeat
+                            }"
+                        />
 
-                        <FormMultiSelect v-model="form.roles" name="roles"
-                            :label="translations.relations.roles" :error="errors.roles"
-                            :options="roleOptions" trackBy="id" optionLabel="name"
-                            :placeholder="translations.select_options" />
+                        <FormMultiSelect
+                            v-model="form.roles"
+                            name="roles"
+                            :label="translations.relations.roles"
+                            :error="errors.roles"
+                            :options="roleOptions"
+                            trackBy="id"
+                            optionLabel="name"
+                            :placeholder="translations.select_options"
+                        />
 
                     </div>
 

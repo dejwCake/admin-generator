@@ -132,7 +132,7 @@ final class Index extends ResourceGenerator
 
     private function buildView(): string
     {
-        $indexColumns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
             ->getForIndex();
 
         return view('brackets/admin-generator::' . $this->view, [
@@ -148,35 +148,35 @@ final class Index extends ResourceGenerator
             //has
             'hasExport' => $this->export,
             'hasBulk' => !$this->withoutBulk,
-            'hasPublishedAt' => $indexColumns->hasByName('published_at'),
-            'hasCreatedByAdminUser' => $indexColumns->hasByName('created_by_admin_user_id'),
-            'hasUpdatedByAdminUser' => $indexColumns->hasByName('updated_by_admin_user_id'),
+            'hasPublishedAt' => $columns->hasByName('published_at'),
+            'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
+            'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
             //columns
-            'columns' => $indexColumns->toLegacyCollection(),
+            'columns' => $columns,
         ])->render();
     }
 
     private function buildListingVue(): string
     {
-        $indexColumns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
             ->getForIndex();
 
-        $hasPublishedAt = $indexColumns->hasByName('published_at');
-        $hasUserDetailTooltip = $indexColumns->hasByName('created_by_admin_user_id')
-            || $indexColumns->hasByName('updated_by_admin_user_id');
+        $hasPublishedAt = $columns->hasByName('published_at');
+        $hasUserDetailTooltip = $columns->hasByName('created_by_admin_user_id')
+            || $columns->hasByName('updated_by_admin_user_id');
 
-        $hasDateColumns = $indexColumns->hasByMajorType('date', 'time', 'datetime')
+        $hasDateColumns = $columns->hasByMajorType('date', 'time', 'datetime')
             || $hasPublishedAt
             || $hasUserDetailTooltip;
 
         $dateImports = new Collection();
-        if ($indexColumns->hasByMajorType('date')) {
+        if ($columns->hasByMajorType('date')) {
             $dateImports->push('formatDate');
         }
-        if ($indexColumns->hasByMajorType('time')) {
+        if ($columns->hasByMajorType('time')) {
             $dateImports->push('formatTime');
         }
-        if ($indexColumns->hasByMajorType('datetime') || $hasPublishedAt || $hasUserDetailTooltip) {
+        if ($columns->hasByMajorType('datetime') || $hasPublishedAt || $hasUserDetailTooltip) {
             $dateImports->push('formatDatetime');
         }
         $dateImports = $dateImports->sort();
@@ -191,12 +191,11 @@ final class Index extends ResourceGenerator
             'hasBulk' => !$this->withoutBulk,
             'hasPublishedAt' => $hasPublishedAt,
             'hasUserDetailTooltip' => $hasUserDetailTooltip,
-            'hasSwitchColumns' => $indexColumns->hasByMajorType('bool'),
+            'hasSwitchColumns' => $columns->hasByMajorType('bool'),
             'hasDateColumns' => $hasDateColumns,
             //columns
-            'columns' => $indexColumns->toLegacyCollection(),
-            'dateImports' => $dateImports->implode(', '),
-            //relations
+            'columns' => $columns,
+            'dateImports' => $dateImports,
         ])->render();
     }
 

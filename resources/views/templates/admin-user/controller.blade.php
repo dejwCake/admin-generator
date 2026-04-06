@@ -1,8 +1,12 @@
 @php
+    use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
     use Illuminate\Support\Collection;
     use Illuminate\Support\Str;
     assert($relations instanceof RelationCollection);
+    assert($queryColumns instanceof ColumnCollection);
+    assert($searchInColumns instanceof ColumnCollection);
+    assert($visibleColumns instanceof ColumnCollection);
 @endphp
 @php echo "<?php";
 @endphp
@@ -12,9 +16,7 @@ declare(strict_types=1);
 
 namespace {{ $controllerNamespace }};
 @php
-    $activation = $columns->search(function ($column, $key) {
-            return $column['name'] === 'activated';
-        }) !== false;
+    $hasActivation = $visibleColumns->hasByName('activated');
     $uses = new Collection([
         'App\Http\Controllers\Controller',
         'Brackets\AdminListing\Builders\ListingBuilder',
@@ -45,7 +47,7 @@ namespace {{ $controllerNamespace }};
         $uses->push('Carbon\CarbonImmutable');
         $uses->push(sprintf('App\Http\Requests\Admin\%s\Export%s', $modelWithNamespaceFromDefault, $modelBaseName));
     }
-    if ($activation) {
+    if ($hasActivation) {
         $uses->push('Brackets\AdminAuth\Activation\Contracts\ActivationBroker');
         $uses->push('Brackets\AdminAuth\Services\ActivationService');
     }
@@ -93,13 +95,13 @@ final class {{ $controllerBaseName }} extends Controller
                 $this->listingQueryBuilder->fromRequest(
                     $request,
                     [
-@foreach($columnsToQuery as $column)
-                        '{{ $column }}',
+@foreach($queryColumns as $column)
+                        '{{ $column->name }}',
 @endforeach
                     ],
                     [
-@foreach($columnsToSearchIn as $column)
-                        '{{ $column }}',
+@foreach($searchInColumns as $column)
+                        '{{ $column->name }}',
 @endforeach
                     ],
                 ),
@@ -150,7 +152,7 @@ final class {{ $controllerBaseName }} extends Controller
 @if($hasExport)
                 'exportUrl' => $this->urlGenerator->route('admin/{{ $resource }}/export'),
 @endif
-@if($activation)
+@if($hasActivation)
                 'resendActivationUrlTemplate' => $this->urlGenerator->route(
                     'admin/{{ $resource }}/resend-activation-email',
                     ['{{ $modelVariableName }}' => ':id'],
@@ -370,7 +372,7 @@ final class {{ $controllerBaseName }} extends Controller
         return $excel->download($export, $nameOfExportedFile);
     }
 @endif
-@if($activation)
+@if($hasActivation)
 
     /**
      * Resend activation e-mail

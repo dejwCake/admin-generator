@@ -1,7 +1,10 @@
 @php
+    use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
     use Illuminate\Support\Str;
     assert($relations instanceof RelationCollection);
+    assert($leftFormColumns instanceof ColumnCollection);
+    assert($publishedColumns instanceof ColumnCollection);
 @endphp
 <template>
     <form class="form-horizontal" method="post" @@submit.prevent="onSubmit" :action="action" novalidate>
@@ -31,83 +34,145 @@
                         />
 
 @endif
-@foreach($leftFormColumns as $col)
-@if($col['name'] === 'password')
+@foreach($leftFormColumns as $column)
+@if($column->name === 'password')
                         <FormPasswordConfirm
-                            v-model:password="form.{{ $col['name'] }}"
-                            v-model:passwordConfirmation="form.{{ $col['name'] }}_confirmation"
-                            :passwordError="errors.{{ $col['name'] }}"
-                            :confirmationError="errors.{{ $col['name'] }}_confirmation"
-                            :translations="{ {{ $col['name'] }}: translations.columns.{{ $col['name'] }}, {{ $col['name'] }}_repeat: translations.columns.{{ $col['name'] }}_repeat }" />
+                            v-model:password="form.{{ $column->name }}"
+                            v-model:passwordConfirmation="form.{{ $column->name }}_confirmation"
+                            :passwordError="errors.{{ $column->name }}"
+                            :confirmationError="errors.{{ $column->name }}_confirmation"
+                            :translations="{
+                                {{ $column->name }}: translations.columns.{{ $column->name }},
+                                {{ $column->name }}_repeat: translations.columns.{{ $column->name }}_repeat
+                            }"
+                        />
 
-@elseif($col['name'] === 'email')
-                        <FormEmail v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}" />
+@elseif($column->name === 'email')
+                        <FormEmail
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                        />
 
-@elseif($col['majorType'] === 'json' && in_array($col['name'], $wysiwygTextColumnNames, true))
-                        <FormLocalizedWysiwyg v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :errors="errors"
-                            :locales="locales" :shouldShowLangGroup="shouldShowLangGroup"
+@elseif($column->majorType === 'json' && in_array($column->name, $wysiwygTextColumnNames, true))
+                        <FormLocalizedWysiwyg
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :errors="errors"
+                            :locales="locales"
+                            :shouldShowLangGroup="shouldShowLangGroup"
                             :isFormLocalized="isFormLocalized"
-                            :upload-url="wysiwygUploadUrl" />
+                            :upload-url="wysiwygUploadUrl"
+                        />
 
-@elseif($col['majorType'] === 'json')
-                        <FormLocalizedInput v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :errors="errors"
-                            :locales="locales" :shouldShowLangGroup="shouldShowLangGroup"
-                            :isFormLocalized="isFormLocalized" />
+@elseif($column->majorType === 'json')
+                        <FormLocalizedInput
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :errors="errors"
+                            :locales="locales"
+                            :shouldShowLangGroup="shouldShowLangGroup"
+                            :isFormLocalized="isFormLocalized"
+                        />
 
-@elseif($col['majorType'] === 'text' && in_array($col['name'], $wysiwygTextColumnNames, true))
-                        <FormWysiwyg v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}"
-                            :upload-url="wysiwygUploadUrl" />
+@elseif($column->majorType === 'text' && in_array($column->name, $wysiwygTextColumnNames, true))
+                        <FormWysiwyg
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                            :upload-url="wysiwygUploadUrl"
+                        />
 
-@elseif($col['majorType'] === 'text')
-                        <FormTextarea v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}" />
+@elseif($column->majorType === 'text')
+                        <FormTextarea
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                        />
 
-@elseif($col['majorType'] === 'bool')
-                        <FormCheckbox v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}" />
+@elseif($column->majorType === 'bool')
+                        <FormCheckbox
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                        />
 
-@elseif($col['majorType'] === 'date')
-                        <FormDatePicker v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}"
-                            :config="datePickerConfig" :placeholder="translations.select_a_date" />
+@elseif($column->majorType === 'date')
+                        <FormDatePicker
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                            :config="datePickerConfig"
+                            :placeholder="translations.select_a_date"
+                        />
 
-@elseif($col['majorType'] === 'time')
-                        <FormDatePicker v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}"
-                            :config="timePickerConfig" icon="fa-clock"
-                            :placeholder="translations.select_a_time" />
+@elseif($column->majorType === 'time')
+                        <FormDatePicker
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                            :config="timePickerConfig"
+                            icon="fa-clock"
+                            :placeholder="translations.select_a_time"
+                        />
 
-@elseif($col['majorType'] === 'datetime')
-                        <FormDatePicker v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}"
-                            :config="datetimePickerConfig" :placeholder="translations.select_date_and_time" />
+@elseif($column->majorType === 'datetime')
+                        <FormDatePicker
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                            :config="datetimePickerConfig"
+                            :placeholder="translations.select_date_and_time"
+                        />
 
-@elseif(isset($col['isForeignKey']) && $col['isForeignKey'] && $relations->hasBelongsToByColumn($col['name']))
-@php $belongsToRelation = $relations->getBelongsToByColumn($col['name']); @endphp
-                        <FormSelect v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}"
-                            :options="{{ $belongsToRelation->optionsPropName }}" trackBy="id" optionLabel="{{ $belongsToRelation->relatedLabel }}"
-                            :placeholder="translations.select_an_option" />
+@elseif($column->isForeignKey && $relations->hasBelongsToByColumn($column->name))
+@php $belongsToRelation = $relations->getBelongsToByColumn($column->name); @endphp
+                        <FormSelect
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                            :options="{{ $belongsToRelation->optionsPropName }}"
+                            trackBy="id"
+                            optionLabel="{{ $belongsToRelation->relatedLabel }}"
+                            :placeholder="translations.select_an_option"
+                        />
 
 @else
-                        <FormInput v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}" />
+                        <FormInput
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                        />
 
 @endif
 @endforeach
 @foreach($relations->getBelongsToMany() as $belongsToMany)
-                        <FormMultiSelect v-model="form.{{ $belongsToMany->relatedTable }}" name="{{ $belongsToMany->relatedTable }}"
-                            :label="translations.relations.{{ Str::lcfirst(Str::plural($belongsToMany->relatedModelName)) }}" :error="errors.{{ $belongsToMany->relatedTable }}"
-                            :options="{{ Str::camel(Str::singular($belongsToMany->relatedTable)) }}Options" trackBy="id" optionLabel="{{ $belongsToMany->relatedLabel }}"
-                            :placeholder="translations.select_options" />
+                        <FormMultiSelect
+                            v-model="form.{{ $belongsToMany->relatedTable }}"
+                            name="{{ $belongsToMany->relatedTable }}"
+                            :label="translations.relations.{{ Str::lcfirst(Str::plural($belongsToMany->relatedModelName)) }}"
+                            :error="errors.{{ $belongsToMany->relatedTable }}"
+                            :options="{{ $belongsToMany->optionsPropName }}"
+                            trackBy="id"
+                            optionLabel="{{ $belongsToMany->relatedLabel }}"
+                            :placeholder="translations.select_options"
+                        />
 
 @endforeach
 @foreach($leftMediaCollections as $collection)
-                        <MediaUpload :ref="media.{{ $collection->collectionName }}.collection + '_uploader'"
+                        <MediaUpload
+                            :ref="media.{{ $collection->collectionName }}.collection + '_uploader'"
                             :label="media.{{ $collection->collectionName }}.label"
                             :collection="media.{{ $collection->collectionName }}.collection"
                             :url="media.{{ $collection->collectionName }}.url"
@@ -115,7 +180,8 @@
                             :max-file-size-in-mb="media.{{ $collection->collectionName }}.maxFileSizeInMb"
                             :accepted-file-types="media.{{ $collection->collectionName }}.acceptedFileTypes"
                             :uploaded-media="media.{{ $collection->collectionName }}.uploadedMedia"
-                            :is-private="media.{{ $collection->collectionName }}.isPrivate ?? false" />
+                            :is-private="media.{{ $collection->collectionName }}.isPrivate ?? false"
+                        />
 
 @endforeach
 @if(!$isUsedTwoColumnsLayout)
@@ -133,36 +199,43 @@
             </div>
 
             <div class="col-md-12 col-lg-12 col-xl-5 col-xxl-4">
-@if($rightFormColumns->isNotEmpty())
+@if($publishedColumns->isNotEmpty())
                 <div class="card">
                     <div class="card-header">
                         <i class="fa fa-check"></i> {{ '{{' }} translations.publish }}
                     </div>
                     <div class="card-body">
-@foreach($rightFormColumns as $col)
-                        <FormDatePicker v-model="form.{{ $col['name'] }}" name="{{ $col['name'] }}"
-                            :label="translations.columns.{{ $col['name'] }}" :error="errors.{{ $col['name'] }}"
-                            :config="datetimePickerConfig" :placeholder="translations.select_date_and_time" />
+@foreach($publishedColumns as $column)
+                        <FormDatePicker
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                            :config="datetimePickerConfig"
+                            :placeholder="translations.select_date_and_time"
+                        />
 @endforeach
                     </div>
                 </div>
 @endif
-@if($rightMediaCollections->isNotEmpty())
+@if($galleryCollections->isNotEmpty())
                 <div class="card mt-2">
                     <div class="card-header">
                         <i class="fa fa-check"></i> {{ '{{' }} translations.gallery }}
                     </div>
                     <div class="card-body">
-@foreach($rightMediaCollections as $collection)
-                        <MediaUpload :ref="media.{{ $collection->collectionName }}.collection + '_uploader'"
-                                     :label="media.{{ $collection->collectionName }}.label"
-                                     :collection="media.{{ $collection->collectionName }}.collection"
-                                     :url="media.{{ $collection->collectionName }}.url"
-                                     :max-number-of-files="media.{{ $collection->collectionName }}.maxNumberOfFiles"
-                                     :max-file-size-in-mb="media.{{ $collection->collectionName }}.maxFileSizeInMb"
-                                     :accepted-file-types="media.{{ $collection->collectionName }}.acceptedFileTypes"
-                                     :uploaded-media="media.{{ $collection->collectionName }}.uploadedMedia"
-                                     :is-private="media.{{ $collection->collectionName }}.isPrivate ?? false" />
+@foreach($galleryCollections as $collection)
+                        <MediaUpload
+                            :ref="media.{{ $collection->collectionName }}.collection + '_uploader'"
+                            :label="media.{{ $collection->collectionName }}.label"
+                            :collection="media.{{ $collection->collectionName }}.collection"
+                            :url="media.{{ $collection->collectionName }}.url"
+                            :max-number-of-files="media.{{ $collection->collectionName }}.maxNumberOfFiles"
+                            :max-file-size-in-mb="media.{{ $collection->collectionName }}.maxFileSizeInMb"
+                            :accepted-file-types="media.{{ $collection->collectionName }}.acceptedFileTypes"
+                            :uploaded-media="media.{{ $collection->collectionName }}.uploadedMedia"
+                            :is-private="media.{{ $collection->collectionName }}.isPrivate ?? false"
+                        />
 @endforeach
                     </div>
                 </div>
@@ -225,7 +298,7 @@ import FormTextarea from '@craftable/components/form/FormTextarea.vue';
 @if($hasBoolColumns)
 import FormCheckbox from '@craftable/components/form/FormCheckbox.vue';
 @endif
-@if($hasDateColumns || $hasTimeColumns || $hasDatetimeColumns || $rightFormColumns->isNotEmpty())
+@if($hasDateColumns || $hasTimeColumns || $hasDatetimeColumns || $publishedColumns->isNotEmpty())
 import FormDatePicker from '@craftable/components/form/FormDatePicker.vue';
 @endif
 @if($hasWysiwyg)
@@ -310,23 +383,21 @@ const {
 
 if (!props.data || Object.keys(props.data).length === 0) {
     form.value = {
-@foreach($leftFormColumns as $col)
-@if($col['name'] === 'password')
+@foreach($leftFormColumns as $column)
+@if($column->name === 'password')
         password: '',
         password_confirmation: '',
-@elseif($col['majorType'] === 'json')
-        {{ $col['name'] }}: getLocalizedFormDefaults(),
-@elseif($col['majorType'] === 'bool')
-        {{ $col['name'] }}: false,
+@elseif($column->majorType === 'json')
+        {{ $column->name }}: getLocalizedFormDefaults(),
+@elseif($column->majorType === 'bool')
+        {{ $column->name }}: false,
 @else
-        {{ $col['name'] }}: '',
+        {{ $column->name }}: '',
 @endif
 @endforeach
-@if($rightFormColumns->isNotEmpty())
-@foreach($rightFormColumns as $col)
-        {{ $col['name'] }}: '',
+@foreach($publishedColumns as $column)
+        {{ $column->name }}: '',
 @endforeach
-@endif
 @if($hasCreatedByAdminUser)
         created_by_admin_user_id: '',
         updated_by_admin_user_id: '',

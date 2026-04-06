@@ -377,10 +377,4 @@ final class ColumnCollection implements IteratorAggregate, Countable
 
         return $firstString->name ?? 'id';
     }
-
-    /** @deprecated just for compatibility with old code */
-    public function toLegacyCollection(): Collection
-    {
-        return $this->columns->map(static fn (Column $column) => $column->toLegacyArray());
-    }
 }

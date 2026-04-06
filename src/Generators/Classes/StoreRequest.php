@@ -61,6 +61,7 @@ final class StoreRequest extends ClassGenerator
     protected function buildClass(): string
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $visibleColumns = $columns->getVisible();
 
         return view('brackets/admin-generator::' . $this->view, [
             //globals
@@ -69,16 +70,14 @@ final class StoreRequest extends ClassGenerator
             'modelDotNotation' => $this->modelDotNotation,
             'relations' => $this->relations,
             //has
-            'hasRuleUsage' => $columns->getVisible()
-                ->hasStoreRuleUsage(),
-            'hasPasswordUsage' => $columns->getVisible()
-                ->hasStorePasswordUsage(),
+            'hasRuleUsage' => $visibleColumns->hasStoreRuleUsage(),
+            'hasPasswordUsage' => $visibleColumns->hasStorePasswordUsage(),
             'hasPassword' => $columns->hasByName('password'),
             'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
             'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
             //columns
             // validation in store/update
-            'columns' => $columns->getVisible(),
+            'visibleColumns' => $visibleColumns,
             'translatableColumns' => $columns->getTranslatable(),
         ])->render();
     }
