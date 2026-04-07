@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
-use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
 use Brackets\AdminGenerator\Dtos\Media\MediaCollection;
-use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
-use Illuminate\Support\Collection;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -73,7 +70,9 @@ final class BladeForm extends ResourceGenerator
                 : 'admin/' . $this->resource . '/update';
         }
 
-        $this->generate($force);
+        $path = resource_path('views/admin/' . $this->fileName . '.blade.php');
+
+        $this->generate($path, $force);
     }
 
     /** @return array<array<string|int>> */
@@ -90,9 +89,9 @@ final class BladeForm extends ResourceGenerator
         ];
     }
 
-    /** @return array<string, Collection|RelationCollection|ColumnCollection|array<string>|string|bool> */
-    private function getCommonViewData(ColumnCollection $columns): array
+    private function build(): string
     {
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
         $visibleColumns = $columns->getVisible();
 
         $hasCreatedByAdminUser = $columns->hasByName('created_by_admin_user_id');
@@ -112,7 +111,7 @@ final class BladeForm extends ResourceGenerator
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
 
-        return [
+        return view('brackets/admin-generator::' . $this->view, [
             //globals
             'modelBaseName' => $this->modelBaseName,
             'modelPlural' => $this->modelPlural,
@@ -158,39 +157,27 @@ final class BladeForm extends ResourceGenerator
                 || $hasUpdatedByAdminUser,
 
             'profileColumns' => $leftFormColumns->rejectByName('password', 'activated', 'forbidden'),
-        ];
+            'modelLabelColumn' => $columns->getLabelColumn(),
+            'route' => $this->route,
+        ])->render();
     }
 
-    private function build(): string
+    private function generate(string $path, bool $force): void
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
-        $data = $this->getCommonViewData($columns);
-
-        $data['modelLabelColumn'] = $columns->getLabelColumn();
-
-        $data['route'] = $this->route;
-
-        return view('brackets/admin-generator::' . $this->view, $data)->render();
-    }
-
-    private function generate(bool $force): void
-    {
-        $viewPath = resource_path('views/admin/' . $this->fileName . '.blade.php');
-
-        if ($this->alreadyExists($viewPath) && !$force) {
-            $this->error('File ' . $viewPath . ' already exists!');
+        if ($this->alreadyExists($path) && !$force) {
+            $this->error('File ' . $path . ' already exists!');
 
             return;
         }
 
-        if ($this->alreadyExists($viewPath) && $force) {
-            $this->warn('File ' . $viewPath . ' already exists! File will be deleted.');
-            $this->files->delete($viewPath);
+        if ($this->alreadyExists($path) && $force) {
+            $this->warn('File ' . $path . ' already exists! File will be deleted.');
+            $this->files->delete($path);
         }
 
-        $this->makeDirectory($viewPath);
+        $this->makeDirectory($path);
 
-        $this->files->put($viewPath, $this->build());
-        $this->info('Generating ' . $viewPath . ' finished');
+        $this->files->put($path, $this->build());
+        $this->info('Generating ' . $path . ' finished');
     }
 }

@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
-use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
 use Brackets\AdminGenerator\Dtos\Media\MediaCollection;
-use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
@@ -87,9 +84,9 @@ final class VueForm extends ResourceGenerator
         ];
     }
 
-    /** @return array<string, Collection|RelationCollection|ColumnCollection|array<string>|string|bool> */
-    private function getCommonViewData(ColumnCollection $columns): array
+    private function build(): string
     {
+        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
         $visibleColumns = $columns->getVisible();
 
         $hasCreatedByAdminUser = $columns->hasByName('created_by_admin_user_id');
@@ -109,7 +106,7 @@ final class VueForm extends ResourceGenerator
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
 
-        return [
+        return view('brackets/admin-generator::' . $this->view, [
             //globals
             'modelBaseName' => $this->modelBaseName,
             'modelPlural' => $this->modelPlural,
@@ -155,28 +152,18 @@ final class VueForm extends ResourceGenerator
                 || $hasUpdatedByAdminUser,
 
             'profileColumns' => $leftFormColumns->rejectByName('password', 'activated', 'forbidden'),
-        ];
-    }
-
-    private function build(): string
-    {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
-        $data = $this->getCommonViewData($columns);
-
-        $data['validationRules'] = $columns->getVisible()->rejectByName(
-            'published_at',
-            'created_by_admin_user_id',
-            'updated_by_admin_user_id',
-        )->getFrontendValidationRules();
-
-        $data['mediaDefaultProp'] = '{' . $this->mediaCollections->keys()
-            ->map(static fn (string $key): string => "$key: {}")
-            ->implode(', ') . '}';
-        $data['mediaCollectionNames'] = $this->mediaCollections->keys()
-            ->map(static fn (string $key): string => "'$key'")
-            ->implode(', ');
-
-        return view('brackets/admin-generator::' . $this->view, $data)->render();
+            'validationRules' => $columns->getVisible()->rejectByName(
+                'published_at',
+                'created_by_admin_user_id',
+                'updated_by_admin_user_id',
+            )->getFrontendValidationRules(),
+            'mediaDefaultProp' => '{' . $this->mediaCollections->keys()
+                    ->map(static fn (string $key): string => "$key: {}")
+                    ->implode(', ') . '}',
+            'mediaCollectionNames' => $this->mediaCollections->keys()
+                ->map(static fn (string $key): string => "'$key'")
+                ->implode(', '),
+        ])->render();
     }
 
     private function generate(string $path, bool $force): void
