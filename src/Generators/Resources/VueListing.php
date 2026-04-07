@@ -54,7 +54,7 @@ final class VueListing extends ResourceGenerator
         $path = resource_path('js/admin/' . $this->modelJSName . '/Listing.vue');
 
         $this->generate($path, $force);
-        $this->registerInAdminJs();
+        $this->registerVueComponent($this->modelBaseName . 'Listing', $this->modelJSName, 'Listing.vue');
     }
 
     /** @return array<array<string|int>> */
@@ -70,26 +70,8 @@ final class VueListing extends ResourceGenerator
         ];
     }
 
-    private function generate(string $path, bool $force): void
-    {
-        if ($this->alreadyExists($path) && !$force) {
-            $this->error('File ' . $path . ' already exists!');
-
-            return;
-        }
-
-        if ($this->alreadyExists($path) && $force) {
-            $this->warn('File ' . $path . ' already exists! File will be deleted.');
-            $this->files->delete($path);
-        }
-
-        $this->makeDirectory($path);
-
-        $this->files->put($path, $this->build());
-        $this->info('Generating ' . $path . ' finished');
-    }
-
-    private function build(): string
+    #[Override]
+    protected function build(): string
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
             ->getForIndex();
@@ -127,34 +109,5 @@ final class VueListing extends ResourceGenerator
             'columns' => $columns,
             'dateImports' => $dateImports,
         ])->render();
-    }
-
-    private function registerInAdminJs(): void
-    {
-        $adminJsPath = resource_path('js/admin/admin.js');
-
-        if (!$this->files->exists($adminJsPath)) {
-            $this->warn('File ' . $adminJsPath . ' does not exist, skipping component registration.');
-
-            return;
-        }
-
-        $content = $this->files->get($adminJsPath);
-
-        $importMarker = '//-- Do not delete me :) I\'m used for auto-generation js import--';
-        $componentMarker = '//-- Do not delete me :) I\'m used for auto-generation component registration--';
-
-        $importLine = "import {$this->modelBaseName}Listing from './{$this->modelJSName}/Listing.vue';";
-        $componentLine = "app.component('{$this->modelBaseName}Listing', {$this->modelBaseName}Listing);";
-
-        if (!str_contains($content, $importLine)) {
-            $content = str_replace($importMarker, $importLine . PHP_EOL . $importMarker, $content);
-        }
-
-        if (!str_contains($content, $componentLine)) {
-            $content = str_replace($componentMarker, $componentLine . PHP_EOL . $componentMarker, $content);
-        }
-
-        $this->files->put($adminJsPath, $content);
     }
 }

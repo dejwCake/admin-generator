@@ -62,7 +62,11 @@ final class VueForm extends ResourceGenerator
         $path = resource_path('js/admin/' . $this->formJsRelativePath . '/Form.vue');
 
         $this->generate($path, $force);
-        $this->registerInAdminJs();
+        $this->registerVueComponent(
+            Str::studly($this->formJsRelativePath) . 'Form',
+            $this->formJsRelativePath,
+            'Form.vue',
+        );
     }
 
     /** @return array<array<string|int>> */
@@ -84,7 +88,8 @@ final class VueForm extends ResourceGenerator
         ];
     }
 
-    private function build(): string
+    #[Override]
+    protected function build(): string
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
         $visibleColumns = $columns->getVisible();
@@ -164,54 +169,5 @@ final class VueForm extends ResourceGenerator
                 ->map(static fn (string $key): string => "'$key'")
                 ->implode(', '),
         ])->render();
-    }
-
-    private function generate(string $path, bool $force): void
-    {
-        if ($this->alreadyExists($path) && !$force) {
-            $this->error('File ' . $path . ' already exists!');
-
-            return;
-        }
-
-        if ($this->alreadyExists($path) && $force) {
-            $this->warn('File ' . $path . ' already exists! File will be deleted.');
-            $this->files->delete($path);
-        }
-
-        $this->makeDirectory($path);
-
-        $this->files->put($path, $this->build());
-        $this->info('Generating ' . $path . ' finished');
-    }
-
-    private function registerInAdminJs(): void
-    {
-        $adminJsPath = resource_path('js/admin/admin.js');
-
-        if (!$this->files->exists($adminJsPath)) {
-            $this->warn('File ' . $adminJsPath . ' does not exist, skipping component registration.');
-
-            return;
-        }
-
-        $content = $this->files->get($adminJsPath);
-
-        $importMarker = '//-- Do not delete me :) I\'m used for auto-generation js import--';
-        $componentMarker = '//-- Do not delete me :) I\'m used for auto-generation component registration--';
-
-        $componentName = Str::studly($this->formJsRelativePath);
-        $importLine = "import {$componentName}Form from './{$this->formJsRelativePath}/Form.vue';";
-        $componentLine = "app.component('{$componentName}Form', {$componentName}Form);";
-
-        if (!str_contains($content, $importLine)) {
-            $content = str_replace($importMarker, $importLine . PHP_EOL . $importMarker, $content);
-        }
-
-        if (!str_contains($content, $componentLine)) {
-            $content = str_replace($componentMarker, $componentLine . PHP_EOL . $componentMarker, $content);
-        }
-
-        $this->files->put($adminJsPath, $content);
     }
 }

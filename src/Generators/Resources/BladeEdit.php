@@ -68,7 +68,8 @@ final class BladeEdit extends ResourceGenerator
         ];
     }
 
-    private function build(): string
+    #[Override]
+    protected function build(): string
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
         $visibleColumns = $columns->getVisible();
@@ -135,24 +136,5 @@ final class BladeEdit extends ResourceGenerator
                 || $hasUpdatedByAdminUser,
             'modelLabelColumn' => $columns->getLabelColumn(),
         ])->render();
-    }
-
-    private function generate(string $path, bool $force): void
-    {
-        if ($this->alreadyExists($path) && !$force) {
-            $this->error('File ' . $path . ' already exists!');
-
-            return;
-        }
-
-        if ($this->alreadyExists($path) && $force) {
-            $this->warn('File ' . $path . ' already exists! File will be deleted.');
-            $this->files->delete($path);
-        }
-
-        $this->makeDirectory($path);
-
-        $this->files->put($path, $this->build());
-        $this->info('Generating ' . $path . ' finished');
     }
 }

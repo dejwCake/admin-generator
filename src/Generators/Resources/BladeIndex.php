@@ -66,26 +66,8 @@ final class BladeIndex extends ResourceGenerator
         ];
     }
 
-    private function generate(string $path, bool $force): void
-    {
-        if ($this->alreadyExists($path) && !$force) {
-            $this->error('File ' . $path . ' already exists!');
-
-            return;
-        }
-
-        if ($this->alreadyExists($path) && $force) {
-            $this->warn('File ' . $path . ' already exists! File will be deleted.');
-            $this->files->delete($path);
-        }
-
-        $this->makeDirectory($path);
-
-        $this->files->put($path, $this->build());
-        $this->info('Generating ' . $path . ' finished');
-    }
-
-    private function build(): string
+    #[Override]
+    protected function build(): string
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
             ->getForIndex();
