@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Auth\UsersController;
 
 
-/* Auto-generated admin routes uses */
+//-- Do not delete me :) I'm used for auto-generation admin routes uses --
 
 Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
     ->prefix('admin')
@@ -39,5 +39,5 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
                     ->name('resend-activation-email');
             });
         /* End of users routes */
-        // Do not delete me :) I'm used for auto-generation of admin routes
+        //-- Do not delete me :) I'm used for auto-generation admin routes --
     });

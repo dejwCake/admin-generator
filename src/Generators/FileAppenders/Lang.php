@@ -66,7 +66,7 @@ final class Lang extends FileAppender
 
         // TODO name-spaced model names should be probably inserted as a sub-array in a translation file..
 
-        $markerText = "// Do not delete me :) I'm used for auto-generation" . PHP_EOL;
+        $markerText = "//-- Do not delete me :) I'm used for auto-generation language arrays --" . PHP_EOL;
         $defaultContent = "<?php" . PHP_EOL . PHP_EOL . "declare(strict_types=1);"
             . PHP_EOL . PHP_EOL . "return [" . PHP_EOL . sprintf('    %s', $markerText) . "];" . PHP_EOL;
 

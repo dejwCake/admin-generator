@@ -55,8 +55,8 @@ abstract class ResourceGenerator extends Generator
 
         $content = $this->files->get($adminJsPath);
 
-        $importMarker = '//-- Do not delete me :) I\'m used for auto-generation js import--';
-        $componentMarker = '//-- Do not delete me :) I\'m used for auto-generation component registration--';
+        $importMarker = '//-- Do not delete me :) I\'m used for auto-generation js import --';
+        $componentMarker = '//-- Do not delete me :) I\'m used for auto-generation component registration --';
 
         $importLine = sprintf("import %s from './%s/%s';", $componentName, $jsRelativePath, $fileName);
         $componentLine = sprintf("app.component('%s', %s);", $componentName, $componentName);

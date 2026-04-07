@@ -31,5 +31,5 @@ return [
         ],
     ],
 
-    // Do not delete me :) I'm used for auto-generation
+    //-- Do not delete me :) I'm used for auto-generation language arrays --
 ];

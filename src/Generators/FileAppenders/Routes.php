@@ -67,8 +67,8 @@ final class Routes extends FileAppender
         }
 
         $routesPath = base_path('routes/admin.php');
-        $insertMarker = "// Do not delete me :) I'm used for auto-generation of admin routes";
-        $useMarker = PHP_EOL . '/* Auto-generated admin routes uses */';
+        $insertMarker = "//-- Do not delete me :) I'm used for auto-generation admin routes --";
+        $useMarker = PHP_EOL . "//-- Do not delete me :) I'm used for auto-generation admin routes uses --";
 
         $defaultContent = '<?php' . PHP_EOL . PHP_EOL
             . 'declare(strict_types=1);' . PHP_EOL . PHP_EOL
