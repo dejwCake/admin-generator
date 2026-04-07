@@ -30,7 +30,7 @@ final class ExportRequest extends ClassGenerator
         $force = $this->option('force');
 
         if ($this->generateClass($force)) {
-            $this->info('Generating ' . $this->classFullName . ' finished');
+            $this->info(sprintf('Generating %s finished', $this->classFullName));
         }
     }
 
@@ -38,7 +38,7 @@ final class ExportRequest extends ClassGenerator
     #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
-        return 'Export' . $this->modelBaseName;
+        return sprintf('Export%s', $this->modelBaseName);
     }
 
     #[Override]
@@ -68,6 +68,6 @@ final class ExportRequest extends ClassGenerator
     #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
-        return $rootNamespace . '\Http\Requests\Admin\\' . $this->modelWithNamespaceFromDefault;
+        return sprintf('%s\Http\Requests\Admin\%s', $rootNamespace, $this->modelWithNamespaceFromDefault);
     }
 }

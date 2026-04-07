@@ -12,7 +12,7 @@ final readonly class PasswordRule implements ServerStoreRule, ServerUpdateRule
 
     public function __toString(): string
     {
-        return 'Password::min(' . $this->length . ')' . PHP_EOL .
+        return sprintf('Password::min(%d)', $this->length) . PHP_EOL .
             '                    ->letters()' . PHP_EOL .
             '                    ->mixedCase()' . PHP_EOL .
             '                    ->numbers()' . PHP_EOL .

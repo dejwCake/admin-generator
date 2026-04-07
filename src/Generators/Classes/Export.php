@@ -36,11 +36,11 @@ final class Export extends ClassGenerator
         $template = $this->option('template');
 
         if ($template !== null) {
-            $this->view = 'classes.templates.' . $template . '.export';
+            $this->view = sprintf('classes.templates.%s.export', $template);
         }
 
         if ($this->generateClass($force)) {
-            $this->info('Generating ' . $this->classFullName . ' finished');
+            $this->info(sprintf('Generating %s finished', $this->classFullName));
         }
     }
 
@@ -56,7 +56,7 @@ final class Export extends ClassGenerator
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
-        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'exportNamespace' => $this->classNamespace,
             'classBaseName' => $this->exportBaseName,
@@ -83,6 +83,6 @@ final class Export extends ClassGenerator
     #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
-        return $rootNamespace . '\Exports';
+        return sprintf('%s\Exports', $rootNamespace);
     }
 }

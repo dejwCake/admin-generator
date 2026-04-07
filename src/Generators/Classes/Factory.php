@@ -40,11 +40,11 @@ final class Factory extends ClassGenerator
         //TODO make global for all generator
         //TODO also with prefix
         if ($template !== null) {
-            $this->view = 'classes.templates.' . $template . '.factory';
+            $this->view = sprintf('classes.templates.%s.factory', $template);
         }
 
         if ($this->generateClass($force)) {
-            $this->info('Generating ' . $this->classFullName . ' finished');
+            $this->info(sprintf('Generating %s finished', $this->classFullName));
         }
 
         if ($seed) {
@@ -57,7 +57,7 @@ final class Factory extends ClassGenerator
     #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
-        return $this->modelBaseName . 'Factory';
+        return sprintf('%sFactory', $this->modelBaseName);
     }
 
     /**
@@ -74,7 +74,7 @@ final class Factory extends ClassGenerator
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
-        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //global
             'namespace' => $this->classNamespace,
             'modelFullName' => $this->modelFullName,

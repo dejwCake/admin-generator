@@ -62,7 +62,7 @@ final class Controller extends ClassGenerator
         //TODO make global for all generator
         //TODO also with prefix
         if ($template !== null) {
-            $this->view = 'classes.templates.' . $template . '.controller';
+            $this->view = sprintf('classes.templates.%s.controller', $template);
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);
@@ -80,7 +80,7 @@ final class Controller extends ClassGenerator
         }
 
         if ($this->generateClass($force)) {
-            $this->info('Generating ' . $this->classFullName . ' finished');
+            $this->info(sprintf('Generating %s finished', $this->classFullName));
 
             $this->addToSidebar();
         }
@@ -89,7 +89,7 @@ final class Controller extends ClassGenerator
     #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
-        return Str::studly($tableName) . 'Controller';
+        return sprintf('%sController', Str::studly($tableName));
     }
 
     #[Override]
@@ -97,7 +97,7 @@ final class Controller extends ClassGenerator
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
-        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'controllerBaseName' => $this->classBaseName,
             'controllerNamespace' => $this->classNamespace,
@@ -155,7 +155,7 @@ final class Controller extends ClassGenerator
     #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
-        return $rootNamespace . '\Http\Controllers\Admin';
+        return sprintf('%s\Http\Controllers\Admin', $rootNamespace);
     }
 
     private function addToSidebar(): void
@@ -182,7 +182,12 @@ final class Controller extends ClassGenerator
             $this->strReplaceInFile(
                 $this->laravel->resourcePath('views/admin/layout/sidebar.blade.php'),
                 "{{-- Do not delete me :) I'm used for auto-generation menu items --}}",
-                "<li class=\"nav-item\"><a class=\"nav-link\" href=\"{{ url('admin/" . $this->resource . "') }}\"><i class=\"nav-icon " . $icon . "\"></i> {{ trans('admin." . $this->modelLangFormat . ".title') }}</a></li>" . PHP_EOL . "           {{-- Do not delete me :) I'm used for auto-generation menu items --}}",
+                sprintf(
+                    "<li class=\"nav-item\"><a class=\"nav-link\" href=\"{{ url('admin/%s') }}\"><i class=\"nav-icon %s\"></i> {{ trans('admin.%s.title') }}</a></li>",
+                    $this->resource,
+                    $icon,
+                    $this->modelLangFormat,
+                ) . PHP_EOL . "           {{-- Do not delete me :) I'm used for auto-generation menu items --}}",
                 '|url\(\'admin\/' . $this->resource . '\'\)|',
             )
         ) {

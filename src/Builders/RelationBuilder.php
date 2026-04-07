@@ -105,7 +105,7 @@ final class RelationBuilder
 
     private function detectHasMany(string $tableName): void
     {
-        $expectedForeignKey = Str::singular($tableName) . '_id';
+        $expectedForeignKey = sprintf('%s_id', Str::singular($tableName));
 
         $this->allTables->each(function (string $candidateTable) use ($tableName, $expectedForeignKey): void {
             if ($candidateTable === $tableName) {
@@ -188,7 +188,7 @@ final class RelationBuilder
             return null;
         }
 
-        $currentTableFk = Str::singular($tableName) . '_id';
+        $currentTableFk = sprintf('%s_id', Str::singular($tableName));
         if (!$idColumns->contains(static fn (array $column): bool => $column['name'] === $currentTableFk)) {
             return null;
         }

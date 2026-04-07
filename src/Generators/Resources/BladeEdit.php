@@ -35,7 +35,7 @@ final class BladeEdit extends ResourceGenerator
         $media = $this->option('media');
 
         if ($template !== null) {
-            $this->view = 'resources.templates.' . $template . '.blade-edit';
+            $this->view = sprintf('resources.templates.%s.blade-edit', $template);
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);
@@ -44,7 +44,7 @@ final class BladeEdit extends ResourceGenerator
             $this->mediaCollections = $this->mediaCollectionBuilder->build($media);
         }
 
-        $path = $this->laravel->resourcePath('views/admin/' . $this->modelViewsDirectory . '/edit.blade.php');
+        $path = $this->laravel->resourcePath(sprintf('views/admin/%s/edit.blade.php', $this->modelViewsDirectory));
 
         $this->generate($path, $force);
     }
@@ -83,7 +83,7 @@ final class BladeEdit extends ResourceGenerator
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
 
-        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'modelVariableName' => $this->modelVariableName,
             'modelJSName' => $this->modelJSName,

@@ -21,17 +21,17 @@ final readonly class BelongsToManyBuilder
             relatedTable: $relatedTable,
             relatedModel: $relatedTable === 'roles'
                 ? 'Spatie\\Permission\\Models\\Role'
-                : 'App\\Models\\' . Naming::modelName($relatedTable),
+                : sprintf('App\\Models\\%s', Naming::modelName($relatedTable)),
             relatedModelName: Naming::modelName($relatedTable),
             relatedLabel: $this->columnCollectionBuilder->build($relatedTable)->getLabelColumn(),
             relationTable: trim($this->getRelationTable($tableName, $relatedTable), '_'),
             relationMethodName: Str::camel($relatedTable),
             relationTranslationKey: Str::lcfirst(Str::plural(Naming::modelName($relatedTable))),
             relationTranslationValue: Str::headline($relatedTable),
-            optionsAttributeName: Str::singular(str_replace('_', '-', $relatedTable)) . '-options',
-            optionsPropName: Str::camel(Str::singular($relatedTable)) . 'Options',
-            foreignKey: Str::singular($tableName) . '_id',
-            relatedKey: Str::singular($relatedTable) . '_id',
+            optionsAttributeName: sprintf('%s-options', Str::singular(str_replace('_', '-', $relatedTable))),
+            optionsPropName: sprintf('%sOptions', Str::camel(Str::singular($relatedTable))),
+            foreignKey: sprintf('%s_id', Str::singular($tableName)),
+            relatedKey: sprintf('%s_id', Str::singular($relatedTable)),
         );
     }
 

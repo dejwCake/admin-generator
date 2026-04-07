@@ -51,7 +51,7 @@ final class BladeForm extends ResourceGenerator
         $this->route = $this->option('route');
 
         if ($template !== null) {
-            $this->view = 'resources.templates.' . $template . '.blade-form';
+            $this->view = sprintf('resources.templates.%s.blade-form', $template);
         }
 
         $belongsToMany = $this->option('belongs-to-many');
@@ -66,11 +66,11 @@ final class BladeForm extends ResourceGenerator
 
         if (!$this->route) {
             $this->route = $fileName
-                ? 'admin/' . $this->fileName
-                : 'admin/' . $this->resource . '/update';
+                ? sprintf('admin/%s', $this->fileName)
+                : sprintf('admin/%s/update', $this->resource);
         }
 
-        $path = $this->laravel->resourcePath('views/admin/' . $this->fileName . '.blade.php');
+        $path = $this->laravel->resourcePath(sprintf('views/admin/%s.blade.php', $this->fileName));
 
         $this->generate($path, $force);
     }
@@ -112,7 +112,7 @@ final class BladeForm extends ResourceGenerator
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
 
-        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'modelVariableName' => $this->modelVariableName,
             'modelJSName' => $this->formJsRelativePath,

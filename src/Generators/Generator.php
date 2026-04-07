@@ -98,7 +98,7 @@ abstract class Generator extends Command
         $this->modelWithNamespaceFromDefault =
             !Str::startsWith(
                 $this->modelFullName,
-                $startsWith = trim($modelGenerator->rootNamespace(), '\\') . '\Models\\',
+                $startsWith = sprintf('%s\Models\\', trim($modelGenerator->rootNamespace(), '\\')),
             )
                 ? $this->modelBaseName : Str::replaceFirst($startsWith, '', $this->modelFullName);
         $this->modelViewsDirectory = Str::lower(Str::kebab(implode(
@@ -132,14 +132,17 @@ abstract class Generator extends Command
         $this->controllerWithNamespaceFromDefault =
             !Str::startsWith(
                 $this->controllerFullName,
-                $startsWith = trim($controllerGenerator->rootNamespace(), '\\') . '\Http\\Controllers\\Admin\\',
+                $startsWith = sprintf(
+                    '%s\Http\\Controllers\\Admin\\',
+                    trim($controllerGenerator->rootNamespace(), '\\'),
+                ),
             )
                 ? $this->controllerFullName : Str::replaceFirst($startsWith, '', $this->controllerFullName);
 
         if ($modelWithFullNamespace !== null) {
             $this->modelFullName = $modelWithFullNamespace;
         }
-        $this->exportBaseName = Str::studly($tableName) . 'Export';
+        $this->exportBaseName = sprintf('%sExport', Str::studly($tableName));
 
         $this->titleSingular = Str::singular(str_replace(['_'], ' ', Str::title($this->tableName)));
         $this->titlePlural = str_replace(['_'], ' ', Str::title($this->tableName));

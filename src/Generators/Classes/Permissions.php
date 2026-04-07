@@ -40,7 +40,7 @@ final class Permissions extends ClassGenerator
         }
 
         if ($this->generateClass($force)) {
-            $this->info('Generating permissions for ' . $this->modelBaseName . ' finished');
+            $this->info(sprintf('Generating permissions for %s finished', $this->modelBaseName));
         }
     }
 
@@ -48,23 +48,23 @@ final class Permissions extends ClassGenerator
     #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
-        return 'FillPermissionsFor' . $this->modelBaseName;
+        return sprintf('FillPermissionsFor%s', $this->modelBaseName);
     }
 
     #[Override]
     protected function generateClass(bool $force = false): bool
     {
-        $fileName = 'fill_permissions_for_' . $this->modelRouteAndViewName . '.php';
-        $path = $this->laravel->databasePath('migrations/' . date('Y_m_d_His', time()) . '_' . $fileName);
+        $fileName = sprintf('fill_permissions_for_%s.php', $this->modelRouteAndViewName);
+        $path = $this->laravel->databasePath(sprintf('migrations/%s_%s', date('Y_m_d_His', time()), $fileName));
 
         $oldPath = $this->alreadyExists($fileName);
         if ($oldPath) {
             $path = $oldPath;
             if ($force) {
-                $this->warn('File ' . $path . ' already exists! File will be deleted.');
+                $this->warn(sprintf('File %s already exists! File will be deleted.', $path));
                 $this->files->delete($path);
             } else {
-                $this->error('File ' . $path . ' already exists!');
+                $this->error(sprintf('File %s already exists!', $path));
 
                 return false;
             }

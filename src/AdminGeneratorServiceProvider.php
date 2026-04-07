@@ -35,7 +35,7 @@ final class AdminGeneratorServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'brackets/admin-generator');
+        $this->loadViewsFrom(sprintf('%s/../resources/views', __DIR__), 'brackets/admin-generator');
     }
 
     #[Override]

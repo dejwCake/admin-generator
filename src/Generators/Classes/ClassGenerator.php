@@ -56,7 +56,7 @@ abstract class ClassGenerator extends Generator
         }
 
         return $this->qualifyClass(
-            $this->getDefaultNamespace(trim($rootNamespace, '\\')) . '\\' . $name,
+            sprintf('%s\%s', $this->getDefaultNamespace(trim($rootNamespace, '\\')), $name),
         );
     }
 
@@ -91,10 +91,10 @@ abstract class ClassGenerator extends Generator
 
         if ($this->alreadyExists($path)) {
             if ($force) {
-                $this->warn('File ' . $path . ' already exists! File will be deleted.');
+                $this->warn(sprintf('File %s already exists! File will be deleted.', $path));
                 $this->files->delete($path);
             } else {
-                $this->error('File ' . $path . ' already exists!');
+                $this->error(sprintf('File %s already exists!', $path));
 
                 return false;
             }

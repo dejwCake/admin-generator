@@ -55,7 +55,7 @@ final class Routes extends FileAppender
         //TODO make global for all generator
         //TODO also with prefix
         if ($template !== null) {
-            $this->view = 'file-appenders.templates.' . $template . '.routes';
+            $this->view = sprintf('file-appenders.templates.%s.routes', $template);
         }
 
         if ($withExport) {
@@ -78,7 +78,7 @@ final class Routes extends FileAppender
             . "    ->prefix('admin')" . PHP_EOL
             . "    ->name('admin/')" . PHP_EOL
             . '    ->group(static function (): void {' . PHP_EOL
-            . '        ' . $insertMarker . PHP_EOL
+            . sprintf('        %s', $insertMarker) . PHP_EOL
             . '    });' . PHP_EOL;
 
         $this->resource = $this->option('resource') ?? $this->resource;
@@ -92,7 +92,7 @@ final class Routes extends FileAppender
                 $defaultContent,
             )
         ) {
-            $this->insertUseStatement($routesPath, 'use ' . $this->controllerFullName . ';', $useMarker);
+            $this->insertUseStatement($routesPath, sprintf('use %s;', $this->controllerFullName), $useMarker);
             $this->info('Appending routes finished');
         }
     }
@@ -113,7 +113,7 @@ final class Routes extends FileAppender
 
     protected function buildContent(): string
     {
-        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'controllerBaseName' => class_basename($this->controllerFullName),
             'modelVariableName' => $this->modelVariableName,

@@ -18,15 +18,19 @@ final readonly class UniqueRule implements ServerStoreRule, ServerUpdateRule
 
     public function __toString(): string
     {
-        $column = '\'' . $this->columnName . '\'';
+        $column = sprintf("'%s'", $this->columnName);
         if ($this->locale) {
-            $column = '\'' . $this->columnName . '->\'.$locale';
+            $column = sprintf("'%s'->'.\$locale", $this->columnName);
         }
 
         $ignore = '';
         if ($this->ignore) {
             //phpcs:ignore SlevomatCodingStandard.Files.LineLength.LineTooLong
-            $ignore = PHP_EOL . '                    ->ignore($this->' . $this->modelVariableName . '->getKey(), $this->' . $this->modelVariableName . '->getKeyName())';
+            $ignore = sprintf(
+                PHP_EOL . '                    ->ignore($this->%s->getKey(), $this->%s->getKeyName())',
+                $this->modelVariableName,
+                $this->modelVariableName,
+            );
         }
 
         $deletedAt = '';
@@ -34,7 +38,7 @@ final readonly class UniqueRule implements ServerStoreRule, ServerUpdateRule
             $deletedAt = PHP_EOL . '                    ->whereNull(\'deleted_at\')';
         }
 
-        return 'Rule::unique(\'' . $this->tableName . '\', ' . $column . ')'
+        return sprintf("Rule::unique('%s', %s)", $this->tableName, $column)
             . $ignore
             . $deletedAt;
     }

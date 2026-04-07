@@ -38,7 +38,7 @@ final class VueListing extends ResourceGenerator
         $template = $this->option('template');
 
         if ($template !== null) {
-            $this->view = 'resources.templates.' . $template . '.vue-listing';
+            $this->view = sprintf('resources.templates.%s.vue-listing', $template);
         }
 
         if ($this->option('with-export')) {
@@ -51,10 +51,10 @@ final class VueListing extends ResourceGenerator
 
         $this->relations = $this->relationBuilder->build($this->tableName, null);
 
-        $path = $this->laravel->resourcePath('js/admin/' . $this->modelJSName . '/Listing.vue');
+        $path = $this->laravel->resourcePath(sprintf('js/admin/%s/Listing.vue', $this->modelJSName));
 
         $this->generate($path, $force);
-        $this->registerVueComponent($this->modelBaseName . 'Listing', $this->modelJSName, 'Listing.vue');
+        $this->registerVueComponent(sprintf('%sListing', $this->modelBaseName), $this->modelJSName, 'Listing.vue');
     }
 
     /** @return array<array<string|int>> */
@@ -96,7 +96,7 @@ final class VueListing extends ResourceGenerator
         }
         $dateImports = $dateImports->sort();
 
-        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'relations' => $this->relations,
             //has

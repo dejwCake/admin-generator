@@ -38,7 +38,7 @@ final readonly class Column
             return null;
         }
 
-        return "'" . $rules->implode('|') . "'";
+        return sprintf("'%s'", $rules->implode('|'));
     }
 
     public function withPriority(?int $priority): self

@@ -44,7 +44,7 @@ final class Model extends ClassGenerator
         //TODO make global for all generator
         //TODO also with prefix
         if ($template !== null) {
-            $this->view = 'classes.templates.' . $template . '.model';
+            $this->view = sprintf('classes.templates.%s.model', $template);
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);
@@ -54,7 +54,7 @@ final class Model extends ClassGenerator
         }
 
         if ($this->generateClass($force)) {
-            $this->info('Generating ' . $this->classFullName . ' finished');
+            $this->info(sprintf('Generating %s finished', $this->classFullName));
         }
     }
 
@@ -69,7 +69,7 @@ final class Model extends ClassGenerator
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
-        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'modelBaseName' => $this->classBaseName,
             'modelNameSpace' => $this->classNamespace,
@@ -128,6 +128,6 @@ final class Model extends ClassGenerator
     #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
-        return $rootNamespace . '\Models';
+        return sprintf('%s\Models', $rootNamespace);
     }
 }

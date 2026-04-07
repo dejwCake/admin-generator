@@ -27,20 +27,20 @@ abstract class ResourceGenerator extends Generator
     protected function generate(string $path, bool $force): void
     {
         if ($this->alreadyExists($path) && !$force) {
-            $this->error('File ' . $path . ' already exists!');
+            $this->error(sprintf('File %s already exists!', $path));
 
             return;
         }
 
         if ($this->alreadyExists($path) && $force) {
-            $this->warn('File ' . $path . ' already exists! File will be deleted.');
+            $this->warn(sprintf('File %s already exists! File will be deleted.', $path));
             $this->files->delete($path);
         }
 
         $this->makeDirectory($path);
 
         $this->files->put($path, $this->buildView());
-        $this->info('Generating ' . $path . ' finished');
+        $this->info(sprintf('Generating %s finished', $path));
     }
 
     protected function registerVueComponent(string $componentName, string $jsRelativePath, string $fileName): void
@@ -48,7 +48,7 @@ abstract class ResourceGenerator extends Generator
         $adminJsPath = $this->laravel->resourcePath('js/admin/admin.js');
 
         if (!$this->files->exists($adminJsPath)) {
-            $this->warn('File ' . $adminJsPath . ' does not exist, skipping component registration.');
+            $this->warn(sprintf('File %s does not exist, skipping component registration.', $adminJsPath));
 
             return;
         }
@@ -58,8 +58,8 @@ abstract class ResourceGenerator extends Generator
         $importMarker = '//-- Do not delete me :) I\'m used for auto-generation js import--';
         $componentMarker = '//-- Do not delete me :) I\'m used for auto-generation component registration--';
 
-        $importLine = "import {$componentName} from './{$jsRelativePath}/{$fileName}';";
-        $componentLine = "app.component('{$componentName}', {$componentName});";
+        $importLine = sprintf("import %s from './%s/%s';", $componentName, $jsRelativePath, $fileName);
+        $componentLine = sprintf("app.component('%s', %s);", $componentName, $componentName);
 
         if (!str_contains($content, $importLine)) {
             $content = str_replace($importMarker, $importLine . PHP_EOL . $importMarker, $content);

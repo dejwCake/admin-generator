@@ -47,7 +47,7 @@ final class Lang extends FileAppender
 //        //TODO make global for all generator
 //        //TODO also with prefix
         if ($template !== null) {
-            $this->view = 'file-appenders.templates.' . $template . '.lang';
+            $this->view = sprintf('file-appenders.templates.%s.lang', $template);
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);
@@ -68,11 +68,11 @@ final class Lang extends FileAppender
 
         $markerText = "// Do not delete me :) I'm used for auto-generation" . PHP_EOL;
         $defaultContent = "<?php" . PHP_EOL . PHP_EOL . "declare(strict_types=1);"
-            . PHP_EOL . PHP_EOL . "return [" . PHP_EOL . "    " . $markerText . "];" . PHP_EOL;
+            . PHP_EOL . PHP_EOL . "return [" . PHP_EOL . sprintf('    %s', $markerText) . "];" . PHP_EOL;
 
         if (
             $this->replaceOrInsertBlock(
-                lang_path($locale . '/admin.php'),
+                lang_path(sprintf('%s/admin.php', $locale)),
                 $this->modelLangFormat,
                 $this->buildContent() . PHP_EOL,
                 $markerText,
@@ -107,7 +107,7 @@ final class Lang extends FileAppender
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
-        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'modelLangFormat' => $this->modelLangFormat,
             'modelBaseName' => $this->modelBaseName,

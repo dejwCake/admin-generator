@@ -40,13 +40,13 @@ final class UpdateRequest extends ClassGenerator
         //TODO make global for all generator
         //TODO also with prefix
         if ($template !== null) {
-            $this->view = 'classes.templates.' . $template . '.update-request';
+            $this->view = sprintf('classes.templates.%s.update-request', $template);
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);
 
         if ($this->generateClass($force)) {
-            $this->info('Generating ' . $this->classFullName . ' finished');
+            $this->info(sprintf('Generating %s finished', $this->classFullName));
         }
     }
 
@@ -54,7 +54,7 @@ final class UpdateRequest extends ClassGenerator
     #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
-        return 'Update' . $this->modelBaseName;
+        return sprintf('Update%s', $this->modelBaseName);
     }
 
     #[Override]
@@ -63,7 +63,7 @@ final class UpdateRequest extends ClassGenerator
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
         $visibleColumns = $columns->getVisible();
 
-        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,
@@ -102,6 +102,6 @@ final class UpdateRequest extends ClassGenerator
     #[Override]
     protected function getDefaultNamespace(string $rootNamespace): string
     {
-        return $rootNamespace . '\Http\Requests\Admin\\' . $this->modelWithNamespaceFromDefault;
+        return sprintf('%s\Http\Requests\Admin\%s', $rootNamespace, $this->modelWithNamespaceFromDefault);
     }
 }

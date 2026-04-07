@@ -102,7 +102,7 @@ abstract class FileAppender extends Generator
         }
 
         $content = $this->files->get($path);
-        $keyPattern = "    '" . $rootKey . "' => [";
+        $keyPattern = sprintf("    '%s' => [", $rootKey);
 
         if (str_contains($content, $keyPattern)) {
             $startPos = strpos($content, $keyPattern);
@@ -112,14 +112,14 @@ abstract class FileAppender extends Generator
             }
 
             // Strip the marker (and its leading indent) from newBlock — it already exists in the file
-            $markerWithIndent = '    ' . $markerText;
+            $markerWithIndent = sprintf('    %s', $markerText);
             $blockWithoutMarker = str_contains($newBlock, $markerWithIndent)
                 ? substr($newBlock, 0, strpos($newBlock, $markerWithIndent))
                 : $newBlock;
 
             $before = substr($content, 0, $startPos);
             $after = substr($content, $endPos);
-            $this->files->put($path, $before . '    ' . $blockWithoutMarker . $after);
+            $this->files->put($path, sprintf('%s    %s%s', $before, $blockWithoutMarker, $after));
         } else {
             // Replace marker text (without leading spaces) — the existing indent
             // before the marker becomes the indent for the first line of newBlock
@@ -145,8 +145,8 @@ abstract class FileAppender extends Generator
         }
 
         $content = $this->files->get($path);
-        $startMarker = '/* Auto-generated ' . $resource . ' routes */';
-        $endMarker = '/* End of ' . $resource . ' routes */';
+        $startMarker = sprintf('/* Auto-generated %s routes */', $resource);
+        $endMarker = sprintf('/* End of %s routes */', $resource);
 
         if (str_contains($content, $startMarker)) {
             $startPos = strpos($content, $startMarker);
@@ -163,13 +163,13 @@ abstract class FileAppender extends Generator
 
             $before = substr($content, 0, $startPos);
             $after = substr($content, $endPos);
-            $this->files->put($path, $before . $newBlock . $after);
+            $this->files->put($path, sprintf('%s%s%s', $before, $newBlock, $after));
         } elseif (str_contains($content, $insertMarker)) {
             $this->files->put(
                 $path,
                 str_replace(
                     $insertMarker,
-                    $newBlock . '        ' . $insertMarker,
+                    sprintf('%s        %s', $newBlock, $insertMarker),
                     $content,
                 ),
             );

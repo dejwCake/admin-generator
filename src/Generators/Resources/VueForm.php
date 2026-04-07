@@ -40,7 +40,7 @@ final class VueForm extends ResourceGenerator
         $fileName = $this->option('file-name');
 
         if ($template !== null) {
-            $this->view = 'resources.templates.' . $template . '.vue-form';
+            $this->view = sprintf('resources.templates.%s.vue-form', $template);
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);
@@ -59,11 +59,11 @@ final class VueForm extends ResourceGenerator
             )
             : $this->modelJSName;
 
-        $path = $this->laravel->resourcePath('js/admin/' . $this->formJsRelativePath . '/Form.vue');
+        $path = $this->laravel->resourcePath(sprintf('js/admin/%s/Form.vue', $this->formJsRelativePath));
 
         $this->generate($path, $force);
         $this->registerVueComponent(
-            Str::studly($this->formJsRelativePath) . 'Form',
+            sprintf('%sForm', Str::studly($this->formJsRelativePath)),
             $this->formJsRelativePath,
             'Form.vue',
         );
@@ -111,7 +111,7 @@ final class VueForm extends ResourceGenerator
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
 
-        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'mediaCollections' => $this->mediaCollections,
             'relations' => $this->relations,
@@ -149,11 +149,11 @@ final class VueForm extends ResourceGenerator
                 'created_by_admin_user_id',
                 'updated_by_admin_user_id',
             )->getFrontendValidationRules(),
-            'mediaDefaultProp' => '{' . $this->mediaCollections->keys()
-                    ->map(static fn (string $key): string => "$key: {}")
-                    ->implode(', ') . '}',
+            'mediaDefaultProp' => sprintf('{%s}', $this->mediaCollections->keys()
+                    ->map(static fn (string $key): string => sprintf('%s: {}', $key))
+                    ->implode(', ')),
             'mediaCollectionNames' => $this->mediaCollections->keys()
-                ->map(static fn (string $key): string => "'$key'")
+                ->map(static fn (string $key): string => sprintf("'%s'", $key))
                 ->implode(', '),
         ])->render();
     }

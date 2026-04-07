@@ -21,12 +21,12 @@ final readonly class BelongsToBuilder
         return new BelongsTo(
             foreignKeyColumn: $foreignKeyColumn,
             relatedTable: $relatedTable,
-            relatedModel: 'App\\Models\\' . $relatedModelName,
+            relatedModel: sprintf('App\\Models\\%s', $relatedModelName),
             relatedModelName: $relatedModelName,
             relatedLabel: $this->columnCollectionBuilder->build($relatedTable)->getLabelColumn(),
             relationMethodName: Str::camel(Str::beforeLast($foreignKeyColumn, '_id')),
-            optionsAttributeName: Str::singular(str_replace('_', '-', $relatedTable)) . '-options',
-            optionsPropName: Str::camel(Str::singular($relatedTable)) . 'Options',
+            optionsAttributeName: sprintf('%s-options', Str::singular(str_replace('_', '-', $relatedTable))),
+            optionsPropName: sprintf('%sOptions', Str::camel(Str::singular($relatedTable))),
         );
     }
 }

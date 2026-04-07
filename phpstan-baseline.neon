@@ -13,42 +13,6 @@ parameters:
 			path: src/Builders/ColumnCollectionBuilder.php
 
 		-
-			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Generators/Classes/BulkDestroyRequest.php
-
-		-
-			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Generators/Classes/DestroyRequest.php
-
-		-
-			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Generators/Classes/ExportRequest.php
-
-		-
-			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Generators/Classes/ImpersonalLoginRequest.php
-
-		-
-			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Generators/Classes/IndexRequest.php
-
-		-
-			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Generators/Classes/Permissions.php
-
-		-
 			message: '#^Cannot call static method factory\(\) on array\|bool\|float\|int\|string\.$#'
 			identifier: staticMethod.nonObject
 			count: 1
