@@ -146,7 +146,13 @@ class RoutesTest extends TestCase
 
         self::assertStringContainsString('/* Auto-generated categories routes */', $content);
         self::assertStringContainsString('/* Auto-generated posts routes */', $content);
-        self::assertSame(1, substr_count($content, "//-- Do not delete me :) I'm used for auto-generation admin routes uses --"));
-        self::assertSame(1, substr_count($content, "//-- Do not delete me :) I'm used for auto-generation admin routes --"));
+        self::assertSame(
+            1,
+            substr_count($content, "//-- Do not delete me :) I'm used for auto-generation admin routes uses --"),
+        );
+        self::assertSame(
+            1,
+            substr_count($content, "//-- Do not delete me :) I'm used for auto-generation admin routes --"),
+        );
     }
 }
