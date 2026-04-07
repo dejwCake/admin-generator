@@ -63,8 +63,8 @@
 </template>
 
 <script setup>
-import { useAppForm } from '../composables/useAppForm.js';
-import { mediaCollectionProp } from '@craftable/utils/mediaProps.js';
+import {useAppForm} from '../composables/useAppForm.js';
+import {mediaCollectionProp} from '@craftable/utils/mediaProps.js';
 import MediaUpload from '@craftable/components/form/MediaUpload.vue';
 import FormInput from '@craftable/components/form/FormInput.vue';
 import FormEmail from '@craftable/components/form/FormEmail.vue';

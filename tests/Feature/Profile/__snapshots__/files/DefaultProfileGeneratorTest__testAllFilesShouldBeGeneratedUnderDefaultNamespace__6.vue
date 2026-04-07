@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { useAppForm } from '../composables/useAppForm.js';
+import {useAppForm} from '../composables/useAppForm.js';
 import FormPasswordConfirm from '@craftable/components/form/FormPasswordConfirm.vue';
 import FormSubmit from '@craftable/components/form/FormSubmit.vue';
 

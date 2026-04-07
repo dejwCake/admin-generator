@@ -1,6 +1,7 @@
 @php
     use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
+    use Illuminate\Support\Collection;
     use Illuminate\Support\Str;
     assert($relations instanceof RelationCollection);
     assert($leftFormColumns instanceof ColumnCollection);
@@ -295,50 +296,57 @@
     </form>
 </template>
 
+@php
+    $imports = new Collection([
+        "{useAppForm} from '../composables/useAppForm.js'",
+    ]);
+    if ($hasCreatedByAdminUser || $hasUpdatedByAdminUser) {
+        $imports->push("UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue'");
+        $imports->push("{formatDatetime} from '@craftable/utils/dateFormatters.js'");
+    }
+    if ($hasTranslatable) {
+        $imports->push("LocalizationBar from '@craftable/components/form/LocalizationBar.vue'");
+    }
+    if ($hasFormInput) {
+        $imports->push("FormInput from '@craftable/components/form/FormInput.vue'");
+    }
+    if ($hasEmail) {
+        $imports->push("FormEmail from '@craftable/components/form/FormEmail.vue'");
+    }
+    if ($hasTextarea) {
+        $imports->push("FormTextarea from '@craftable/components/form/FormTextarea.vue'");
+    }
+    if ($hasBoolColumns) {
+        $imports->push("FormCheckbox from '@craftable/components/form/FormCheckbox.vue'");
+    }
+    $imports->push("FormSelect from '@craftable/components/form/FormSelect.vue'");
+    if ($hasDateColumns || $hasTimeColumns || $hasDatetimeColumns || $publishedColumns->isNotEmpty()) {
+        $imports->push("FormDatePicker from '@craftable/components/form/FormDatePicker.vue'");
+    }
+    if ($hasWysiwyg) {
+        $imports->push("FormWysiwyg from '@craftable/components/form/FormWysiwyg.vue'");
+    }
+    if ($relations->hasBelongsToMany()) {
+        $imports->push("FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue'");
+    }
+    if ($hasLocalizedInput) {
+        $imports->push("FormLocalizedInput from '@craftable/components/form/FormLocalizedInput.vue'");
+    }
+    if ($hasLocalizedWysiwyg) {
+        $imports->push("FormLocalizedWysiwyg from '@craftable/components/form/FormLocalizedWysiwyg.vue'");
+    }
+    if ($hasPassword) {
+        $imports->push("FormPasswordConfirm from '@craftable/components/form/FormPasswordConfirm.vue'");
+    }
+    $imports->push("FormSubmit from '@craftable/components/form/FormSubmit.vue'");
+    if ($mediaCollections->isNotEmpty()) {
+        $imports->push("MediaUpload from '@craftable/components/form/MediaUpload.vue'");
+    }
+@endphp
 <script setup>
-import {useAppForm} from '../composables/useAppForm.js';
-@if($hasCreatedByAdminUser || $hasUpdatedByAdminUser)
-import UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue';
-import {formatDatetime} from '@craftable/utils/dateFormatters.js';
-@endif
-@if($hasTranslatable)
-import LocalizationBar from '@craftable/components/form/LocalizationBar.vue';
-@endif
-@if($hasFormInput)
-import FormInput from '@craftable/components/form/FormInput.vue';
-@endif
-@if($hasEmail)
-import FormEmail from '@craftable/components/form/FormEmail.vue';
-@endif
-@if($hasTextarea)
-import FormTextarea from '@craftable/components/form/FormTextarea.vue';
-@endif
-@if($hasBoolColumns)
-import FormCheckbox from '@craftable/components/form/FormCheckbox.vue';
-@endif
-import FormSelect from '@craftable/components/form/FormSelect.vue';
-@if($hasDateColumns || $hasTimeColumns || $hasDatetimeColumns || $publishedColumns->isNotEmpty())
-import FormDatePicker from '@craftable/components/form/FormDatePicker.vue';
-@endif
-@if($hasWysiwyg)
-import FormWysiwyg from '@craftable/components/form/FormWysiwyg.vue';
-@endif
-@if($relations->hasBelongsToMany())
-import FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue';
-@endif
-@if($hasLocalizedInput)
-import FormLocalizedInput from '@craftable/components/form/FormLocalizedInput.vue';
-@endif
-@if($hasLocalizedWysiwyg)
-import FormLocalizedWysiwyg from '@craftable/components/form/FormLocalizedWysiwyg.vue';
-@endif
-@if($hasPassword)
-import FormPasswordConfirm from '@craftable/components/form/FormPasswordConfirm.vue';
-@endif
-import FormSubmit from '@craftable/components/form/FormSubmit.vue';
-@if($mediaCollections->isNotEmpty())
-import MediaUpload from '@craftable/components/form/MediaUpload.vue';
-@endif
+@foreach($imports as $import)
+import {!! $import !!};
+@endforeach
 
 const props = defineProps({
     action: {type: String, required: true},

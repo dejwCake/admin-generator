@@ -1,3 +1,6 @@
+@php
+    use Illuminate\Support\Collection;
+@endphp
 <template>
     <form class="form-horizontal" method="post" @@submit.prevent="onSubmit" :action="action" novalidate>
         <div class="card">
@@ -18,10 +21,17 @@
     </form>
 </template>
 
+@php
+    $imports = new Collection([
+        "{useAppForm} from '../composables/useAppForm.js'",
+        "FormPasswordConfirm from '@craftable/components/form/FormPasswordConfirm.vue'",
+        "FormSubmit from '@craftable/components/form/FormSubmit.vue'",
+    ]);
+@endphp
 <script setup>
-import { useAppForm } from '../composables/useAppForm.js';
-import FormPasswordConfirm from '@@craftable/components/form/FormPasswordConfirm.vue';
-import FormSubmit from '@@craftable/components/form/FormSubmit.vue';
+@foreach($imports as $import)
+import {!! $import !!};
+@endforeach
 
 const props = defineProps({
     action: { type: String, required: true },

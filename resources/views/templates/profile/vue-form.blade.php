@@ -1,6 +1,7 @@
 @php
     use Brackets\AdminGenerator\Dtos\Columns\Column;
     use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
+    use Illuminate\Support\Collection;
     assert($profileColumns instanceof ColumnCollection);
 @endphp
 <template>
@@ -74,23 +75,30 @@
     </form>
 </template>
 
+@php
+    $imports = new Collection([
+        "{useAppForm} from '../composables/useAppForm.js'",
+        "{mediaCollectionProp} from '@craftable/utils/mediaProps.js'",
+        "MediaUpload from '@craftable/components/form/MediaUpload.vue'",
+    ]);
+    if ($profileColumns->hasFormInput()) {
+        $imports->push("FormInput from '@craftable/components/form/FormInput.vue'");
+    }
+    if ($profileColumns->hasByName('email')) {
+        $imports->push("FormEmail from '@craftable/components/form/FormEmail.vue'");
+    }
+    if ($profileColumns->hasByName('language')) {
+        $imports->push("FormSelect from '@craftable/components/form/FormSelect.vue'");
+    }
+    if ($profileColumns->hasByMajorType('bool')) {
+        $imports->push("FormCheckbox from '@craftable/components/form/FormCheckbox.vue'");
+    }
+    $imports->push("FormSubmit from '@craftable/components/form/FormSubmit.vue'");
+@endphp
 <script setup>
-import { useAppForm } from '../composables/useAppForm.js';
-import { mediaCollectionProp } from '@@craftable/utils/mediaProps.js';
-import MediaUpload from '@@craftable/components/form/MediaUpload.vue';
-@if($profileColumns->hasFormInput())
-import FormInput from '@@craftable/components/form/FormInput.vue';
-@endif
-@if($profileColumns->hasByName('email'))
-import FormEmail from '@@craftable/components/form/FormEmail.vue';
-@endif
-@if($profileColumns->hasByName('language'))
-import FormSelect from '@@craftable/components/form/FormSelect.vue';
-@endif
-@if($profileColumns->hasByMajorType('bool'))
-import FormCheckbox from '@@craftable/components/form/FormCheckbox.vue';
-@endif
-import FormSubmit from '@@craftable/components/form/FormSubmit.vue';
+@foreach($imports as $import)
+import {!! $import !!};
+@endforeach
 
 const props = defineProps({
     action: { type: String, required: true },
