@@ -22,9 +22,15 @@ use Brackets\AdminGenerator\Generators\Generate;
 use Brackets\AdminGenerator\Generators\GenerateAdminUser;
 use Brackets\AdminGenerator\Generators\GenerateAdminUserProfile;
 use Brackets\AdminGenerator\Generators\GenerateUser;
+use Brackets\AdminGenerator\Generators\Resources\BladeCreate;
+use Brackets\AdminGenerator\Generators\Resources\BladeEdit;
+use Brackets\AdminGenerator\Generators\Resources\BladeForm;
+use Brackets\AdminGenerator\Generators\Resources\BladeIndex;
 use Brackets\AdminGenerator\Generators\Resources\Form;
 use Brackets\AdminGenerator\Generators\Resources\FullForm;
 use Brackets\AdminGenerator\Generators\Resources\Index;
+use Brackets\AdminGenerator\Generators\Resources\VueForm;
+use Brackets\AdminGenerator\Generators\Resources\VueListing;
 use Illuminate\Support\ServiceProvider;
 use Override;
 
@@ -61,9 +67,15 @@ final class AdminGeneratorServiceProvider extends ServiceProvider
             Lang::class,
             Routes::class,
             //Resources
+            BladeCreate::class,
+            BladeEdit::class,
+            BladeForm::class,
+            BladeIndex::class,
             Form::class,
             FullForm::class,
             Index::class,
+            VueForm::class,
+            VueListing::class,
         ]);
     }
 }
