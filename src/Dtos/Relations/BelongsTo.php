@@ -13,6 +13,7 @@ final readonly class BelongsTo
         public string $relatedModelName,
         public string $relatedLabel,
         public string $relationMethodName,
+        public string $optionsAttributeName,
         public string $optionsPropName,
     ) {
     }

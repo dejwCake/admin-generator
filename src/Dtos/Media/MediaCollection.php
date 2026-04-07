@@ -11,6 +11,8 @@ final readonly class MediaCollection
         public MediaCollectionType $type,
         public MediaCollectionDisk $disk,
         public int $maxFiles,
+        public string $translationKey,
+        public string $translationValue,
     ) {
     }
 

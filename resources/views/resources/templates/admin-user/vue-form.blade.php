@@ -2,7 +2,6 @@
     use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
     use Illuminate\Support\Collection;
-    use Illuminate\Support\Str;
     assert($relations instanceof RelationCollection);
     assert($leftFormColumns instanceof ColumnCollection);
     assert($publishedColumns instanceof ColumnCollection);
@@ -181,7 +180,7 @@
                         <FormMultiSelect
                             v-model="form.{{ $belongsToMany->relatedTable }}"
                             name="{{ $belongsToMany->relatedTable }}"
-                            :label="translations.relations.{{ Str::lcfirst(Str::plural($belongsToMany->relatedModelName)) }}"
+                            :label="translations.relations.{{ $belongsToMany->relationTranslationKey }}"
                             :error="errors.{{ $belongsToMany->relatedTable }}"
                             :options="{{ $belongsToMany->optionsPropName }}"
                             trackBy="id" optionLabel="{{ $belongsToMany->relatedLabel }}"

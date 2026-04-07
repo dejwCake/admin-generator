@@ -1,7 +1,6 @@
 @php
     use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
-    use Illuminate\Support\Str;
     assert($relations instanceof RelationCollection);
     assert($columns instanceof ColumnCollection);
     assert($publishedColumns instanceof ColumnCollection);
@@ -30,11 +29,11 @@
             :show-history="true"
 @endif
 @foreach($relations->getBelongsToMany() as $belongsToMany)
-            :{{ Str::singular(str_replace('_', '-', $belongsToMany->relatedTable)) }}-options="{{'{{'}} ${{ $belongsToMany->relatedTable }}->toJson() }}"
+            :{{ $belongsToMany->optionsAttributeName }}="{{'{{'}} ${{ $belongsToMany->relatedTable }}->toJson() }}"
 @endforeach
 @foreach($relations->getBelongsTo() as $belongsTo)
 @if(!$relations->hasRelatedTableInBelongsToMany($belongsTo->relatedTable))
-            :{{ Str::singular(str_replace('_', '-', $belongsTo->relatedTable)) }}-options="{{'{{'}} ${{ $belongsTo->relatedTable }}->toJson() }}"
+            :{{ $belongsTo->optionsAttributeName }}="{{'{{'}} ${{ $belongsTo->relatedTable }}->toJson() }}"
 @endif
 @endforeach
             :translations="{{'{{'}} json_encode([
@@ -52,7 +51,7 @@
 @if(count($relations->getBelongsToMany()) > 0)
                 'relations' => [
 @foreach($relations->getBelongsToMany() as $belongsToMany)
-                    '{{ Str::lcfirst(Str::plural($belongsToMany->relatedModelName)) }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ Str::lcfirst(Str::plural($belongsToMany->relatedModelName)) }}'),
+                    '{{ $belongsToMany->relationTranslationKey }}' => trans('admin.{{ $modelLangFormat }}.relations.{{ $belongsToMany->relationTranslationKey }}'),
 @endforeach
                 ],
 @endif

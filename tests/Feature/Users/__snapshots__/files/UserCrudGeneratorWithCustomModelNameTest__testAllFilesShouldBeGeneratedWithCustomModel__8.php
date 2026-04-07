@@ -20,7 +20,7 @@
                     'password_repeat' => trans('admin.user.columns.password_repeat'),
                 ],
                 'relations' => [
-                    'roles' => trans('admin.user.columns.roles'),
+                    'roles' => trans('admin.user.relations.roles'),
                 ],
                 'select_date_and_time' => trans('brackets/admin-ui::admin.forms.select_date_and_time'),
                 'select_options' => trans('brackets/admin-ui::admin.forms.select_options'),

@@ -1,7 +1,6 @@
 @php
     use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
-    use Illuminate\Support\Str;
     assert($relations instanceof RelationCollection);
     assert($columns instanceof ColumnCollection);
 @endphp
@@ -31,18 +30,21 @@
             '{{ $column->name }}_repeat' => '{{ $column->defaultTranslation }} Confirmation',
 @endif
 @endforeach
-@if ($relations->hasBelongsToMany())
-            //Belongs to many relations
-@foreach($relations->getBelongsToMany() as $belongsToMany)
-            '{{ Str::lcfirst(Str::plural($belongsToMany->relatedModelName)) }}' => '{{ Str::ucfirst(str_replace('_', ' ', Str::plural($belongsToMany->relatedModelName))) }}',
-@endforeach
-@endif
         ],
+@if ($relations->hasBelongsToMany())
+
+        //Belongs to many relations
+        'relations' => [
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+            '{{ $belongsToMany->relationTranslationKey }}' => '{{ $belongsToMany->relationTranslationValue }}',
+@endforeach
+        ],
+@endif
 @if($mediaCollections->isNotEmpty())
 
         'collections' => [
 @foreach($mediaCollections as $collection)
-            '{{ Str::lcfirst($collection->collectionName) }}' => '{{ Str::headline($collection->collectionName) }}',
+            '{{ $collection->translationKey }}' => '{{ $collection->translationValue }}',
 @endforeach
         ],
 @endif

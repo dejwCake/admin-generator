@@ -22,7 +22,10 @@ return [
             'remember_token' => 'Remember token',
             'created_at' => 'Created at',
             'updated_at' => 'Updated at',
-            //Belongs to many relations
+        ],
+
+        //Belongs to many relations
+        'relations' => [
             'roles' => 'Roles',
         ],
     ],

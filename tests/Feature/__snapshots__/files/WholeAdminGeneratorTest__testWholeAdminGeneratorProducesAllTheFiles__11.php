@@ -33,7 +33,7 @@
                     'views' => trans('admin.category.columns.views'),
                 ],
                 'relations' => [
-                    'posts' => trans('admin.category.columns.posts'),
+                    'posts' => trans('admin.category.relations.posts'),
                 ],
                 'publish' => trans('brackets/admin-ui::admin.forms.publish'),
                 'history' => trans('brackets/admin-ui::admin.forms.history'),

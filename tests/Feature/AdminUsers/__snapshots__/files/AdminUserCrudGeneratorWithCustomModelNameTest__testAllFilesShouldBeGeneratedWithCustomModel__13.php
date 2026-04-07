@@ -25,7 +25,7 @@
                     'language' => trans('admin.user.columns.language'),
                 ],
                 'relations' => [
-                    'roles' => trans('admin.user.columns.roles'),
+                    'roles' => trans('admin.user.relations.roles'),
                 ],
                 'select_options' => trans('brackets/admin-ui::admin.forms.select_options'),
                 'save' => trans('brackets/admin-ui::admin.btn.save'),

@@ -25,6 +25,7 @@ final readonly class BelongsToBuilder
             relatedModelName: $relatedModelName,
             relatedLabel: $this->columnCollectionBuilder->build($relatedTable)->getLabelColumn(),
             relationMethodName: Str::camel(Str::beforeLast($foreignKeyColumn, '_id')),
+            optionsAttributeName: Str::singular(str_replace('_', '-', $relatedTable)) . '-options',
             optionsPropName: Str::camel(Str::singular($relatedTable)) . 'Options',
         );
     }

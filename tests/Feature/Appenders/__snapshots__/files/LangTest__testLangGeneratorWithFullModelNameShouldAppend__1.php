@@ -34,7 +34,10 @@ return [
             'created_at' => 'Created at',
             'updated_at' => 'Updated at',
             'deleted_at' => 'Deleted at',
-            //Belongs to many relations
+        ],
+
+        //Belongs to many relations
+        'relations' => [
             'posts' => 'Posts',
         ],
     ],

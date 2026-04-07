@@ -31,7 +31,7 @@
                     'views' => trans('admin.categ-ory.columns.views'),
                 ],
                 'relations' => [
-                    'posts' => trans('admin.categ-ory.columns.posts'),
+                    'posts' => trans('admin.categ-ory.relations.posts'),
                 ],
                 'publish' => trans('brackets/admin-ui::admin.forms.publish'),
                 'currently_editing_translation' => trans('brackets/admin-ui::admin.forms.currently_editing_translation'),

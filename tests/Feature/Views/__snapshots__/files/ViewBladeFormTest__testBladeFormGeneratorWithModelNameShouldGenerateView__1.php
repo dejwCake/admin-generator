@@ -33,7 +33,7 @@
                     'views' => trans('admin.billing_categ-ory.columns.views'),
                 ],
                 'relations' => [
-                    'posts' => trans('admin.billing_categ-ory.columns.posts'),
+                    'posts' => trans('admin.billing_categ-ory.relations.posts'),
                 ],
                 'publish' => trans('brackets/admin-ui::admin.forms.publish'),
                 'history' => trans('brackets/admin-ui::admin.forms.history'),
