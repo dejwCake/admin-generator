@@ -26,9 +26,6 @@ use Brackets\AdminGenerator\Generators\Resources\BladeCreate;
 use Brackets\AdminGenerator\Generators\Resources\BladeEdit;
 use Brackets\AdminGenerator\Generators\Resources\BladeForm;
 use Brackets\AdminGenerator\Generators\Resources\BladeIndex;
-use Brackets\AdminGenerator\Generators\Resources\Form;
-use Brackets\AdminGenerator\Generators\Resources\FullForm;
-use Brackets\AdminGenerator\Generators\Resources\Index;
 use Brackets\AdminGenerator\Generators\Resources\VueForm;
 use Brackets\AdminGenerator\Generators\Resources\VueListing;
 use Illuminate\Support\ServiceProvider;
@@ -71,9 +68,6 @@ final class AdminGeneratorServiceProvider extends ServiceProvider
             BladeEdit::class,
             BladeForm::class,
             BladeIndex::class,
-            Form::class,
-            FullForm::class,
-            Index::class,
             VueForm::class,
             VueListing::class,
         ]);

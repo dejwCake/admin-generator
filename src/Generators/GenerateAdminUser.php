@@ -151,7 +151,7 @@ final class GenerateAdminUser extends Command
             '--without-bulk' => $withoutBulk,
         ]);
 
-        $this->call('admin:generate:index', [
+        $this->call('admin:generate:blade-index', [
             'table_name' => $tableName,
             '--model-name' => $modelName,
             '--force' => $force,
@@ -160,7 +160,34 @@ final class GenerateAdminUser extends Command
             '--without-bulk' => $withoutBulk,
         ]);
 
-        $this->call('admin:generate:form', [
+        $this->call('admin:generate:vue-listing', [
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--template' => 'admin-user',
+            '--with-export' => $withExport,
+            '--without-bulk' => $withoutBulk,
+        ]);
+
+        $this->call('admin:generate:blade-create', [
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--template' => 'admin-user',
+            '--belongs-to-many' => 'roles',
+            '--media' => $media,
+        ]);
+
+        $this->call('admin:generate:blade-edit', [
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--template' => 'admin-user',
+            '--belongs-to-many' => 'roles',
+            '--media' => $media,
+        ]);
+
+        $this->call('admin:generate:vue-form', [
             'table_name' => $tableName,
             '--model-name' => $modelName,
             '--force' => $force,

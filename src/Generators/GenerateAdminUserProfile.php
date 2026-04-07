@@ -68,7 +68,7 @@ final class GenerateAdminUserProfile extends Command
         ]);
         // TODO add this route to the dropdown user-menu
 
-        $this->call('admin:generate:full-form', [
+        $this->call('admin:generate:blade-form', [
             'table_name' => $tableName,
             '--model-name' => $modelName,
             '--force' => $force,
@@ -77,13 +77,29 @@ final class GenerateAdminUserProfile extends Command
             '--route' => 'admin/profile',
         ]);
 
-        $this->call('admin:generate:full-form', [
+        $this->call('admin:generate:vue-form', [
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--template' => 'profile',
+            '--file-name' => 'profile/edit-profile',
+        ]);
+
+        $this->call('admin:generate:blade-form', [
             'table_name' => $tableName,
             '--model-name' => $modelName,
             '--force' => $force,
             '--template' => 'profile.password',
             '--file-name' => 'profile/edit-password',
             '--route' => 'admin/password',
+        ]);
+
+        $this->call('admin:generate:vue-form', [
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--template' => 'profile.password',
+            '--file-name' => 'profile/edit-password',
         ]);
 
         $this->strReplaceInFile(
