@@ -66,7 +66,6 @@ final class GenerateAdminUserProfile extends Command
             '--template' => 'profile',
             '--resource' => 'profile',
         ]);
-        // TODO add this route to the dropdown user-menu
 
         $this->call('admin:generate:blade-form', [
             'table_name' => $tableName,
