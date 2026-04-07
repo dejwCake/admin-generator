@@ -73,19 +73,16 @@ final class BladeIndex extends ResourceGenerator
             ->getForIndex();
 
         return view('brackets/admin-generator::' . $this->view, [
-            'modelBaseName' => $this->modelBaseName,
-            'modelPlural' => $this->modelPlural,
-            'modelRouteAndViewName' => $this->modelRouteAndViewName,
-            'modelViewsDirectory' => $this->modelViewsDirectory,
+            //globals
             'modelJSName' => $this->modelJSName,
-            'modelDotNotation' => $this->modelDotNotation,
             'modelLangFormat' => $this->modelLangFormat,
-            'resource' => $this->resource,
+            //has
             'hasExport' => $this->hasExport,
             'hasBulk' => $this->hasBulk,
             'hasPublishedAt' => $columns->hasByName('published_at'),
             'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
             'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
+            //columns
             'columns' => $columns,
         ])->render();
     }

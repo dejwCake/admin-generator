@@ -114,15 +114,9 @@ final class BladeForm extends ResourceGenerator
 
         return view('brackets/admin-generator::' . $this->view, [
             //globals
-            'modelBaseName' => $this->modelBaseName,
-            'modelPlural' => $this->modelPlural,
             'modelVariableName' => $this->modelVariableName,
-            'modelRouteAndViewName' => $this->modelRouteAndViewName,
-            'modelViewsDirectory' => $this->modelViewsDirectory,
-            'modelDotNotation' => $this->modelDotNotation,
             'modelJSName' => $this->formJsRelativePath,
             'modelLangFormat' => $this->modelLangFormat,
-            'resource' => $this->resource,
             'mediaCollections' => $this->mediaCollections,
             'relations' => $this->relations,
             //has
@@ -133,7 +127,6 @@ final class BladeForm extends ResourceGenerator
             'hasWysiwyg' => $leftFormColumns->hasWysiwyg(),
             'hasPassword' => $leftFormColumns->hasByName('password'),
             'hasEmail' => $leftFormColumns->hasByName('email'),
-            'hasLanguage' => $leftFormColumns->hasByName('language'),
             'hasBoolColumns' => $leftFormColumns->hasByMajorType('bool'),
             'hasDateColumns' => $leftFormColumns->hasByMajorType('date'),
             'hasTimeColumns' => $leftFormColumns->hasByMajorType('time'),
@@ -151,15 +144,13 @@ final class BladeForm extends ResourceGenerator
             'publishedColumns' => $publishedColumns,
             'galleryCollections' => $galleryCollections,
             'wysiwygTextColumnNames' => $columns->getWysiwygColumnNames(),
-
+            //other
             'isUsedTwoColumnsLayout' => $publishedColumns->isNotEmpty()
                 || $galleryCollections->isNotEmpty()
                 || $hasCreatedByAdminUser
                 || $hasUpdatedByAdminUser,
-
             'profileColumns' => $leftFormColumns->rejectByName('password', 'activated', 'forbidden'),
             'modelLabelColumn' => $columns->getLabelColumn(),
-            'route' => $this->route,
         ])->render();
     }
 }

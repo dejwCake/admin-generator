@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
-use Brackets\AdminGenerator\Dtos\Media\MediaCollection;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -74,66 +73,33 @@ final class BladeCreate extends ResourceGenerator
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
         $visibleColumns = $columns->getVisible();
 
-        $hasCreatedByAdminUser = $columns->hasByName('created_by_admin_user_id');
-        $hasUpdatedByAdminUser = $columns->hasByName('updated_by_admin_user_id');
-
-        // Columns to display in the main form body (excluding sidebar/system columns)
-        $leftFormColumns = $visibleColumns->rejectByName(
+        $formColumns = $visibleColumns->rejectByName(
             'published_at',
             'created_by_admin_user_id',
             'updated_by_admin_user_id',
         );
-        // Right column: only published_at
         $publishedColumns = $visibleColumns->filterByName('published_at');
-
-        // Split media collections: gallery goes right, rest left
         $galleryCollections = $this->mediaCollections->filter(
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
 
         return view('brackets/admin-generator::' . $this->view, [
             //globals
-            'modelBaseName' => $this->modelBaseName,
-            'modelPlural' => $this->modelPlural,
-            'modelVariableName' => $this->modelVariableName,
-            'modelRouteAndViewName' => $this->modelRouteAndViewName,
-            'modelViewsDirectory' => $this->modelViewsDirectory,
-            'modelDotNotation' => $this->modelDotNotation,
             'modelJSName' => $this->modelJSName,
             'modelLangFormat' => $this->modelLangFormat,
-            'resource' => $this->resource,
             'mediaCollections' => $this->mediaCollections,
             'relations' => $this->relations,
             //has
-            'hasCreatedByAdminUser' => $hasCreatedByAdminUser,
-            'hasUpdatedByAdminUser' => $hasUpdatedByAdminUser,
             'hasTranslatable' => $columns->hasByMajorType('json'),
             'hasPublishedAt' => $columns->hasByName('published_at'),
-            'hasPassword' => $leftFormColumns->hasByName('password'),
-            'hasEmail' => $leftFormColumns->hasByName('email'),
-            'hasWysiwyg' => $leftFormColumns->hasWysiwyg(),
-            'hasBoolColumns' => $leftFormColumns->hasByMajorType('bool'),
-            'hasDateColumns' => $leftFormColumns->hasByMajorType('date'),
-            'hasTimeColumns' => $leftFormColumns->hasByMajorType('time'),
-            'hasDatetimeColumns' => $leftFormColumns->hasByMajorType('datetime'),
-            'hasFormInput' => $leftFormColumns->hasFormInput(),
-            'hasTextarea' => $leftFormColumns->hasTextarea(),
-            'hasLocalizedInput' => $leftFormColumns->hasLocalizedInput(),
-            'hasLocalizedWysiwyg' => $leftFormColumns->hasLocalizedWysiwyg(),
+            'hasWysiwyg' => $formColumns->hasWysiwyg(),
+            'hasDateColumns' => $formColumns->hasByMajorType('date'),
+            'hasTimeColumns' => $formColumns->hasByMajorType('time'),
+            'hasDatetimeColumns' => $formColumns->hasByMajorType('datetime'),
             //columns
             'columns' => $visibleColumns,
-            'leftFormColumns' => $leftFormColumns,
-            'leftMediaCollections' => $this->mediaCollections->reject(
-                static fn (MediaCollection $mediaCollection): bool => $mediaCollection->collectionName === 'gallery',
-            ),
             'publishedColumns' => $publishedColumns,
             'galleryCollections' => $galleryCollections,
-
-            'wysiwygTextColumnNames' => $columns->getWysiwygColumnNames(),
-            'isUsedTwoColumnsLayout' => $publishedColumns->isNotEmpty()
-                || $galleryCollections->isNotEmpty()
-                || $hasCreatedByAdminUser
-                || $hasUpdatedByAdminUser,
         ])->render();
     }
 }

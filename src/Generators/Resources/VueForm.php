@@ -113,26 +113,15 @@ final class VueForm extends ResourceGenerator
 
         return view('brackets/admin-generator::' . $this->view, [
             //globals
-            'modelBaseName' => $this->modelBaseName,
-            'modelPlural' => $this->modelPlural,
-            'modelVariableName' => $this->modelVariableName,
-            'modelRouteAndViewName' => $this->modelRouteAndViewName,
-            'modelViewsDirectory' => $this->modelViewsDirectory,
-            'modelDotNotation' => $this->modelDotNotation,
-            'modelJSName' => $this->formJsRelativePath,
-            'modelLangFormat' => $this->modelLangFormat,
-            'resource' => $this->resource,
             'mediaCollections' => $this->mediaCollections,
             'relations' => $this->relations,
             //has
             'hasCreatedByAdminUser' => $hasCreatedByAdminUser,
             'hasUpdatedByAdminUser' => $hasUpdatedByAdminUser,
             'hasTranslatable' => $columns->hasByMajorType('json'),
-            'hasPublishedAt' => $columns->hasByName('published_at'),
             'hasWysiwyg' => $leftFormColumns->hasWysiwyg(),
             'hasPassword' => $leftFormColumns->hasByName('password'),
             'hasEmail' => $leftFormColumns->hasByName('email'),
-            'hasLanguage' => $leftFormColumns->hasByName('language'),
             'hasBoolColumns' => $leftFormColumns->hasByMajorType('bool'),
             'hasDateColumns' => $leftFormColumns->hasByMajorType('date'),
             'hasTimeColumns' => $leftFormColumns->hasByMajorType('time'),
@@ -142,7 +131,6 @@ final class VueForm extends ResourceGenerator
             'hasLocalizedInput' => $leftFormColumns->hasLocalizedInput(),
             'hasLocalizedWysiwyg' => $leftFormColumns->hasLocalizedWysiwyg(),
             //columns
-            'columns' => $visibleColumns,
             'leftFormColumns' => $leftFormColumns,
             'leftMediaCollections' => $this->mediaCollections->reject(
                 static fn (MediaCollection $mediaCollection): bool => $mediaCollection->collectionName === 'gallery',
@@ -150,12 +138,11 @@ final class VueForm extends ResourceGenerator
             'publishedColumns' => $publishedColumns,
             'galleryCollections' => $galleryCollections,
             'wysiwygTextColumnNames' => $columns->getWysiwygColumnNames(),
-
+            //other
             'isUsedTwoColumnsLayout' => $publishedColumns->isNotEmpty()
                 || $galleryCollections->isNotEmpty()
                 || $hasCreatedByAdminUser
                 || $hasUpdatedByAdminUser,
-
             'profileColumns' => $leftFormColumns->rejectByName('password', 'activated', 'forbidden'),
             'validationRules' => $columns->getVisible()->rejectByName(
                 'published_at',

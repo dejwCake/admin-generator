@@ -97,16 +97,18 @@ final class VueListing extends ResourceGenerator
         $dateImports = $dateImports->sort();
 
         return view('brackets/admin-generator::' . $this->view, [
-            'modelJSName' => $this->modelJSName,
-            'modelVariableName' => $this->modelVariableName,
+            //globals
             'relations' => $this->relations,
+            //has
             'hasExport' => $this->hasExport,
             'hasBulk' => $this->hasBulk,
             'hasPublishedAt' => $hasPublishedAt,
             'hasUserDetailTooltip' => $hasUserDetailTooltip,
             'hasSwitchColumns' => $columns->hasByMajorType('bool'),
             'hasDateColumns' => $hasDateColumns,
+            //columns
             'columns' => $columns,
+            //other
             'dateImports' => $dateImports,
         ])->render();
     }
