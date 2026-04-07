@@ -41,38 +41,12 @@ final class ColumnCollection implements IteratorAggregate, Countable
         $this->columns->put($column->name, $column);
     }
 
-    public function get(string $name): ?Column
-    {
-        return $this->columns->get($name);
-    }
-
-    public function has(string $name): bool
-    {
-        return $this->columns->has($name);
-    }
-
-    public function first(?Closure $callback = null): ?Column
-    {
-        return $this->columns->first($callback);
-    }
-
     public function filter(Closure $callback): self
     {
         $filtered = new self();
         $filtered->columns = $this->columns->filter($callback);
 
         return $filtered;
-    }
-
-    public function contains(Closure $callback): bool
-    {
-        return $this->columns->contains($callback);
-    }
-
-    /** @return Collection<int|string, bool|Column|string|null> */
-    public function map(Closure $callback): Collection
-    {
-        return $this->columns->map($callback);
     }
 
     /** @return Collection<int, string|bool> */
@@ -150,15 +124,6 @@ final class ColumnCollection implements IteratorAggregate, Countable
                     in_array($column->majorType, ['json', 'text', 'string'], true) || $column->name === 'id',
             )->filter(
                 static fn (Column $column) => !in_array($column->name, ['password', 'remember_token'], true),
-            ),
-        );
-    }
-
-    public function getFilters(): self
-    {
-        return new self(
-            $this->columns->filter(
-                static fn (Column $column): bool => in_array($column->majorType, ['bool', 'date'], true),
             ),
         );
     }

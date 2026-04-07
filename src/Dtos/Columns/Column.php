@@ -17,13 +17,10 @@ final readonly class Column
      */
     public function __construct(
         public string $name,
-        public string $type,
         public string $majorType,
         public string $phpType,
         public string $faker,
         public bool $required,
-        public bool $unique,
-        public bool $hasUniqueDeleteAtIndex,
         public string $defaultTranslation,
         public bool $isForeignKey,
         public ?int $priority,
@@ -48,13 +45,10 @@ final readonly class Column
     {
         return new self(
             name: $this->name,
-            type: $this->type,
             majorType: $this->majorType,
             phpType: $this->phpType,
             faker: $this->faker,
             required: $this->required,
-            unique: $this->unique,
-            hasUniqueDeleteAtIndex: $this->hasUniqueDeleteAtIndex,
             defaultTranslation: $this->defaultTranslation,
             isForeignKey: $this->isForeignKey,
             priority: $priority,

@@ -43,13 +43,10 @@ final readonly class ColumnBuilder
 
         return new Column(
             name: $name,
-            type: $type,
             majorType: $majorType,
             phpType: $this->getPhpType($majorType),
             faker: $this->getFaker($name, $majorType),
             required: $nullable === false,
-            unique: $hasUniqueIndex,
-            hasUniqueDeleteAtIndex: $hasUniqueDeleteAtIndex,
             defaultTranslation: $this->getDefaultTranslation($name),
             isForeignKey: $isForeignKey,
             priority: $this->getFixedPriority($name),

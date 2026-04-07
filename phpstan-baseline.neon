@@ -13,12 +13,6 @@ parameters:
 			path: src/Builders/ColumnCollectionBuilder.php
 
 		-
-			message: '#^Method Brackets\\AdminGenerator\\Dtos\\Columns\\ColumnCollection\:\:map\(\) should return Illuminate\\Support\\Collection\<int\|string, bool\|Brackets\\AdminGenerator\\Dtos\\Columns\\Column\|string\|null\> but returns Illuminate\\Support\\Collection\<string, mixed\>\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Dtos/Columns/ColumnCollection.php
-
-		-
 			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
 			identifier: argument.type
 			count: 1
