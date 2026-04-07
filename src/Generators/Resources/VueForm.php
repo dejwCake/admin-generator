@@ -89,7 +89,7 @@ final class VueForm extends ResourceGenerator
     }
 
     #[Override]
-    protected function build(): string
+    protected function buildView(): string
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
         $visibleColumns = $columns->getVisible();

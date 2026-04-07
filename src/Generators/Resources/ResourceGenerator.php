@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class ResourceGenerator extends Generator
 {
-    abstract protected function build(): string;
+    abstract protected function buildView(): string;
 
     /** @return array<array<string|int>> */
     #[Override]
@@ -39,7 +39,7 @@ abstract class ResourceGenerator extends Generator
 
         $this->makeDirectory($path);
 
-        $this->files->put($path, $this->build());
+        $this->files->put($path, $this->buildView());
         $this->info('Generating ' . $path . ' finished');
     }
 

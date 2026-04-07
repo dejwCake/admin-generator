@@ -67,7 +67,7 @@ final class BladeIndex extends ResourceGenerator
     }
 
     #[Override]
-    protected function build(): string
+    protected function buildView(): string
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
             ->getForIndex();
