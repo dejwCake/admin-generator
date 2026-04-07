@@ -70,7 +70,7 @@ final class BladeForm extends ResourceGenerator
                 : 'admin/' . $this->resource . '/update';
         }
 
-        $path = resource_path('views/admin/' . $this->fileName . '.blade.php');
+        $path = $this->laravel->resourcePath('views/admin/' . $this->fileName . '.blade.php');
 
         $this->generate($path, $force);
     }
@@ -112,7 +112,7 @@ final class BladeForm extends ResourceGenerator
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
 
-        return view('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
             //globals
             'modelVariableName' => $this->modelVariableName,
             'modelJSName' => $this->formJsRelativePath,

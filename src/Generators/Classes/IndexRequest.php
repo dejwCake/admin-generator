@@ -46,7 +46,7 @@ final class IndexRequest extends ClassGenerator
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
-        return view('brackets/admin-generator::classes.index-request', [
+        return $this->viewFactory->make('brackets/admin-generator::classes.index-request', [
             //globals
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,

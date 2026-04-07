@@ -59,7 +59,7 @@ final class VueForm extends ResourceGenerator
             )
             : $this->modelJSName;
 
-        $path = resource_path('js/admin/' . $this->formJsRelativePath . '/Form.vue');
+        $path = $this->laravel->resourcePath('js/admin/' . $this->formJsRelativePath . '/Form.vue');
 
         $this->generate($path, $force);
         $this->registerVueComponent(
@@ -111,7 +111,7 @@ final class VueForm extends ResourceGenerator
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
 
-        return view('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
             //globals
             'mediaCollections' => $this->mediaCollections,
             'relations' => $this->relations,

@@ -107,7 +107,7 @@ final class Lang extends FileAppender
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
-        return view('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
             //globals
             'modelLangFormat' => $this->modelLangFormat,
             'modelBaseName' => $this->modelBaseName,

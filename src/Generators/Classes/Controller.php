@@ -97,7 +97,7 @@ final class Controller extends ClassGenerator
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
-        return view('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
             //globals
             'controllerBaseName' => $this->classBaseName,
             'controllerNamespace' => $this->classNamespace,
@@ -180,7 +180,7 @@ final class Controller extends ClassGenerator
         );
         if (
             $this->strReplaceInFile(
-                resource_path('views/admin/layout/sidebar.blade.php'),
+                $this->laravel->resourcePath('views/admin/layout/sidebar.blade.php'),
                 "{{-- Do not delete me :) I'm used for auto-generation menu items --}}",
                 "<li class=\"nav-item\"><a class=\"nav-link\" href=\"{{ url('admin/" . $this->resource . "') }}\"><i class=\"nav-icon " . $icon . "\"></i> {{ trans('admin." . $this->modelLangFormat . ".title') }}</a></li>" . PHP_EOL . "           {{-- Do not delete me :) I'm used for auto-generation menu items --}}",
                 '|url\(\'admin\/' . $this->resource . '\'\)|',

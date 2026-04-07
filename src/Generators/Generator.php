@@ -12,6 +12,7 @@ use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
 use Brackets\AdminGenerator\Generators\Classes\Controller;
 use Brackets\AdminGenerator\Generators\Classes\Model;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -52,6 +53,7 @@ abstract class Generator extends Command
         protected readonly ColumnCollectionBuilder $columnCollectionBuilder,
         protected readonly MediaCollectionBuilder $mediaCollectionBuilder,
         protected readonly RelationBuilder $relationBuilder,
+        protected readonly ViewFactory $viewFactory,
     ) {
         parent::__construct();
 
@@ -79,7 +81,7 @@ abstract class Generator extends Command
         if ($this instanceof Model) {
             $modelGenerator = $this;
         } else {
-            $modelGenerator = app(Model::class);
+            $modelGenerator = $this->laravel->make(Model::class);
             $modelGenerator->setLaravel($this->laravel);
         }
 
@@ -118,7 +120,7 @@ abstract class Generator extends Command
         if ($this instanceof Controller) {
             $controllerGenerator = $this;
         } else {
-            $controllerGenerator = app(Controller::class);
+            $controllerGenerator = $this->laravel->make(Controller::class);
             $controllerGenerator->setLaravel($this->laravel);
         }
 

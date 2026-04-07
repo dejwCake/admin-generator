@@ -45,10 +45,10 @@ final class GenerateAdminUserProfile extends Command
 
         if ($force) {
             //remove all files
-            $this->files->delete(app_path('Http/Controllers/Admin/ProfileController.php'));
-            $this->files->deleteDirectory(resource_path('js/admin/profile-edit-profile'));
-            $this->files->deleteDirectory(resource_path('js/admin/profile-edit-password'));
-            $this->files->deleteDirectory(resource_path('views/admin/profile'));
+            $this->files->delete($this->laravel->path('Http/Controllers/Admin/ProfileController.php'));
+            $this->files->deleteDirectory($this->laravel->resourcePath('js/admin/profile-edit-profile'));
+            $this->files->deleteDirectory($this->laravel->resourcePath('js/admin/profile-edit-password'));
+            $this->files->deleteDirectory($this->laravel->resourcePath('views/admin/profile'));
         }
 
         $this->call('admin:generate:controller', [
@@ -102,7 +102,7 @@ final class GenerateAdminUserProfile extends Command
         ]);
 
         $this->strReplaceInFile(
-            resource_path('views/admin/layout/profile-dropdown.blade.php'),
+            $this->laravel->resourcePath('views/admin/layout/profile-dropdown.blade.php'),
             '{{-- Do not delete me :) I\'m used for auto-generation menu items --}}',
             '<a href="{{ url(\'admin/profile\') }}" class="dropdown-item"><i class="fa fa-user"></i>  {{ trans(\'brackets/admin-auth::admin.profile_dropdown.profile\') }}</a>
     {{-- Do not delete me :) I\'m used for auto-generation menu items --}}',
@@ -110,7 +110,7 @@ final class GenerateAdminUserProfile extends Command
         );
 
         $this->strReplaceInFile(
-            resource_path('views/admin/layout/profile-dropdown.blade.php'),
+            $this->laravel->resourcePath('views/admin/layout/profile-dropdown.blade.php'),
             '{{-- Do not delete me :) I\'m used for auto-generation menu items --}}',
             '<a href="{{ url(\'admin/password\') }}" class="dropdown-item"><i class="fa fa-key"></i>  {{ trans(\'brackets/admin-auth::admin.profile_dropdown.password\') }}</a>
     {{-- Do not delete me :) I\'m used for auto-generation menu items --}}',

@@ -51,7 +51,7 @@ final class VueListing extends ResourceGenerator
 
         $this->relations = $this->relationBuilder->build($this->tableName, null);
 
-        $path = resource_path('js/admin/' . $this->modelJSName . '/Listing.vue');
+        $path = $this->laravel->resourcePath('js/admin/' . $this->modelJSName . '/Listing.vue');
 
         $this->generate($path, $force);
         $this->registerVueComponent($this->modelBaseName . 'Listing', $this->modelJSName, 'Listing.vue');
@@ -96,7 +96,7 @@ final class VueListing extends ResourceGenerator
         }
         $dateImports = $dateImports->sort();
 
-        return view('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
             //globals
             'relations' => $this->relations,
             //has

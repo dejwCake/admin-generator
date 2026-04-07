@@ -63,7 +63,7 @@ final class UpdateRequest extends ClassGenerator
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
         $visibleColumns = $columns->getVisible();
 
-        return view('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
             //globals
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,

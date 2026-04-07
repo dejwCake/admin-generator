@@ -55,7 +55,7 @@ final class Permissions extends ClassGenerator
     protected function generateClass(bool $force = false): bool
     {
         $fileName = 'fill_permissions_for_' . $this->modelRouteAndViewName . '.php';
-        $path = database_path('migrations/' . date('Y_m_d_His', time()) . '_' . $fileName);
+        $path = $this->laravel->databasePath('migrations/' . date('Y_m_d_His', time()) . '_' . $fileName);
 
         $oldPath = $this->alreadyExists($fileName);
         if ($oldPath) {
@@ -82,11 +82,11 @@ final class Permissions extends ClassGenerator
      */
     protected function alreadyExists(string $path): bool|string
     {
-        if (!$this->files->exists(database_path('migrations'))) {
+        if (!$this->files->exists($this->laravel->databasePath('migrations'))) {
             return false;
         }
 
-        foreach ($this->files->files(database_path('migrations')) as $file) {
+        foreach ($this->files->files($this->laravel->databasePath('migrations')) as $file) {
             if (str_contains($file->getFilename(), $path)) {
                 return $file->getPathname();
             }
@@ -98,7 +98,7 @@ final class Permissions extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        return view('brackets/admin-generator::classes.permissions', [
+        return $this->viewFactory->make('brackets/admin-generator::classes.permissions', [
             //globals
             'modelBaseName' => $this->modelBaseName,
             'modelDotNotation' => $this->modelDotNotation,

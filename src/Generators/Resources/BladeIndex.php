@@ -48,7 +48,7 @@ final class BladeIndex extends ResourceGenerator
             $this->hasBulk = false;
         }
 
-        $path = resource_path('views/admin/' . $this->modelViewsDirectory . '/index.blade.php');
+        $path = $this->laravel->resourcePath('views/admin/' . $this->modelViewsDirectory . '/index.blade.php');
 
         $this->generate($path, $force);
     }
@@ -72,7 +72,7 @@ final class BladeIndex extends ResourceGenerator
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
             ->getForIndex();
 
-        return view('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
             //globals
             'modelJSName' => $this->modelJSName,
             'modelLangFormat' => $this->modelLangFormat,

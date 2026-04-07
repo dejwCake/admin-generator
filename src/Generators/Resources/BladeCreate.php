@@ -44,7 +44,7 @@ final class BladeCreate extends ResourceGenerator
             $this->mediaCollections = $this->mediaCollectionBuilder->build($media);
         }
 
-        $path = resource_path('views/admin/' . $this->modelViewsDirectory . '/create.blade.php');
+        $path = $this->laravel->resourcePath('views/admin/' . $this->modelViewsDirectory . '/create.blade.php');
 
         $this->generate($path, $force);
     }
@@ -83,7 +83,7 @@ final class BladeCreate extends ResourceGenerator
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
 
-        return view('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
             //globals
             'modelJSName' => $this->modelJSName,
             'modelLangFormat' => $this->modelLangFormat,

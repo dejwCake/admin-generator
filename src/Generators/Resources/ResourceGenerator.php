@@ -45,7 +45,7 @@ abstract class ResourceGenerator extends Generator
 
     protected function registerVueComponent(string $componentName, string $jsRelativePath, string $fileName): void
     {
-        $adminJsPath = resource_path('js/admin/admin.js');
+        $adminJsPath = $this->laravel->resourcePath('js/admin/admin.js');
 
         if (!$this->files->exists($adminJsPath)) {
             $this->warn('File ' . $adminJsPath . ' does not exist, skipping component registration.');

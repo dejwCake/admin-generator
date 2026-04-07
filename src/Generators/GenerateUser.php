@@ -50,15 +50,15 @@ final class GenerateUser extends Command
         if ($force) {
             //remove all files
             if ($generateModel) {
-                $this->files->delete(app_path('Models/User.php'));
+                $this->files->delete($this->laravel->path('Models/User.php'));
             }
             if ($withExport) {
-                $this->files->delete(app_path('Exports/UsersExport.php'));
+                $this->files->delete($this->laravel->path('Exports/UsersExport.php'));
             }
-            $this->files->delete(app_path('Http/Controllers/Admin/UsersController.php'));
-            $this->files->deleteDirectory(app_path('Http/Requests/Admin/User'));
-            $this->files->deleteDirectory(resource_path('js/admin/user'));
-            $this->files->deleteDirectory(resource_path('views/admin/user'));
+            $this->files->delete($this->laravel->path('Http/Controllers/Admin/UsersController.php'));
+            $this->files->deleteDirectory($this->laravel->path('Http/Requests/Admin/User'));
+            $this->files->deleteDirectory($this->laravel->resourcePath('js/admin/user'));
+            $this->files->deleteDirectory($this->laravel->resourcePath('views/admin/user'));
 
             $this->info('Deleting previous files finished.');
         }
@@ -78,7 +78,7 @@ final class GenerateUser extends Command
 
         // we need to replace this before controller generation happens
         $this->strReplaceInFile(
-            resource_path('views/admin/layout/sidebar.blade.php'),
+            $this->laravel->resourcePath('views/admin/layout/sidebar.blade.php'),
             '{{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
             '<li class="nav-item"><a class="nav-link" href="{{ url(\'admin/users\') }}"><i class="nav-icon fa fa-user"></i> {{ __(\'Manage users\') }}</a></li>
             {{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',

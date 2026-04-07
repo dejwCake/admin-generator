@@ -69,7 +69,7 @@ final class Model extends ClassGenerator
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
 
-        return view('brackets/admin-generator::' . $this->view, [
+        return $this->viewFactory->make('brackets/admin-generator::' . $this->view, [
             //globals
             'modelBaseName' => $this->classBaseName,
             'modelNameSpace' => $this->classNamespace,
