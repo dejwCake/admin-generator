@@ -29,7 +29,7 @@ final class BladeForm extends ResourceGenerator
     /**
      * Path for blade view
      */
-    protected string $view = 'blade-form';
+    protected string $view = 'resources.blade-form';
 
     /**
      * Name of view, will be used in directory
@@ -51,7 +51,7 @@ final class BladeForm extends ResourceGenerator
         $this->route = $this->option('route');
 
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.blade-form';
+            $this->view = 'resources.templates.' . $template . '.blade-form';
         }
 
         $belongsToMany = $this->option('belongs-to-many');

@@ -98,7 +98,7 @@ final class Permissions extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        return view('brackets/admin-generator::permissions', [
+        return view('brackets/admin-generator::classes.permissions', [
             //globals
             'modelBaseName' => $this->modelBaseName,
             'modelDotNotation' => $this->modelDotNotation,

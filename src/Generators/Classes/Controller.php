@@ -34,7 +34,7 @@ final class Controller extends ClassGenerator
     /**
      * Path for view
      */
-    protected string $view = 'controller';
+    protected string $view = 'classes.controller';
 
     /**
      * Controller has also export method
@@ -62,7 +62,7 @@ final class Controller extends ClassGenerator
         //TODO make global for all generator
         //TODO also with prefix
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.controller';
+            $this->view = 'classes.templates.' . $template . '.controller';
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);

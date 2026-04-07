@@ -28,7 +28,7 @@ final class Lang extends FileAppender
     /**
      * Path for view
      */
-    protected string $view = 'lang';
+    protected string $view = 'file-appenders.lang';
 
     /**
      * Lang has also export translation
@@ -47,7 +47,7 @@ final class Lang extends FileAppender
 //        //TODO make global for all generator
 //        //TODO also with prefix
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.lang';
+            $this->view = 'file-appenders.templates.' . $template . '.lang';
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);

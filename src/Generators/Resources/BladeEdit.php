@@ -25,7 +25,7 @@ final class BladeEdit extends ResourceGenerator
      */
     protected $description = 'Generate an edit blade view';
 
-    protected string $view = 'blade-edit';
+    protected string $view = 'resources.blade-edit';
 
     public function handle(): void
     {
@@ -35,7 +35,7 @@ final class BladeEdit extends ResourceGenerator
         $media = $this->option('media');
 
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.blade-edit';
+            $this->view = 'resources.templates.' . $template . '.blade-edit';
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);

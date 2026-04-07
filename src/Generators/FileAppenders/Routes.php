@@ -28,7 +28,7 @@ final class Routes extends FileAppender
     /**
      * Path for view
      */
-    protected string $view = 'routes';
+    protected string $view = 'file-appenders.routes';
 
     /**
      * Routes have also export route
@@ -55,7 +55,7 @@ final class Routes extends FileAppender
         //TODO make global for all generator
         //TODO also with prefix
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.routes';
+            $this->view = 'file-appenders.templates.' . $template . '.routes';
         }
 
         if ($withExport) {

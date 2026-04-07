@@ -44,7 +44,7 @@ final class ImpersonalLoginRequest extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        return view('brackets/admin-generator::impersonal-login-request', [
+        return view('brackets/admin-generator::classes.impersonal-login-request', [
             //globals
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,

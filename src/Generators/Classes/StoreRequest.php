@@ -28,7 +28,7 @@ final class StoreRequest extends ClassGenerator
     /**
      * Path for view
      */
-    protected string $view = 'store-request';
+    protected string $view = 'classes.store-request';
 
     public function handle(): void
     {
@@ -40,7 +40,7 @@ final class StoreRequest extends ClassGenerator
         //TODO make global for all generator
         //TODO also with prefix
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.store-request';
+            $this->view = 'classes.templates.' . $template . '.store-request';
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);

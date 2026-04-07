@@ -28,7 +28,7 @@ final class UpdateRequest extends ClassGenerator
     /**
      * Path for view
      */
-    protected string $view = 'update-request';
+    protected string $view = 'classes.update-request';
 
     public function handle(): void
     {
@@ -40,7 +40,7 @@ final class UpdateRequest extends ClassGenerator
         //TODO make global for all generator
         //TODO also with prefix
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.update-request';
+            $this->view = 'classes.templates.' . $template . '.update-request';
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);

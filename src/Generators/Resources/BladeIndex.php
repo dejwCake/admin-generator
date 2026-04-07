@@ -25,7 +25,7 @@ final class BladeIndex extends ResourceGenerator
      */
     protected $description = 'Generate an index blade view';
 
-    protected string $view = 'blade-index';
+    protected string $view = 'resources.blade-index';
 
     protected bool $hasExport = false;
 
@@ -37,7 +37,7 @@ final class BladeIndex extends ResourceGenerator
         $template = $this->option('template');
 
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.blade-index';
+            $this->view = 'resources.templates.' . $template . '.blade-index';
         }
 
         if ($this->option('with-export')) {

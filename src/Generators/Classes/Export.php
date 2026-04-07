@@ -28,7 +28,7 @@ final class Export extends ClassGenerator
     /**
      * Path for view
      */
-    protected string $view = 'export';
+    protected string $view = 'classes.export';
 
     public function handle(): void
     {
@@ -36,7 +36,7 @@ final class Export extends ClassGenerator
         $template = $this->option('template');
 
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.export';
+            $this->view = 'classes.templates.' . $template . '.export';
         }
 
         if ($this->generateClass($force)) {

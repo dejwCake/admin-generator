@@ -28,7 +28,7 @@ final class Factory extends ClassGenerator
     /**
      * Path for view
      */
-    protected string $view = 'factory';
+    protected string $view = 'classes.factory';
 
     public function handle(): void
     {
@@ -40,7 +40,7 @@ final class Factory extends ClassGenerator
         //TODO make global for all generator
         //TODO also with prefix
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.factory';
+            $this->view = 'classes.templates.' . $template . '.factory';
         }
 
         if ($this->generateClass($force)) {

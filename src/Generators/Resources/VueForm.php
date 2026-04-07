@@ -27,7 +27,7 @@ final class VueForm extends ResourceGenerator
      */
     protected $description = 'Generate a form Vue component';
 
-    protected string $view = 'vue-form';
+    protected string $view = 'resources.vue-form';
 
     protected string $formJsRelativePath = '';
 
@@ -40,7 +40,7 @@ final class VueForm extends ResourceGenerator
         $fileName = $this->option('file-name');
 
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.vue-form';
+            $this->view = 'resources.templates.' . $template . '.vue-form';
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);

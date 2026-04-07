@@ -26,7 +26,7 @@ final class VueListing extends ResourceGenerator
      */
     protected $description = 'Generate a listing Vue component';
 
-    protected string $view = 'vue-listing';
+    protected string $view = 'resources.vue-listing';
 
     protected bool $hasExport = false;
 
@@ -38,7 +38,7 @@ final class VueListing extends ResourceGenerator
         $template = $this->option('template');
 
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.vue-listing';
+            $this->view = 'resources.templates.' . $template . '.vue-listing';
         }
 
         if ($this->option('with-export')) {

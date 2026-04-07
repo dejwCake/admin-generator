@@ -25,7 +25,7 @@ final class BladeCreate extends ResourceGenerator
      */
     protected $description = 'Generate a create blade view';
 
-    protected string $view = 'blade-create';
+    protected string $view = 'resources.blade-create';
 
     public function handle(): void
     {
@@ -35,7 +35,7 @@ final class BladeCreate extends ResourceGenerator
         $media = $this->option('media');
 
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.blade-create';
+            $this->view = 'resources.templates.' . $template . '.blade-create';
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);

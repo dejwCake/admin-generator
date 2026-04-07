@@ -44,7 +44,7 @@ final class DestroyRequest extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        return view('brackets/admin-generator::destroy-request', [
+        return view('brackets/admin-generator::classes.destroy-request', [
             //globals
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,

@@ -31,7 +31,7 @@ final class Model extends ClassGenerator
     /**
      * Path for view
      */
-    protected string $view = 'model';
+    protected string $view = 'classes.model';
 
     public function handle(): void
     {
@@ -44,7 +44,7 @@ final class Model extends ClassGenerator
         //TODO make global for all generator
         //TODO also with prefix
         if ($template !== null) {
-            $this->view = 'templates.' . $template . '.model';
+            $this->view = 'classes.templates.' . $template . '.model';
         }
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);
