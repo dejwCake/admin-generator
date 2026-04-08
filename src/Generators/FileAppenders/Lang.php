@@ -111,17 +111,17 @@ final class Lang extends FileAppender
             //globals
             'modelLangFormat' => $this->modelLangFormat,
             'modelBaseName' => $this->modelBaseName,
-            'modelPlural' => $this->modelPlural,
             'titleSingular' => $this->titleSingular,
             'titlePlural' => $this->titlePlural,
             'relations' => $this->relations,
-            'mediaCollections' => $this->mediaCollections,
             //has
             'hasExport' => $this->export,
             'hasProfile' => $this->tableName === 'admin_users',
             'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns
             'columns' => $columns,
+            //media
+            'mediaCollections' => $this->mediaCollections,
         ])->render();
     }
 }

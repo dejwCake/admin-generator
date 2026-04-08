@@ -76,7 +76,6 @@ final class UpdateRequest extends ClassGenerator
             'hasRuleUsage' => $visibleColumns->hasUpdateRuleUsage(),
             'hasPasswordUsage' => $visibleColumns->hasUpdatePasswordUsage(),
             'hasPassword' => $columns->hasByName('password'),
-            'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
             'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
             'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns

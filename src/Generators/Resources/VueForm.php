@@ -111,9 +111,14 @@ final class VueForm extends ResourceGenerator
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
 
+        $validationRules = $visibleColumns->rejectByName(
+            'published_at',
+            'created_by_admin_user_id',
+            'updated_by_admin_user_id',
+        )->getFrontendValidationRules();
+
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
-            'mediaCollections' => $this->mediaCollections,
             'relations' => $this->relations,
             //has
             'hasCreatedByAdminUser' => $hasCreatedByAdminUser,
@@ -130,31 +135,30 @@ final class VueForm extends ResourceGenerator
             'hasTextarea' => $leftFormColumns->hasTextarea(),
             'hasLocalizedInput' => $leftFormColumns->hasLocalizedInput(),
             'hasLocalizedWysiwyg' => $leftFormColumns->hasLocalizedWysiwyg(),
+            'hasUseAppFormOptions' => count($validationRules) > 0 || $this->relations->hasBelongsTo(),
             //columns
             'leftFormColumns' => $leftFormColumns,
+            'publishedColumns' => $publishedColumns,
+            'profileColumns' => $leftFormColumns->rejectByName('password', 'activated', 'forbidden'),
+            //media
+            'mediaCollections' => $this->mediaCollections,
             'leftMediaCollections' => $this->mediaCollections->reject(
                 static fn (MediaCollection $mediaCollection): bool => $mediaCollection->collectionName === 'gallery',
             ),
-            'publishedColumns' => $publishedColumns,
             'galleryCollections' => $galleryCollections,
-            'wysiwygTextColumnNames' => $columns->getWysiwygColumnNames(),
-            //other
-            'isUsedTwoColumnsLayout' => $publishedColumns->isNotEmpty()
-                || $galleryCollections->isNotEmpty()
-                || $hasCreatedByAdminUser
-                || $hasUpdatedByAdminUser,
-            'profileColumns' => $leftFormColumns->rejectByName('password', 'activated', 'forbidden'),
-            'validationRules' => $columns->getVisible()->rejectByName(
-                'published_at',
-                'created_by_admin_user_id',
-                'updated_by_admin_user_id',
-            )->getFrontendValidationRules(),
             'mediaDefaultProp' => sprintf('{%s}', $this->mediaCollections->keys()
                     ->map(static fn (string $key): string => sprintf('%s: {}', $key))
                     ->implode(', ')),
             'mediaCollectionNames' => $this->mediaCollections->keys()
                 ->map(static fn (string $key): string => sprintf("'%s'", $key))
                 ->implode(', '),
+            //other
+            'wysiwygTextColumnNames' => $columns->getWysiwygColumnNames(),
+            'isUsedTwoColumnsLayout' => $publishedColumns->isNotEmpty()
+                || $galleryCollections->isNotEmpty()
+                || $hasCreatedByAdminUser
+                || $hasUpdatedByAdminUser,
+            'validationRules' => $validationRules,
         ])->render();
     }
 }

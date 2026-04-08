@@ -79,7 +79,6 @@ final class Model extends ClassGenerator
                 ? $this->tableName
                 : null,
             'relations' => $this->relations,
-            'mediaCollections' => $this->mediaCollections,
             //has
             'hasCarbonProperty' => $columns->hasByMajorType('datetime', 'date'),
             'hasSoftDelete' => $columns->hasByName('deleted_at'),
@@ -93,6 +92,8 @@ final class Model extends ClassGenerator
             'fillableColumns' => $columns->getFillable(),
             'hiddenColumns' => $columns->getHidden(),
             'translatableColumns' => $columns->getTranslatable(),
+            //media
+            'mediaCollections' => $this->mediaCollections,
         ])->render();
     }
 

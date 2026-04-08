@@ -100,9 +100,7 @@ final class Permissions extends ClassGenerator
     {
         return $this->viewFactory->make('brackets/admin-generator::classes.permissions', [
             //globals
-            'modelBaseName' => $this->modelBaseName,
             'modelDotNotation' => $this->modelDotNotation,
-            'className' => $this->generateClassNameFromTable($this->tableName),
             //has
             'hasBulk' => !$this->withoutBulk,
         ])->render();

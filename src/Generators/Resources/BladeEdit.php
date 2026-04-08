@@ -88,7 +88,6 @@ final class BladeEdit extends ResourceGenerator
             'modelVariableName' => $this->modelVariableName,
             'modelJSName' => $this->modelJSName,
             'modelLangFormat' => $this->modelLangFormat,
-            'mediaCollections' => $this->mediaCollections,
             'relations' => $this->relations,
             //has
             'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
@@ -102,6 +101,8 @@ final class BladeEdit extends ResourceGenerator
             //columns
             'columns' => $visibleColumns,
             'publishedColumns' => $publishedColumns,
+            //media
+            'mediaCollections' => $this->mediaCollections,
             'galleryCollections' => $galleryCollections,
             //other
             'modelLabelColumn' => $columns->getLabelColumn(),

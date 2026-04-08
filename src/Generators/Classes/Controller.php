@@ -6,6 +6,7 @@ namespace Brackets\AdminGenerator\Generators\Classes;
 
 use Brackets\AdminGenerator\Generators\Traits\FileManipulations;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Override;
 use Symfony\Component\Console\Input\InputArgument;
@@ -96,6 +97,26 @@ final class Controller extends ClassGenerator
     protected function buildClass(): string
     {
         $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $visibleColumns = $columns->getVisible();
+
+        $indexEagerLoads = new Collection();
+        $editEagerLoads = new Collection();
+
+        if ($visibleColumns->hasByName('created_by_admin_user_id')) {
+            $indexEagerLoads->push('createdByAdminUser');
+            $editEagerLoads->push('createdByAdminUser');
+        }
+        if ($visibleColumns->hasByName('updated_by_admin_user_id')) {
+            $indexEagerLoads->push('updatedByAdminUser');
+            $editEagerLoads->push('updatedByAdminUser');
+        }
+        foreach ($this->relations->getBelongsTo() as $belongsTo) {
+            $indexEagerLoads->push($belongsTo->relationMethodName);
+            $editEagerLoads->push($belongsTo->relationMethodName);
+        }
+        foreach ($this->relations->getBelongsToMany() as $belongsToMany) {
+            $editEagerLoads->push($belongsToMany->relationMethodName);
+        }
 
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
@@ -104,23 +125,25 @@ final class Controller extends ClassGenerator
             'exportBaseName' => $this->exportBaseName,
             'modelBaseName' => $this->modelBaseName,
             'modelFullName' => $this->modelFullName,
-            'modelPlural' => $this->modelPlural,
             'modelVariableName' => $this->modelVariableName,
-            'modelRouteAndViewName' => $this->modelRouteAndViewName,
-            'modelViewsDirectory' => $this->modelViewsDirectory,
             'modelDotNotation' => $this->modelDotNotation,
             'modelWithNamespaceFromDefault' => $this->modelWithNamespaceFromDefault,
             'resource' => $this->resource,
             'relations' => $this->relations,
-            'mediaCollections' => $this->mediaCollections,
             //has
+            'hasActivation' => $visibleColumns->hasByName('activated'),
             'hasExport' => $this->export,
             'hasBulk' => !$this->withoutBulk,
             'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns
             'queryColumns' => $columns->getToQuery(),
             'searchInColumns' => $columns->getToSearchIn(),
-            'visibleColumns' => $columns->getVisible(),
+            'visibleColumns' => $visibleColumns,
+            //media
+            'mediaCollections' => $this->mediaCollections,
+            //eager loads
+            'indexEagerLoads' => $indexEagerLoads,
+            'editEagerLoads' => $editEagerLoads,
         ])->render();
     }
 

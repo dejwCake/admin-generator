@@ -367,7 +367,6 @@ const {
     showLocalizedValidationError, getPostData, onSubmit, onSuccess, onFail,
     getLocalizedFormDefaults, showLocalization, hideLocalization,
     shouldShowLangGroup,
-@php $hasUseAppFormOptions = !empty($validationRules) || $relations->hasBelongsTo(); @endphp
 } = useAppForm(props{!! $hasUseAppFormOptions ? ', {' : '' !!}
 @if(!empty($validationRules))
     validationSchema: {

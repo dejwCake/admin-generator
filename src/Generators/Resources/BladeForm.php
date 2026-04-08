@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
-use Brackets\AdminGenerator\Dtos\Media\MediaCollection;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -117,7 +116,6 @@ final class BladeForm extends ResourceGenerator
             'modelVariableName' => $this->modelVariableName,
             'modelJSName' => $this->formJsRelativePath,
             'modelLangFormat' => $this->modelLangFormat,
-            'mediaCollections' => $this->mediaCollections,
             'relations' => $this->relations,
             //has
             'hasCreatedByAdminUser' => $hasCreatedByAdminUser,
@@ -125,31 +123,17 @@ final class BladeForm extends ResourceGenerator
             'hasTranslatable' => $columns->hasByMajorType('json'),
             'hasPublishedAt' => $columns->hasByName('published_at'),
             'hasWysiwyg' => $leftFormColumns->hasWysiwyg(),
-            'hasPassword' => $leftFormColumns->hasByName('password'),
-            'hasEmail' => $leftFormColumns->hasByName('email'),
-            'hasBoolColumns' => $leftFormColumns->hasByMajorType('bool'),
             'hasDateColumns' => $leftFormColumns->hasByMajorType('date'),
             'hasTimeColumns' => $leftFormColumns->hasByMajorType('time'),
             'hasDatetimeColumns' => $leftFormColumns->hasByMajorType('datetime'),
-            'hasFormInput' => $leftFormColumns->hasFormInput(),
-            'hasTextarea' => $leftFormColumns->hasTextarea(),
-            'hasLocalizedInput' => $leftFormColumns->hasLocalizedInput(),
-            'hasLocalizedWysiwyg' => $leftFormColumns->hasLocalizedWysiwyg(),
             //columns
             'columns' => $visibleColumns,
-            'leftFormColumns' => $leftFormColumns,
-            'leftMediaCollections' => $this->mediaCollections->reject(
-                static fn (MediaCollection $mediaCollection): bool => $mediaCollection->collectionName === 'gallery',
-            ),
             'publishedColumns' => $publishedColumns,
-            'galleryCollections' => $galleryCollections,
-            'wysiwygTextColumnNames' => $columns->getWysiwygColumnNames(),
-            //other
-            'isUsedTwoColumnsLayout' => $publishedColumns->isNotEmpty()
-                || $galleryCollections->isNotEmpty()
-                || $hasCreatedByAdminUser
-                || $hasUpdatedByAdminUser,
             'profileColumns' => $leftFormColumns->rejectByName('password', 'activated', 'forbidden'),
+            //media
+            'mediaCollections' => $this->mediaCollections,
+            'galleryCollections' => $galleryCollections,
+            //other
             'modelLabelColumn' => $columns->getLabelColumn(),
         ])->render();
     }

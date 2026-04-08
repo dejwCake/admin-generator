@@ -98,22 +98,10 @@ final class {{ $controllerBaseName }} extends Controller
 @endforeach
                     ],
                 ),
-@php
-    $eagerLoads = new Collection([]);
-    if ($visibleColumns->hasByName('created_by_admin_user_id')) {
-        $eagerLoads->push('createdByAdminUser');
-    }
-    if ($visibleColumns->hasByName('updated_by_admin_user_id')) {
-        $eagerLoads->push('updatedByAdminUser');
-    }
-    foreach ($relations->getBelongsTo() as $belongsTo) {
-        $eagerLoads->push($belongsTo->relationMethodName);
-    }
-@endphp
-@if($eagerLoads->isNotEmpty())
+@if($indexEagerLoads->isNotEmpty())
                 static function (Builder $query): void {
                     $query->with([
-@foreach($eagerLoads as $eagerLoad)
+@foreach($indexEagerLoads as $eagerLoad)
                         '{{ $eagerLoad }}',
 @endforeach
                     ]);
@@ -222,24 +210,9 @@ final class {{ $controllerBaseName }} extends Controller
     {
         $this->gate->authorize('admin.{{ $modelDotNotation }}.edit', ${{ $modelVariableName }});
 
-@php
-    $eagerLoads = new Collection([]);
-    if ($visibleColumns->hasByName('created_by_admin_user_id')) {
-        $eagerLoads->push('createdByAdminUser');
-    }
-    if ($visibleColumns->hasByName('updated_by_admin_user_id')) {
-        $eagerLoads->push('updatedByAdminUser');
-    }
-    foreach ($relations->getBelongsToMany() as $belongsToMany) {
-        $eagerLoads->push($belongsToMany->relationMethodName);
-    }
-    foreach ($relations->getBelongsTo() as $belongsTo) {
-        $eagerLoads->push($belongsTo->relationMethodName);
-    }
-@endphp
-@if($eagerLoads->isNotEmpty())
+@if($editEagerLoads->isNotEmpty())
         ${{ $modelVariableName }}->load([
-@foreach($eagerLoads as $eagerLoad)
+@foreach($editEagerLoads as $eagerLoad)
             '{{ $eagerLoad }}',
 @endforeach
         ]);

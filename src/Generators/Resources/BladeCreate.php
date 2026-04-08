@@ -87,7 +87,6 @@ final class BladeCreate extends ResourceGenerator
             //globals
             'modelJSName' => $this->modelJSName,
             'modelLangFormat' => $this->modelLangFormat,
-            'mediaCollections' => $this->mediaCollections,
             'relations' => $this->relations,
             //has
             'hasTranslatable' => $columns->hasByMajorType('json'),
@@ -99,6 +98,8 @@ final class BladeCreate extends ResourceGenerator
             //columns
             'columns' => $visibleColumns,
             'publishedColumns' => $publishedColumns,
+            //media
+            'mediaCollections' => $this->mediaCollections,
             'galleryCollections' => $galleryCollections,
         ])->render();
     }
