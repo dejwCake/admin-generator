@@ -30,7 +30,7 @@
         </properties>
         <exclude-pattern>src/Generators/FileAppenders/FileAppender.php</exclude-pattern>
         <exclude-pattern>src/Generators/GenerateUser.php</exclude-pattern>
-        <exclude-pattern>tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php</exclude-pattern>
+        <exclude-pattern>tests/Feature/Generators/GenerateAdminUser/DefaultTest.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Files.LineLength.LineTooLong">

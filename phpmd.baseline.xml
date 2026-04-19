@@ -12,8 +12,8 @@
   <violation rule="PHPMD\Rule\Design\NpathComplexity" file="src/Generators/GenerateUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/GenerateUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\TooManyFields" file="src/Generators/Generator.php"/>
-  <violation rule="PHPMD\Rule\CyclomaticComplexity" file="tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
-  <violation rule="PHPMD\Rule\Design\NpathComplexity" file="tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
+  <violation rule="PHPMD\Rule\CyclomaticComplexity" file="tests/Feature/Generators/GenerateAdminUser/DefaultTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
+  <violation rule="PHPMD\Rule\Design\NpathComplexity" file="tests/Feature/Generators/GenerateAdminUser/DefaultTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
   <violation rule="PHPMD\Rule\Design\NumberOfChildren" file="tests/TestCase.php"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/UserTestCase.php" method="setUpDatabase"/>
 </phpmd-baseline>
