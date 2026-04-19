@@ -4,6 +4,9 @@
     <testsuite name="Admin Generator Feature Tests">
       <directory suffix="Test.php">./tests/Feature</directory>
     </testsuite>
+    <testsuite name="Admin Generator Unit Tests">
+      <directory suffix="Test.php">./tests/Unit</directory>
+    </testsuite>
   </testsuites>
   <php>
     <env name="APP_ENV" value="testing"/>

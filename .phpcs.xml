@@ -35,19 +35,9 @@
 
     <rule ref="SlevomatCodingStandard.Files.LineLength.LineTooLong">
         <exclude-pattern>src/Generators/Classes/Controller.php</exclude-pattern>
-        <exclude-pattern>src/Generators/FileAppenders/Lang.php</exclude-pattern>
-        <exclude-pattern>src/Generators/GenerateAdminUserProfile.php</exclude-pattern>
         <exclude-pattern>src/Generators/GenerateAdminUser.php</exclude-pattern>
+        <exclude-pattern>src/Generators/GenerateAdminUserProfile.php</exclude-pattern>
         <exclude-pattern>src/Generators/GenerateUser.php</exclude-pattern>
-        <exclude-pattern>src/Generators/Traits/Columns.php</exclude-pattern>
-        <exclude-pattern>tests/Feature/AdminUsers/AdminUserCrudGeneratorWithCustomControllerNameTest.php</exclude-pattern>
-        <exclude-pattern>tests/Feature/AdminUsers/AdminUserCrudGeneratorWithCustomModelNameTest.php</exclude-pattern>
-        <exclude-pattern>tests/Feature/AdminUsers/DefaultAdminUserCrudGeneratorTest.php</exclude-pattern>
-        <exclude-pattern>tests/Feature/Profile/DefaultProfileGeneratorTest.php</exclude-pattern>
-        <exclude-pattern>tests/Feature/Profile/ProfileGeneratorWithCustomControllerNameTest.php</exclude-pattern>
-        <exclude-pattern>tests/Feature/Users/UserCrudGeneratorWithCustomModelNameTest.php</exclude-pattern>
-        <exclude-pattern>tests/Feature/Users/DefaultUserCrudGeneratorTest.php</exclude-pattern>
-        <exclude-pattern>tests/Feature/Users/UserCrudGeneratorWithCustomControllerNameTest.php</exclude-pattern>
-        <exclude-pattern>tests/Feature/Appenders/RoutesTest.php</exclude-pattern>
+        <exclude-pattern>tests/Feature/Builders/ColumnCollectionBuilderTest.php</exclude-pattern>
     </rule>
 </ruleset>
