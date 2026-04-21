@@ -8,14 +8,11 @@ use Brackets\AdminGenerator\Builders\ColumnCollectionBuilder;
 use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\ServerUpdateRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\UniqueRule;
-use Brackets\AdminGenerator\Tests\TestCase;
+use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 final class ColumnCollectionBuilderTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testBuildForCategoriesTableReturnsColumnCollection(): void
     {
         $builder = $this->app->make(ColumnCollectionBuilder::class);

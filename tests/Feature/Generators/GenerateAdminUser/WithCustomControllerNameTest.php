@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\GenerateAdminUser;
 
-use Brackets\AdminGenerator\Tests\UserTestCase;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Brackets\AdminGenerator\Tests\Feature\TestCase;
 
-class WithCustomControllerNameTest extends UserTestCase
+class WithCustomControllerNameTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testAdminUserControllerNameCanBeNamespaced(): void
     {
         $filePathController = base_path('app/Http/Controllers/Admin/Auth/AdminUsersController.php');

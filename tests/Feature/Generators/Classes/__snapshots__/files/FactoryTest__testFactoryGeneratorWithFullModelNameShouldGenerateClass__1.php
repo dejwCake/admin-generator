@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Billing\Cat;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -13,24 +15,37 @@ final class CatFactory extends Factory
 {
     public function definition(): array
     {
+        $hasher = Container::getInstance()->make(Hasher::class);
+
         return [
             'user_id' => $this->faker->randomNumber(5),
             'title' => $this->faker->sentence,
+            'name' => $this->faker->firstName,
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName,
+            'subject' => $this->faker->sentence,
+            'email' => $this->faker->email,
+            'password' => $hasher->make($this->faker->password),
+            'remember_token' => null,
+            'language' => 'en',
             'slug' => $this->faker->unique()->slug,
             'perex' => $this->faker->text(),
             'published_at' => $this->faker->date(),
             'date_start' => $this->faker->date(),
             'time_start' => $this->faker->time(),
             'date_time_end' => $this->faker->dateTime,
+            'released_at' => $this->faker->dateTime,
             'enabled' => $this->faker->boolean(),
             'send' => $this->faker->boolean(),
             'price' => $this->faker->randomFloat(2, max: 10000),
+            'rating' => $this->faker->randomFloat(2),
             'views' => $this->faker->randomNumber(5),
             'created_by_admin_user_id' => $this->faker->randomNumber(5),
             'updated_by_admin_user_id' => $this->faker->randomNumber(5),
             'created_at' => $this->faker->dateTime,
             'updated_at' => $this->faker->dateTime,
             'deleted_at' => null,
+            'long_text' => ['en' => $this->faker->sentence],
             'text' => ['en' => $this->faker->sentence],
             'description' => ['en' => $this->faker->sentence],
         ];

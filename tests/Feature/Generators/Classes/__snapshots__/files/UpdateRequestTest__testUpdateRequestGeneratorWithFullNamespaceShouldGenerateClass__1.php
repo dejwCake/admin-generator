@@ -10,8 +10,10 @@ use Carbon\CarbonImmutable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 /**
  * @property Category $category
@@ -37,6 +39,44 @@ final class UpdateCategory extends TranslatableFormRequest
                 'integer',
             ],
             'title' => [
+                'sometimes',
+                Rule::unique('categories', 'title')
+                    ->ignore($this->category->getKey(), $this->category->getKeyName()),
+                'string',
+            ],
+            'name' => [
+                'nullable',
+                'string',
+            ],
+            'first_name' => [
+                'nullable',
+                'string',
+            ],
+            'last_name' => [
+                'nullable',
+                'string',
+            ],
+            'subject' => [
+                'nullable',
+                'string',
+            ],
+            'email' => [
+                'nullable',
+                'email',
+                'string',
+            ],
+            'password' => [
+                'nullable',
+                'confirmed',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised(),
+                'string',
+            ],
+            'language' => [
                 'sometimes',
                 'string',
             ],
@@ -66,6 +106,10 @@ final class UpdateCategory extends TranslatableFormRequest
                 'nullable',
                 'date',
             ],
+            'released_at' => [
+                'sometimes',
+                'date',
+            ],
             'enabled' => [
                 'sometimes',
                 'boolean',
@@ -75,6 +119,10 @@ final class UpdateCategory extends TranslatableFormRequest
                 'boolean',
             ],
             'price' => [
+                'nullable',
+                'numeric',
+            ],
+            'rating' => [
                 'nullable',
                 'numeric',
             ],
@@ -111,6 +159,10 @@ final class UpdateCategory extends TranslatableFormRequest
     public function translatableRules(string $locale): array
     {
         return [
+            'long_text' => [
+                'nullable',
+                'string',
+            ],
             'text' => [
                 'sometimes',
                 'string',
@@ -130,6 +182,15 @@ final class UpdateCategory extends TranslatableFormRequest
         $data = $this->validated();
         if (isset($data['posts'])) {
             $data['posts'] = new Collection($data['posts'] ?? []);
+        }
+
+        if (array_key_exists('password', $data) && ($data['password'] === '' || $data['password'] === null)) {
+            unset($data['password']);
+        }
+        if (isset($data['password'])) {
+            $hasher = Container::getInstance()->make(Hasher::class);
+            assert($hasher instanceof Hasher);
+            $data['password'] = $hasher->make($data['password']);
         }
 
         if (isset($data['publish_now']) && $data['publish_now'] === true) {

@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\GenerateUser;
 
-use Brackets\AdminGenerator\Tests\UserTestCase;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class DefaultTest extends UserTestCase
+class DefaultTest extends TestCase
 {
-    use DatabaseMigrations;
-
     #[DataProvider('getCases')]
     public function testAllFilesShouldBeGeneratedUnderDefaultNamespace(array $options): void
     {

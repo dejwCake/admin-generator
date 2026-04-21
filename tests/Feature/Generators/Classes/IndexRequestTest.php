@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\Classes;
 
-use Brackets\AdminGenerator\Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Brackets\AdminGenerator\Tests\Feature\TestCase;
 
 class IndexRequestTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testIndexRequestGeneratorShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Requests/Admin/Category/IndexCategory.php');

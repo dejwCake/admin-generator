@@ -8,8 +8,10 @@ use Brackets\Translatable\Http\Requests\TranslatableFormRequest;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 final class StoreCat extends TranslatableFormRequest
 {
@@ -32,6 +34,43 @@ final class StoreCat extends TranslatableFormRequest
                 'integer',
             ],
             'title' => [
+                'required',
+                Rule::unique('categories', 'title'),
+                'string',
+            ],
+            'name' => [
+                'nullable',
+                'string',
+            ],
+            'first_name' => [
+                'nullable',
+                'string',
+            ],
+            'last_name' => [
+                'nullable',
+                'string',
+            ],
+            'subject' => [
+                'nullable',
+                'string',
+            ],
+            'email' => [
+                'nullable',
+                'email',
+                'string',
+            ],
+            'password' => [
+                'nullable',
+                'confirmed',
+                Password::min(8)
+                    ->letters()
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised(),
+                'string',
+            ],
+            'language' => [
                 'required',
                 'string',
             ],
@@ -60,6 +99,10 @@ final class StoreCat extends TranslatableFormRequest
                 'nullable',
                 'date',
             ],
+            'released_at' => [
+                'required',
+                'date',
+            ],
             'enabled' => [
                 'required',
                 'boolean',
@@ -69,6 +112,10 @@ final class StoreCat extends TranslatableFormRequest
                 'boolean',
             ],
             'price' => [
+                'nullable',
+                'numeric',
+            ],
+            'rating' => [
                 'nullable',
                 'numeric',
             ],
@@ -95,6 +142,10 @@ final class StoreCat extends TranslatableFormRequest
     public function translatableRules(string $locale): array
     {
         return [
+            'long_text' => [
+                'nullable',
+                'string',
+            ],
             'text' => [
                 'required',
                 'string',
@@ -113,6 +164,12 @@ final class StoreCat extends TranslatableFormRequest
     {
         $data = $this->validated();
         $data['posts'] = new Collection($data['posts'] ?? []);
+
+        if (isset($data['password'])) {
+            $hasher = Container::getInstance()->make(Hasher::class);
+            assert($hasher instanceof Hasher);
+            $data['password'] = $hasher->make($data['password']);
+        }
 
         $config = Container::getInstance()->make(Config::class);
         assert($config instanceof Config);

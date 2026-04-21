@@ -22,11 +22,15 @@
                             @update:current-locale="currentLocale = $event"
                         />
 
-                        <FormInput
+                        <FormSelect
                             v-model="form.user_id"
                             name="user_id"
                             :label="translations.columns.user_id"
                             :error="errors.user_id"
+                            :options="userOptions"
+                            trackBy="id"
+                            optionLabel="name"
+                            :placeholder="translations.select_an_option"
                         />
 
                         <FormInput
@@ -34,6 +38,59 @@
                             name="title"
                             :label="translations.columns.title"
                             :error="errors.title"
+                        />
+
+                        <FormInput
+                            v-model="form.name"
+                            name="name"
+                            :label="translations.columns.name"
+                            :error="errors.name"
+                        />
+
+                        <FormInput
+                            v-model="form.first_name"
+                            name="first_name"
+                            :label="translations.columns.first_name"
+                            :error="errors.first_name"
+                        />
+
+                        <FormInput
+                            v-model="form.last_name"
+                            name="last_name"
+                            :label="translations.columns.last_name"
+                            :error="errors.last_name"
+                        />
+
+                        <FormInput
+                            v-model="form.subject"
+                            name="subject"
+                            :label="translations.columns.subject"
+                            :error="errors.subject"
+                        />
+
+                        <FormEmail
+                            v-model="form.email"
+                            name="email"
+                            :label="translations.columns.email"
+                            :error="errors.email"
+                        />
+
+                        <FormPasswordConfirm
+                            v-model:password="form.password"
+                            v-model:passwordConfirmation="form.password_confirmation"
+                            :passwordError="errors.password"
+                            :confirmationError="errors.password_confirmation"
+                            :translations="{
+                                password: translations.columns.password,
+                                password_repeat: translations.columns.password_repeat
+                            }"
+                        />
+
+                        <FormInput
+                            v-model="form.language"
+                            name="language"
+                            :label="translations.columns.language"
+                            :error="errors.language"
                         />
 
                         <FormInput
@@ -49,6 +106,16 @@
                             :label="translations.columns.perex"
                             :error="errors.perex"
                             :upload-url="wysiwygUploadUrl"
+                        />
+
+                        <FormLocalizedInput
+                            v-model="form.long_text"
+                            name="long_text"
+                            :label="translations.columns.long_text"
+                            :errors="errors"
+                            :locales="locales"
+                            :shouldShowLangGroup="shouldShowLangGroup"
+                            :isFormLocalized="isFormLocalized"
                         />
 
                         <FormDatePicker
@@ -75,6 +142,15 @@
                             name="date_time_end"
                             :label="translations.columns.date_time_end"
                             :error="errors.date_time_end"
+                            :config="datetimePickerConfig"
+                            :placeholder="translations.select_date_and_time"
+                        />
+
+                        <FormDatePicker
+                            v-model="form.released_at"
+                            name="released_at"
+                            :label="translations.columns.released_at"
+                            :error="errors.released_at"
                             :config="datetimePickerConfig"
                             :placeholder="translations.select_date_and_time"
                         />
@@ -120,6 +196,13 @@
                             name="price"
                             :label="translations.columns.price"
                             :error="errors.price"
+                        />
+
+                        <FormInput
+                            v-model="form.rating"
+                            name="rating"
+                            :label="translations.columns.rating"
+                            :error="errors.rating"
                         />
 
                         <FormInput
@@ -197,11 +280,15 @@ import UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue';
 import {formatDatetime} from '@craftable/utils/dateFormatters.js';
 import LocalizationBar from '@craftable/components/form/LocalizationBar.vue';
 import FormInput from '@craftable/components/form/FormInput.vue';
+import FormEmail from '@craftable/components/form/FormEmail.vue';
 import FormCheckbox from '@craftable/components/form/FormCheckbox.vue';
 import FormDatePicker from '@craftable/components/form/FormDatePicker.vue';
 import FormWysiwyg from '@craftable/components/form/FormWysiwyg.vue';
+import FormSelect from '@craftable/components/form/FormSelect.vue';
 import FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue';
+import FormLocalizedInput from '@craftable/components/form/FormLocalizedInput.vue';
 import FormLocalizedWysiwyg from '@craftable/components/form/FormLocalizedWysiwyg.vue';
+import FormPasswordConfirm from '@craftable/components/form/FormPasswordConfirm.vue';
 import FormSubmit from '@craftable/components/form/FormSubmit.vue';
 
 const props = defineProps({
@@ -209,6 +296,7 @@ const props = defineProps({
     data: {type: Object, default: () => ({})},
     translations: {type: Object, default: () => ({})},
     postOptions: {type: Array, default: () => []},
+    userOptions: {type: Array, default: () => []},
     locales: {type: Array, default: () => []},
     defaultLocale: {type: String, default: ''},
     sendEmptyLocales: {type: Boolean, default: true},
@@ -227,11 +315,21 @@ const {
 } = useAppForm(props, {
     validationSchema: {
         title: 'required',
+        email: 'email',
+        language: 'required',
         slug: 'required',
+        released_at: 'required',
         text: 'required',
         description: 'required',
         price: 'numeric',
+        rating: 'numeric',
         views: 'required|integer',
+    },
+    transformData: (data) => {
+        if (data.user_id && typeof data.user_id === 'object') {
+            data.user_id = data.user_id.id;
+        }
+        return data;
     },
 });
 
@@ -239,21 +337,37 @@ if (!props.data || Object.keys(props.data).length === 0) {
     form.value = {
         user_id: '',
         title: '',
+        name: '',
+        first_name: '',
+        last_name: '',
+        subject: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+        language: '',
         slug: '',
         perex: '',
+        long_text: getLocalizedFormDefaults(),
         date_start: '',
         time_start: '',
         date_time_end: '',
+        released_at: '',
         text: getLocalizedFormDefaults(),
         description: getLocalizedFormDefaults(),
         enabled: false,
         send: false,
         price: '',
+        rating: '',
         views: '',
         published_at: '',
         created_by_admin_user_id: '',
         updated_by_admin_user_id: '',
         posts: [],
     };
+} else {
+    if (form.value.user_id) {
+        const match = props.userOptions.find(p => p.id === form.value.user_id);
+        if (match) form.value.user_id = match;
+    }
 }
 </script>

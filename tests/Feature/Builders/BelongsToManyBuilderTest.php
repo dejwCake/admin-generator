@@ -6,14 +6,10 @@ namespace Brackets\AdminGenerator\Tests\Feature\Builders;
 
 use Brackets\AdminGenerator\Builders\BelongsToManyBuilder;
 use Brackets\AdminGenerator\Dtos\Relations\BelongsToMany;
-use Brackets\AdminGenerator\Tests\TestCase;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Brackets\AdminGenerator\Tests\Feature\TestCase;
 
 final class BelongsToManyBuilderTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testBuildReturnsBelongsToManyWithExpectedFieldsForCategoriesAndPosts(): void
     {
         $belongsToManyBuilder = $this->app->make(BelongsToManyBuilder::class);
@@ -48,11 +44,6 @@ final class BelongsToManyBuilderTest extends TestCase
 
     public function testBuildUsesSpatieRoleModelForRolesTable(): void
     {
-        $this->app['db']->connection()->getSchemaBuilder()->create('roles', static function (Blueprint $table): void {
-            $table->increments('id');
-            $table->string('name');
-        });
-
         $belongsToManyBuilder = $this->app->make(BelongsToManyBuilder::class);
 
         $result = $belongsToManyBuilder->build('roles', 'admin_users');

@@ -27,18 +27,12 @@ parameters:
 		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
-			count: 8
-			path: tests/TestCase.php
+			count: 9
+			path: tests/Feature/TestCase.php
 
 		-
 			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''Illuminate\\\\Support\\\\Collection'' and Illuminate\\Support\\Collection will always evaluate to true\.$#'
 			identifier: staticMethod.alreadyNarrowedType
 			count: 1
 			path: tests/Unit/Builders/FrontendRulesBuilderTest.php
-
-		-
-			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
-			identifier: larastan.noEnvCallsOutsideOfConfig
-			count: 9
-			path: tests/UserTestCase.php
 

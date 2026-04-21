@@ -6,13 +6,10 @@ namespace Brackets\AdminGenerator\Tests\Feature\Builders;
 
 use Brackets\AdminGenerator\Builders\BelongsToBuilder;
 use Brackets\AdminGenerator\Dtos\Relations\BelongsTo;
-use Brackets\AdminGenerator\Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Brackets\AdminGenerator\Tests\Feature\TestCase;
 
 final class BelongsToBuilderTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testBuildReturnsBelongsToWithExpectedFieldsForCategoriesTable(): void
     {
         $belongsToBuilder = $this->app->make(BelongsToBuilder::class);

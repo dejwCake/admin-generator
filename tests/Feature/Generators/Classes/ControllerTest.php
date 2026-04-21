@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\Classes;
 
-use Brackets\AdminGenerator\Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Brackets\AdminGenerator\Tests\Feature\TestCase;
 
 class ControllerTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testControllerGeneratorShouldGenerateClass(): void
     {
         $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');

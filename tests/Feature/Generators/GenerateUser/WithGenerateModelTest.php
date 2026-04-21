@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\GenerateUser;
 
-use Brackets\AdminGenerator\Tests\UserTestCase;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Brackets\AdminGenerator\Tests\Feature\TestCase;
 
-class WithGenerateModelTest extends UserTestCase
+class WithGenerateModelTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testUserModelNameShouldAutoGenerateFromTableNameIfRequired(): void
     {
         $filePath = base_path('app/Models/User.php');

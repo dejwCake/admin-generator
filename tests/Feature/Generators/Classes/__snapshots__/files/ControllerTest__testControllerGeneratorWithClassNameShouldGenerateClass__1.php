@@ -12,6 +12,7 @@ use App\Http\Requests\Admin\Category\StoreCategory;
 use App\Http\Requests\Admin\Category\UpdateCategory;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\User;
 use Brackets\AdminListing\Builders\ListingBuilder;
 use Brackets\AdminListing\Builders\ListingQueryBuilder;
 use Exception;
@@ -51,15 +52,24 @@ final class MyNameController extends Controller
                         'id',
                         'user_id',
                         'title',
+                        'name',
+                        'first_name',
+                        'last_name',
+                        'subject',
+                        'email',
+                        'language',
+                        'long_text',
                         'published_at',
                         'date_start',
                         'time_start',
                         'date_time_end',
+                        'released_at',
                         'text',
                         'description',
                         'enabled',
                         'send',
                         'price',
+                        'rating',
                         'views',
                         'created_by_admin_user_id',
                         'updated_by_admin_user_id',
@@ -69,8 +79,15 @@ final class MyNameController extends Controller
                     [
                         'id',
                         'title',
+                        'name',
+                        'first_name',
+                        'last_name',
+                        'subject',
+                        'email',
+                        'language',
                         'slug',
                         'perex',
+                        'long_text',
                         'text',
                         'description',
                     ],
@@ -79,6 +96,7 @@ final class MyNameController extends Controller
                     $query->with([
                         'createdByAdminUser',
                         'updatedByAdminUser',
+                        'user',
                     ]);
                 },
             );
@@ -124,6 +142,7 @@ final class MyNameController extends Controller
             [
                 'action' => $this->urlGenerator->route('admin/categories/store'),
                 'posts' => Post::all(),
+                'users' => User::all(),
             ],
         );
     }
@@ -160,6 +179,7 @@ final class MyNameController extends Controller
         $category->load([
             'createdByAdminUser',
             'updatedByAdminUser',
+            'user',
             'posts',
         ]);
 
@@ -169,6 +189,7 @@ final class MyNameController extends Controller
                 'category' => $category,
                 'action' => $this->urlGenerator->route('admin/categories/update', [$category]),
                 'posts' => Post::all(),
+                'users' => User::all(),
             ],
         );
     }

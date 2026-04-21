@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\Resources;
 
-use Brackets\AdminGenerator\Tests\TestCase;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Brackets\AdminGenerator\Tests\Feature\TestCase;
 
 class BladeFormTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testBladeFormGeneratorShouldGenerateView(): void
     {
         $path = resource_path('views/admin/category/form.blade.php');

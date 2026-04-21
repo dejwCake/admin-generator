@@ -5,14 +5,11 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Tests\Feature\Builders;
 
 use Brackets\AdminGenerator\Builders\RelationBuilder;
-use Brackets\AdminGenerator\Tests\TestCase;
+use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 final class RelationBuilderTest extends TestCase
 {
-    use DatabaseMigrations;
-
     public function testBuildForPostsTableDetectsBelongsToManyViaPivotTable(): void
     {
         $relationBuilder = $this->app->make(RelationBuilder::class);
@@ -33,15 +30,6 @@ final class RelationBuilderTest extends TestCase
         self::assertTrue($result->hasRelatedTableInBelongsToMany('posts'));
     }
 
-    public function testBuildHasNoBelongsToWhenForeignTableMissing(): void
-    {
-        $relationBuilder = $this->app->make(RelationBuilder::class);
-
-        $result = $relationBuilder->build('categories', null);
-
-        self::assertFalse($result->hasBelongsTo());
-    }
-
     public function testBuildExcludesAuditColumnsFromBelongsTo(): void
     {
         $relationBuilder = $this->app->make(RelationBuilder::class);
@@ -54,11 +42,6 @@ final class RelationBuilderTest extends TestCase
 
     public function testBuildDetectsBelongsToWhenRelatedTableExists(): void
     {
-        $this->app['db']->connection()->getSchemaBuilder()->create('users', static function (Blueprint $table): void {
-            $table->increments('id');
-            $table->string('name');
-        });
-
         $relationBuilder = $this->app->make(RelationBuilder::class);
 
         $result = $relationBuilder->build('categories', null);

@@ -14,22 +14,34 @@
             :wysiwyg-upload-url="'{{ $wysiwygUploadUrl }}'"
             :show-history="true"
             :post-options="{{ $posts->toJson() }}"
+            :user-options="{{ $users->toJson() }}"
             :translations="{{ json_encode([
                 'form_title' => trans('admin.category.actions.edit', ['name' => $category->title]),
                 'columns' => [
                     'user_id' => trans('admin.category.columns.user_id'),
                     'title' => trans('admin.category.columns.title'),
+                    'name' => trans('admin.category.columns.name'),
+                    'first_name' => trans('admin.category.columns.first_name'),
+                    'last_name' => trans('admin.category.columns.last_name'),
+                    'subject' => trans('admin.category.columns.subject'),
+                    'email' => trans('admin.category.columns.email'),
+                    'password' => trans('admin.category.columns.password'),
+                    'password_repeat' => trans('admin.category.columns.password_repeat'),
+                    'language' => trans('admin.category.columns.language'),
                     'slug' => trans('admin.category.columns.slug'),
                     'perex' => trans('admin.category.columns.perex'),
+                    'long_text' => trans('admin.category.columns.long_text'),
                     'published_at' => trans('admin.category.columns.published_at'),
                     'date_start' => trans('admin.category.columns.date_start'),
                     'time_start' => trans('admin.category.columns.time_start'),
                     'date_time_end' => trans('admin.category.columns.date_time_end'),
+                    'released_at' => trans('admin.category.columns.released_at'),
                     'text' => trans('admin.category.columns.text'),
                     'description' => trans('admin.category.columns.description'),
                     'enabled' => trans('admin.category.columns.enabled'),
                     'send' => trans('admin.category.columns.send'),
                     'price' => trans('admin.category.columns.price'),
+                    'rating' => trans('admin.category.columns.rating'),
                     'views' => trans('admin.category.columns.views'),
                 ],
                 'relations' => [
@@ -46,6 +58,7 @@
                 'select_a_time' => trans('brackets/admin-ui::admin.forms.select_a_time'),
                 'select_date_and_time' => trans('brackets/admin-ui::admin.forms.select_date_and_time'),
                 'select_options' => trans('brackets/admin-ui::admin.forms.select_options'),
+                'select_an_option' => trans('brackets/admin-ui::admin.forms.select_an_option'),
                 'created_by' => trans('brackets/admin-ui::admin.forms.created_by'),
                 'created_on' => trans('brackets/admin-ui::admin.forms.created_on'),
                 'updated_by' => trans('brackets/admin-ui::admin.forms.updated_by'),
