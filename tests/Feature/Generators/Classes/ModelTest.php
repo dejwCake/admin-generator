@@ -10,7 +10,7 @@ class ModelTest extends TestCase
 {
     public function testModelGeneratorShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Models/Category.php');
+        $filePath = $this->app->basePath('app/Models/Category.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -24,7 +24,7 @@ class ModelTest extends TestCase
 
     public function testModelGeneratorWithClassNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Models/Billing/Category.php');
+        $filePath = $this->app->basePath('app/Models/Billing/Category.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -39,7 +39,7 @@ class ModelTest extends TestCase
 
     public function testModelGeneratorWithFullClassNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Billing/Category.php');
+        $filePath = $this->app->basePath('app/Billing/Category.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -54,7 +54,7 @@ class ModelTest extends TestCase
 
     public function testModelGeneratorWithBelongsToManyShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Models/Category.php');
+        $filePath = $this->app->basePath('app/Models/Category.php');
 
         self::assertFileDoesNotExist($filePath);
 

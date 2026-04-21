@@ -10,7 +10,7 @@ class WithGenerateModelTest extends TestCase
 {
     public function testUserModelNameShouldAutoGenerateFromTableNameIfRequired(): void
     {
-        $filePath = base_path('app/Models/User.php');
+        $filePath = $this->app->basePath('app/Models/User.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -24,7 +24,7 @@ class WithGenerateModelTest extends TestCase
 
     public function testUserModelNameShouldUseCustomNameIfRequired(): void
     {
-        $filePath = base_path('app/Models/Auth/User.php');
+        $filePath = $this->app->basePath('app/Models/Auth/User.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -39,7 +39,7 @@ class WithGenerateModelTest extends TestCase
 
     public function testUserModelNameShouldUseCustomNameOutsideDefaultFolderIfRequired(): void
     {
-        $filePath = base_path('app/Auth/User.php');
+        $filePath = $this->app->basePath('app/Auth/User.php');
 
         self::assertFileDoesNotExist($filePath);
 

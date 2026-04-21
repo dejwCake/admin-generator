@@ -10,22 +10,22 @@ class GenerateTest extends TestCase
 {
     public function testWholeAdminGeneratorProducesAllTheFiles(): void
     {
-        $modelPath = base_path('app/Models/Category.php');
-        $controllerPath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
-        $indexRequestPath = base_path('app/Http/Requests/Admin/Category/IndexCategory.php');
-        $storeRequestPath = base_path('app/Http/Requests/Admin/Category/StoreCategory.php');
-        $updateRequestPath = base_path('app/Http/Requests/Admin/Category/UpdateCategory.php');
-        $destroyRequestPath = base_path('app/Http/Requests/Admin/Category/DestroyCategory.php');
-        $bulkDestroyRequestPath = base_path('app/Http/Requests/Admin/Category/BulkDestroyCategory.php');
-        $exportPath = base_path('app/Exports/CategoriesExport.php');
-        $routesPath = base_path('routes/admin.php');
-        $indexPath = resource_path('views/admin/category/index.blade.php');
-        $listingVuePath = resource_path('js/admin/category/Listing.vue');
-        $createPath = resource_path('views/admin/category/create.blade.php');
-        $editPath = resource_path('views/admin/category/edit.blade.php');
-        $formVuePath = resource_path('js/admin/category/Form.vue');
-        $factoryPath = base_path('database/factories/CategoryFactory.php');
-        $langPath = lang_path('en/admin.php');
+        $modelPath = $this->app->basePath('app/Models/Category.php');
+        $controllerPath = $this->app->basePath('app/Http/Controllers/Admin/CategoriesController.php');
+        $indexRequestPath = $this->app->basePath('app/Http/Requests/Admin/Category/IndexCategory.php');
+        $storeRequestPath = $this->app->basePath('app/Http/Requests/Admin/Category/StoreCategory.php');
+        $updateRequestPath = $this->app->basePath('app/Http/Requests/Admin/Category/UpdateCategory.php');
+        $destroyRequestPath = $this->app->basePath('app/Http/Requests/Admin/Category/DestroyCategory.php');
+        $bulkDestroyRequestPath = $this->app->basePath('app/Http/Requests/Admin/Category/BulkDestroyCategory.php');
+        $exportPath = $this->app->basePath('app/Exports/CategoriesExport.php');
+        $routesPath = $this->app->basePath('routes/admin.php');
+        $indexPath = $this->app->resourcePath('views/admin/category/index.blade.php');
+        $listingVuePath = $this->app->resourcePath('js/admin/category/Listing.vue');
+        $createPath = $this->app->resourcePath('views/admin/category/create.blade.php');
+        $editPath = $this->app->resourcePath('views/admin/category/edit.blade.php');
+        $formVuePath = $this->app->resourcePath('js/admin/category/Form.vue');
+        $factoryPath = $this->app->basePath('database/factories/CategoryFactory.php');
+        $langPath = $this->app->langPath('en/admin.php');
 
         self::assertFileDoesNotExist($controllerPath);
         self::assertFileDoesNotExist($indexRequestPath);

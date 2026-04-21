@@ -10,7 +10,7 @@ class FactoryTest extends TestCase
 {
     public function testFactoryGeneratorShouldGenerateClass(): void
     {
-        $filePath = base_path('database/factories/CategoryFactory.php');
+        $filePath = $this->app->basePath('database/factories/CategoryFactory.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -24,7 +24,7 @@ class FactoryTest extends TestCase
 
     public function testFactoryGeneratorWithModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('database/factories/CatFactory.php');
+        $filePath = $this->app->basePath('database/factories/CatFactory.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -39,7 +39,7 @@ class FactoryTest extends TestCase
 
     public function testFactoryGeneratorWithFullModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('database/factories/CatFactory.php');
+        $filePath = $this->app->basePath('database/factories/CatFactory.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -54,7 +54,7 @@ class FactoryTest extends TestCase
 
     public function testModelGeneratorWithModelWithFullNamespaceShouldGenerateClass(): void
     {
-        $filePath = base_path('database/factories/CategoryFactory.php');
+        $filePath = $this->app->basePath('database/factories/CategoryFactory.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -70,7 +70,7 @@ class FactoryTest extends TestCase
     public function testFactoryGeneratorWithSeedShouldGenerateClass(): void
     {
         $this->markTestSkipped('This test is skipped as we do not generate model');
-        $filePath = base_path('database/factories/CategoryFactory.php');
+        $filePath = $this->app->basePath('database/factories/CategoryFactory.php');
 
         self::assertFileDoesNotExist($filePath);
 

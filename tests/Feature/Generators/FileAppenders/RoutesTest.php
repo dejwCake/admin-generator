@@ -10,7 +10,7 @@ class RoutesTest extends TestCase
 {
     public function testRoutesGeneratorShouldAppend(): void
     {
-        $filePath = base_path('routes/admin.php');
+        $filePath = $this->app->basePath('routes/admin.php');
 
         $this->artisan('admin:generate:routes', [
             'table_name' => 'categories',
@@ -21,7 +21,7 @@ class RoutesTest extends TestCase
 
     public function testRoutesGeneratorWithModelNameShouldAppend(): void
     {
-        $filePath = base_path('routes/admin.php');
+        $filePath = $this->app->basePath('routes/admin.php');
 
         $this->artisan('admin:generate:routes', [
             'table_name' => 'categories',
@@ -33,7 +33,7 @@ class RoutesTest extends TestCase
 
     public function testRoutesGeneratorWithFullModelNameShouldAppend(): void
     {
-        $filePath = base_path('routes/admin.php');
+        $filePath = $this->app->basePath('routes/admin.php');
 
         $this->artisan('admin:generate:routes', [
             'table_name' => 'categories',
@@ -45,7 +45,7 @@ class RoutesTest extends TestCase
 
     public function testRoutesGeneratorWithControllerNameShouldAppend(): void
     {
-        $filePath = base_path('routes/admin.php');
+        $filePath = $this->app->basePath('routes/admin.php');
 
         $this->artisan('admin:generate:routes', [
             'table_name' => 'categories',
@@ -57,7 +57,7 @@ class RoutesTest extends TestCase
 
     public function testRoutesGeneratorWithFullControllerNameShouldAppend(): void
     {
-        $filePath = base_path('routes/admin.php');
+        $filePath = $this->app->basePath('routes/admin.php');
 
         $this->artisan('admin:generate:routes', [
             'table_name' => 'categories',
@@ -69,7 +69,7 @@ class RoutesTest extends TestCase
 
     public function testRoutesGeneratorWithExportShouldAppend(): void
     {
-        $filePath = base_path('routes/admin.php');
+        $filePath = $this->app->basePath('routes/admin.php');
 
         $this->artisan('admin:generate:routes', [
             'table_name' => 'categories',
@@ -81,7 +81,7 @@ class RoutesTest extends TestCase
 
     public function testRoutesGeneratorWithoutBulkShouldAppend(): void
     {
-        $filePath = base_path('routes/admin.php');
+        $filePath = $this->app->basePath('routes/admin.php');
 
         $this->artisan('admin:generate:routes', [
             'table_name' => 'categories',
@@ -93,7 +93,7 @@ class RoutesTest extends TestCase
 
     public function testRoutesGeneratorShouldBeIdempotent(): void
     {
-        $filePath = base_path('routes/admin.php');
+        $filePath = $this->app->basePath('routes/admin.php');
 
         $this->artisan('admin:generate:routes', [
             'table_name' => 'categories',
@@ -110,7 +110,7 @@ class RoutesTest extends TestCase
 
     public function testRoutesGeneratorShouldReplaceExistingBlock(): void
     {
-        $filePath = base_path('routes/admin.php');
+        $filePath = $this->app->basePath('routes/admin.php');
 
         $this->artisan('admin:generate:routes', [
             'table_name' => 'categories',
@@ -130,7 +130,7 @@ class RoutesTest extends TestCase
 
     public function testRoutesGeneratorShouldAddMultipleResources(): void
     {
-        $filePath = base_path('routes/admin.php');
+        $filePath = $this->app->basePath('routes/admin.php');
 
         $this->artisan('admin:generate:routes', [
             'table_name' => 'categories',

@@ -10,7 +10,7 @@ class DestroyRequestTest extends TestCase
 {
     public function testDestroyRequestGeneratorShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Category/DestroyCategory.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Category/DestroyCategory.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -24,7 +24,7 @@ class DestroyRequestTest extends TestCase
 
     public function testDestroyRequestGeneratorWithModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/DestroyCat.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Billing/Cat/DestroyCat.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -39,7 +39,7 @@ class DestroyRequestTest extends TestCase
 
     public function testDestroyRequestGeneratorWithFullModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Cat/DestroyCat.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Cat/DestroyCat.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -54,7 +54,7 @@ class DestroyRequestTest extends TestCase
 
     public function testDestroyRequestGeneratorWithFullNamespaceShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Category/DestroyCategory.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Category/DestroyCategory.php');
 
         self::assertFileDoesNotExist($filePath);
 

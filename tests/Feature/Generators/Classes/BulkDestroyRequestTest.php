@@ -10,7 +10,7 @@ class BulkDestroyRequestTest extends TestCase
 {
     public function testBulkDestroyRequestGeneratorShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Category/BulkDestroyCategory.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Category/BulkDestroyCategory.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -24,7 +24,7 @@ class BulkDestroyRequestTest extends TestCase
 
     public function testBulkDestroyRequestGeneratorWithModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/BulkDestroyCat.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Billing/Cat/BulkDestroyCat.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -39,7 +39,7 @@ class BulkDestroyRequestTest extends TestCase
 
     public function testBulkDestroyRequestGeneratorWithFullModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Cat/BulkDestroyCat.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Cat/BulkDestroyCat.php');
 
         self::assertFileDoesNotExist($filePath);
 

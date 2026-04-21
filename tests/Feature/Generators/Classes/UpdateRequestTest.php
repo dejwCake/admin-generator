@@ -10,7 +10,7 @@ class UpdateRequestTest extends TestCase
 {
     public function testUpdateRequestGeneratorShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Category/UpdateCategory.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Category/UpdateCategory.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -24,7 +24,7 @@ class UpdateRequestTest extends TestCase
 
     public function testUpdateRequestGeneratorWithModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/UpdateCat.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Billing/Cat/UpdateCat.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -39,7 +39,7 @@ class UpdateRequestTest extends TestCase
 
     public function testUpdateRequestGeneratorWithFullModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Cat/UpdateCat.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Cat/UpdateCat.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -54,7 +54,7 @@ class UpdateRequestTest extends TestCase
 
     public function testUpdateRequestGeneratorWithFullNamespaceShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Category/UpdateCategory.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Category/UpdateCategory.php');
 
         self::assertFileDoesNotExist($filePath);
 

@@ -10,7 +10,7 @@ class BladeIndexTest extends TestCase
 {
     public function testBladeIndexGeneratorShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/category/index.blade.php');
+        $path = $this->app->resourcePath('views/admin/category/index.blade.php');
 
         self::assertFileDoesNotExist($path);
 
@@ -24,7 +24,7 @@ class BladeIndexTest extends TestCase
 
     public function testBladeIndexGeneratorWithModelNameShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/billing/categ-ory/index.blade.php');
+        $path = $this->app->resourcePath('views/admin/billing/categ-ory/index.blade.php');
 
         self::assertFileDoesNotExist($path);
 
@@ -39,7 +39,7 @@ class BladeIndexTest extends TestCase
 
     public function testBladeIndexGeneratorWithFullModelNameShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/categ-ory/index.blade.php');
+        $path = $this->app->resourcePath('views/admin/categ-ory/index.blade.php');
 
         self::assertFileDoesNotExist($path);
 
@@ -54,7 +54,7 @@ class BladeIndexTest extends TestCase
 
     public function testBladeIndexGeneratorWithExportShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/category/index.blade.php');
+        $path = $this->app->resourcePath('views/admin/category/index.blade.php');
 
         self::assertFileDoesNotExist($path);
 
@@ -69,7 +69,7 @@ class BladeIndexTest extends TestCase
 
     public function testBladeIndexGeneratorWithoutBulkShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/category/index.blade.php');
+        $path = $this->app->resourcePath('views/admin/category/index.blade.php');
 
         self::assertFileDoesNotExist($path);
 

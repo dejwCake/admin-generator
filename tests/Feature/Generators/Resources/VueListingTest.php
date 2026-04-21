@@ -10,7 +10,7 @@ class VueListingTest extends TestCase
 {
     public function testVueListingGeneratorShouldGenerateComponent(): void
     {
-        $path = resource_path('js/admin/category/Listing.vue');
+        $path = $this->app->resourcePath('js/admin/category/Listing.vue');
 
         self::assertFileDoesNotExist($path);
 
@@ -24,7 +24,7 @@ class VueListingTest extends TestCase
 
     public function testVueListingGeneratorWithModelNameShouldGenerateComponent(): void
     {
-        $path = resource_path('js/admin/billing-categ-ory/Listing.vue');
+        $path = $this->app->resourcePath('js/admin/billing-categ-ory/Listing.vue');
 
         self::assertFileDoesNotExist($path);
 
@@ -39,7 +39,7 @@ class VueListingTest extends TestCase
 
     public function testVueListingGeneratorWithFullModelNameShouldGenerateComponent(): void
     {
-        $path = resource_path('js/admin/categ-ory/Listing.vue');
+        $path = $this->app->resourcePath('js/admin/categ-ory/Listing.vue');
 
         self::assertFileDoesNotExist($path);
 
@@ -54,7 +54,7 @@ class VueListingTest extends TestCase
 
     public function testVueListingGeneratorWithExportShouldGenerateComponent(): void
     {
-        $path = resource_path('js/admin/category/Listing.vue');
+        $path = $this->app->resourcePath('js/admin/category/Listing.vue');
 
         self::assertFileDoesNotExist($path);
 
@@ -69,7 +69,7 @@ class VueListingTest extends TestCase
 
     public function testVueListingGeneratorWithoutBulkShouldGenerateComponent(): void
     {
-        $path = resource_path('js/admin/category/Listing.vue');
+        $path = $this->app->resourcePath('js/admin/category/Listing.vue');
 
         self::assertFileDoesNotExist($path);
 

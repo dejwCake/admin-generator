@@ -10,7 +10,7 @@ class IndexRequestTest extends TestCase
 {
     public function testIndexRequestGeneratorShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Category/IndexCategory.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Category/IndexCategory.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -24,7 +24,7 @@ class IndexRequestTest extends TestCase
 
     public function testIndexRequestGeneratorWithModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/IndexCat.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Billing/Cat/IndexCat.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -39,7 +39,7 @@ class IndexRequestTest extends TestCase
 
     public function testIndexRequestGeneratorWithFullModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Cat/IndexCat.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Cat/IndexCat.php');
 
         self::assertFileDoesNotExist($filePath);
 

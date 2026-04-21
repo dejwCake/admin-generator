@@ -10,7 +10,7 @@ class ImpersonalLoginRequestTest extends TestCase
 {
     public function testImpersonalLoginRequestGeneratorShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Category/ImpersonalLoginCategory.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Category/ImpersonalLoginCategory.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -24,7 +24,7 @@ class ImpersonalLoginRequestTest extends TestCase
 
     public function testImpersonalLoginRequestGeneratorWithModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/ImpersonalLoginCat.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Billing/Cat/ImpersonalLoginCat.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -39,7 +39,7 @@ class ImpersonalLoginRequestTest extends TestCase
 
     public function testImpersonalLoginRequestGeneratorWithFullModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Cat/ImpersonalLoginCat.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Cat/ImpersonalLoginCat.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -54,7 +54,7 @@ class ImpersonalLoginRequestTest extends TestCase
 
     public function testImpersonalLoginRequestGeneratorWithFullNamespaceShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Category/ImpersonalLoginCategory.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Category/ImpersonalLoginCategory.php');
 
         self::assertFileDoesNotExist($filePath);
 

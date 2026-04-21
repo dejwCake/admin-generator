@@ -11,12 +11,12 @@ class DefaultTest extends TestCase
     /** @test */
     public function testAllFilesShouldBeGeneratedUnderDefaultNamespace(): void
     {
-        $filePathController = base_path('app/Http/Controllers/Admin/ProfileController.php');
-        $filePathRoute = base_path('routes/admin.php');
-        $editPathProfile = resource_path('views/admin/profile/edit-profile.blade.php');
-        $formVuePathProfile = resource_path('js/admin/profile-edit-profile/Form.vue');
-        $editPathPassword = resource_path('views/admin/profile/edit-password.blade.php');
-        $formVuePathPassword = resource_path('js/admin/profile-edit-password/Form.vue');
+        $filePathController = $this->app->basePath('app/Http/Controllers/Admin/ProfileController.php');
+        $filePathRoute = $this->app->basePath('routes/admin.php');
+        $editPathProfile = $this->app->resourcePath('views/admin/profile/edit-profile.blade.php');
+        $formVuePathProfile = $this->app->resourcePath('js/admin/profile-edit-profile/Form.vue');
+        $editPathPassword = $this->app->resourcePath('views/admin/profile/edit-password.blade.php');
+        $formVuePathPassword = $this->app->resourcePath('js/admin/profile-edit-password/Form.vue');
 
         self::assertFileDoesNotExist($filePathController);
         self::assertFileDoesNotExist($editPathProfile);

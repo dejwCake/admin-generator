@@ -12,22 +12,24 @@ class DefaultTest extends TestCase
     #[DataProvider('getCases')]
     public function testAllFilesShouldBeGeneratedUnderDefaultNamespace(array $options): void
     {
-        $controllerPath = base_path('app/Http/Controllers/Admin/AdminUsersController.php');
-        $indexRequestPath = base_path('app/Http/Requests/Admin/AdminUser/IndexAdminUser.php');
-        $storeRequestPath = base_path('app/Http/Requests/Admin/AdminUser/StoreAdminUser.php');
-        $updateRequestPath = base_path('app/Http/Requests/Admin/AdminUser/UpdateAdminUser.php');
-        $destroyRequestPath = base_path('app/Http/Requests/Admin/AdminUser/DestroyAdminUser.php');
-        $bulkDestroyRequestPath = base_path('app/Http/Requests/Admin/AdminUser/BulkDestroyAdminUser.php');
-        $impersonalLoginRequestPath = base_path('app/Http/Requests/Admin/AdminUser/ImpersonalLoginAdminUser.php');
-        $exportPath = base_path('app/Exports/AdminUsersExport.php');
-        $routesPath = base_path('routes/admin.php');
-        $indexPath = resource_path('views/admin/admin-user/index.blade.php');
-        $listingVuePath = resource_path('js/admin/admin-user/Listing.vue');
-        $createPath = resource_path('views/admin/admin-user/create.blade.php');
-        $editPath = resource_path('views/admin/admin-user/edit.blade.php');
-        $formVuePath = resource_path('js/admin/admin-user/Form.vue');
-        $factoryPath = base_path('database/factories/AdminUserFactory.php');
-        $langPath = lang_path('en/admin.php');
+        $controllerPath = $this->app->basePath('app/Http/Controllers/Admin/AdminUsersController.php');
+        $indexRequestPath = $this->app->basePath('app/Http/Requests/Admin/AdminUser/IndexAdminUser.php');
+        $storeRequestPath = $this->app->basePath('app/Http/Requests/Admin/AdminUser/StoreAdminUser.php');
+        $updateRequestPath = $this->app->basePath('app/Http/Requests/Admin/AdminUser/UpdateAdminUser.php');
+        $destroyRequestPath = $this->app->basePath('app/Http/Requests/Admin/AdminUser/DestroyAdminUser.php');
+        $bulkDestroyRequestPath = $this->app->basePath('app/Http/Requests/Admin/AdminUser/BulkDestroyAdminUser.php');
+        $impersonalLoginRequestPath = $this->app->basePath(
+            'app/Http/Requests/Admin/AdminUser/ImpersonalLoginAdminUser.php',
+        );
+        $exportPath = $this->app->basePath('app/Exports/AdminUsersExport.php');
+        $routesPath = $this->app->basePath('routes/admin.php');
+        $indexPath = $this->app->resourcePath('views/admin/admin-user/index.blade.php');
+        $listingVuePath = $this->app->resourcePath('js/admin/admin-user/Listing.vue');
+        $createPath = $this->app->resourcePath('views/admin/admin-user/create.blade.php');
+        $editPath = $this->app->resourcePath('views/admin/admin-user/edit.blade.php');
+        $formVuePath = $this->app->resourcePath('js/admin/admin-user/Form.vue');
+        $factoryPath = $this->app->basePath('database/factories/AdminUserFactory.php');
+        $langPath = $this->app->langPath('en/admin.php');
 
         self::assertFileDoesNotExist($controllerPath);
         self::assertFileDoesNotExist($indexRequestPath);

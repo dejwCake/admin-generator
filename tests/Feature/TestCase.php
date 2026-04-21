@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Tests\Feature;
 
 use Brackets\AdminGenerator\AdminGeneratorServiceProvider;
+use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\Snapshots\MatchesSnapshots;
 use SplFileInfo;
@@ -29,7 +30,7 @@ abstract class TestCase extends Orchestra
 
     protected function setUpDatabase(Application $app): void
     {
-        $schemaBuilder = $app['db']->connection()->getSchemaBuilder();
+        $schemaBuilder = $app->get(DatabaseManager::class)->connection()->getSchemaBuilder();
 
         $schemaBuilder->create('users', static function (Blueprint $table): void {
             $table->id();
@@ -60,15 +61,9 @@ abstract class TestCase extends Orchestra
         });
 
         if (env('DB_CONNECTION') === 'pgsql') {
-            $schemaBuilder->table(
-                'admin_users',
-                //phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-                static function (Blueprint $table): void {
-                    DB::statement(
-                        'CREATE UNIQUE INDEX admin_users_email_null_deleted_at ON admin_users (email) '
-                        . 'WHERE deleted_at IS NULL;',
-                    );
-                },
+            $app->get(DatabaseManager::class)->statement(
+                'CREATE UNIQUE INDEX admin_users_email_null_deleted_at ON admin_users (email) '
+                . 'WHERE deleted_at IS NULL;',
             );
         }
 
@@ -204,17 +199,18 @@ abstract class TestCase extends Orchestra
      */
     protected function getEnvironmentSetUp($app): void
     {
+        $filesystem = $app->make(Filesystem::class);
         $newBasePath = $app->basePath() . DIRECTORY_SEPARATOR . 'testing_folder';
 
         $app->getNamespace();
         $app->setBasePath($newBasePath);
-        $this->initializeDirectory($newBasePath);
+        $this->initializeDirectory($filesystem, $newBasePath);
 
-        File::copyDirectory(__DIR__ . '/../fixtures/resources', resource_path());
+        $filesystem->copyDirectory(__DIR__ . '/../fixtures/resources', $app->resourcePath());
 
         if (env('DB_CONNECTION') === 'pgsql') {
-            $app['config']->set('database.default', 'pgsql');
-            $app['config']->set('database.connections.pgsql', [
+            $app->get(Config::class)->set('database.default', 'pgsql');
+            $app->get(Config::class)->set('database.connections.pgsql', [
                 'driver' => 'pgsql',
                 'host' => 'pgsql',
                 'port' => '5432',
@@ -227,8 +223,8 @@ abstract class TestCase extends Orchestra
                 'sslmode' => 'prefer',
             ]);
         } elseif (env('DB_CONNECTION') === 'mysql') {
-            $app['config']->set('database.default', 'mysql');
-            $app['config']->set('database.connections.mysql', [
+            $app->get(Config::class)->set('database.default', 'mysql');
+            $app->get(Config::class)->set('database.connections.mysql', [
                 'driver' => 'mysql',
                 'host' => 'mysql',
                 'port' => '3306',
@@ -241,8 +237,8 @@ abstract class TestCase extends Orchestra
                 'sslmode' => 'prefer',
             ]);
         } else {
-            $app['config']->set('database.default', 'sqlite');
-            $app['config']->set('database.connections.sqlite', [
+            $app->get(Config::class)->set('database.default', 'sqlite');
+            $app->get(Config::class)->set('database.connections.sqlite', [
                 'driver' => 'sqlite',
                 'database' => ':memory:',
                 'prefix' => '',
@@ -263,17 +259,18 @@ abstract class TestCase extends Orchestra
         ];
     }
 
-    protected function initializeDirectory(string $directory): void
+    protected function initializeDirectory(Filesystem $filesystem, string $directory): void
     {
-        if (File::isDirectory($directory)) {
-            File::deleteDirectory($directory);
+        if ($filesystem->isDirectory($directory)) {
+            $filesystem->deleteDirectory($directory);
         }
-        File::makeDirectory($directory);
+        $filesystem->makeDirectory($directory);
     }
 
     protected function getPermissionMigrationPath(string $fileName): ?string
     {
-        $file = (new Collection(File::files(database_path('migrations'))))
+        $filesystem = $this->app->make(Filesystem::class);
+        $file = (new Collection($filesystem->files($this->app->databasePath('migrations'))))
             ->filter(static fn (SplFileInfo $file) => str_contains($file->getFilename(), $fileName))
             ->first();
         if ($file === null) {

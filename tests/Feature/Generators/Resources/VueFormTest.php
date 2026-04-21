@@ -10,7 +10,7 @@ class VueFormTest extends TestCase
 {
     public function testVueFormGeneratorShouldGenerateComponent(): void
     {
-        $path = resource_path('js/admin/category/Form.vue');
+        $path = $this->app->resourcePath('js/admin/category/Form.vue');
 
         self::assertFileDoesNotExist($path);
 
@@ -24,7 +24,7 @@ class VueFormTest extends TestCase
 
     public function testVueFormGeneratorWithModelNameShouldGenerateComponent(): void
     {
-        $path = resource_path('js/admin/billing-categ-ory/Form.vue');
+        $path = $this->app->resourcePath('js/admin/billing-categ-ory/Form.vue');
 
         self::assertFileDoesNotExist($path);
 
@@ -39,7 +39,7 @@ class VueFormTest extends TestCase
 
     public function testVueFormGeneratorWithFullModelNameShouldGenerateComponent(): void
     {
-        $path = resource_path('js/admin/categ-ory/Form.vue');
+        $path = $this->app->resourcePath('js/admin/categ-ory/Form.vue');
 
         self::assertFileDoesNotExist($path);
 
@@ -54,7 +54,7 @@ class VueFormTest extends TestCase
 
     public function testVueFormGeneratorWithBelongsToManyShouldGenerateComponent(): void
     {
-        $path = resource_path('js/admin/category/Form.vue');
+        $path = $this->app->resourcePath('js/admin/category/Form.vue');
 
         self::assertFileDoesNotExist($path);
 
@@ -69,7 +69,7 @@ class VueFormTest extends TestCase
 
     public function testVueFormGeneratorWithFileNameShouldGenerateComponent(): void
     {
-        $path = resource_path('js/admin/profile-edit-password/Form.vue');
+        $path = $this->app->resourcePath('js/admin/profile-edit-password/Form.vue');
 
         self::assertFileDoesNotExist($path);
 
@@ -84,7 +84,7 @@ class VueFormTest extends TestCase
 
     public function testVueFormGeneratorWithRouteShouldGenerateComponent(): void
     {
-        $path = resource_path('js/admin/category/Form.vue');
+        $path = $this->app->resourcePath('js/admin/category/Form.vue');
 
         self::assertFileDoesNotExist($path);
 

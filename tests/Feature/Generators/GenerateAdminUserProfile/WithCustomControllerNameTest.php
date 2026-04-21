@@ -10,8 +10,8 @@ class WithCustomControllerNameTest extends TestCase
 {
     public function testProfileControllerNameCanBeNamespaced(): void
     {
-        $filePathController = base_path('app/Http/Controllers/Admin/Auth/ProfileController.php');
-        $filePathRoute = base_path('routes/admin.php');
+        $filePathController = $this->app->basePath('app/Http/Controllers/Admin/Auth/ProfileController.php');
+        $filePathRoute = $this->app->basePath('routes/admin.php');
 
         self::assertFileDoesNotExist($filePathController);
 
@@ -26,7 +26,7 @@ class WithCustomControllerNameTest extends TestCase
 
     public function testProfileControllerNameCanBeOutsideDefaultDirectory(): void
     {
-        $filePath = base_path('app/Http/Controllers/Auth/ProfileController.php');
+        $filePath = $this->app->basePath('app/Http/Controllers/Auth/ProfileController.php');
 
         self::assertFileDoesNotExist($filePath);
 

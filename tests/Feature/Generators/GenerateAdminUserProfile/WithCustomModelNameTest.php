@@ -11,7 +11,7 @@ class WithCustomModelNameTest extends TestCase
     /** @test */
     public function testProfileControllerShouldBeGeneratedWithCustomModel(): void
     {
-        $filePath = base_path('app/Http/Controllers/Admin/Auth/ProfileController.php');
+        $filePath = $this->app->basePath('app/Http/Controllers/Admin/Auth/ProfileController.php');
 
         self::assertFileDoesNotExist($filePath);
 

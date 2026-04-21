@@ -12,21 +12,21 @@ class DefaultTest extends TestCase
     #[DataProvider('getCases')]
     public function testAllFilesShouldBeGeneratedUnderDefaultNamespace(array $options): void
     {
-        $controllerPath = base_path('app/Http/Controllers/Admin/UsersController.php');
-        $indexRequestPath = base_path('app/Http/Requests/Admin/User/IndexUser.php');
-        $storeRequestPath = base_path('app/Http/Requests/Admin/User/StoreUser.php');
-        $updateRequestPath = base_path('app/Http/Requests/Admin/User/UpdateUser.php');
-        $destroyRequestPath = base_path('app/Http/Requests/Admin/User/DestroyUser.php');
-        $bulkDestroyRequestPath = base_path('app/Http/Requests/Admin/User/BulkDestroyUser.php');
-        $exportPath = base_path('app/Exports/UsersExport.php');
-        $routesPath = base_path('routes/admin.php');
-        $indexPath = resource_path('views/admin/user/index.blade.php');
-        $listingVuePath = resource_path('js/admin/user/Listing.vue');
-        $createPath = resource_path('views/admin/user/create.blade.php');
-        $editPath = resource_path('views/admin/user/edit.blade.php');
-        $formVuePath = resource_path('js/admin/user/Form.vue');
-        $factoryPath = base_path('database/factories/UserFactory.php');
-        $langPath = lang_path('en/admin.php');
+        $controllerPath = $this->app->basePath('app/Http/Controllers/Admin/UsersController.php');
+        $indexRequestPath = $this->app->basePath('app/Http/Requests/Admin/User/IndexUser.php');
+        $storeRequestPath = $this->app->basePath('app/Http/Requests/Admin/User/StoreUser.php');
+        $updateRequestPath = $this->app->basePath('app/Http/Requests/Admin/User/UpdateUser.php');
+        $destroyRequestPath = $this->app->basePath('app/Http/Requests/Admin/User/DestroyUser.php');
+        $bulkDestroyRequestPath = $this->app->basePath('app/Http/Requests/Admin/User/BulkDestroyUser.php');
+        $exportPath = $this->app->basePath('app/Exports/UsersExport.php');
+        $routesPath = $this->app->basePath('routes/admin.php');
+        $indexPath = $this->app->resourcePath('views/admin/user/index.blade.php');
+        $listingVuePath = $this->app->resourcePath('js/admin/user/Listing.vue');
+        $createPath = $this->app->resourcePath('views/admin/user/create.blade.php');
+        $editPath = $this->app->resourcePath('views/admin/user/edit.blade.php');
+        $formVuePath = $this->app->resourcePath('js/admin/user/Form.vue');
+        $factoryPath = $this->app->basePath('database/factories/UserFactory.php');
+        $langPath = $this->app->langPath('en/admin.php');
 
         self::assertFileDoesNotExist($controllerPath);
         self::assertFileDoesNotExist($indexRequestPath);

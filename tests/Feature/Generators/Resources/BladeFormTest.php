@@ -10,7 +10,7 @@ class BladeFormTest extends TestCase
 {
     public function testBladeFormGeneratorShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/category/form.blade.php');
+        $path = $this->app->resourcePath('views/admin/category/form.blade.php');
 
         self::assertFileDoesNotExist($path);
 
@@ -24,7 +24,7 @@ class BladeFormTest extends TestCase
 
     public function testBladeFormGeneratorWithModelNameShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/billing/categ-ory/form.blade.php');
+        $path = $this->app->resourcePath('views/admin/billing/categ-ory/form.blade.php');
 
         self::assertFileDoesNotExist($path);
 
@@ -39,7 +39,7 @@ class BladeFormTest extends TestCase
 
     public function testBladeFormGeneratorWithFullModelNameShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/categ-ory/form.blade.php');
+        $path = $this->app->resourcePath('views/admin/categ-ory/form.blade.php');
 
         self::assertFileDoesNotExist($path);
 
@@ -54,7 +54,7 @@ class BladeFormTest extends TestCase
 
     public function testBladeFormGeneratorWithFileNameShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/profile/edit-password.blade.php');
+        $path = $this->app->resourcePath('views/admin/profile/edit-password.blade.php');
 
         self::assertFileDoesNotExist($path);
 
@@ -69,7 +69,7 @@ class BladeFormTest extends TestCase
 
     public function testBladeFormGeneratorWithRouteShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/category/form.blade.php');
+        $path = $this->app->resourcePath('views/admin/category/form.blade.php');
 
         self::assertFileDoesNotExist($path);
 

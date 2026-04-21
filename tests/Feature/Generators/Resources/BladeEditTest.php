@@ -10,7 +10,7 @@ class BladeEditTest extends TestCase
 {
     public function testBladeEditGeneratorShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/category/edit.blade.php');
+        $path = $this->app->resourcePath('views/admin/category/edit.blade.php');
 
         self::assertFileDoesNotExist($path);
 
@@ -24,7 +24,7 @@ class BladeEditTest extends TestCase
 
     public function testBladeEditGeneratorWithModelNameShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/billing/categ-ory/edit.blade.php');
+        $path = $this->app->resourcePath('views/admin/billing/categ-ory/edit.blade.php');
 
         self::assertFileDoesNotExist($path);
 
@@ -39,7 +39,7 @@ class BladeEditTest extends TestCase
 
     public function testBladeEditGeneratorWithFullModelNameShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/categ-ory/edit.blade.php');
+        $path = $this->app->resourcePath('views/admin/categ-ory/edit.blade.php');
 
         self::assertFileDoesNotExist($path);
 
@@ -54,7 +54,7 @@ class BladeEditTest extends TestCase
 
     public function testBladeEditGeneratorWithBelongsToManyShouldGenerateView(): void
     {
-        $path = resource_path('views/admin/category/edit.blade.php');
+        $path = $this->app->resourcePath('views/admin/category/edit.blade.php');
 
         self::assertFileDoesNotExist($path);
 

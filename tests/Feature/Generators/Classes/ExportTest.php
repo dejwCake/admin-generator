@@ -10,7 +10,7 @@ class ExportTest extends TestCase
 {
     public function testExportGeneratorShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Exports/CategoriesExport.php');
+        $filePath = $this->app->basePath('app/Exports/CategoriesExport.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -24,7 +24,7 @@ class ExportTest extends TestCase
 
     public function testExportGeneratorWithModelWithFullNamespaceShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Exports/CategoriesExport.php');
+        $filePath = $this->app->basePath('app/Exports/CategoriesExport.php');
 
         self::assertFileDoesNotExist($filePath);
 

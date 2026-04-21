@@ -10,7 +10,7 @@ class StoreRequestTest extends TestCase
 {
     public function testStoreRequestGeneratorShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Category/StoreCategory.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Category/StoreCategory.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -24,7 +24,7 @@ class StoreRequestTest extends TestCase
 
     public function testStoreRequestGeneratorWithModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Billing/Cat/StoreCat.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Billing/Cat/StoreCat.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -39,7 +39,7 @@ class StoreRequestTest extends TestCase
 
     public function testStoreRequestGeneratorWithFullModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Cat/StoreCat.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Cat/StoreCat.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -54,7 +54,7 @@ class StoreRequestTest extends TestCase
 
     public function testStoreRequestGeneratorWithBelongsToManyShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Requests/Admin/Category/StoreCategory.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Category/StoreCategory.php');
 
         self::assertFileDoesNotExist($filePath);
 

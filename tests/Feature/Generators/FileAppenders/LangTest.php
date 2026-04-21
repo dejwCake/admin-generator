@@ -10,7 +10,7 @@ class LangTest extends TestCase
 {
     public function testLangGeneratorShouldAppend(): void
     {
-        $filePath = lang_path('en/admin.php');
+        $filePath = $this->app->langPath('en/admin.php');
 
         $this->artisan('admin:generate:lang', [
             'table_name' => 'categories',
@@ -21,7 +21,7 @@ class LangTest extends TestCase
 
     public function testLangGeneratorWithModelNameShouldAppend(): void
     {
-        $filePath = lang_path('en/admin.php');
+        $filePath = $this->app->langPath('en/admin.php');
 
         $this->artisan('admin:generate:lang', [
             'table_name' => 'categories',
@@ -33,7 +33,7 @@ class LangTest extends TestCase
 
     public function testLangGeneratorWithFullModelNameShouldAppend(): void
     {
-        $filePath = lang_path('en/admin.php');
+        $filePath = $this->app->langPath('en/admin.php');
 
         $this->artisan('admin:generate:lang', [
             'table_name' => 'categories',
@@ -45,7 +45,7 @@ class LangTest extends TestCase
 
     public function testLangGeneratorWithLocaleShouldAppend(): void
     {
-        $filePath = lang_path('nl/admin.php');
+        $filePath = $this->app->langPath('nl/admin.php');
 
         $this->artisan('admin:generate:lang', [
             'table_name' => 'categories',
@@ -57,7 +57,7 @@ class LangTest extends TestCase
 
     public function testLangGeneratorWithBelongsToManyShouldAppend(): void
     {
-        $filePath = lang_path('en/admin.php');
+        $filePath = $this->app->langPath('en/admin.php');
 
         $this->artisan('admin:generate:lang', [
             'table_name' => 'categories',
@@ -69,7 +69,7 @@ class LangTest extends TestCase
 
     public function testLangGeneratorWithExportShouldAppend(): void
     {
-        $filePath = lang_path('en/admin.php');
+        $filePath = $this->app->langPath('en/admin.php');
 
         $this->artisan('admin:generate:lang', [
             'table_name' => 'categories',
@@ -81,7 +81,7 @@ class LangTest extends TestCase
 
     public function testLangGeneratorShouldBeIdempotent(): void
     {
-        $filePath = lang_path('en/admin.php');
+        $filePath = $this->app->langPath('en/admin.php');
 
         $this->artisan('admin:generate:lang', [
             'table_name' => 'categories',
@@ -100,7 +100,7 @@ class LangTest extends TestCase
 
     public function testLangGeneratorShouldReplaceExistingKeyAfterUserEdit(): void
     {
-        $filePath = lang_path('en/admin.php');
+        $filePath = $this->app->langPath('en/admin.php');
 
         $this->artisan('admin:generate:lang', [
             'table_name' => 'categories',

@@ -10,7 +10,7 @@ class ControllerTest extends TestCase
 {
     public function testControllerGeneratorShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
+        $filePath = $this->app->basePath('app/Http/Controllers/Admin/CategoriesController.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -24,7 +24,7 @@ class ControllerTest extends TestCase
 
     public function testControllerGeneratorWithClassNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Controllers/Admin/Billing/MyNameController.php');
+        $filePath = $this->app->basePath('app/Http/Controllers/Admin/Billing/MyNameController.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -39,7 +39,7 @@ class ControllerTest extends TestCase
 
     public function testControllerGeneratorWithFullClassNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Controllers/Billing/CategoriesController.php');
+        $filePath = $this->app->basePath('app/Http/Controllers/Billing/CategoriesController.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -54,7 +54,7 @@ class ControllerTest extends TestCase
 
     public function testControllerGeneratorWithModelNameShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
+        $filePath = $this->app->basePath('app/Http/Controllers/Admin/CategoriesController.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -69,7 +69,7 @@ class ControllerTest extends TestCase
 
     public function testControllerGeneratorWithBelongsToManyShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
+        $filePath = $this->app->basePath('app/Http/Controllers/Admin/CategoriesController.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -84,7 +84,7 @@ class ControllerTest extends TestCase
 
     public function testControllerGeneratorWithModelWithFullNamespaceShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
+        $filePath = $this->app->basePath('app/Http/Controllers/Admin/CategoriesController.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -99,7 +99,7 @@ class ControllerTest extends TestCase
 
     public function testControllerGeneratorWithExportShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
+        $filePath = $this->app->basePath('app/Http/Controllers/Admin/CategoriesController.php');
 
         self::assertFileDoesNotExist($filePath);
 
@@ -114,7 +114,7 @@ class ControllerTest extends TestCase
 
     public function testControllerGeneratorWithoutBulkShouldGenerateClass(): void
     {
-        $filePath = base_path('app/Http/Controllers/Admin/CategoriesController.php');
+        $filePath = $this->app->basePath('app/Http/Controllers/Admin/CategoriesController.php');
 
         self::assertFileDoesNotExist($filePath);
 
