@@ -70,20 +70,13 @@ final class ColumnCollectionBuilderTest extends TestCase
     public function testBuildDetectsSoftDeleteAndAddsWhereNullDeletedAtToUniqueRule(): void
     {
         $schemaBuilder = $this->app['db']->connection()->getSchemaBuilder();
-        $connection = $this->app['db']->connection();
 
         $schemaBuilder->create('soft_delete_items', static function (Blueprint $table): void {
             $table->increments('id');
             $table->string('code');
             $table->softDeletes();
+            $table->unique('code', 'soft_delete_items_code_null_deleted_at_unique');
         });
-
-        // Create a partial unique index whose name contains 'null_deleted_at'
-        // (rawIndex with WHERE clause is not supported by Laravel's SQLite grammar;
-        // use a raw statement instead)
-        $connection->statement(
-            'CREATE UNIQUE INDEX soft_delete_items_code_null_deleted_at_unique ON soft_delete_items (code) WHERE deleted_at IS NULL',
-        );
 
         $builder = $this->app->make(ColumnCollectionBuilder::class);
         $result = $builder->build('soft_delete_items');

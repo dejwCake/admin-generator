@@ -16,7 +16,7 @@ final class CoreOperationsTest extends TestCase
         $collection = new ColumnCollection();
         $collection->push(self::makeColumn('name'));
 
-        self::assertSame(1, $collection->count());
+        self::assertCount(1, $collection);
     }
 
     public function testToArrayReturnsKeyedArray(): void
@@ -60,7 +60,7 @@ final class CoreOperationsTest extends TestCase
 
         $filtered = $collection->filter(static fn (Column $c) => $c->majorType === 'string');
 
-        self::assertSame(1, $filtered->count());
+        self::assertCount(1, $filtered);
         self::assertArrayHasKey('title', $filtered->toArray());
     }
 
@@ -71,7 +71,7 @@ final class CoreOperationsTest extends TestCase
         $collection->push(self::makeColumn('b'));
         $collection->push(self::makeColumn('c'));
 
-        self::assertSame(3, $collection->count());
+        self::assertCount(3, $collection);
     }
 
     private static function makeColumn(string $name, string $majorType = 'string'): Column

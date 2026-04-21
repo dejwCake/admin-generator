@@ -21,7 +21,7 @@ final class NameFiltersTest extends TestCase
 
         $result = $collection->filterByName('title', 'views');
 
-        self::assertSame(2, $result->count());
+        self::assertCount(2, $result);
         self::assertArrayNotHasKey('slug', $result->toArray());
     }
 
@@ -35,7 +35,7 @@ final class NameFiltersTest extends TestCase
 
         $result = $collection->rejectByName('slug', 'views');
 
-        self::assertSame(1, $result->count());
+        self::assertCount(1, $result);
         self::assertArrayHasKey('title', $result->toArray());
     }
 

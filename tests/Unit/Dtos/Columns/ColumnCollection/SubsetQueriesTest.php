@@ -25,7 +25,7 @@ final class SubsetQueriesTest extends TestCase
 
         $visible = $collection->getVisible();
 
-        self::assertSame(1, $visible->count());
+        self::assertCount(1, $visible);
         self::assertArrayHasKey('title', $visible->toArray());
     }
 
@@ -43,7 +43,7 @@ final class SubsetQueriesTest extends TestCase
 
         $fillable = $collection->getFillable();
 
-        self::assertSame(2, $fillable->count());
+        self::assertCount(2, $fillable);
         self::assertArrayHasKey('last_login_at', $fillable->toArray());
         self::assertArrayHasKey('title', $fillable->toArray());
     }
@@ -84,7 +84,7 @@ final class SubsetQueriesTest extends TestCase
 
         $result = $collection->getToExport();
 
-        self::assertSame(1, $result->count());
+        self::assertCount(1, $result);
         self::assertArrayHasKey('title', $result->toArray());
     }
 
@@ -98,7 +98,7 @@ final class SubsetQueriesTest extends TestCase
 
         $result = $collection->getForIndex();
 
-        self::assertSame(2, $result->count());
+        self::assertCount(2, $result);
         self::assertArrayHasKey('title', $result->toArray());
         self::assertArrayHasKey('views', $result->toArray());
         self::assertArrayNotHasKey('slug', $result->toArray());

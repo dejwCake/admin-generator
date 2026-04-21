@@ -94,8 +94,8 @@ final class FrontendRulesBuilderTest extends TestCase
         $rules = $this->builder->build(name: 'email', majorType: 'string', required: true, isForeignKey: false);
 
         $all = $rules->all();
-        self::assertSame(1, count(array_keys($all, 'required', true)));
-        self::assertSame(1, count(array_keys($all, 'email', true)));
+        self::assertCount(1, array_keys($all, 'required', true));
+        self::assertCount(1, array_keys($all, 'email', true));
     }
 
     public function testOutputIsCollection(): void

@@ -20,7 +20,7 @@ final class TypeBasedQueriesTest extends TestCase
 
         $result = $collection->getTranslatable();
 
-        self::assertSame(1, $result->count());
+        self::assertCount(1, $result);
         self::assertArrayHasKey('data', $result->toArray());
     }
 
@@ -34,7 +34,7 @@ final class TypeBasedQueriesTest extends TestCase
 
         $result = $collection->getNonTranslatable();
 
-        self::assertSame(1, $result->count());
+        self::assertCount(1, $result);
         self::assertArrayHasKey('title', $result->toArray());
     }
 
@@ -47,7 +47,7 @@ final class TypeBasedQueriesTest extends TestCase
 
         $result = $collection->getBoolean();
 
-        self::assertSame(1, $result->count());
+        self::assertCount(1, $result);
         self::assertArrayHasKey('enabled', $result->toArray());
     }
 
@@ -61,7 +61,7 @@ final class TypeBasedQueriesTest extends TestCase
 
         $result = $collection->getDates();
 
-        self::assertSame(2, $result->count());
+        self::assertCount(2, $result);
         self::assertArrayHasKey('published_at', $result->toArray());
         self::assertArrayHasKey('created_at', $result->toArray());
     }
@@ -76,7 +76,7 @@ final class TypeBasedQueriesTest extends TestCase
 
         $result = $collection->getHidden();
 
-        self::assertSame(2, $result->count());
+        self::assertCount(2, $result);
         self::assertArrayHasKey('password', $result->toArray());
         self::assertArrayHasKey('remember_token', $result->toArray());
     }

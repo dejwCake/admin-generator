@@ -15,21 +15,21 @@ final class ConstructionTest extends TestCase
     {
         $collection = new ColumnCollection([self::makeColumn('title'), self::makeColumn('slug')]);
 
-        self::assertSame(2, $collection->count());
+        self::assertCount(2, $collection);
     }
 
     public function testConstructorAcceptsCollection(): void
     {
         $collection = new ColumnCollection(new Collection([self::makeColumn('title')]));
 
-        self::assertSame(1, $collection->count());
+        self::assertCount(1, $collection);
     }
 
     public function testConstructorFiltersNonColumnEntries(): void
     {
         $collection = new ColumnCollection([self::makeColumn('title'), 'not-a-column', 42, null]);
 
-        self::assertSame(1, $collection->count());
+        self::assertCount(1, $collection);
     }
 
     public function testConstructorKeysByName(): void
