@@ -12,9 +12,11 @@
   <violation rule="PHPMD\Rule\Design\NpathComplexity" file="src/Generators/GenerateUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/GenerateUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\TooManyFields" file="src/Generators/Generator.php"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/Generators/Classes/ControllerTest.php" method="getCases"/>
   <violation rule="PHPMD\Rule\CyclomaticComplexity" file="tests/Feature/Generators/GenerateAdminUser/DefaultTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
   <violation rule="PHPMD\Rule\Design\NpathComplexity" file="tests/Feature/Generators/GenerateAdminUser/DefaultTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
   <violation rule="PHPMD\Rule\Design\NumberOfChildren" file="tests/Feature/TestCase.php"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/TestCase.php" method="setUpDatabase"/>
   <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Builders/ColumnBuilder/FakerByNameTest.php"/>
   <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Builders/ColumnBuilder/MajorTypeTest.php"/>
   <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Builders/FrontendRulesBuilderTest.php"/>
@@ -22,5 +24,4 @@
   <violation rule="PHPMD\Rule\Design\LongParameterList" file="tests/Unit/Dtos/Columns/ColumnTest.php" method="makeColumn"/>
   <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Dtos/Columns/Rules/TrivialRulesTest.php"/>
   <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Dtos/Relations/RelationCollection/BelongsToManyTest.php"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/TestCase.php" method="setUpDatabase"/>
 </phpmd-baseline>

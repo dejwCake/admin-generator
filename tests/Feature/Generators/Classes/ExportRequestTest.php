@@ -7,7 +7,7 @@ namespace Brackets\AdminGenerator\Tests\Feature\Generators\Classes;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class FactoryTest extends TestCase
+class ExportRequestTest extends TestCase
 {
     #[DataProvider('getCases')]
     public function testGeneratorShouldGenerateClass(array $arguments, string $expectedFilePath): void
@@ -16,7 +16,7 @@ class FactoryTest extends TestCase
 
         self::assertFileDoesNotExist($filePath);
 
-        $this->artisan('admin:generate:factory', $arguments);
+        $this->artisan('admin:generate:request:export', $arguments);
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
@@ -24,38 +24,33 @@ class FactoryTest extends TestCase
 
     public function testGeneratorWithForceShouldOverwriteClass(): void
     {
-        $filePath = $this->app->basePath('database/factories/CategoryFactory.php');
+        $filePath = $this->app->basePath('app/Http/Requests/Admin/Category/ExportCategory.php');
 
-        $this->artisan('admin:generate:factory', ['table_name' => 'categories']);
+        $this->artisan('admin:generate:request:export', ['table_name' => 'categories']);
         self::assertFileExists($filePath);
 
-        $this->artisan('admin:generate:factory', [
+        $this->artisan('admin:generate:request:export', [
             'table_name' => 'categories',
             '--force' => true,
         ]);
         self::assertFileExists($filePath);
     }
 
-    public function testFactoryGeneratorWithSeedShouldGenerateClass(): void
-    {
-        self::markTestSkipped('This test is skipped as we do not generate model');
-    }
-
     public static function getCases(): iterable
     {
         yield 'categories default' => [
             'arguments' => ['table_name' => 'categories'],
-            'expectedFilePath' => 'database/factories/CategoryFactory.php',
+            'expectedFilePath' => 'app/Http/Requests/Admin/Category/ExportCategory.php',
         ];
 
         yield 'categories with model-name Billing\\Cat' => [
             'arguments' => ['table_name' => 'categories', '--model-name' => 'Billing\\Cat'],
-            'expectedFilePath' => 'database/factories/CatFactory.php',
+            'expectedFilePath' => 'app/Http/Requests/Admin/Billing/Cat/ExportCat.php',
         ];
 
         yield 'categories with model-name App\\Billing\\Cat' => [
             'arguments' => ['table_name' => 'categories', '--model-name' => 'App\\Billing\\Cat'],
-            'expectedFilePath' => 'database/factories/CatFactory.php',
+            'expectedFilePath' => 'app/Http/Requests/Admin/Cat/ExportCat.php',
         ];
 
         yield 'categories with model-with-full-namespace App\\Billing\\Category' => [
@@ -63,17 +58,22 @@ class FactoryTest extends TestCase
                 'table_name' => 'categories',
                 '--model-with-full-namespace' => 'App\\Billing\\Category',
             ],
-            'expectedFilePath' => 'database/factories/CategoryFactory.php',
+            'expectedFilePath' => 'app/Http/Requests/Admin/Category/ExportCategory.php',
         ];
 
         yield 'posts default' => [
             'arguments' => ['table_name' => 'posts'],
-            'expectedFilePath' => 'database/factories/PostFactory.php',
+            'expectedFilePath' => 'app/Http/Requests/Admin/Post/ExportPost.php',
         ];
 
         yield 'posts with model-name Feed\\Article' => [
             'arguments' => ['table_name' => 'posts', '--model-name' => 'Feed\\Article'],
-            'expectedFilePath' => 'database/factories/ArticleFactory.php',
+            'expectedFilePath' => 'app/Http/Requests/Admin/Feed/Article/ExportArticle.php',
+        ];
+
+        yield 'posts with model-name App\\Feed\\Article' => [
+            'arguments' => ['table_name' => 'posts', '--model-name' => 'App\\Feed\\Article'],
+            'expectedFilePath' => 'app/Http/Requests/Admin/Article/ExportArticle.php',
         ];
 
         yield 'posts with model-with-full-namespace App\\Feed\\Post' => [
@@ -81,7 +81,7 @@ class FactoryTest extends TestCase
                 'table_name' => 'posts',
                 '--model-with-full-namespace' => 'App\\Feed\\Post',
             ],
-            'expectedFilePath' => 'database/factories/PostFactory.php',
+            'expectedFilePath' => 'app/Http/Requests/Admin/Post/ExportPost.php',
         ];
     }
 }

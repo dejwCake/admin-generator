@@ -5,65 +5,74 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\Classes;
 
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class PermissionsTest extends TestCase
 {
-    public function testPermissionsGeneratorShouldGenerateClass(): void
+    #[DataProvider('getCases')]
+    public function testGeneratorShouldGenerateClass(array $arguments, string $migrationFile): void
     {
-        $permissionMigrationFile = 'fill_permissions_for_category.php';
+        $this->artisan('admin:generate:permissions', $arguments);
 
-        $this->artisan('admin:generate:permissions', [
-            'table_name' => 'categories',
-        ]);
-
-        $filePath = $this->getPermissionMigrationPath($permissionMigrationFile);
+        $filePath = $this->getPermissionMigrationPath($migrationFile);
 
         self::assertFileExists($filePath);
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testPermissionsGeneratorWithModelNameShouldGenerateClass(): void
+    public function testGeneratorWithForceShouldOverwriteClass(): void
     {
-        $permissionMigrationFile = 'fill_permissions_for_cat.php';
+        $this->artisan('admin:generate:permissions', ['table_name' => 'categories']);
+
+        $filePath = $this->getPermissionMigrationPath('fill_permissions_for_category.php');
+        self::assertNotNull($filePath);
+        self::assertFileExists($filePath);
 
         $this->artisan('admin:generate:permissions', [
             'table_name' => 'categories',
-            '--model-name' => 'Billing\\Cat',
+            '--force' => true,
         ]);
 
-        $filePath = $this->getPermissionMigrationPath($permissionMigrationFile);
-
+        $filePath = $this->getPermissionMigrationPath('fill_permissions_for_category.php');
+        self::assertNotNull($filePath);
         self::assertFileExists($filePath);
-        self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testPermissionsGeneratorWithFullModelNameShouldGenerateClass(): void
+    public static function getCases(): iterable
     {
-        $permissionMigrationFile = 'fill_permissions_for_cat.php';
+        yield 'categories default' => [
+            'arguments' => ['table_name' => 'categories'],
+            'migrationFile' => 'fill_permissions_for_category.php',
+        ];
 
-        $this->artisan('admin:generate:permissions', [
-            'table_name' => 'categories',
-            '--model-name' => 'App\\Billing\\Cat',
-        ]);
+        yield 'categories with model-name Billing\\Cat' => [
+            'arguments' => ['table_name' => 'categories', '--model-name' => 'Billing\\Cat'],
+            'migrationFile' => 'fill_permissions_for_cat.php',
+        ];
 
-        $filePath = $this->getPermissionMigrationPath($permissionMigrationFile);
+        yield 'categories with model-name App\\Billing\\Cat' => [
+            'arguments' => ['table_name' => 'categories', '--model-name' => 'App\\Billing\\Cat'],
+            'migrationFile' => 'fill_permissions_for_cat.php',
+        ];
 
-        self::assertFileExists($filePath);
-        self::assertMatchesFileSnapshot($filePath);
-    }
+        yield 'categories without bulk' => [
+            'arguments' => ['table_name' => 'categories', '--without-bulk' => true],
+            'migrationFile' => 'fill_permissions_for_category.php',
+        ];
 
-    public function testPermissionsGeneratorWithoutBulkShouldGenerateClass(): void
-    {
-        $permissionMigrationFile = 'fill_permissions_for_category.php';
+        yield 'posts default' => [
+            'arguments' => ['table_name' => 'posts'],
+            'migrationFile' => 'fill_permissions_for_post.php',
+        ];
 
-        $this->artisan('admin:generate:permissions', [
-            'table_name' => 'categories',
-            '--without-bulk' => true,
-        ]);
+        yield 'posts with model-name Feed\\Article' => [
+            'arguments' => ['table_name' => 'posts', '--model-name' => 'Feed\\Article'],
+            'migrationFile' => 'fill_permissions_for_article.php',
+        ];
 
-        $filePath = $this->getPermissionMigrationPath($permissionMigrationFile);
-
-        self::assertFileExists($filePath);
-        self::assertMatchesFileSnapshot($filePath);
+        yield 'posts without bulk' => [
+            'arguments' => ['table_name' => 'posts', '--without-bulk' => true],
+            'migrationFile' => 'fill_permissions_for_post.php',
+        ];
     }
 }
