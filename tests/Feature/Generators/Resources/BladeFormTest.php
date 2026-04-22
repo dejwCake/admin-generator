@@ -5,80 +5,97 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\Resources;
 
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class BladeFormTest extends TestCase
 {
-    public function testBladeFormGeneratorShouldGenerateView(): void
+    #[DataProvider('getCases')]
+    public function testGeneratorShouldGenerateView(array $arguments, string $expectedFilePath): void
     {
-        $path = $this->app->resourcePath('views/admin/category/form.blade.php');
+        $filePath = $this->app->basePath($expectedFilePath);
 
-        self::assertFileDoesNotExist($path);
+        self::assertFileDoesNotExist($filePath);
 
-        $this->artisan('admin:generate:blade-form', [
-            'table_name' => 'categories',
-        ]);
+        $this->artisan('admin:generate:blade-form', $arguments);
 
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testBladeFormGeneratorWithModelNameShouldGenerateView(): void
+    public function testGeneratorWithForceShouldOverwriteView(): void
     {
-        $path = $this->app->resourcePath('views/admin/billing/categ-ory/form.blade.php');
+        $filePath = $this->app->basePath('resources/views/admin/category/form.blade.php');
 
-        self::assertFileDoesNotExist($path);
+        $this->artisan('admin:generate:blade-form', ['table_name' => 'categories']);
+        self::assertFileExists($filePath);
 
         $this->artisan('admin:generate:blade-form', [
             'table_name' => 'categories',
-            '--model-name' => 'Billing\\CategOry',
+            '--force' => true,
         ]);
-
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
+        self::assertFileExists($filePath);
     }
 
-    public function testBladeFormGeneratorWithFullModelNameShouldGenerateView(): void
+    public static function getCases(): iterable
     {
-        $path = $this->app->resourcePath('views/admin/categ-ory/form.blade.php');
+        yield 'categories default' => [
+            'arguments' => ['table_name' => 'categories'],
+            'expectedFilePath' => 'resources/views/admin/category/form.blade.php',
+        ];
 
-        self::assertFileDoesNotExist($path);
+        yield 'categories with model-name Billing\\CategOry' => [
+            'arguments' => ['table_name' => 'categories', '--model-name' => 'Billing\\CategOry'],
+            'expectedFilePath' => 'resources/views/admin/billing/categ-ory/form.blade.php',
+        ];
 
-        $this->artisan('admin:generate:blade-form', [
-            'table_name' => 'categories',
-            '--model-name' => 'App\\Billing\\CategOry',
-        ]);
+        yield 'categories with model-name App\\Billing\\CategOry' => [
+            'arguments' => ['table_name' => 'categories', '--model-name' => 'App\\Billing\\CategOry'],
+            'expectedFilePath' => 'resources/views/admin/categ-ory/form.blade.php',
+        ];
 
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
-    }
+        yield 'categories with belongs-to-many posts' => [
+            'arguments' => ['table_name' => 'categories', '--belongs-to-many' => 'posts'],
+            'expectedFilePath' => 'resources/views/admin/category/form.blade.php',
+        ];
 
-    public function testBladeFormGeneratorWithFileNameShouldGenerateView(): void
-    {
-        $path = $this->app->resourcePath('views/admin/profile/edit-password.blade.php');
+        yield 'categories with template profile' => [
+            'arguments' => ['table_name' => 'categories', '--template' => 'profile'],
+            'expectedFilePath' => 'resources/views/admin/category/form.blade.php',
+        ];
 
-        self::assertFileDoesNotExist($path);
+        yield 'categories with template profile.password' => [
+            'arguments' => ['table_name' => 'categories', '--template' => 'profile.password'],
+            'expectedFilePath' => 'resources/views/admin/category/form.blade.php',
+        ];
 
-        $this->artisan('admin:generate:blade-form', [
-            'table_name' => 'categories',
-            '--file-name' => 'profile/edit-password',
-        ]);
+        yield 'categories with file-name profile/edit-password' => [
+            'arguments' => ['table_name' => 'categories', '--file-name' => 'profile/edit-password'],
+            'expectedFilePath' => 'resources/views/admin/profile/edit-password.blade.php',
+        ];
 
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
-    }
+        yield 'categories with route admin/categ-ories' => [
+            'arguments' => ['table_name' => 'categories', '--route' => 'admin/categ-ories'],
+            'expectedFilePath' => 'resources/views/admin/category/form.blade.php',
+        ];
 
-    public function testBladeFormGeneratorWithRouteShouldGenerateView(): void
-    {
-        $path = $this->app->resourcePath('views/admin/category/form.blade.php');
+        yield 'posts default' => [
+            'arguments' => ['table_name' => 'posts'],
+            'expectedFilePath' => 'resources/views/admin/post/form.blade.php',
+        ];
 
-        self::assertFileDoesNotExist($path);
+        yield 'posts with model-name Feed\\Article' => [
+            'arguments' => ['table_name' => 'posts', '--model-name' => 'Feed\\Article'],
+            'expectedFilePath' => 'resources/views/admin/feed/article/form.blade.php',
+        ];
 
-        $this->artisan('admin:generate:blade-form', [
-            'table_name' => 'categories',
-            '--route' => 'admin/categ-ories',
-        ]);
+        yield 'posts with model-name App\\Feed\\Article' => [
+            'arguments' => ['table_name' => 'posts', '--model-name' => 'App\\Feed\\Article'],
+            'expectedFilePath' => 'resources/views/admin/article/form.blade.php',
+        ];
 
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
+        yield 'posts with belongs-to-many categories' => [
+            'arguments' => ['table_name' => 'posts', '--belongs-to-many' => 'categories'],
+            'expectedFilePath' => 'resources/views/admin/post/form.blade.php',
+        ];
     }
 }

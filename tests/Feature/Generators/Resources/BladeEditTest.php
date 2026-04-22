@@ -5,65 +5,92 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\Resources;
 
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class BladeEditTest extends TestCase
 {
-    public function testBladeEditGeneratorShouldGenerateView(): void
+    #[DataProvider('getCases')]
+    public function testGeneratorShouldGenerateView(array $arguments, string $expectedFilePath): void
     {
-        $path = $this->app->resourcePath('views/admin/category/edit.blade.php');
+        $filePath = $this->app->basePath($expectedFilePath);
 
-        self::assertFileDoesNotExist($path);
+        self::assertFileDoesNotExist($filePath);
 
-        $this->artisan('admin:generate:blade-edit', [
-            'table_name' => 'categories',
-        ]);
+        $this->artisan('admin:generate:blade-edit', $arguments);
 
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testBladeEditGeneratorWithModelNameShouldGenerateView(): void
+    public function testGeneratorWithForceShouldOverwriteView(): void
     {
-        $path = $this->app->resourcePath('views/admin/billing/categ-ory/edit.blade.php');
+        $filePath = $this->app->basePath('resources/views/admin/category/edit.blade.php');
 
-        self::assertFileDoesNotExist($path);
+        $this->artisan('admin:generate:blade-edit', ['table_name' => 'categories']);
+        self::assertFileExists($filePath);
 
         $this->artisan('admin:generate:blade-edit', [
             'table_name' => 'categories',
-            '--model-name' => 'Billing\\CategOry',
+            '--force' => true,
         ]);
-
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
+        self::assertFileExists($filePath);
     }
 
-    public function testBladeEditGeneratorWithFullModelNameShouldGenerateView(): void
+    public static function getCases(): iterable
     {
-        $path = $this->app->resourcePath('views/admin/categ-ory/edit.blade.php');
+        yield 'categories default' => [
+            'arguments' => ['table_name' => 'categories'],
+            'expectedFilePath' => 'resources/views/admin/category/edit.blade.php',
+        ];
 
-        self::assertFileDoesNotExist($path);
+        yield 'categories with model-name Billing\\CategOry' => [
+            'arguments' => ['table_name' => 'categories', '--model-name' => 'Billing\\CategOry'],
+            'expectedFilePath' => 'resources/views/admin/billing/categ-ory/edit.blade.php',
+        ];
 
-        $this->artisan('admin:generate:blade-edit', [
-            'table_name' => 'categories',
-            '--model-name' => 'App\\Billing\\CategOry',
-        ]);
+        yield 'categories with model-name App\\Billing\\CategOry' => [
+            'arguments' => ['table_name' => 'categories', '--model-name' => 'App\\Billing\\CategOry'],
+            'expectedFilePath' => 'resources/views/admin/categ-ory/edit.blade.php',
+        ];
 
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
-    }
+        yield 'categories with belongs-to-many posts' => [
+            'arguments' => ['table_name' => 'categories', '--belongs-to-many' => 'posts'],
+            'expectedFilePath' => 'resources/views/admin/category/edit.blade.php',
+        ];
 
-    public function testBladeEditGeneratorWithBelongsToManyShouldGenerateView(): void
-    {
-        $path = $this->app->resourcePath('views/admin/category/edit.blade.php');
+        yield 'categories with template admin-user' => [
+            'arguments' => ['table_name' => 'categories', '--template' => 'admin-user'],
+            'expectedFilePath' => 'resources/views/admin/category/edit.blade.php',
+        ];
 
-        self::assertFileDoesNotExist($path);
+        yield 'categories with template user' => [
+            'arguments' => ['table_name' => 'categories', '--template' => 'user'],
+            'expectedFilePath' => 'resources/views/admin/category/edit.blade.php',
+        ];
 
-        $this->artisan('admin:generate:blade-edit', [
-            'table_name' => 'categories',
-            '--belongs-to-many' => 'posts',
-        ]);
+        yield 'categories with media gallery' => [
+            'arguments' => ['table_name' => 'categories', '--media' => ['gallery:image:public:5000']],
+            'expectedFilePath' => 'resources/views/admin/category/edit.blade.php',
+        ];
 
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
+        yield 'posts default' => [
+            'arguments' => ['table_name' => 'posts'],
+            'expectedFilePath' => 'resources/views/admin/post/edit.blade.php',
+        ];
+
+        yield 'posts with model-name Feed\\Article' => [
+            'arguments' => ['table_name' => 'posts', '--model-name' => 'Feed\\Article'],
+            'expectedFilePath' => 'resources/views/admin/feed/article/edit.blade.php',
+        ];
+
+        yield 'posts with model-name App\\Feed\\Article' => [
+            'arguments' => ['table_name' => 'posts', '--model-name' => 'App\\Feed\\Article'],
+            'expectedFilePath' => 'resources/views/admin/article/edit.blade.php',
+        ];
+
+        yield 'posts with belongs-to-many categories' => [
+            'arguments' => ['table_name' => 'posts', '--belongs-to-many' => 'categories'],
+            'expectedFilePath' => 'resources/views/admin/post/edit.blade.php',
+        ];
     }
 }

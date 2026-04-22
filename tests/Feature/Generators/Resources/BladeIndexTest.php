@@ -5,80 +5,97 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\Resources;
 
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class BladeIndexTest extends TestCase
 {
-    public function testBladeIndexGeneratorShouldGenerateView(): void
+    #[DataProvider('getCases')]
+    public function testGeneratorShouldGenerateView(array $arguments, string $expectedFilePath): void
     {
-        $path = $this->app->resourcePath('views/admin/category/index.blade.php');
+        $filePath = $this->app->basePath($expectedFilePath);
 
-        self::assertFileDoesNotExist($path);
+        self::assertFileDoesNotExist($filePath);
 
-        $this->artisan('admin:generate:blade-index', [
-            'table_name' => 'categories',
-        ]);
+        $this->artisan('admin:generate:blade-index', $arguments);
 
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
+        self::assertFileExists($filePath);
+        self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testBladeIndexGeneratorWithModelNameShouldGenerateView(): void
+    public function testGeneratorWithForceShouldOverwriteView(): void
     {
-        $path = $this->app->resourcePath('views/admin/billing/categ-ory/index.blade.php');
+        $filePath = $this->app->basePath('resources/views/admin/category/index.blade.php');
 
-        self::assertFileDoesNotExist($path);
+        $this->artisan('admin:generate:blade-index', ['table_name' => 'categories']);
+        self::assertFileExists($filePath);
 
         $this->artisan('admin:generate:blade-index', [
             'table_name' => 'categories',
-            '--model-name' => 'Billing\\CategOry',
+            '--force' => true,
         ]);
-
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
+        self::assertFileExists($filePath);
     }
 
-    public function testBladeIndexGeneratorWithFullModelNameShouldGenerateView(): void
+    public static function getCases(): iterable
     {
-        $path = $this->app->resourcePath('views/admin/categ-ory/index.blade.php');
+        yield 'categories default' => [
+            'arguments' => ['table_name' => 'categories'],
+            'expectedFilePath' => 'resources/views/admin/category/index.blade.php',
+        ];
 
-        self::assertFileDoesNotExist($path);
+        yield 'categories with model-name Billing\\CategOry' => [
+            'arguments' => ['table_name' => 'categories', '--model-name' => 'Billing\\CategOry'],
+            'expectedFilePath' => 'resources/views/admin/billing/categ-ory/index.blade.php',
+        ];
 
-        $this->artisan('admin:generate:blade-index', [
-            'table_name' => 'categories',
-            '--model-name' => 'App\\Billing\\CategOry',
-        ]);
+        yield 'categories with model-name App\\Billing\\CategOry' => [
+            'arguments' => ['table_name' => 'categories', '--model-name' => 'App\\Billing\\CategOry'],
+            'expectedFilePath' => 'resources/views/admin/categ-ory/index.blade.php',
+        ];
 
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
-    }
+        yield 'categories with with-export' => [
+            'arguments' => ['table_name' => 'categories', '--with-export' => true],
+            'expectedFilePath' => 'resources/views/admin/category/index.blade.php',
+        ];
 
-    public function testBladeIndexGeneratorWithExportShouldGenerateView(): void
-    {
-        $path = $this->app->resourcePath('views/admin/category/index.blade.php');
+        yield 'categories without bulk' => [
+            'arguments' => ['table_name' => 'categories', '--without-bulk' => true],
+            'expectedFilePath' => 'resources/views/admin/category/index.blade.php',
+        ];
 
-        self::assertFileDoesNotExist($path);
+        yield 'categories with template admin-user' => [
+            'arguments' => ['table_name' => 'categories', '--template' => 'admin-user'],
+            'expectedFilePath' => 'resources/views/admin/category/index.blade.php',
+        ];
 
-        $this->artisan('admin:generate:blade-index', [
-            'table_name' => 'categories',
-            '--with-export' => true,
-        ]);
+        yield 'categories with template user' => [
+            'arguments' => ['table_name' => 'categories', '--template' => 'user'],
+            'expectedFilePath' => 'resources/views/admin/category/index.blade.php',
+        ];
 
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
-    }
+        yield 'posts default' => [
+            'arguments' => ['table_name' => 'posts'],
+            'expectedFilePath' => 'resources/views/admin/post/index.blade.php',
+        ];
 
-    public function testBladeIndexGeneratorWithoutBulkShouldGenerateView(): void
-    {
-        $path = $this->app->resourcePath('views/admin/category/index.blade.php');
+        yield 'posts with model-name Feed\\Article' => [
+            'arguments' => ['table_name' => 'posts', '--model-name' => 'Feed\\Article'],
+            'expectedFilePath' => 'resources/views/admin/feed/article/index.blade.php',
+        ];
 
-        self::assertFileDoesNotExist($path);
+        yield 'posts with model-name App\\Feed\\Article' => [
+            'arguments' => ['table_name' => 'posts', '--model-name' => 'App\\Feed\\Article'],
+            'expectedFilePath' => 'resources/views/admin/article/index.blade.php',
+        ];
 
-        $this->artisan('admin:generate:blade-index', [
-            'table_name' => 'categories',
-            '--without-bulk' => true,
-        ]);
+        yield 'posts with with-export' => [
+            'arguments' => ['table_name' => 'posts', '--with-export' => true],
+            'expectedFilePath' => 'resources/views/admin/post/index.blade.php',
+        ];
 
-        self::assertFileExists($path);
-        self::assertMatchesFileSnapshot($path);
+        yield 'posts without bulk' => [
+            'arguments' => ['table_name' => 'posts', '--without-bulk' => true],
+            'expectedFilePath' => 'resources/views/admin/post/index.blade.php',
+        ];
     }
 }
