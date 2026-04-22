@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\Billing\CategOryController;
+use App\Http\Controllers\Admin\PostsController;
 
 
 //-- Do not delete me :) I'm used for auto-generation admin routes uses --
@@ -12,10 +12,10 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
     ->prefix('admin')
     ->name('admin/')
     ->group(static function (): void {
-        /* Auto-generated categories routes */
-        Route::prefix('categories')
-            ->name('categories/')
-            ->controller(CategOryController::class)
+        /* Auto-generated articles routes */
+        Route::prefix('articles')
+            ->name('articles/')
+            ->controller(PostsController::class)
             ->group(static function (): void {
                 Route::get('/', 'index')
                     ->name('index');
@@ -23,15 +23,15 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
                     ->name('create');
                 Route::post('/', 'store')
                     ->name('store');
-                Route::get('/{category}/edit', 'edit')
+                Route::get('/{article}/edit', 'edit')
                     ->name('edit');
                 Route::post('/bulk-destroy', 'bulkDestroy')
                     ->name('bulk-destroy');
-                Route::post('/{category}', 'update')
+                Route::post('/{article}', 'update')
                     ->name('update');
-                Route::delete('/{category}', 'destroy')
+                Route::delete('/{article}', 'destroy')
                     ->name('destroy');
             });
-        /* End of categories routes */
+        /* End of articles routes */
         //-- Do not delete me :) I'm used for auto-generation admin routes --
     });

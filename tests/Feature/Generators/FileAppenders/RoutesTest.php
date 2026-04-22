@@ -5,93 +5,21 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\FileAppenders;
 
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class RoutesTest extends TestCase
 {
-    public function testRoutesGeneratorShouldAppend(): void
+    #[DataProvider('getCases')]
+    public function testGeneratorShouldAppend(array $arguments, string $expectedFilePath): void
     {
-        $filePath = $this->app->basePath('routes/admin.php');
+        $filePath = $this->app->basePath($expectedFilePath);
 
-        $this->artisan('admin:generate:routes', [
-            'table_name' => 'categories',
-        ]);
+        $this->artisan('admin:generate:routes', $arguments);
 
         self::assertMatchesFileSnapshot($filePath);
     }
 
-    public function testRoutesGeneratorWithModelNameShouldAppend(): void
-    {
-        $filePath = $this->app->basePath('routes/admin.php');
-
-        $this->artisan('admin:generate:routes', [
-            'table_name' => 'categories',
-            '--model-name' => 'Billing\\CategOry',
-        ]);
-
-        self::assertMatchesFileSnapshot($filePath);
-    }
-
-    public function testRoutesGeneratorWithFullModelNameShouldAppend(): void
-    {
-        $filePath = $this->app->basePath('routes/admin.php');
-
-        $this->artisan('admin:generate:routes', [
-            'table_name' => 'categories',
-            '--model-name' => 'App\\Billing\\Category',
-        ]);
-
-        self::assertMatchesFileSnapshot($filePath);
-    }
-
-    public function testRoutesGeneratorWithControllerNameShouldAppend(): void
-    {
-        $filePath = $this->app->basePath('routes/admin.php');
-
-        $this->artisan('admin:generate:routes', [
-            'table_name' => 'categories',
-            '--controller-name' => 'Billing\\CategOryController',
-        ]);
-
-        self::assertMatchesFileSnapshot($filePath);
-    }
-
-    public function testRoutesGeneratorWithFullControllerNameShouldAppend(): void
-    {
-        $filePath = $this->app->basePath('routes/admin.php');
-
-        $this->artisan('admin:generate:routes', [
-            'table_name' => 'categories',
-            '--controller-name' => 'App\\Http\\Billing\\CategOryController',
-        ]);
-
-        self::assertMatchesFileSnapshot($filePath);
-    }
-
-    public function testRoutesGeneratorWithExportShouldAppend(): void
-    {
-        $filePath = $this->app->basePath('routes/admin.php');
-
-        $this->artisan('admin:generate:routes', [
-            'table_name' => 'categories',
-            '--with-export' => true,
-        ]);
-
-        self::assertMatchesFileSnapshot($filePath);
-    }
-
-    public function testRoutesGeneratorWithoutBulkShouldAppend(): void
-    {
-        $filePath = $this->app->basePath('routes/admin.php');
-
-        $this->artisan('admin:generate:routes', [
-            'table_name' => 'categories',
-            '--without-bulk' => true,
-        ]);
-
-        self::assertMatchesFileSnapshot($filePath);
-    }
-
-    public function testRoutesGeneratorShouldBeIdempotent(): void
+    public function testGeneratorShouldBeIdempotent(): void
     {
         $filePath = $this->app->basePath('routes/admin.php');
 
@@ -108,7 +36,7 @@ class RoutesTest extends TestCase
         self::assertSame($contentAfterFirst, $contentAfterSecond);
     }
 
-    public function testRoutesGeneratorShouldReplaceExistingBlock(): void
+    public function testGeneratorShouldReplaceExistingBlock(): void
     {
         $filePath = $this->app->basePath('routes/admin.php');
 
@@ -128,7 +56,7 @@ class RoutesTest extends TestCase
         self::assertSame(1, substr_count($content, '/* End of categories routes */'));
     }
 
-    public function testRoutesGeneratorShouldAddMultipleResources(): void
+    public function testGeneratorShouldAddMultipleResources(): void
     {
         $filePath = $this->app->basePath('routes/admin.php');
 
@@ -151,5 +79,110 @@ class RoutesTest extends TestCase
             1,
             substr_count($content, "//-- Do not delete me :) I'm used for auto-generation admin routes --"),
         );
+    }
+
+    public static function getCases(): iterable
+    {
+        yield 'categories default' => [
+            'arguments' => ['table_name' => 'categories'],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'categories with model-name Billing\\Cat' => [
+            'arguments' => ['table_name' => 'categories', '--model-name' => 'Billing\\Cat'],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'categories with model-name App\\Billing\\Cat' => [
+            'arguments' => ['table_name' => 'categories', '--model-name' => 'App\\Billing\\Cat'],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'categories with controller-name Billing\\CategoryController' => [
+            'arguments' => [
+                'table_name' => 'categories',
+                '--controller-name' => 'Billing\\CategoryController',
+            ],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'categories with controller-name App\\Http\\Billing\\CategoryController' => [
+            'arguments' => [
+                'table_name' => 'categories',
+                '--controller-name' => 'App\\Http\\Billing\\CategoryController',
+            ],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'categories with with-export' => [
+            'arguments' => ['table_name' => 'categories', '--with-export' => true],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'categories without bulk' => [
+            'arguments' => ['table_name' => 'categories', '--without-bulk' => true],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'categories with template admin-user' => [
+            'arguments' => ['table_name' => 'categories', '--template' => 'admin-user'],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'categories with template user' => [
+            'arguments' => ['table_name' => 'categories', '--template' => 'user'],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'categories with template profile' => [
+            'arguments' => ['table_name' => 'categories', '--template' => 'profile'],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'categories with resource custom-resource' => [
+            'arguments' => ['table_name' => 'categories', '--resource' => 'custom-resource'],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'posts default' => [
+            'arguments' => ['table_name' => 'posts'],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'posts with model-name Feed\\Article' => [
+            'arguments' => ['table_name' => 'posts', '--model-name' => 'Feed\\Article'],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'posts with model-name App\\Feed\\Article' => [
+            'arguments' => ['table_name' => 'posts', '--model-name' => 'App\\Feed\\Article'],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'posts with controller-name Feed\\PostController' => [
+            'arguments' => [
+                'table_name' => 'posts',
+                '--controller-name' => 'Feed\\PostController',
+            ],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'posts with controller-name App\\Http\\Feed\\PostController' => [
+            'arguments' => [
+                'table_name' => 'posts',
+                '--controller-name' => 'App\\Http\\Feed\\PostController',
+            ],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'posts with with-export' => [
+            'arguments' => ['table_name' => 'posts', '--with-export' => true],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
+
+        yield 'posts without bulk' => [
+            'arguments' => ['table_name' => 'posts', '--without-bulk' => true],
+            'expectedFilePath' => 'routes/admin.php',
+        ];
     }
 }

@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 return [
-    'billing_categ-ory' => [
+    'billing_cat' => [
         'title' => 'Categories',
 
         'actions' => [
             'index' => 'Categories',
             'create' => 'New Category',
             'edit' => 'Edit :name',
-            'will_be_published' => 'CategOry will be published at',
+            'will_be_published' => 'Cat will be published at',
         ],
 
         'columns' => [

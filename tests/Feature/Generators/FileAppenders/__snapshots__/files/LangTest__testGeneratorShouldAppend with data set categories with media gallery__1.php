@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 return [
-    'categ-ory' => [
+    'category' => [
         'title' => 'Categories',
 
         'actions' => [
             'index' => 'Categories',
             'create' => 'New Category',
             'edit' => 'Edit :name',
-            'will_be_published' => 'CategOry will be published at',
+            'will_be_published' => 'Category will be published at',
         ],
 
         'columns' => [
@@ -51,6 +51,10 @@ return [
         //Belongs to many relations
         'relations' => [
             'posts' => 'Posts',
+        ],
+
+        'collections' => [
+            'gallery' => 'Gallery',
         ],
     ],
 

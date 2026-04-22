@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Billing\CategOryController;
+use App\Http\Controllers\Admin\Billing\CategoryController;
 
 
 //-- Do not delete me :) I'm used for auto-generation admin routes uses --
@@ -15,7 +15,7 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
         /* Auto-generated categories routes */
         Route::prefix('categories')
             ->name('categories/')
-            ->controller(CategOryController::class)
+            ->controller(CategoryController::class)
             ->group(static function (): void {
                 Route::get('/', 'index')
                     ->name('index');
