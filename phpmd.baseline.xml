@@ -14,8 +14,7 @@
   <violation rule="PHPMD\Rule\Design\TooManyFields" file="src/Generators/Generator.php"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/Generators/Classes/ControllerTest.php" method="getCases"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/Generators/FileAppenders/RoutesTest.php" method="getCases"/>
-  <violation rule="PHPMD\Rule\CyclomaticComplexity" file="tests/Feature/Generators/GenerateAdminUser/DefaultTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
-  <violation rule="PHPMD\Rule\Design\NpathComplexity" file="tests/Feature/Generators/GenerateAdminUser/DefaultTest.php" method="testAllFilesShouldBeGeneratedUnderDefaultNamespace"/>
+  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/Generators/GenerateTest.php" method="getCases"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/Generators/GenerateUserTest.php" method="getCases"/>
   <violation rule="PHPMD\Rule\Design\NumberOfChildren" file="tests/Feature/TestCase.php"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/TestCase.php" method="setUpDatabase"/>

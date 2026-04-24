@@ -176,7 +176,7 @@ final class Generate extends Command
             ]);
         }
 
-        if ($this->shouldGeneratePermissionsMigration()) {
+        if ($this->shouldGeneratePermissionsMigration() || $this->option('force-permissions')) {
             $this->call('admin:generate:permissions', [
                 'table_name' => $tableName,
                 '--model-name' => $modelName,
@@ -204,7 +204,7 @@ final class Generate extends Command
         ];
     }
 
-    /** @return array<array<string|int>> */
+    /** @return array<array<string|int|null>> */
     #[Override]
     protected function getOptions(): array
     {
@@ -222,6 +222,12 @@ final class Generate extends Command
                 'Media collections (format: name:type:disk:maxFiles)',
             ],
             ['seed', 's', InputOption::VALUE_NONE, 'Seeds the table with fake data'],
+            [
+                'force-permissions',
+                null,
+                InputOption::VALUE_NONE,
+                'Force generating permissions migration even if the Craftable service provider is not installed',
+            ],
         ];
     }
 
