@@ -30,6 +30,7 @@
                     'perex' => trans('admin.billing_cat.columns.perex'),
                     'long_text' => trans('admin.billing_cat.columns.long_text'),
                     'published_at' => trans('admin.billing_cat.columns.published_at'),
+                    'published_to' => trans('admin.billing_cat.columns.published_to'),
                     'date_start' => trans('admin.billing_cat.columns.date_start'),
                     'time_start' => trans('admin.billing_cat.columns.time_start'),
                     'date_time_end' => trans('admin.billing_cat.columns.date_time_end'),

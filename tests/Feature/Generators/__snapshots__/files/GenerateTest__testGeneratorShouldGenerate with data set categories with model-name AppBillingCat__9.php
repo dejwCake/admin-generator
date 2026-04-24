@@ -32,6 +32,7 @@
                     'perex' => trans('admin.cat.columns.perex'),
                     'long_text' => trans('admin.cat.columns.long_text'),
                     'published_at' => trans('admin.cat.columns.published_at'),
+                    'published_to' => trans('admin.cat.columns.published_to'),
                     'date_start' => trans('admin.cat.columns.date_start'),
                     'time_start' => trans('admin.cat.columns.time_start'),
                     'date_time_end' => trans('admin.cat.columns.date_time_end'),

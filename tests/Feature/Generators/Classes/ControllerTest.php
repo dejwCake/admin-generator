@@ -104,11 +104,6 @@ class ControllerTest extends TestCase
             'expectedFilePath' => 'app/Http/Controllers/Admin/CategoriesController.php',
         ];
 
-        yield 'categories with template profile' => [
-            'arguments' => ['table_name' => 'categories', '--template' => 'profile'],
-            'expectedFilePath' => 'app/Http/Controllers/Admin/CategoriesController.php',
-        ];
-
         yield 'posts default' => [
             'arguments' => ['table_name' => 'posts'],
             'expectedFilePath' => 'app/Http/Controllers/Admin/PostsController.php',

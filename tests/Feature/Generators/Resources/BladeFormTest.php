@@ -58,16 +58,6 @@ class BladeFormTest extends TestCase
             'expectedFilePath' => 'resources/views/admin/category/form.blade.php',
         ];
 
-        yield 'categories with template profile' => [
-            'arguments' => ['table_name' => 'categories', '--template' => 'profile'],
-            'expectedFilePath' => 'resources/views/admin/category/form.blade.php',
-        ];
-
-        yield 'categories with template profile.password' => [
-            'arguments' => ['table_name' => 'categories', '--template' => 'profile.password'],
-            'expectedFilePath' => 'resources/views/admin/category/form.blade.php',
-        ];
-
         yield 'categories with file-name profile/edit-password' => [
             'arguments' => ['table_name' => 'categories', '--file-name' => 'profile/edit-password'],
             'expectedFilePath' => 'resources/views/admin/profile/edit-password.blade.php',

@@ -121,6 +121,15 @@
                         />
 
                         <FormDatePicker
+                            v-model="form.published_to"
+                            name="published_to"
+                            :label="translations.columns.published_to"
+                            :error="errors.published_to"
+                            :config="datePickerConfig"
+                            :placeholder="translations.select_a_date"
+                        />
+
+                        <FormDatePicker
                             v-model="form.date_start"
                             name="date_start"
                             :label="translations.columns.date_start"
@@ -351,6 +360,7 @@ if (!props.data || Object.keys(props.data).length === 0) {
         slug: '',
         perex: '',
         long_text: getLocalizedFormDefaults(),
+        published_to: '',
         date_start: '',
         time_start: '',
         date_time_end: '',

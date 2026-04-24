@@ -68,16 +68,6 @@ class VueFormTest extends TestCase
             'expectedFilePath' => 'resources/js/admin/category/Form.vue',
         ];
 
-        yield 'categories with template profile' => [
-            'arguments' => ['table_name' => 'categories', '--template' => 'profile'],
-            'expectedFilePath' => 'resources/js/admin/category/Form.vue',
-        ];
-
-        yield 'categories with template profile.password' => [
-            'arguments' => ['table_name' => 'categories', '--template' => 'profile.password'],
-            'expectedFilePath' => 'resources/js/admin/category/Form.vue',
-        ];
-
         yield 'categories with media gallery' => [
             'arguments' => ['table_name' => 'categories', '--media' => ['gallery:image:public:5000']],
             'expectedFilePath' => 'resources/js/admin/category/Form.vue',

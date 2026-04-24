@@ -28,6 +28,7 @@
                 'language' => trans('admin.category.columns.language'),
                 'long_text' => trans('admin.category.columns.long_text'),
                 'published_at' => trans('admin.category.columns.published_at'),
+                'published_to' => trans('admin.category.columns.published_to'),
                 'date_start' => trans('admin.category.columns.date_start'),
                 'time_start' => trans('admin.category.columns.time_start'),
                 'date_time_end' => trans('admin.category.columns.date_time_end'),

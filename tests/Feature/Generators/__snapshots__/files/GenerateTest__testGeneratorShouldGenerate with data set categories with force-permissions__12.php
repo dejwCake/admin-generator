@@ -31,6 +31,7 @@ final class CategoryFactory extends Factory
             'slug' => $this->faker->unique()->slug,
             'perex' => $this->faker->text(),
             'published_at' => $this->faker->date(),
+            'published_to' => $this->faker->date(),
             'date_start' => $this->faker->date(),
             'time_start' => $this->faker->time(),
             'date_time_end' => $this->faker->dateTime,

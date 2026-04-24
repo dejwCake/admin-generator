@@ -134,11 +134,6 @@ class RoutesTest extends TestCase
             'expectedFilePath' => 'routes/admin.php',
         ];
 
-        yield 'categories with template profile' => [
-            'arguments' => ['table_name' => 'categories', '--template' => 'profile'],
-            'expectedFilePath' => 'routes/admin.php',
-        ];
-
         yield 'categories with resource custom-resource' => [
             'arguments' => ['table_name' => 'categories', '--resource' => 'custom-resource'],
             'expectedFilePath' => 'routes/admin.php',

@@ -37,6 +37,7 @@ final class IndexCategory extends FormRequest
                     'language',
                     'long_text',
                     'published_at',
+                    'published_to',
                     'date_start',
                     'time_start',
                     'date_time_end',

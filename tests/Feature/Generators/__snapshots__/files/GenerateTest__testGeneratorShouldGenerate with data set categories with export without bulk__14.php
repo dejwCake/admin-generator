@@ -31,6 +31,7 @@ return [
             'perex' => 'Perex',
             'long_text' => 'Long text',
             'published_at' => 'Published at',
+            'published_to' => 'Published to',
             'date_start' => 'Date start',
             'time_start' => 'Time start',
             'date_time_end' => 'Date time end',

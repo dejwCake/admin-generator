@@ -37,6 +37,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property string|null $perex
  * @property array|null $long_text
  * @property CarbonInterface|null $published_at
+ * @property CarbonInterface|null $published_to
  * @property CarbonInterface|null $date_start
  * @property string|null $time_start
  * @property CarbonInterface|null $date_time_end
@@ -85,6 +86,7 @@ final class Category extends Model implements HasMedia
         'perex',
         'long_text',
         'published_at',
+        'published_to',
         'date_start',
         'time_start',
         'date_time_end',
@@ -193,6 +195,7 @@ final class Category extends Model implements HasMedia
             'enabled' => 'boolean',
             'send' => 'boolean',
             'published_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
+            'published_to' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'date_start' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'date_time_end' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'released_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,

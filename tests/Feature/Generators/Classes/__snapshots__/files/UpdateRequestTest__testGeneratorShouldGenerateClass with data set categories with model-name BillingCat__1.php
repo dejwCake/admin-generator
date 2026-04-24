@@ -94,6 +94,10 @@ final class UpdateCat extends TranslatableFormRequest
                 'nullable',
                 'date',
             ],
+            'published_to' => [
+                'nullable',
+                'date',
+            ],
             'date_start' => [
                 'nullable',
                 'date',
