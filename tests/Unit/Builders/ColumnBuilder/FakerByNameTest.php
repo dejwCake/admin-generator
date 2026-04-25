@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 final class FakerByNameTest extends TestCase
 {
-    private ColumnBuilder $columnBuilder;
+    private readonly ColumnBuilder $columnBuilder;
 
     protected function setUp(): void
     {

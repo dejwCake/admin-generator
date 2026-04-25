@@ -90,9 +90,9 @@ abstract class Generator extends Command
         }
         $this->modelFullName = $modelGenerator->qualifyClass($modelName);
 
-        $this->modelBaseName = class_basename($modelName);
-        $this->modelPlural = Str::plural(class_basename($modelName));
-        $this->modelVariableName = Str::lcfirst(Str::singular(class_basename($this->modelBaseName)));
+        $this->modelBaseName = basename(str_replace('\\', '/', $modelName));
+        $this->modelPlural = Str::plural($this->modelBaseName);
+        $this->modelVariableName = Str::lcfirst(Str::singular($this->modelBaseName));
         $this->modelRouteAndViewName = Str::lower(Str::kebab($this->modelBaseName));
         $this->modelNamespace = Str::replaceLast('\\' . $this->modelBaseName, '', $this->modelFullName);
         $this->modelWithNamespaceFromDefault =

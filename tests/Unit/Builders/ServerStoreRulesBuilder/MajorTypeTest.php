@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 final class MajorTypeTest extends TestCase
 {
-    private ServerStoreRulesBuilder $serverStoreRulesBuilder;
+    private readonly ServerStoreRulesBuilder $serverStoreRulesBuilder;
 
     protected function setUp(): void
     {

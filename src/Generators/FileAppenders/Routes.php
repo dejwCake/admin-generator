@@ -66,7 +66,7 @@ final class Routes extends FileAppender
             $this->withoutBulk = true;
         }
 
-        $routesPath = base_path('routes/admin.php');
+        $routesPath = $this->laravel->basePath('routes/admin.php');
         $insertMarker = "//-- Do not delete me :) I'm used for auto-generation admin routes --";
         $useMarker = PHP_EOL . "//-- Do not delete me :) I'm used for auto-generation admin routes uses --";
 
@@ -115,7 +115,7 @@ final class Routes extends FileAppender
     {
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
-            'controllerBaseName' => class_basename($this->controllerFullName),
+            'controllerBaseName' => basename(str_replace('\\', '/', $this->controllerFullName)),
             'modelVariableName' => $this->modelVariableName,
             'resource' => $this->resource,
             //has

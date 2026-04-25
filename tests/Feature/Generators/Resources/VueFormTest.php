@@ -7,7 +7,7 @@ namespace Brackets\AdminGenerator\Tests\Feature\Generators\Resources;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class VueFormTest extends TestCase
+final class VueFormTest extends TestCase
 {
     #[DataProvider('getCases')]
     public function testGeneratorShouldGenerateComponent(array $arguments, string $expectedFilePath): void

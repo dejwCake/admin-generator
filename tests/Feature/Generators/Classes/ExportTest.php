@@ -7,7 +7,7 @@ namespace Brackets\AdminGenerator\Tests\Feature\Generators\Classes;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class ExportTest extends TestCase
+final class ExportTest extends TestCase
 {
     #[DataProvider('getCases')]
     public function testGeneratorShouldGenerateClass(array $arguments, string $expectedFilePath): void

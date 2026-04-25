@@ -7,7 +7,7 @@ namespace Brackets\AdminGenerator\Tests\Feature\Generators\Classes;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class ImpersonalLoginRequestTest extends TestCase
+final class ImpersonalLoginRequestTest extends TestCase
 {
     #[DataProvider('getCases')]
     public function testGeneratorShouldGenerateClass(array $arguments, string $expectedFilePath): void

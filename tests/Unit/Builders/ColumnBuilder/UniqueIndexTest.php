@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 final class UniqueIndexTest extends TestCase
 {
-    private ColumnBuilder $columnBuilder;
+    private readonly ColumnBuilder $columnBuilder;
 
     protected function setUp(): void
     {

@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 
 final class SometimesTest extends TestCase
 {
-    private ServerUpdateRulesBuilder $serverUpdateRulesBuilder;
+    private readonly ServerUpdateRulesBuilder $serverUpdateRulesBuilder;
 
     protected function setUp(): void
     {

@@ -7,7 +7,7 @@ namespace Brackets\AdminGenerator\Tests\Feature\Generators\Resources;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class BladeEditTest extends TestCase
+final class BladeEditTest extends TestCase
 {
     #[DataProvider('getCases')]
     public function testGeneratorShouldGenerateView(array $arguments, string $expectedFilePath): void

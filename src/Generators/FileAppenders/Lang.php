@@ -72,7 +72,7 @@ final class Lang extends FileAppender
 
         if (
             $this->replaceOrInsertBlock(
-                lang_path(sprintf('%s/admin.php', $locale)),
+                $this->laravel->langPath(sprintf('%s/admin.php', $locale)),
                 $this->modelLangFormat,
                 $this->buildContent() . PHP_EOL,
                 $markerText,

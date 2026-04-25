@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 final class MediaCollectionBuilderTest extends TestCase
 {
-    private MediaCollectionBuilder $mediaCollectionBuilder;
+    private readonly MediaCollectionBuilder $mediaCollectionBuilder;
 
     protected function setUp(): void
     {

@@ -7,7 +7,7 @@ namespace Brackets\AdminGenerator\Tests\Feature\Generators\FileAppenders;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class RoutesTest extends TestCase
+final class RoutesTest extends TestCase
 {
     #[DataProvider('getCases')]
     public function testGeneratorShouldAppend(array $arguments, string $expectedFilePath): void

@@ -87,7 +87,7 @@ abstract class ClassGenerator extends Generator
 
     protected function generateClass(bool $force = false): bool
     {
-        $path = base_path($this->getPathFromClassName($this->classFullName));
+        $path = $this->laravel->basePath($this->getPathFromClassName($this->classFullName));
 
         if ($this->alreadyExists($path)) {
             if ($force) {
@@ -147,7 +147,7 @@ abstract class ClassGenerator extends Generator
         }
 
         $this->classFullName = $this->qualifyClass($className);
-        $this->classBaseName = class_basename($this->classFullName);
+        $this->classBaseName = basename(str_replace('\\', '/', $this->classFullName));
         $this->classNamespace = Str::replaceLast('\\' . $this->classBaseName, '', $this->classFullName);
     }
 }

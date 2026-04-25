@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 final class NameBasedTest extends TestCase
 {
-    private ServerStoreRulesBuilder $serverStoreRulesBuilder;
+    private readonly ServerStoreRulesBuilder $serverStoreRulesBuilder;
 
     protected function setUp(): void
     {

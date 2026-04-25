@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 final class FrontendRulesBuilderTest extends TestCase
 {
-    private FrontendRulesBuilder $builder;
+    private readonly FrontendRulesBuilder $builder;
 
     protected function setUp(): void
     {

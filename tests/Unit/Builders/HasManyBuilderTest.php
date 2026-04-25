@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 final class HasManyBuilderTest extends TestCase
 {
-    private HasManyBuilder $builder;
+    private readonly HasManyBuilder $builder;
 
     protected function setUp(): void
     {
