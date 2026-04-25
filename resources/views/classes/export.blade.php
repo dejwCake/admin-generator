@@ -16,13 +16,9 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class {{ $classBaseName }} implements FromCollection, WithMapping, WithHeadings
+final class {{ $classBaseName }} implements FromCollection, WithMapping, WithHeadings
 {
-    /**
-     * {{'@'}}return Collection
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
-     */
-    public function collection()
+    public function collection(): Collection
     {
         return {{ $modelBaseName }}::all();
     }
