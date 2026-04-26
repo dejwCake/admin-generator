@@ -2,34 +2,40 @@
 
 declare(strict_types=1);
 
-return [
-    'user' => [
-        'title' => 'Users',
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\UsersController;
 
-        'actions' => [
-            'index' => 'Users',
-            'create' => 'New User',
-            'edit' => 'Edit :name',
-            'export' => 'Export',
-        ],
 
-        'columns' => [
-            'id' => 'ID',
-            'name' => 'Name',
-            'email' => 'Email',
-            'email_verified_at' => 'Email verified at',
-            'password' => 'Password',
-            'password_repeat' => 'Password Confirmation',
-            'remember_token' => 'Remember token',
-            'created_at' => 'Created at',
-            'updated_at' => 'Updated at',
-        ],
+//-- Do not delete me :) I'm used for auto-generation admin routes uses --
 
-        //Belongs to many relations
-        'relations' => [
-            'roles' => 'Roles',
-        ],
-    ],
-
-    //-- Do not delete me :) I'm used for auto-generation language arrays --
-];
+Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
+    ->prefix('admin')
+    ->name('admin/')
+    ->group(static function (): void {
+        /* Auto-generated users routes */
+        Route::prefix('users')
+            ->name('users/')
+            ->controller(UsersController::class)
+            ->group(static function (): void {
+                Route::get('/', 'index')
+                    ->name('index');
+                Route::get('/create', 'create')
+                    ->name('create');
+                Route::post('/', 'store')
+                    ->name('store');
+                Route::get('/{user}/edit', 'edit')
+                    ->name('edit');
+                Route::post('/{user}', 'update')
+                    ->name('update');
+                Route::delete('/{user}', 'destroy')
+                    ->name('destroy');
+                Route::get('/export', 'export')
+                    ->name('export');
+                Route::get('/{user}/resend-verify-email', 'resendVerifyEmail')
+                    ->name('resend-verify-email');
+                Route::get('/{user}/impersonal-login', 'impersonalLogin')
+                    ->name('impersonal-login');
+            });
+        /* End of users routes */
+        //-- Do not delete me :) I'm used for auto-generation admin routes --
+    });

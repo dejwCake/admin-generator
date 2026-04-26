@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\User\BulkDestroyUser;
 use App\Http\Requests\Admin\User\DestroyUser;
+use App\Http\Requests\Admin\User\ImpersonalLoginUser;
 use App\Http\Requests\Admin\User\IndexUser;
 use App\Http\Requests\Admin\User\StoreUser;
 use App\Http\Requests\Admin\User\UpdateUser;
@@ -16,6 +17,7 @@ use Brackets\AdminListing\Builders\ListingQueryBuilder;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Routing\UrlGenerator;
@@ -95,6 +97,11 @@ final class UsersController extends Controller
                     'admin/users/resend-verify-email',
                     ['user' => ':id'],
                 ),
+                'impersonalLoginUrlTemplate' => $this->urlGenerator->route(
+                    'admin/users/impersonal-login',
+                    ['user' => ':id'],
+                ),
+                'canImpersonalLogin' => $this->gate->check('admin.user.impersonal-login'),
             ],
         );
     }
@@ -247,6 +254,22 @@ final class UsersController extends Controller
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
+
+        return $this->redirector->back();
+    }
+
+    /**
+     * Impersonal login as user
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function impersonalLogin(
+        ImpersonalLoginUser $request,
+        User $user,
+        AuthFactory $auth,
+    ): RedirectResponse {
+        $auth->guard($this->guard)
+            ->login($user);
 
         return $this->redirector->back();
     }

@@ -2,46 +2,38 @@
 
 declare(strict_types=1);
 
-use Brackets\Craftable\Database\Migrations\PermissionMigration;
+namespace App\Http\Requests\Admin\User;
+
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
 
-return new class extends PermissionMigration
+final class BulkDestroyUser extends FormRequest
 {
-    public function __construct()
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(Gate $gate): bool
     {
-        parent::__construct();
-
-        $this->setPermissionsAndRoles(
-            new Collection([
-                'admin.user',
-                'admin.user.index',
-                'admin.user.create',
-                'admin.user.show',
-                'admin.user.edit',
-                'admin.user.delete',
-                'admin.user.bulk-delete',
-            ]),
-            new Collection(),
-        );
+        return $gate->allows('admin.user.bulk-delete');
     }
 
     /**
-     * Run the migrations.
-     *
-     * @throws Exception
+     * Get the validation rules that apply to the request.
      */
-    public function up(): void
+    public function rules(): array
     {
-        $this->migrateUp();
+        return [
+            'ids.*' => [
+                'integer',
+            ],
+        ];
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @throws Exception
-     */
-    public function down(): void
+    public function getIds(): Collection
     {
-        $this->migrateDown();
+        $data = $this->validated();
+
+        return new Collection($data['ids'] ?? []);
     }
-};
+}

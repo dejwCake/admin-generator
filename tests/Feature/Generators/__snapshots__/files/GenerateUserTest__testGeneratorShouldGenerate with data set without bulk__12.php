@@ -2,36 +2,35 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\UsersController;
+namespace Database\Factories;
 
+use App\Models\User;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-//-- Do not delete me :) I'm used for auto-generation admin routes uses --
+#[UseModel(User::class)]
+final class UserFactory extends Factory
+{
+    public function definition(): array
+    {
+        $hasher = Container::getInstance()->make(Hasher::class);
 
-Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
-    ->prefix('admin')
-    ->name('admin/')
-    ->group(static function (): void {
-        /* Auto-generated users routes */
-        Route::prefix('users')
-            ->name('users/')
-            ->controller(UsersController::class)
-            ->group(static function (): void {
-                Route::get('/', 'index')
-                    ->name('index');
-                Route::get('/create', 'create')
-                    ->name('create');
-                Route::post('/', 'store')
-                    ->name('store');
-                Route::get('/{user}/edit', 'edit')
-                    ->name('edit');
-                Route::post('/{user}', 'update')
-                    ->name('update');
-                Route::delete('/{user}', 'destroy')
-                    ->name('destroy');
-                Route::get('/{user}/resend-verify-email', 'resendVerifyEmail')
-                    ->name('resend-verify-email');
-            });
-        /* End of users routes */
-        //-- Do not delete me :) I'm used for auto-generation admin routes --
-    });
+        return [
+            'name' => $this->faker->firstName,
+            'email' => $this->faker->email,
+            'email_verified_at' => $this->faker->dateTime,
+            'password' => $hasher->make($this->faker->password),
+            'remember_token' => null,
+            'created_at' => $this->faker->dateTime,
+            'updated_at' => $this->faker->dateTime,
+        ];
+    }
+
+    public function unverified(): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(static fn (array $attributes) => ['email_verified_at' => null]);
+    }
+}

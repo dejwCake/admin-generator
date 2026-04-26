@@ -1,6 +1,6 @@
 @extends('brackets/admin-ui::admin.layout.default')
 
-@section('title', trans('admin.auth_user.actions.edit', ['name' => $user->name]))
+@section('title', trans('admin.auth_user.actions.create'))
 
 @section('body')
 
@@ -8,10 +8,9 @@
 
         <auth-user-form
             :action="'{{ $action }}'"
-            :data="{{ $user->toJson() }}"
             :role-options="{{ $roles->toJson() }}"
             :translations="{{ json_encode([
-                'form_title' => trans('admin.auth_user.actions.edit', ['name' => $user->name]),
+                'form_title' => trans('admin.auth_user.actions.create'),
                 'columns' => [
                     'name' => trans('admin.auth_user.columns.name'),
                     'email' => trans('admin.auth_user.columns.email'),

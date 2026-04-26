@@ -24,6 +24,9 @@ return new class extends PermissionMigration
 @if($hasBulk)
                 'admin.{{ $modelDotNotation }}.bulk-delete',
 @endif
+@if($hasImpersonalLogin)
+                'admin.{{ $modelDotNotation }}.impersonal-login',
+@endif
             ]),
             new Collection(),
         );

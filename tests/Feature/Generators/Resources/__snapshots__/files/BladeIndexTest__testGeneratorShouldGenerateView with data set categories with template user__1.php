@@ -14,6 +14,8 @@
         :bulk-all-url="'{{ $bulkAllUrl }}'"
         :bulk-destroy-url="'{{ $bulkDestroyUrl }}'"
         :resend-verify-email-url-template="'{{ $resendVerifyEmailUrlTemplate }}'"
+        :impersonal-login-url-template="'{{ $impersonalLoginUrlTemplate }}'"
+        :can-impersonal-login="{{ json_encode($canImpersonalLogin) }}"
         :translations="{{ json_encode([
             'listing_title' => trans('admin.category.actions.index'),
             'create_btn' => trans('admin.category.actions.create'),
@@ -43,6 +45,7 @@
                 'updated_by_admin_user_id' => trans('admin.category.columns.updated_by_admin_user_id'),
             ],
             'resend_verify_email_btn' => trans('admin.category.actions.resend_verify_email'),
+            'impersonal_login_btn' => trans('brackets/admin-ui::admin.operation.impersonal_login'),
             'search_placeholder' => trans('brackets/admin-ui::admin.placeholder.search'),
             'search_btn' => trans('brackets/admin-ui::admin.btn.search'),
             'edit_btn' => trans('brackets/admin-ui::admin.btn.edit'),

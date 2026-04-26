@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Category\BulkDestroyCategory;
 use App\Http\Requests\Admin\Category\DestroyCategory;
+use App\Http\Requests\Admin\Category\ImpersonalLoginCategory;
 use App\Http\Requests\Admin\Category\IndexCategory;
 use App\Http\Requests\Admin\Category\StoreCategory;
 use App\Http\Requests\Admin\Category\UpdateCategory;
@@ -17,6 +18,7 @@ use Brackets\AdminListing\Builders\ListingQueryBuilder;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Routing\UrlGenerator;
@@ -135,6 +137,11 @@ final class CategoriesController extends Controller
                     'admin/categories/resend-verify-email',
                     ['category' => ':id'],
                 ),
+                'impersonalLoginUrlTemplate' => $this->urlGenerator->route(
+                    'admin/categories/impersonal-login',
+                    ['category' => ':id'],
+                ),
+                'canImpersonalLogin' => $this->gate->check('admin.category.impersonal-login'),
             ],
         );
     }
@@ -292,6 +299,22 @@ final class CategoriesController extends Controller
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
+
+        return $this->redirector->back();
+    }
+
+    /**
+     * Impersonal login as user
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function impersonalLogin(
+        ImpersonalLoginCategory $request,
+        Category $category,
+        AuthFactory $auth,
+    ): RedirectResponse {
+        $auth->guard($this->guard)
+            ->login($category);
 
         return $this->redirector->back();
     }

@@ -33,6 +33,8 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
                     ->name('destroy');
                 Route::get('/{category}/resend-verify-email', 'resendVerifyEmail')
                     ->name('resend-verify-email');
+                Route::get('/{category}/impersonal-login', 'impersonalLogin')
+                    ->name('impersonal-login');
             });
         /* End of categories routes */
         //-- Do not delete me :) I'm used for auto-generation admin routes --

@@ -140,6 +140,12 @@ final class GenerateUser extends Command
             ]);
         }
 
+        $this->call('admin:generate:request:impersonal-login', [
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+        ]);
+
         $this->call('admin:generate:routes', [
             'table_name' => $tableName,
             '--model-name' => $modelName,
@@ -221,6 +227,7 @@ final class GenerateUser extends Command
                 '--model-name' => $modelName,
                 '--force' => $force,
                 '--without-bulk' => $withoutBulk,
+                '--with-impersonal-login' => true,
             ]);
 
             if (

@@ -26,5 +26,7 @@
 @endif
                 Route::get('/{{ '{' }}{{ $modelVariableName }}}/resend-verify-email', 'resendVerifyEmail')
                     ->name('resend-verify-email');
+                Route::get('/{{ '{' }}{{ $modelVariableName }}}/impersonal-login', 'impersonalLogin')
+                    ->name('impersonal-login');
             });
         /* End of {{ $resource }} routes */

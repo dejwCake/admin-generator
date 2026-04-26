@@ -23,6 +23,7 @@ namespace {{ $controllerNamespace }};
         'Exception',
         'Illuminate\Auth\Access\AuthorizationException',
         'Illuminate\Contracts\Auth\Access\Gate',
+        'Illuminate\Contracts\Auth\Factory as AuthFactory',
         'Illuminate\Contracts\Auth\MustVerifyEmail',
         'Illuminate\Contracts\Config\Repository as Config',
         'Illuminate\Contracts\Routing\UrlGenerator',
@@ -33,6 +34,7 @@ namespace {{ $controllerNamespace }};
         'Illuminate\Routing\Redirector',
         'Symfony\Component\HttpKernel\Exception\HttpException',
         sprintf('App\Http\Requests\Admin\%s\Destroy%s', $modelWithNamespaceFromDefault, $modelBaseName),
+        sprintf('App\Http\Requests\Admin\%s\ImpersonalLogin%s', $modelWithNamespaceFromDefault, $modelBaseName),
         sprintf('App\Http\Requests\Admin\%s\Index%s', $modelWithNamespaceFromDefault, $modelBaseName),
         sprintf('App\Http\Requests\Admin\%s\Store%s', $modelWithNamespaceFromDefault, $modelBaseName),
         sprintf('App\Http\Requests\Admin\%s\Update%s', $modelWithNamespaceFromDefault, $modelBaseName),
@@ -144,6 +146,11 @@ final class {{ $controllerBaseName }} extends Controller
                     'admin/{{ $resource }}/resend-verify-email',
                     ['{{ $modelVariableName }}' => ':id'],
                 ),
+                'impersonalLoginUrlTemplate' => $this->urlGenerator->route(
+                    'admin/{{ $resource }}/impersonal-login',
+                    ['{{ $modelVariableName }}' => ':id'],
+                ),
+                'canImpersonalLogin' => $this->gate->check('admin.{{ $modelDotNotation }}.impersonal-login'),
             ],
         );
     }
@@ -364,6 +371,22 @@ final class {{ $controllerBaseName }} extends Controller
                 'message' => trans('brackets/admin-ui::admin.operation.succeeded'),
             ];
         }
+
+        return $this->redirector->back();
+    }
+
+    /**
+     * Impersonal login as user
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function impersonalLogin(
+        ImpersonalLogin{{ $modelBaseName }} $request,
+        {{ $modelBaseName }} ${{ $modelVariableName }},
+        AuthFactory $auth,
+    ): RedirectResponse {
+        $auth->guard($this->guard)
+            ->login(${{ $modelVariableName }});
 
         return $this->redirector->back();
     }

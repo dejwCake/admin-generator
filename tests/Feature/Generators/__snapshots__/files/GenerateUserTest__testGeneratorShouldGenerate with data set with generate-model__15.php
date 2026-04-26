@@ -2,75 +2,38 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Http\Requests\Admin\User;
 
-use Brackets\AdminAuth\Notifications\ResetPassword;
-use Carbon\CarbonInterface;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Collection;
 
-/**
- * @property int $id
- * @property string $name
- * @property string $email
- * @property CarbonInterface|null $email_verified_at
- * @property string $password
- * @property string|null $remember_token
- * @property CarbonInterface|null $created_at
- * @property CarbonInterface|null $updated_at
- */
-final class User extends Authenticatable implements MustVerifyEmail
+final class BulkDestroyUser extends FormRequest
 {
-    use HasFactory;
-    use HasRoles;
-    use Notifiable;
-
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     * Determine if the user is authorized to make this request.
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'email_verified_at',
-        'password',
-    ];
-
-    /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
-     * Send the password reset notification.
-     *
-     * @param string $token
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
-     */
-    public function sendPasswordResetNotification($token): void
+    public function authorize(Gate $gate): bool
     {
-        $this->notify(app(ResetPassword::class, ['token' => $token]));
+        return $gate->allows('admin.user.bulk-delete');
     }
 
     /**
-     * @return array<string>
+     * Get the validation rules that apply to the request.
      */
-    protected function casts(): array
+    public function rules(): array
     {
         return [
-            'email_verified_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
-            'created_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
-            'updated_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
-            'password' => 'hashed',
+            'ids.*' => [
+                'integer',
+            ],
         ];
+    }
+
+    public function getIds(): Collection
+    {
+        $data = $this->validated();
+
+        return new Collection($data['ids'] ?? []);
     }
 }

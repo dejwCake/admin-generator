@@ -1,45 +1,31 @@
-@extends('brackets/admin-ui::admin.layout.default')
+<?php
 
-@section('title', trans('admin.user.actions.index'))
+declare(strict_types=1);
 
-@section('body')
+namespace App\Http\Requests\Admin\User;
 
-    <user-listing
-        :data="{{ $data->toJson() }}"
-        :url="'{{ $url }}'"
-        :create-url="'{{ $createUrl }}'"
-        :edit-url-template="'{{ $editUrlTemplate }}'"
-        :update-url-template="'{{ $updateUrlTemplate }}'"
-        :destroy-url-template="'{{ $destroyUrlTemplate }}'"
-        :resend-verify-email-url-template="'{{ $resendVerifyEmailUrlTemplate }}'"
-        :translations="{{ json_encode([
-            'listing_title' => trans('admin.user.actions.index'),
-            'create_btn' => trans('admin.user.actions.create'),
-            'columns' => [
-                'id' => trans('admin.user.columns.id'),
-                'name' => trans('admin.user.columns.name'),
-                'email' => trans('admin.user.columns.email'),
-                'email_verified_at' => trans('admin.user.columns.email_verified_at'),
-            ],
-            'resend_verify_email_btn' => trans('admin.user.actions.resend_verify_email'),
-            'search_placeholder' => trans('brackets/admin-ui::admin.placeholder.search'),
-            'search_btn' => trans('brackets/admin-ui::admin.btn.search'),
-            'edit_btn' => trans('brackets/admin-ui::admin.btn.edit'),
-            'delete_btn' => trans('brackets/admin-ui::admin.btn.delete'),
-            'confirm_delete_title' => trans('brackets/admin-ui::admin.operation.confirm_delete_title'),
-            'confirm_delete_text' => trans('brackets/admin-ui::admin.operation.confirm_delete_text'),
-            'confirm_delete_text_multiple' => trans('brackets/admin-ui::admin.operation.confirm_delete_text_multiple'),
-            'cancel_btn' => trans('brackets/admin-ui::admin.btn.cancel'),
-            'selected_items' => trans('brackets/admin-ui::admin.listing.selected_items'),
-            'check_all_items' => trans('brackets/admin-ui::admin.listing.check_all_items'),
-            'uncheck_all_items' => trans('brackets/admin-ui::admin.listing.uncheck_all_items'),
-            'overview' => trans('brackets/admin-ui::admin.pagination.overview'),
-            'previous' => trans('brackets/admin-ui::admin.pagination.previous'),
-            'next' => trans('brackets/admin-ui::admin.pagination.next'),
-            'no_items' => trans('brackets/admin-ui::admin.index.no_items'),
-            'try_changing_items' => trans('brackets/admin-ui::admin.index.try_changing_items'),
-        ]) }}"
-        v-cloak
-    ></user-listing>
+use App\Models\User;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Http\FormRequest;
 
-@endsection
+/**
+ * @property User $user
+ */
+final class ImpersonalLoginUser extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(Gate $gate): bool
+    {
+        return $gate->allows('admin.user.impersonal-login', $this->user);
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     */
+    public function rules(): array
+    {
+        return [];
+    }
+}

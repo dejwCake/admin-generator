@@ -2,38 +2,37 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\Admin\User;
+return [
+    'user' => [
+        'title' => 'Users',
 
-use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Collection;
+        'actions' => [
+            'index' => 'Users',
+            'create' => 'New User',
+            'edit' => 'Edit :name',
+        ],
 
-final class BulkDestroyUser extends FormRequest
-{
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(Gate $gate): bool
-    {
-        return $gate->allows('admin.user.bulk-delete');
-    }
+        'columns' => [
+            'id' => 'ID',
+            'name' => 'Name',
+            'email' => 'Email',
+            'email_verified_at' => 'Email verified at',
+            'password' => 'Password',
+            'password_repeat' => 'Password Confirmation',
+            'remember_token' => 'Remember token',
+            'created_at' => 'Created at',
+            'updated_at' => 'Updated at',
+        ],
 
-    /**
-     * Get the validation rules that apply to the request.
-     */
-    public function rules(): array
-    {
-        return [
-            'ids.*' => [
-                'integer',
-            ],
-        ];
-    }
+        //Belongs to many relations
+        'relations' => [
+            'roles' => 'Roles',
+        ],
 
-    public function getIds(): Collection
-    {
-        $data = $this->validated();
+        'collections' => [
+            'gallery' => 'Gallery',
+        ],
+    ],
 
-        return new Collection($data['ids'] ?? []);
-    }
-}
+    //-- Do not delete me :) I'm used for auto-generation language arrays --
+];

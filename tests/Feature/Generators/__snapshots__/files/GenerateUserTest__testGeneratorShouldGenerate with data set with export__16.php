@@ -2,42 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Exports;
+namespace App\Http\Requests\Admin\User;
 
-use App\Models\User;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Http\FormRequest;
 
-final class UsersExport implements FromCollection, WithMapping, WithHeadings
+final class ExportUser extends FormRequest
 {
-    public function collection(): Collection
-    {
-        return User::all();
-    }
-
-    public function headings(): array
-    {
-        return [
-            trans('admin.user.columns.id'),
-            trans('admin.user.columns.name'),
-            trans('admin.user.columns.email'),
-            trans('admin.user.columns.email_verified_at'),
-        ];
-    }
-
     /**
-     * @param User $user
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * Determine if the user is authorized to make this request.
      */
-    public function map($user): array
+    public function authorize(Gate $gate): bool
     {
-        return [
-            $user->id,
-            $user->name,
-            $user->email,
-            $user->email_verified_at,
-        ];
+        return $gate->allows('admin.user.index');
     }
 }

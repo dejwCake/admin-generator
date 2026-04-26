@@ -60,6 +60,11 @@ final class PermissionsTest extends TestCase
             'migrationFile' => 'fill_permissions_for_category.php',
         ];
 
+        yield 'categories with-impersonal-login' => [
+            'arguments' => ['table_name' => 'categories', '--with-impersonal-login' => true],
+            'migrationFile' => 'fill_permissions_for_category.php',
+        ];
+
         yield 'posts default' => [
             'arguments' => ['table_name' => 'posts'],
             'migrationFile' => 'fill_permissions_for_post.php',

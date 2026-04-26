@@ -1,104 +1,163 @@
 <template>
-    <form class="form-horizontal" method="post" @submit.prevent="onSubmit" :action="action" novalidate>
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fa" :class="data && Object.keys(data).length > 0 ? 'fa-pencil' : 'fa-plus'"></i>
-                        {{ translations.form_title }}
-                    </div>
-                    <div class="card-body">
-                        <FormInput
-                            v-model="form.name"
-                            name="name"
-                            :label="translations.columns.name"
-                            :error="errors.name"
-                        />
-
-                        <FormEmail
-                            v-model="form.email"
-                            name="email"
-                            :label="translations.columns.email"
-                            :error="errors.email"
-                        />
-
-                        <FormDatePicker
-                            v-model="form.email_verified_at"
-                            name="email_verified_at"
-                            :label="translations.columns.email_verified_at"
-                            :error="errors.email_verified_at"
-                            :config="datetimePickerConfig"
-                            :placeholder="translations.select_date_and_time"
-                        />
-
-                        <FormPasswordConfirm
-                            v-model:password="form.password"
-                            v-model:passwordConfirmation="form.password_confirmation"
-                            :passwordError="errors.password"
-                            :confirmationError="errors.password_confirmation"
-                            :translations="{
-                                password: translations.columns.password,
-                                password_repeat: translations.columns.password_repeat
-                            }"
-                        />
-
-                        <FormMultiSelect
-                            v-model="form.roles"
-                            name="roles"
-                            :label="translations.relations.roles"
-                            :error="errors.roles"
-                            :options="roleOptions"
-                            trackBy="id"
-                            optionLabel="name"
-                            :placeholder="translations.select_options"
-                        />
-
-                    </div>
-
-                    <div class="card-footer">
-                        <FormSubmit :submitting="submitting" :label="translations.save" />
-                    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <ListingHeader
+                        :createUrl="createUrl"
+                        :exportUrl="exportUrl"
+                        :translations="translations"
+                    />
                 </div>
-    </form>
+                <div class="card-body" ref="cardBody">
+                    <div class="row justify-content-md-between">
+                        <div class="col col-lg-7 col-xl-5 mb-3">
+                            <Search
+                                v-model:search="search"
+                                :filterFn="filter"
+                                :translations="translations"
+                            />
+                        </div>
+                        <div class="col-sm-auto mb-3">
+                            <PerPage v-model="pagination.state.per_page"/>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-listing">
+                            <thead>
+                            <tr>
+
+                                <Sortable v-if="isColumnVisible(2)" :column="'id'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.id }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(0)" :column="'name'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.name }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(1)" :column="'email'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.email }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(3)" :column="'email_verified_at'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.email_verified_at }}
+                                </Sortable>
+
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr
+                                v-for="(item, index) in collection"
+                                :key="item.id"
+                            >
+
+                                <td v-if="isColumnVisible(2)">{{ item.id }}</td>
+                                <td v-if="isColumnVisible(0)">{{ item.name }}</td>
+                                <td v-if="isColumnVisible(1)">{{ item.email }}</td>
+                                <td v-if="isColumnVisible(3)">{{ formatDatetime(item.email_verified_at) }}</td>
+
+                                <td>
+                                    <div class="d-flex gap-1 justify-content-center">
+                                        <button
+                                            v-if="canImpersonalLogin"
+                                            class="btn btn-sm btn-success"
+                                            @click="getAction(resolveUrl(impersonalLoginUrlTemplate, item))"
+                                            :title="translations.impersonal_login_btn"
+                                            role="button"
+                                        >
+                                            <i class="fa fa-user"></i>
+                                        </button>
+                                        <button
+                                            class="btn btn-sm btn-warning"
+                                            v-show="!item.email_verified_at"
+                                            @click="getAction(resolveUrl(resendVerifyEmailUrlTemplate, item))"
+                                            :title="translations.resend_verify_email_btn"
+                                            role="button"
+                                        >
+                                            <i class="fa fa-envelope"></i>
+                                        </button>
+                                        <EditButton
+                                            :url="resolveUrl(editUrlTemplate, item)"
+                                            :translations="translations"
+                                        />
+                                        <DeleteButton
+                                            :url="resolveUrl(destroyUrlTemplate, item)"
+                                            :translations="{
+                                              ...translations,
+                                              confirm_title: translations.confirm_delete_title,
+                                              confirm_text: translations.confirm_delete_text,
+                                              confirm_btn: translations.delete_btn,
+                                            }"
+                                            @deleted="loadData"
+                                        />
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <Pagination
+                        :pagination="pagination.state"
+                        :options="pagination.options"
+                        :translations="translations"
+                        @page-change="onPageChange"
+                        @per-page-change="onPerPageChange"
+                    />
+
+                    <EmptyState
+                        :show="!collection?.length"
+                        :createUrl="createUrl"
+                        :translations="translations"
+                    />
+                </div>
+            </div>
+        </div>
+
+        <ConfirmModal
+            :show="confirmModal.show"
+            :translations="confirmModal.translations"
+            @confirm="confirmModal.onConfirm"
+            @cancel="confirmModal.show = false"
+        />
+    </div>
 </template>
 
 <script setup>
-import {useAppForm} from '../composables/useAppForm.js';
-import FormInput from '@craftable/components/form/FormInput.vue';
-import FormEmail from '@craftable/components/form/FormEmail.vue';
-import FormDatePicker from '@craftable/components/form/FormDatePicker.vue';
-import FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue';
-import FormPasswordConfirm from '@craftable/components/form/FormPasswordConfirm.vue';
-import FormSubmit from '@craftable/components/form/FormSubmit.vue';
+import {ref} from 'vue';
+import {useAppListing} from '../composables/useAppListing.js';
+import {useResponsiveColumns} from '@craftable/composables/useResponsiveColumns.js';
+import {formatDatetime} from '@craftable/utils/dateFormatters.js';
+import Sortable from '@craftable/components/listing/Sortable.vue';
+import Pagination from '@craftable/components/listing/Pagination.vue';
+import Search from '@craftable/components/listing/Search.vue';
+import PerPage from '@craftable/components/listing/PerPage.vue';
+import EmptyState from '@craftable/components/listing/EmptyState.vue';
+import ListingHeader from '@craftable/components/listing/ListingHeader.vue';
+import EditButton from '@craftable/components/listing/EditButton.vue';
+import DeleteButton from '@craftable/components/listing/DeleteButton.vue';
+import ConfirmModal from '@craftable/components/ConfirmModal.vue';
 
 const props = defineProps({
-    action: {type: String, required: true},
-    data: {type: Object, default: () => ({})},
+    url: {type: String, required: true},
+    data: {type: Object, default: null},
+    timezone: {type: String, default: 'UTC'},
     translations: {type: Object, default: () => ({})},
-    roleOptions: {type: Array, default: () => []},
-    responsiveBreakpoint: {type: Number, default: 850},
+    createUrl: {type: String, default: ''},
+    exportUrl: {type: String, default: ''},
+    editUrlTemplate: {type: String, required: true},
+    updateUrlTemplate: {type: String, required: true},
+    destroyUrlTemplate: {type: String, required: true},
+    resendVerifyEmailUrlTemplate: {type: String, default: ''},
+    impersonalLoginUrlTemplate: {type: String, default: ''},
+    canImpersonalLogin: {type: Boolean, default: false},
 });
+
+const cardBody = ref(null);
+const {isColumnVisible} = useResponsiveColumns(cardBody);
 
 const {
-    form, wysiwygMedia, mediaCollections, isFormLocalized, currentLocale,
-    submitting, onSmallScreen, errors, datePickerConfig, timePickerConfig,
-    datetimePickerConfig, locales, defaultLocale, otherLocales,
-    showLocalizedValidationError, getPostData, onSubmit, onSuccess, onFail,
-    getLocalizedFormDefaults, showLocalization, hideLocalization,
-    shouldShowLangGroup,
-} = useAppForm(props, {
-    validationSchema: {
-        name: 'required',
-        email: 'required|email',
-    },
-});
-
-if (!props.data || Object.keys(props.data).length === 0) {
-    form.value = {
-        name: '',
-        email: '',
-        email_verified_at: '',
-        password: '',
-        password_confirmation: '',
-        roles: [],
-    };
-}
+    pagination, orderBy, filters, search, collection, now,
+    loadData, filter, resolveUrl, getAction, confirmModal,
+    onSort, onPageChange, onPerPageChange,
+} = useAppListing(props);
 </script>

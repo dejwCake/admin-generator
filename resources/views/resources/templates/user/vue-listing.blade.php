@@ -138,6 +138,15 @@
                                 <td>
                                     <div class="d-flex gap-1 justify-content-center">
                                         <button
+                                            v-if="canImpersonalLogin"
+                                            class="btn btn-sm btn-success"
+                                            @click="getAction(resolveUrl(impersonalLoginUrlTemplate, item))"
+                                            :title="translations.impersonal_login_btn"
+                                            role="button"
+                                        >
+                                            <i class="fa fa-user"></i>
+                                        </button>
+                                        <button
                                             class="btn btn-sm btn-warning"
                                             v-show="!item.email_verified_at"
                                             @click="getAction(resolveUrl(resendVerifyEmailUrlTemplate, item))"
@@ -242,6 +251,8 @@ const props = defineProps({
     bulkDestroyUrl: {type: String, default: ''},
 @endif
     resendVerifyEmailUrlTemplate: {type: String, default: ''},
+    impersonalLoginUrlTemplate: {type: String, default: ''},
+    canImpersonalLogin: {type: Boolean, default: false},
 });
 
 const cardBody = ref(null);
