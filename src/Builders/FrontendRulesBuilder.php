@@ -50,7 +50,6 @@ final class FrontendRulesBuilder
 
         $rule = match ($majorType) {
             'integer' => 'integer',
-            'float' => 'numeric',
             'bool' => '',
             default => null,
         };

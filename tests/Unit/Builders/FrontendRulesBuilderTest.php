@@ -73,11 +73,13 @@ final class FrontendRulesBuilderTest extends TestCase
         self::assertContains('integer', $rules->all());
     }
 
-    public function testFloatMajorTypeAddsNumericRule(): void
+    public function testFloatMajorTypeAddsNoTypeRule(): void
     {
         $rules = $this->builder->build(name: 'amount', majorType: 'float', required: false, isForeignKey: false);
 
-        self::assertContains('numeric', $rules->all());
+        self::assertNotContains('numeric', $rules->all());
+        self::assertNotContains('integer', $rules->all());
+        self::assertNotContains('', $rules->all());
     }
 
     public function testBoolMajorTypeAddsEmptyString(): void

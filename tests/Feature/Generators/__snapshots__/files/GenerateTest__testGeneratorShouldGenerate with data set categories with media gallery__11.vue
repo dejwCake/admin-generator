@@ -350,8 +350,6 @@ const {
         released_at: 'required',
         text: 'required',
         description: 'required',
-        price: 'numeric',
-        rating: 'numeric',
         views: 'required|integer',
     },
     transformData: (data) => {
