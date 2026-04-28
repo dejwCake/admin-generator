@@ -64,9 +64,9 @@ jobs:
     container:
       image: dejwcake/php8.5:1
       env:
-        DB_CONNECTION: pgsql
-        DB_HOST: pgsql
-        DB_PORT: 5432
+        DB_CONNECTION: mysql
+        DB_HOST: mysql
+        DB_PORT: 3306
         DB_DATABASE: laravel
         DB_USERNAME: root
         DB_PASSWORD: bestsecret
