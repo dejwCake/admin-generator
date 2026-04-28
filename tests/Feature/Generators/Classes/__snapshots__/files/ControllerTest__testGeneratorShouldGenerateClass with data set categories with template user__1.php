@@ -308,11 +308,8 @@ final class CategoriesController extends Controller
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    public function impersonalLogin(
-        ImpersonalLoginCategory $request,
-        Category $category,
-        AuthFactory $auth,
-    ): RedirectResponse {
+    public function impersonalLogin(ImpersonalLoginCategory $request, Category $category, AuthFactory $auth): RedirectResponse
+    {
         $auth->guard($this->guard)
             ->login($category);
 

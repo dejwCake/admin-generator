@@ -380,11 +380,8 @@ final class {{ $controllerBaseName }} extends Controller
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    public function impersonalLogin(
-        ImpersonalLogin{{ $modelBaseName }} $request,
-        {{ $modelBaseName }} ${{ $modelVariableName }},
-        AuthFactory $auth,
-    ): RedirectResponse {
+    public function impersonalLogin(ImpersonalLogin{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}, AuthFactory $auth): RedirectResponse
+    {
         $auth->guard($this->guard)
             ->login(${{ $modelVariableName }});
 

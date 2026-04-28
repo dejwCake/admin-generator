@@ -263,11 +263,8 @@ final class UsersController extends Controller
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    public function impersonalLogin(
-        ImpersonalLoginUser $request,
-        User $user,
-        AuthFactory $auth,
-    ): RedirectResponse {
+    public function impersonalLogin(ImpersonalLoginUser $request, User $user, AuthFactory $auth): RedirectResponse
+    {
         $auth->guard($this->guard)
             ->login($user);
 
