@@ -108,14 +108,11 @@
                             :upload-url="wysiwygUploadUrl"
                         />
 
-                        <FormLocalizedInput
+                        <FormTextarea
                             v-model="form.long_text"
                             name="long_text"
                             :label="translations.columns.long_text"
-                            :errors="errors"
-                            :locales="locales"
-                            :shouldShowLangGroup="shouldShowLangGroup"
-                            :isFormLocalized="isFormLocalized"
+                            :error="errors.long_text"
                         />
 
                         <FormDatePicker
@@ -290,12 +287,12 @@ import {formatDatetime} from '@craftable/utils/dateFormatters.js';
 import LocalizationBar from '@craftable/components/form/LocalizationBar.vue';
 import FormInput from '@craftable/components/form/FormInput.vue';
 import FormEmail from '@craftable/components/form/FormEmail.vue';
+import FormTextarea from '@craftable/components/form/FormTextarea.vue';
 import FormCheckbox from '@craftable/components/form/FormCheckbox.vue';
 import FormDatePicker from '@craftable/components/form/FormDatePicker.vue';
 import FormWysiwyg from '@craftable/components/form/FormWysiwyg.vue';
 import FormSelect from '@craftable/components/form/FormSelect.vue';
 import FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue';
-import FormLocalizedInput from '@craftable/components/form/FormLocalizedInput.vue';
 import FormLocalizedWysiwyg from '@craftable/components/form/FormLocalizedWysiwyg.vue';
 import FormPasswordConfirm from '@craftable/components/form/FormPasswordConfirm.vue';
 import FormSubmit from '@craftable/components/form/FormSubmit.vue';
@@ -354,7 +351,7 @@ if (!props.data || Object.keys(props.data).length === 0) {
         language: '',
         slug: '',
         perex: '',
-        long_text: getLocalizedFormDefaults(),
+        long_text: '',
         published_to: '',
         date_start: '',
         time_start: '',

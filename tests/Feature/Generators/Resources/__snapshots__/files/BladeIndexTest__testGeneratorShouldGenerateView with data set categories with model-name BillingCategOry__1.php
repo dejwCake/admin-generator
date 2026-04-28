@@ -26,7 +26,6 @@
                 'subject' => trans('admin.billing_categ-ory.columns.subject'),
                 'email' => trans('admin.billing_categ-ory.columns.email'),
                 'language' => trans('admin.billing_categ-ory.columns.language'),
-                'long_text' => trans('admin.billing_categ-ory.columns.long_text'),
                 'published_at' => trans('admin.billing_categ-ory.columns.published_at'),
                 'published_to' => trans('admin.billing_categ-ory.columns.published_to'),
                 'date_start' => trans('admin.billing_categ-ory.columns.date_start'),

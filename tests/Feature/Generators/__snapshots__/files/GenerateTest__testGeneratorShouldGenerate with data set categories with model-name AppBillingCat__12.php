@@ -30,6 +30,7 @@ final class CatFactory extends Factory
             'language' => 'en',
             'slug' => $this->faker->unique()->slug,
             'perex' => $this->faker->text(),
+            'long_text' => $this->faker->text(),
             'published_at' => $this->faker->date(),
             'published_to' => $this->faker->date(),
             'date_start' => $this->faker->date(),
@@ -46,7 +47,6 @@ final class CatFactory extends Factory
             'created_at' => $this->faker->dateTime,
             'updated_at' => $this->faker->dateTime,
             'deleted_at' => null,
-            'long_text' => ['en' => $this->faker->sentence],
             'text' => ['en' => $this->faker->sentence],
             'description' => ['en' => $this->faker->sentence],
         ];

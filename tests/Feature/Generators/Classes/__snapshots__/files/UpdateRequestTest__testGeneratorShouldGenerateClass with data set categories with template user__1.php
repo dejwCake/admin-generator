@@ -88,6 +88,10 @@ final class UpdateCategory extends TranslatableFormRequest
                 'nullable',
                 'string',
             ],
+            'long_text' => [
+                'nullable',
+                'string',
+            ],
             'published_at' => [
                 'nullable',
                 'date',
@@ -152,10 +156,6 @@ final class UpdateCategory extends TranslatableFormRequest
     public function translatableRules(string $locale): array
     {
         return [
-            'long_text' => [
-                'nullable',
-                'string',
-            ],
             'text' => [
                 'sometimes',
                 'string',

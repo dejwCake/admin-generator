@@ -29,7 +29,6 @@
                 'subject' => trans('admin.category.columns.subject'),
                 'email' => trans('admin.category.columns.email'),
                 'language' => trans('admin.category.columns.language'),
-                'long_text' => trans('admin.category.columns.long_text'),
                 'published_at' => trans('admin.category.columns.published_at'),
                 'published_to' => trans('admin.category.columns.published_to'),
                 'date_start' => trans('admin.category.columns.date_start'),

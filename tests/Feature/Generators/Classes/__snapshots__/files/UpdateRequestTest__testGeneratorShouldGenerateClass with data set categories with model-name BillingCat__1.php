@@ -90,6 +90,10 @@ final class UpdateCat extends TranslatableFormRequest
                 'nullable',
                 'string',
             ],
+            'long_text' => [
+                'nullable',
+                'string',
+            ],
             'published_at' => [
                 'nullable',
                 'date',
@@ -163,10 +167,6 @@ final class UpdateCat extends TranslatableFormRequest
     public function translatableRules(string $locale): array
     {
         return [
-            'long_text' => [
-                'nullable',
-                'string',
-            ],
             'text' => [
                 'sometimes',
                 'string',

@@ -63,7 +63,6 @@ final class CategoriesController extends Controller
                         'subject',
                         'email',
                         'language',
-                        'long_text',
                         'published_at',
                         'published_to',
                         'date_start',

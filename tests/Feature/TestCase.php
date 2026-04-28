@@ -159,7 +159,7 @@ abstract class TestCase extends Orchestra
             $table->string('language', 2)->default('en');
             $table->string('slug')->unique();
             $table->text('perex')->nullable();
-            $table->longText('long_text')->nullable();
+            $table->text('long_text')->nullable();
             $table->date('published_at')->nullable();
             $table->date('published_to')->nullable();
             $table->date('date_start')->nullable();

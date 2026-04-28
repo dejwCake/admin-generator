@@ -58,22 +58,19 @@
                                 <Sortable v-if="isColumnVisible(5)" :column="'language'" :orderBy="orderBy" @sort="onSort">
                                     {{ translations.columns.language }}
                                 </Sortable>
-                                <Sortable v-if="isColumnVisible(6)" :column="'long_text'" :orderBy="orderBy" @sort="onSort">
-                                    {{ translations.columns.long_text }}
-                                </Sortable>
                                 <Sortable v-if="isColumnVisible(3)" :column="'published_at'" :orderBy="orderBy" @sort="onSort">
                                     {{ translations.columns.published_at }}
                                 </Sortable>
-                                <Sortable v-if="isColumnVisible(7)" :column="'published_to'" :orderBy="orderBy" @sort="onSort">
+                                <Sortable v-if="isColumnVisible(6)" :column="'published_to'" :orderBy="orderBy" @sort="onSort">
                                     {{ translations.columns.published_to }}
                                 </Sortable>
-                                <Sortable v-if="isColumnVisible(8)" :column="'date_start'" :orderBy="orderBy" @sort="onSort">
+                                <Sortable v-if="isColumnVisible(7)" :column="'date_start'" :orderBy="orderBy" @sort="onSort">
                                     {{ translations.columns.date_start }}
                                 </Sortable>
-                                <Sortable v-if="isColumnVisible(9)" :column="'time_start'" :orderBy="orderBy" @sort="onSort">
+                                <Sortable v-if="isColumnVisible(8)" :column="'time_start'" :orderBy="orderBy" @sort="onSort">
                                     {{ translations.columns.time_start }}
                                 </Sortable>
-                                <Sortable v-if="isColumnVisible(10)" :column="'date_time_end'" :orderBy="orderBy" @sort="onSort">
+                                <Sortable v-if="isColumnVisible(9)" :column="'date_time_end'" :orderBy="orderBy" @sort="onSort">
                                     {{ translations.columns.date_time_end }}
                                 </Sortable>
                                 <Sortable v-if="isColumnVisible(10)" :column="'released_at'" :orderBy="orderBy" @sort="onSort">
@@ -142,12 +139,11 @@
                                 <td v-if="isColumnVisible(0)">{{ item.subject }}</td>
                                 <td v-if="isColumnVisible(1)">{{ item.email }}</td>
                                 <td v-if="isColumnVisible(5)">{{ item.language }}</td>
-                                <td v-if="isColumnVisible(6)">{{ item.long_text }}</td>
                                 <td v-if="isColumnVisible(3)">{{ formatDate(item.published_at) }}</td>
-                                <td v-if="isColumnVisible(7)">{{ formatDate(item.published_to) }}</td>
-                                <td v-if="isColumnVisible(8)">{{ formatDate(item.date_start) }}</td>
-                                <td v-if="isColumnVisible(9)">{{ formatTime(item.time_start) }}</td>
-                                <td v-if="isColumnVisible(10)">{{ formatDatetime(item.date_time_end) }}</td>
+                                <td v-if="isColumnVisible(6)">{{ formatDate(item.published_to) }}</td>
+                                <td v-if="isColumnVisible(7)">{{ formatDate(item.date_start) }}</td>
+                                <td v-if="isColumnVisible(8)">{{ formatTime(item.time_start) }}</td>
+                                <td v-if="isColumnVisible(9)">{{ formatDatetime(item.date_time_end) }}</td>
                                 <td v-if="isColumnVisible(10)">{{ formatDatetime(item.released_at) }}</td>
                                 <td v-if="isColumnVisible(10)">
                                     <ToggleSwitch

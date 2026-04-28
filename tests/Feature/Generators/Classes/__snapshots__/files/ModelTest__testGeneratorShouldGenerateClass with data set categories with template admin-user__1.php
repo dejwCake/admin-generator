@@ -30,7 +30,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string $language
  * @property string $slug
  * @property string|null $perex
- * @property array|null $long_text
+ * @property string|null $long_text
  * @property CarbonInterface|null $published_at
  * @property CarbonInterface|null $published_to
  * @property CarbonInterface|null $date_start
@@ -107,7 +107,6 @@ final class Category extends Authenticatable implements CanActivateContract
      * @var array<int, string>
      */
     protected array $translatable = [
-        'long_text',
         'text',
         'description',
     ];
