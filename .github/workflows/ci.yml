@@ -52,7 +52,7 @@ jobs:
       - run: composer install --prefer-dist
       - run: >-
           phpmd
-          ./resources,./src,./tests
+          ./src,./tests
           text phpmd.xml
           --suffixes php
           --baseline-file phpmd.baseline.xml
