@@ -36,11 +36,6 @@ final class FactoryTest extends TestCase
         self::assertFileExists($filePath);
     }
 
-    public function testFactoryGeneratorWithSeedShouldGenerateClass(): void
-    {
-        self::markTestSkipped('This test is skipped as we do not generate model');
-    }
-
     public static function getCases(): iterable
     {
         yield 'categories default' => [
