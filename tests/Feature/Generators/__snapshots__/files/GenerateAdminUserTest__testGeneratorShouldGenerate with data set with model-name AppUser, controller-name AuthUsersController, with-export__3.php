@@ -40,7 +40,8 @@ final class StoreUser extends FormRequest
             'email' => [
                 'required',
                 'email',
-                Rule::unique('admin_users', 'email'),
+                Rule::unique('admin_users', 'email')
+                    ->whereNull('deleted_at'),
                 'string',
             ],
             'password' => [

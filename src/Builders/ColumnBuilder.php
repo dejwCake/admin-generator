@@ -33,7 +33,7 @@ final readonly class ColumnBuilder
             ->contains(static fn (array $index): bool
                 => in_array($name, $index['columns'], true)
                     && ($index['unique'] && !$index['primary'])
-                    && str_contains($index['name'], 'null_deleted_at'));
+                    && str_contains($index['name'], 'deleted_at'));
         // TODO add foreign key
 
         $majorType = $this->getMajorTypeFromType($type);

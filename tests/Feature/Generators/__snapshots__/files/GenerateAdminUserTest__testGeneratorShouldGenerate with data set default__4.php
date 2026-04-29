@@ -45,7 +45,8 @@ final class UpdateAdminUser extends FormRequest
                 'sometimes',
                 'email',
                 Rule::unique('admin_users', 'email')
-                    ->ignore($this->adminUser->getKey(), $this->adminUser->getKeyName()),
+                    ->ignore($this->adminUser->getKey(), $this->adminUser->getKeyName())
+                    ->whereNull('deleted_at'),
                 'string',
             ],
             'password' => [
