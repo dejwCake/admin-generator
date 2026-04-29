@@ -31,7 +31,11 @@ abstract class ClassGenerator extends Generator
     {
         $path = str_replace('\\', '/', $name) . '.php';
 
-        return preg_replace('|^App/|', 'app/', $path);
+        return preg_replace(
+            ['|^App/|', '|^Database/Factories/|'],
+            ['app/', 'database/factories/'],
+            $path,
+        );
     }
 
     /**
