@@ -13,8 +13,8 @@ final class RelationBuilder
 {
     private RelationCollection $relationCollection;
 
-    /** @var Collection<int, string> */
-    private Collection $allTables;
+    /** @var Collection<int, string>|null */
+    private ?Collection $allTables = null;
 
     public function __construct(
         private Schema $schema,
@@ -22,8 +22,6 @@ final class RelationBuilder
         private BelongsToBuilder $belongsToBuilder,
         private HasManyBuilder $hasManyBuilder,
     ) {
-        $this->allTables = (new Collection($this->schema->getTables()))
-            ->pluck('name');
     }
 
     public function build(string $tableName, ?string $belongsToManyTableList): RelationCollection
@@ -35,6 +33,15 @@ final class RelationBuilder
         $this->buildHasMany($tableName);
 
         return $this->relationCollection;
+    }
+
+    /**
+     * @return Collection<int, string>
+     */
+    private function allTables(): Collection
+    {
+        return $this->allTables ??= (new Collection($this->schema->getTables()))
+            ->pluck('name');
     }
 
     private function buildBelongsToMany(string $tableName, ?string $belongsToManyTableList): void
@@ -66,7 +73,7 @@ final class RelationBuilder
 
     private function detectBelongsToManyForTable(string $tableName): void
     {
-        $this->allTables->each(function (string $candidateTable) use ($tableName): void {
+        $this->allTables()->each(function (string $candidateTable) use ($tableName): void {
             $relatedTable = $this->detectPivotRelation($candidateTable, $tableName);
             if ($relatedTable === null) {
                 return;
@@ -88,7 +95,7 @@ final class RelationBuilder
         )->each(function (array $column): void {
             $relatedTable = Str::plural(Str::beforeLast($column['name'], '_id'));
 
-            if (!$this->allTables->contains($relatedTable)) {
+            if (!$this->allTables()->contains($relatedTable)) {
                 return;
             }
 
@@ -107,7 +114,7 @@ final class RelationBuilder
     {
         $expectedForeignKey = sprintf('%s_id', Str::singular($tableName));
 
-        $this->allTables->each(function (string $candidateTable) use ($tableName, $expectedForeignKey): void {
+        $this->allTables()->each(function (string $candidateTable) use ($tableName, $expectedForeignKey): void {
             if ($candidateTable === $tableName) {
                 return;
             }
@@ -196,7 +203,7 @@ final class RelationBuilder
         $otherFk = $idColumns->first(static fn (array $column): bool => $column['name'] !== $currentTableFk);
         $relatedTable = Str::plural(Str::beforeLast($otherFk['name'], '_id'));
 
-        if (!$this->allTables->contains($relatedTable)) {
+        if (!$this->allTables()->contains($relatedTable)) {
             return null;
         }
 
