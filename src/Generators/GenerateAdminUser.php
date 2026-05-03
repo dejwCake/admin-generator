@@ -71,7 +71,7 @@ final class GenerateAdminUser extends Command
             $this->laravel->resourcePath('views/admin/layout/sidebar.blade.php'),
             '{{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
             '<li class="nav-item"><a class="nav-link" href="{{ url(\'admin/admin-users\') }}"><i class="nav-icon fa fa-user"></i> {{ __(\'Manage access\') }}</a></li>
-            {{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
+        {{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
             '|url\(\'admin\/admin-users\'\)|',
         );
 

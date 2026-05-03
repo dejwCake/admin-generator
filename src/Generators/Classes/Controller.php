@@ -215,7 +215,7 @@ final class Controller extends ClassGenerator
                     $this->resource,
                     $icon,
                     $this->modelLangFormat,
-                ) . PHP_EOL . "           {{-- Do not delete me :) I'm used for auto-generation menu items --}}",
+                ) . PHP_EOL . "        {{-- Do not delete me :) I'm used for auto-generation menu items --}}",
                 '|url\(\'admin\/' . $this->resource . '\'\)|',
             )
         ) {
