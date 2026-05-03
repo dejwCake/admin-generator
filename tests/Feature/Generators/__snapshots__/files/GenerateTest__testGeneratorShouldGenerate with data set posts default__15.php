@@ -2,38 +2,26 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\Admin\Post;
+return [
+    'post' => [
+        'title' => 'Posts',
 
-use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Collection;
+        'actions' => [
+            'index' => 'Posts',
+            'create' => 'New Post',
+            'edit' => 'Edit :name',
+        ],
 
-final class BulkDestroyPost extends FormRequest
-{
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(Gate $gate): bool
-    {
-        return $gate->allows('admin.post.bulk-delete');
-    }
+        'columns' => [
+            'id' => 'ID',
+            'title' => 'Title',
+        ],
 
-    /**
-     * Get the validation rules that apply to the request.
-     */
-    public function rules(): array
-    {
-        return [
-            'ids.*' => [
-                'integer',
-            ],
-        ];
-    }
+        //Belongs to many relations
+        'relations' => [
+            'categories' => 'Categories',
+        ],
+    ],
 
-    public function getIds(): Collection
-    {
-        $data = $this->validated();
-
-        return new Collection($data['ids'] ?? []);
-    }
-}
+    //-- Do not delete me :) I'm used for auto-generation language arrays --
+];

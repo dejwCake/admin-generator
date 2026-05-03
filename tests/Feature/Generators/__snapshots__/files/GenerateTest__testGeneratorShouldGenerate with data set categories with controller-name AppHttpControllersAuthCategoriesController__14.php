@@ -2,58 +2,25 @@
 
 declare(strict_types=1);
 
-return [
-    'category' => [
-        'title' => 'Categories',
+use App\Http\Controllers\Auth\CategoriesController;
+use Illuminate\Support\Facades\Route;
 
-        'actions' => [
-            'index' => 'Categories',
-            'create' => 'New Category',
-            'edit' => 'Edit :name',
-            'will_be_published' => 'Category will be published at',
-        ],
-
-        'columns' => [
-            'id' => 'ID',
-            'user_id' => 'User',
-            'title' => 'Title',
-            'name' => 'Name',
-            'first_name' => 'First name',
-            'last_name' => 'Last name',
-            'subject' => 'Subject',
-            'email' => 'Email',
-            'password' => 'Password',
-            'password_repeat' => 'Password Confirmation',
-            'remember_token' => 'Remember token',
-            'language' => 'Language',
-            'slug' => 'Slug',
-            'perex' => 'Perex',
-            'long_text' => 'Long text',
-            'published_at' => 'Published at',
-            'published_to' => 'Published to',
-            'date_start' => 'Date start',
-            'time_start' => 'Time start',
-            'date_time_end' => 'Date time end',
-            'released_at' => 'Released at',
-            'text' => 'Text',
-            'description' => 'Description',
-            'enabled' => 'Enabled',
-            'send' => 'Send',
-            'price' => 'Price',
-            'rating' => 'Rating',
-            'views' => 'Views',
-            'created_by_admin_user_id' => 'Created by admin user',
-            'updated_by_admin_user_id' => 'Updated by admin user',
-            'created_at' => 'Created at',
-            'updated_at' => 'Updated at',
-            'deleted_at' => 'Deleted at',
-        ],
-
-        //Belongs to many relations
-        'relations' => [
-            'posts' => 'Posts',
-        ],
-    ],
-
-    //-- Do not delete me :) I'm used for auto-generation language arrays --
-];
+Route::prefix('categories')
+    ->name('categories/')
+    ->controller(CategoriesController::class)
+    ->group(static function (): void {
+        Route::get('/', 'index')
+            ->name('index');
+        Route::get('/create', 'create')
+            ->name('create');
+        Route::post('/', 'store')
+            ->name('store');
+        Route::get('/{category}/edit', 'edit')
+            ->name('edit');
+        Route::post('/bulk-destroy', 'bulkDestroy')
+            ->name('bulk-destroy');
+        Route::post('/{category}', 'update')
+            ->name('update');
+        Route::delete('/{category}', 'destroy')
+            ->name('destroy');
+    });

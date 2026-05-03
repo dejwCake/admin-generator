@@ -17,7 +17,6 @@ use Brackets\AdminGenerator\Generators\Classes\Permissions;
 use Brackets\AdminGenerator\Generators\Classes\StoreRequest;
 use Brackets\AdminGenerator\Generators\Classes\UpdateRequest;
 use Brackets\AdminGenerator\Generators\FileAppenders\Lang;
-use Brackets\AdminGenerator\Generators\FileAppenders\Routes;
 use Brackets\AdminGenerator\Generators\Generate;
 use Brackets\AdminGenerator\Generators\GenerateAdminUser;
 use Brackets\AdminGenerator\Generators\GenerateAdminUserProfile;
@@ -28,6 +27,7 @@ use Brackets\AdminGenerator\Generators\Resources\BladeForm;
 use Brackets\AdminGenerator\Generators\Resources\BladeIndex;
 use Brackets\AdminGenerator\Generators\Resources\VueForm;
 use Brackets\AdminGenerator\Generators\Resources\VueListing;
+use Brackets\AdminGenerator\Generators\Routes\Routes;
 use Illuminate\Support\ServiceProvider;
 use Override;
 
@@ -62,7 +62,6 @@ final class AdminGeneratorServiceProvider extends ServiceProvider
             UpdateRequest::class,
             //FileAppenders
             Lang::class,
-            Routes::class,
             //Resources
             BladeCreate::class,
             BladeEdit::class,
@@ -70,6 +69,8 @@ final class AdminGeneratorServiceProvider extends ServiceProvider
             BladeIndex::class,
             VueForm::class,
             VueListing::class,
+            //Routes
+            Routes::class,
         ]);
     }
 }

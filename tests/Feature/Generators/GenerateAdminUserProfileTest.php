@@ -20,6 +20,7 @@ final class GenerateAdminUserProfileTest extends TestCase
         'resources/js/admin/profile-edit-profile/Form.vue',
         'resources/js/admin/profile-edit-password/Form.vue',
         'routes/admin.php',
+        'routes/admin/profile.php',
     ];
 
     /**

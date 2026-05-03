@@ -2,46 +2,38 @@
 
 declare(strict_types=1);
 
-use Brackets\Craftable\Database\Migrations\PermissionMigration;
+namespace App\Http\Requests\Admin\Category;
+
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
 
-return new class extends PermissionMigration
+final class BulkDestroyCategory extends FormRequest
 {
-    public function __construct()
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(Gate $gate): bool
     {
-        parent::__construct();
-
-        $this->setPermissionsAndRoles(
-            new Collection([
-                'admin.category',
-                'admin.category.index',
-                'admin.category.create',
-                'admin.category.show',
-                'admin.category.edit',
-                'admin.category.delete',
-                'admin.category.bulk-delete',
-            ]),
-            new Collection(),
-        );
+        return $gate->allows('admin.category.bulk-delete');
     }
 
     /**
-     * Run the migrations.
-     *
-     * @throws Exception
+     * Get the validation rules that apply to the request.
      */
-    public function up(): void
+    public function rules(): array
     {
-        $this->migrateUp();
+        return [
+            'ids.*' => [
+                'integer',
+            ],
+        ];
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @throws Exception
-     */
-    public function down(): void
+    public function getIds(): Collection
     {
-        $this->migrateDown();
+        $data = $this->validated();
+
+        return new Collection($data['ids'] ?? []);
     }
-};
+}

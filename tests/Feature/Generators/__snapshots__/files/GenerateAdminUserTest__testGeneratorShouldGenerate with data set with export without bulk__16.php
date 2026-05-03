@@ -2,48 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Exports;
+namespace App\Http\Requests\Admin\AdminUser;
 
-use Brackets\AdminAuth\Models\AdminUser;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Http\FormRequest;
 
-final class AdminUsersExport implements FromCollection, WithMapping, WithHeadings
+final class ExportAdminUser extends FormRequest
 {
-    public function collection(): Collection
-    {
-        return AdminUser::all();
-    }
-
-    public function headings(): array
-    {
-        return [
-            trans('admin.admin-user.columns.id'),
-            trans('admin.admin-user.columns.first_name'),
-            trans('admin.admin-user.columns.last_name'),
-            trans('admin.admin-user.columns.email'),
-            trans('admin.admin-user.columns.activated'),
-            trans('admin.admin-user.columns.forbidden'),
-            trans('admin.admin-user.columns.language'),
-        ];
-    }
-
     /**
-     * @param AdminUser $adminUser
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * Determine if the user is authorized to make this request.
      */
-    public function map($adminUser): array
+    public function authorize(Gate $gate): bool
     {
-        return [
-            $adminUser->id,
-            $adminUser->first_name,
-            $adminUser->last_name,
-            $adminUser->email,
-            $adminUser->activated,
-            $adminUser->forbidden,
-            $adminUser->language,
-        ];
+        return $gate->allows('admin.admin-user.index');
     }
 }

@@ -243,6 +243,7 @@ final class GenerateTest extends TestCase
     {
         $kebab = strtolower((string) preg_replace('/(?<!^)([A-Z])/', '-$1', $modelBaseName));
         $plural = Str::plural($modelBaseName);
+        $resource = self::resourceKebab($plural);
 
         return [
             sprintf('app/Models/%s.php', $modelBaseName),
@@ -258,6 +259,7 @@ final class GenerateTest extends TestCase
             sprintf('resources/js/admin/%s/Form.vue', $kebab),
             sprintf('database/factories/%sFactory.php', $modelBaseName),
             'routes/admin.php',
+            sprintf('routes/admin/%s.php', $resource),
             'lang/en/admin.php',
         ];
     }
@@ -289,6 +291,11 @@ final class GenerateTest extends TestCase
         $jsDir = implode('-', $bladeAndJsSegments);
         $modelPath = sprintf('app/Models/%s.php', str_replace('\\', '/', $subNamespace));
 
+        $namespaceParts = explode('\\', $subNamespace);
+        array_pop($namespaceParts);
+        $namespaceParts[] = Str::plural($modelBaseName);
+        $resource = self::resourceKebab(implode('', $namespaceParts));
+
         return [
             $modelPath,
             sprintf('app/Http/Controllers/Admin/%sController.php', $pluralBaseName),
@@ -303,6 +310,7 @@ final class GenerateTest extends TestCase
             sprintf('resources/js/admin/%s/Form.vue', $jsDir),
             sprintf('database/factories/%sFactory.php', $modelBaseName),
             'routes/admin.php',
+            sprintf('routes/admin/%s.php', $resource),
             'lang/en/admin.php',
         ];
     }
@@ -320,6 +328,7 @@ final class GenerateTest extends TestCase
         string $modelSubPath,
     ): array {
         $kebab = strtolower((string) preg_replace('/(?<!^)([A-Z])/', '-$1', $modelBaseName));
+        $resource = self::resourceKebab(Str::plural($modelBaseName));
 
         return [
             sprintf('app/%s/%s.php', $modelSubPath, $modelBaseName),
@@ -335,6 +344,7 @@ final class GenerateTest extends TestCase
             sprintf('resources/js/admin/%s/Form.vue', $kebab),
             sprintf('database/factories/%sFactory.php', $modelBaseName),
             'routes/admin.php',
+            sprintf('routes/admin/%s.php', $resource),
             'lang/en/admin.php',
         ];
     }
@@ -382,5 +392,10 @@ final class GenerateTest extends TestCase
             static fn (string $part): string => ucfirst($part),
             explode('/', $path),
         ));
+    }
+
+    private static function resourceKebab(string $studlyConcat): string
+    {
+        return strtolower((string) preg_replace('/(?<!^)([A-Z])/', '-$1', $studlyConcat));
     }
 }

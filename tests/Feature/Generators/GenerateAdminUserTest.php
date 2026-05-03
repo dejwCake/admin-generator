@@ -28,6 +28,7 @@ final class GenerateAdminUserTest extends TestCase
         'resources/js/admin/admin-user/Form.vue',
         'database/factories/AdminUserFactory.php',
         'routes/admin.php',
+        'routes/admin/admin-users.php',
         'lang/en/admin.php',
     ];
 
@@ -218,6 +219,9 @@ final class GenerateAdminUserTest extends TestCase
     private static function commonForModelBaseName(string $modelBaseName): array
     {
         $kebab = strtolower((string) preg_replace('/(?<!^)([A-Z])/', '-$1', $modelBaseName));
+        $resource = strtolower(
+            (string) preg_replace('/(?<!^)([A-Z])/', '-$1', $modelBaseName . 's'),
+        );
 
         return [
             'app/Http/Controllers/Admin/AdminUsersController.php',
@@ -233,6 +237,7 @@ final class GenerateAdminUserTest extends TestCase
             sprintf('resources/js/admin/%s/Form.vue', $kebab),
             sprintf('database/factories/%sFactory.php', $modelBaseName),
             'routes/admin.php',
+            sprintf('routes/admin/%s.php', $resource),
             'lang/en/admin.php',
         ];
     }
@@ -257,6 +262,13 @@ final class GenerateAdminUserTest extends TestCase
         $jsDir = strtolower(implode('-', $nestedSegments));
         $modelBaseName = (string) end($segments);
 
+        $resourceSegments = $segments;
+        array_pop($resourceSegments);
+        $resourceSegments[] = $modelBaseName . 's';
+        $resource = strtolower(
+            (string) preg_replace('/(?<!^)([A-Z])/', '-$1', implode('', $resourceSegments)),
+        );
+
         return [
             'app/Http/Controllers/Admin/AdminUsersController.php',
             sprintf('app/Http/Requests/Admin/%s/Index%s.php', self::ucPath($requestsDir), $modelBaseName),
@@ -271,6 +283,7 @@ final class GenerateAdminUserTest extends TestCase
             sprintf('resources/js/admin/%s/Form.vue', $jsDir),
             sprintf('database/factories/%sFactory.php', $modelBaseName),
             'routes/admin.php',
+            sprintf('routes/admin/%s.php', $resource),
             'lang/en/admin.php',
         ];
     }

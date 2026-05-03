@@ -2,26 +2,25 @@
 
 declare(strict_types=1);
 
-return [
-    'post' => [
-        'title' => 'Posts',
+use App\Http\Controllers\Admin\PostsController;
+use Illuminate\Support\Facades\Route;
 
-        'actions' => [
-            'index' => 'Posts',
-            'create' => 'New Post',
-            'edit' => 'Edit :name',
-        ],
-
-        'columns' => [
-            'id' => 'ID',
-            'title' => 'Title',
-        ],
-
-        //Belongs to many relations
-        'relations' => [
-            'categories' => 'Categories',
-        ],
-    ],
-
-    //-- Do not delete me :) I'm used for auto-generation language arrays --
-];
+Route::prefix('posts')
+    ->name('posts/')
+    ->controller(PostsController::class)
+    ->group(static function (): void {
+        Route::get('/', 'index')
+            ->name('index');
+        Route::get('/create', 'create')
+            ->name('create');
+        Route::post('/', 'store')
+            ->name('store');
+        Route::get('/{post}/edit', 'edit')
+            ->name('edit');
+        Route::post('/bulk-destroy', 'bulkDestroy')
+            ->name('bulk-destroy');
+        Route::post('/{post}', 'update')
+            ->name('update');
+        Route::delete('/{post}', 'destroy')
+            ->name('destroy');
+    });

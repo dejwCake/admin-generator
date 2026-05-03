@@ -2,43 +2,29 @@
 
 declare(strict_types=1);
 
-return [
-    'admin-user' => [
-        'title' => 'Admin Users',
+use App\Http\Controllers\Admin\AdminUsersController;
+use Illuminate\Support\Facades\Route;
 
-        'actions' => [
-            'index' => 'Admin Users',
-            'create' => 'New Admin User',
-            'edit' => 'Edit :name',
-            'edit_profile' => 'Edit Profile',
-            'edit_password' => 'Edit Password',
-        ],
-
-        'columns' => [
-            'id' => 'ID',
-            'first_name' => 'First name',
-            'last_name' => 'Last name',
-            'email' => 'Email',
-            'password' => 'Password',
-            'password_repeat' => 'Password Confirmation',
-            'remember_token' => 'Remember token',
-            'activated' => 'Activated',
-            'forbidden' => 'Forbidden',
-            'language' => 'Language',
-            'deleted_at' => 'Deleted at',
-            'created_at' => 'Created at',
-            'updated_at' => 'Updated at',
-        ],
-
-        //Belongs to many relations
-        'relations' => [
-            'roles' => 'Roles',
-        ],
-
-        'collections' => [
-            'gallery' => 'Gallery',
-        ],
-    ],
-
-    //-- Do not delete me :) I'm used for auto-generation language arrays --
-];
+Route::prefix('admin-users')
+    ->name('admin-users/')
+    ->controller(AdminUsersController::class)
+    ->group(static function (): void {
+        Route::get('/', 'index')
+            ->name('index');
+        Route::get('/create', 'create')
+            ->name('create');
+        Route::post('/', 'store')
+            ->name('store');
+        Route::get('/{adminUser}/edit', 'edit')
+            ->name('edit');
+        Route::post('/bulk-destroy', 'bulkDestroy')
+            ->name('bulk-destroy');
+        Route::post('/{adminUser}', 'update')
+            ->name('update');
+        Route::delete('/{adminUser}', 'destroy')
+            ->name('destroy');
+        Route::get('/{adminUser}/impersonal-login', 'impersonalLogin')
+            ->name('impersonal-login');
+        Route::get('/{adminUser}/resend-activation', 'resendActivationEmail')
+            ->name('resend-activation-email');
+    });

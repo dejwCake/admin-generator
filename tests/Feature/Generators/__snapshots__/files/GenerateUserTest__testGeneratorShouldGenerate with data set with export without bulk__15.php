@@ -2,18 +2,34 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\Admin\User;
+return [
+    'user' => [
+        'title' => 'Users',
 
-use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Foundation\Http\FormRequest;
+        'actions' => [
+            'index' => 'Users',
+            'create' => 'New User',
+            'edit' => 'Edit :name',
+            'export' => 'Export',
+        ],
 
-final class ExportUser extends FormRequest
-{
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(Gate $gate): bool
-    {
-        return $gate->allows('admin.user.index');
-    }
-}
+        'columns' => [
+            'id' => 'ID',
+            'name' => 'Name',
+            'email' => 'Email',
+            'email_verified_at' => 'Email verified at',
+            'password' => 'Password',
+            'password_repeat' => 'Password Confirmation',
+            'remember_token' => 'Remember token',
+            'created_at' => 'Created at',
+            'updated_at' => 'Updated at',
+        ],
+
+        //Belongs to many relations
+        'relations' => [
+            'roles' => 'Roles',
+        ],
+    ],
+
+    //-- Do not delete me :) I'm used for auto-generation language arrays --
+];

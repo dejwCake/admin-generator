@@ -95,7 +95,7 @@ The flat `Brackets\AdminGenerator\Generate\*` namespace was split by output cate
 | `Generate\ExportRequest` | `Generators\Classes\ExportRequest` |
 | `Generate\ImpersonalLoginRequest` | `Generators\Classes\ImpersonalLoginRequest` |
 | `Generate\Lang` | `Generators\FileAppenders\Lang` |
-| `Generate\Routes` | `Generators\FileAppenders\Routes` |
+| `Generate\Routes` | `Generators\Routes\Routes` (no longer a `FileAppender` — see "Routes file layout changed" below) |
 | `Generate\ViewIndex` | **removed** — split into `Generators\Resources\BladeIndex` + `Generators\Resources\VueListing` |
 | `Generate\ViewForm` | **removed** — split into `Generators\Resources\BladeForm` + `Generators\Resources\BladeCreate` + `Generators\Resources\BladeEdit` + `Generators\Resources\VueForm` |
 | `Generate\ViewFullForm` | **removed** — folded into the resources above |
@@ -146,6 +146,86 @@ v1 only had impersonate in `admin:generate:admin-user`. v2 ports the same flow t
 
 If you regenerate over an existing v1 user CRUD without `--force`, the `ImpersonalLogin{Model}.php` request file will be newly created, but the controller / routes / blade / Vue won't update. Use `--force` to overwrite (which deletes the existing files in those four categories first), then review the diff.
 
+### Routes file layout changed (single file → umbrella + per-resource folder)
+
+**v1 layout** — every generated CRUD appended to a single `routes/admin.php`:
+
+```
+routes/
+└── admin.php          # one shared file, all resources
+```
+
+That file held a single `Route::middleware(...)->group(...)` block, with all `use App\Http\Controllers\Admin\…` imports stacked at the top, and per-resource `Route::prefix('…')…` blocks one after another inside the group. Each `admin:generate:routes` call appended a new block + injected a new `use` line. The result was fragile: import order was non-deterministic across packages, blank lines accumulated between imports on each run, and two devs generating different resources hit merge conflicts.
+
+**v2 layout** — `routes/admin.php` is a thin "umbrella" that pulls in per-resource files from `routes/admin/`:
+
+```
+routes/
+├── admin.php           # umbrella: outer middleware/prefix group + glob loader
+└── admin/              # one file per resource
+    ├── admin-users.php
+    ├── categories.php
+    ├── posts.php
+    └── …
+```
+
+`routes/admin.php` (umbrella):
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Support\Facades\Route;
+
+Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
+    ->prefix('admin')
+    ->name('admin/')
+    ->group(static function (): void {
+        foreach (glob(__DIR__ . '/admin/*.php') as $file) {
+            require $file;
+        }
+    });
+```
+
+Each per-resource file contains only its own narrow imports and `Route::prefix(...)->name(...)->controller(...)->group(...)` block — no outer middleware group (the umbrella handles that), no shared `use` collisions.
+
+`routes/admin/categories.php` (example):
+
+```php
+<?php
+
+declare(strict_types=1);
+
+use App\Http\Controllers\Admin\CategoriesController;
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('categories')
+    ->name('categories/')
+    ->controller(CategoriesController::class)
+    ->group(static function (): void {
+        Route::get('/', 'index')->name('index');
+        // …
+    });
+```
+
+**No automated migration.** Existing projects must split `routes/admin.php` by hand — there's no `craftable:upgrade-routes` command. The mechanical procedure:
+
+1. Open the existing `routes/admin.php`.
+2. For each `/* Auto-generated <resource> routes */` … `/* End of <resource> routes */` block:
+   - Create `routes/admin/<resource>.php` (e.g. `routes/admin/posts.php`).
+   - Copy the relevant `use App\Http\Controllers\Admin\<…>Controller;` line from the top of `admin.php`.
+   - Copy the `Route::prefix(...)->…->group(...);` block (without the surrounding `Route::middleware([...])->prefix('admin')->...->group(...)` outer wrapper).
+   - Wrap each file with `<?php`, `declare(strict_types=1);`, the per-file `use Illuminate\Support\Facades\Route;`, and the controller import.
+3. Replace `routes/admin.php` with the umbrella shown above.
+4. Delete any leftover `//-- Do not delete me :) I'm used for auto-generation admin routes --` markers.
+
+After the split, regenerate one resource with `php artisan admin:generate <table> --force` to verify the new flow before moving on.
+
+**`bootstrap/app.php` is unchanged.** The `Route::middleware('web')->group(base_path('routes/admin.php'))` line that `craftable:install` writes still points at the same umbrella file. You don't need to touch `bootstrap/app.php`.
+
+**Class relocation.** `Brackets\AdminGenerator\Generators\FileAppenders\Routes` → `Brackets\AdminGenerator\Generators\Routes\Routes`. The artisan command name (`admin:generate:routes`) is unchanged. The class now extends `Generator` directly (not `FileAppender`) because it writes self-contained files instead of mutating an existing one.
+
 ## Suggested upgrade procedure
 
 1. **Bump platform versions.** Update `composer.json`:
@@ -162,13 +242,15 @@ If you regenerate over an existing v1 user CRUD without `--force`, the `Imperson
 
 3. **Run the test suite + manually check the admin.** Generated code from v1 still works at runtime under v2 admin-generator — only your in-repo CRUD output keeps the v1 style until you regenerate.
 
-4. **(Optional) Replace direct calls to the split sub-commands.** If your CI / Make / `composer scripts` run `admin:generate:index` or `admin:generate:form`, swap them for the new commands listed above.
+4. **Split `routes/admin.php` into the umbrella + `routes/admin/` layout.** Required before the next `admin:generate:*` run that touches routes. Follow the manual procedure under "Routes file layout changed" above. There's no automated migration command — the split is a one-time mechanical edit per project.
 
-5. **(Optional) Replace v1 FQN references.** If you `use Brackets\AdminGenerator\Generate\<Foo>` anywhere in your app/package code (uncommon — most consumers don't), rename to the v2 path.
+5. **(Optional) Replace direct calls to the split sub-commands.** If your CI / Make / `composer scripts` run `admin:generate:index` or `admin:generate:form`, swap them for the new commands listed above.
 
-6. **(Optional) Regenerate scaffolds.** Pick a feature (e.g. one CRUD module), run `php artisan admin:generate <table> --force`, and review the diff. The new output uses `final readonly class`, full DI, native types, and the new impersonate flow for users. Roll out per module — there's no big-bang requirement.
+6. **(Optional) Replace v1 FQN references.** If you `use Brackets\AdminGenerator\Generate\<Foo>` anywhere in your app/package code (uncommon — most consumers don't), rename to the v2 path.
 
-7. **(Optional) Adopt new options.**
+7. **(Optional) Regenerate scaffolds.** Pick a feature (e.g. one CRUD module), run `php artisan admin:generate <table> --force`, and review the diff. The new output uses `final readonly class`, full DI, native types, and the new impersonate flow for users. Roll out per module — there's no big-bang requirement.
+
+8. **(Optional) Adopt new options.**
    - `admin:generate:permissions --with-impersonal-login` if you want the permission seeded.
    - `admin:generate:user --force-permissions` if Craftable isn't installed but you still want the permissions migration generated.
 

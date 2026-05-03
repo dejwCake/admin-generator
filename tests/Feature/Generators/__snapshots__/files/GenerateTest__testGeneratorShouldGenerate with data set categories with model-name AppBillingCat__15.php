@@ -2,38 +2,58 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\Admin\Cat;
+return [
+    'cat' => [
+        'title' => 'Categories',
 
-use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Collection;
+        'actions' => [
+            'index' => 'Categories',
+            'create' => 'New Category',
+            'edit' => 'Edit :name',
+            'will_be_published' => 'Cat will be published at',
+        ],
 
-final class BulkDestroyCat extends FormRequest
-{
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(Gate $gate): bool
-    {
-        return $gate->allows('admin.cat.bulk-delete');
-    }
+        'columns' => [
+            'id' => 'ID',
+            'user_id' => 'User',
+            'title' => 'Title',
+            'name' => 'Name',
+            'first_name' => 'First name',
+            'last_name' => 'Last name',
+            'subject' => 'Subject',
+            'email' => 'Email',
+            'password' => 'Password',
+            'password_repeat' => 'Password Confirmation',
+            'remember_token' => 'Remember token',
+            'language' => 'Language',
+            'slug' => 'Slug',
+            'perex' => 'Perex',
+            'long_text' => 'Long text',
+            'published_at' => 'Published at',
+            'published_to' => 'Published to',
+            'date_start' => 'Date start',
+            'time_start' => 'Time start',
+            'date_time_end' => 'Date time end',
+            'released_at' => 'Released at',
+            'text' => 'Text',
+            'description' => 'Description',
+            'enabled' => 'Enabled',
+            'send' => 'Send',
+            'price' => 'Price',
+            'rating' => 'Rating',
+            'views' => 'Views',
+            'created_by_admin_user_id' => 'Created by admin user',
+            'updated_by_admin_user_id' => 'Updated by admin user',
+            'created_at' => 'Created at',
+            'updated_at' => 'Updated at',
+            'deleted_at' => 'Deleted at',
+        ],
 
-    /**
-     * Get the validation rules that apply to the request.
-     */
-    public function rules(): array
-    {
-        return [
-            'ids.*' => [
-                'integer',
-            ],
-        ];
-    }
+        //Belongs to many relations
+        'relations' => [
+            'posts' => 'Posts',
+        ],
+    ],
 
-    public function getIds(): Collection
-    {
-        $data = $this->validated();
-
-        return new Collection($data['ids'] ?? []);
-    }
-}
+    //-- Do not delete me :) I'm used for auto-generation language arrays --
+];

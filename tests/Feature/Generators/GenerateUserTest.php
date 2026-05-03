@@ -28,6 +28,7 @@ final class GenerateUserTest extends TestCase
         'resources/js/admin/user/Form.vue',
         'database/factories/UserFactory.php',
         'routes/admin.php',
+        'routes/admin/users.php',
         'lang/en/admin.php',
     ];
 
@@ -263,6 +264,14 @@ final class GenerateUserTest extends TestCase
         $requestsBaseName = end($nestedSegments);
         $requestsBaseNameUcFirst = ucfirst($requestsBaseName);
 
+        $namespaceParts = explode('\\', $subNamespace);
+        $modelBaseName = (string) end($namespaceParts);
+        array_pop($namespaceParts);
+        $namespaceParts[] = ucfirst($modelBaseName) . 's';
+        $resource = strtolower(
+            (string) preg_replace('/(?<!^)([A-Z])/', '-$1', implode('', $namespaceParts)),
+        );
+
         return [
             'app/Http/Controllers/Admin/UsersController.php',
             sprintf('app/Http/Requests/Admin/%s/Index%s.php', self::ucPath($requestsDir), $requestsBaseNameUcFirst),
@@ -281,6 +290,7 @@ final class GenerateUserTest extends TestCase
             sprintf('resources/js/admin/%s/Form.vue', $jsDir),
             'database/factories/UserFactory.php',
             'routes/admin.php',
+            sprintf('routes/admin/%s.php', $resource),
             'lang/en/admin.php',
         ];
     }

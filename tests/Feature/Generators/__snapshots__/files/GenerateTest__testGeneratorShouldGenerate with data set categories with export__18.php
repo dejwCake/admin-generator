@@ -1,0 +1,89 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Exports;
+
+use App\Models\Category;
+use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
+
+final class CategoriesExport implements FromCollection, WithMapping, WithHeadings
+{
+    public function collection(): Collection
+    {
+        return Category::all();
+    }
+
+    public function headings(): array
+    {
+        return [
+            trans('admin.category.columns.id'),
+            trans('admin.category.columns.user_id'),
+            trans('admin.category.columns.title'),
+            trans('admin.category.columns.name'),
+            trans('admin.category.columns.first_name'),
+            trans('admin.category.columns.last_name'),
+            trans('admin.category.columns.subject'),
+            trans('admin.category.columns.email'),
+            trans('admin.category.columns.language'),
+            trans('admin.category.columns.slug'),
+            trans('admin.category.columns.perex'),
+            trans('admin.category.columns.long_text'),
+            trans('admin.category.columns.published_at'),
+            trans('admin.category.columns.published_to'),
+            trans('admin.category.columns.date_start'),
+            trans('admin.category.columns.time_start'),
+            trans('admin.category.columns.date_time_end'),
+            trans('admin.category.columns.released_at'),
+            trans('admin.category.columns.text'),
+            trans('admin.category.columns.description'),
+            trans('admin.category.columns.enabled'),
+            trans('admin.category.columns.send'),
+            trans('admin.category.columns.price'),
+            trans('admin.category.columns.rating'),
+            trans('admin.category.columns.views'),
+            trans('admin.category.columns.created_by_admin_user_id'),
+            trans('admin.category.columns.updated_by_admin_user_id'),
+        ];
+    }
+
+    /**
+     * @param Category $category
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     */
+    public function map($category): array
+    {
+        return [
+            $category->id,
+            $category->user_id,
+            $category->title,
+            $category->name,
+            $category->first_name,
+            $category->last_name,
+            $category->subject,
+            $category->email,
+            $category->language,
+            $category->slug,
+            $category->perex,
+            $category->long_text,
+            $category->published_at,
+            $category->published_to,
+            $category->date_start,
+            $category->time_start,
+            $category->date_time_end,
+            $category->released_at,
+            $category->text,
+            $category->description,
+            $category->enabled,
+            $category->send,
+            $category->price,
+            $category->rating,
+            $category->views,
+            $category->created_by_admin_user_id,
+            $category->updated_by_admin_user_id,
+        ];
+    }
+}
