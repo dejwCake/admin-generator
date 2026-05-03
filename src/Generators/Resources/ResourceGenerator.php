@@ -55,19 +55,24 @@ abstract class ResourceGenerator extends Generator
 
         $content = $this->files->get($adminJsPath);
 
-        $importMarker = '//-- Do not delete me :) I\'m used for auto-generation js import --';
-        $componentMarker = '//-- Do not delete me :) I\'m used for auto-generation component registration --';
-
         $importLine = sprintf("import %s from './%s/%s';", $componentName, $jsRelativePath, $fileName);
         $componentLine = sprintf("app.component('%s', %s);", $componentName, $componentName);
 
-        if (!str_contains($content, $importLine)) {
-            $content = str_replace($importMarker, $importLine . PHP_EOL . $importMarker, $content);
-        }
+        $content = $this->mergeSortedRegion(
+            $content,
+            '//-- Do not delete me :) I\'m used for auto-generation js import begin --',
+            '//-- Do not delete me :) I\'m used for auto-generation js import end --',
+            $componentName,
+            $importLine,
+        );
 
-        if (!str_contains($content, $componentLine)) {
-            $content = str_replace($componentMarker, $componentLine . PHP_EOL . $componentMarker, $content);
-        }
+        $content = $this->mergeSortedRegion(
+            $content,
+            '//-- Do not delete me :) I\'m used for auto-generation component registration begin --',
+            '//-- Do not delete me :) I\'m used for auto-generation component registration end --',
+            $componentName,
+            $componentLine,
+        );
 
         $this->files->put($adminJsPath, $content);
     }
@@ -95,5 +100,45 @@ abstract class ResourceGenerator extends Generator
         $this->initCommonNames($this->argument('table_name'), $this->option('model-name'));
 
         return parent::execute($input, $output);
+    }
+
+    private function mergeSortedRegion(
+        string $content,
+        string $beginMarker,
+        string $endMarker,
+        string $componentName,
+        string $newLine,
+    ): string {
+        $beginPos = strpos($content, $beginMarker);
+        $endPos = strpos($content, $endMarker);
+
+        if ($beginPos === false || $endPos === false || $endPos < $beginPos) {
+            $this->warn(sprintf('Markers %s / %s not found, skipping registration.', $beginMarker, $endMarker));
+
+            return $content;
+        }
+
+        $bodyStart = $beginPos + strlen($beginMarker);
+        $body = substr($content, $bodyStart, $endPos - $bodyStart);
+
+        $entries = [];
+        foreach (preg_split('/\R/', trim($body)) ?: [] as $line) {
+            $line = trim($line);
+            if ($line === '') {
+                continue;
+            }
+            if (preg_match('/^import\s+(\w+)\s+from\s+\'[^\']+\';$/', $line, $matches) === 1) {
+                $entries[$matches[1]] = $line;
+            } elseif (preg_match('/^app\.component\(\'(\w+)\',\s*\w+\);$/', $line, $matches) === 1) {
+                $entries[$matches[1]] = $line;
+            }
+        }
+
+        $entries[$componentName] = $newLine;
+        ksort($entries, SORT_STRING);
+
+        $rebuilt = PHP_EOL . implode(PHP_EOL, $entries) . PHP_EOL;
+
+        return substr($content, 0, $bodyStart) . $rebuilt . substr($content, $endPos);
     }
 }

@@ -226,6 +226,30 @@ After the split, regenerate one resource with `php artisan admin:generate <table
 
 **Class relocation.** `Brackets\AdminGenerator\Generators\FileAppenders\Routes` → `Brackets\AdminGenerator\Generators\Routes\Routes`. The artisan command name (`admin:generate:routes`) is unchanged. The class now extends `Generator` directly (not `FileAppender`) because it writes self-contained files instead of mutating an existing one.
 
+### `admin.js` markers changed shape
+
+`registerVueComponent` now manages the auto-generated import and `app.component(...)` lines as **sorted regions delimited by begin/end markers**, not as a single anchor with appended lines. v2 expects two pairs of markers in `resources/js/admin/admin.js`:
+
+```js
+//-- Do not delete me :) I'm used for auto-generation js import begin --
+//-- Do not delete me :) I'm used for auto-generation js import end --
+```
+
+```js
+//-- Do not delete me :) I'm used for auto-generation component registration begin --
+//-- Do not delete me :) I'm used for auto-generation component registration end --
+```
+
+On every generation the region body is parsed, the new entry is merged in (keyed by component name, so re-runs dedupe), the entries are re-sorted ASCII-ascending by component name, and the body is rewritten between the markers. Only auto-generated lines live inside the markers — keep hand-curated imports outside.
+
+**Migration (manual, one-time):** in your project's `resources/js/admin/admin.js`,
+
+1. Replace `//-- Do not delete me :) I'm used for auto-generation js import --` with the begin/end pair shown above. Move every previously generated `import …` line that sat above it to between the new pair.
+2. Replace `//-- Do not delete me :) I'm used for auto-generation component registration --` with the begin/end pair. Move every previously generated `app.component(...)` line that sat above it to between the new pair.
+3. (Optional) sort the lines now — the next `admin:generate:*` run will re-sort them anyway.
+
+There is no backward-compatibility shim. If the new markers are missing the generator warns and skips registration without modifying the file.
+
 ## Suggested upgrade procedure
 
 1. **Bump platform versions.** Update `composer.json`:
