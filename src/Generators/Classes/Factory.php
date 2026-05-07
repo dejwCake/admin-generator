@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Classes;
 
+use Illuminate\Support\Str;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -57,7 +58,19 @@ final class Factory extends ClassGenerator
     #[Override]
     public function generateClassNameFromTable(string $tableName): string
     {
-        return sprintf('%sFactory', $this->modelBaseName);
+        $appNamespace = trim($this->laravel->getNamespace(), '\\');
+        $modelsPrefix = sprintf('%s\\Models\\', $appNamespace);
+        $appPrefix = sprintf('%s\\', $appNamespace);
+
+        if (Str::startsWith($this->modelFullName, $modelsPrefix)) {
+            $sub = Str::after($this->modelFullName, $modelsPrefix);
+        } elseif (Str::startsWith($this->modelFullName, $appPrefix)) {
+            $sub = Str::after($this->modelFullName, $appPrefix);
+        } else {
+            $sub = $this->modelFullName;
+        }
+
+        return sprintf('%sFactory', $sub);
     }
 
     /**

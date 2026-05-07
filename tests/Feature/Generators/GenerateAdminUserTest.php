@@ -26,7 +26,7 @@ final class GenerateAdminUserTest extends TestCase
         'resources/views/admin/admin-user/edit.blade.php',
         'resources/js/admin/admin-user/Listing.vue',
         'resources/js/admin/admin-user/Form.vue',
-        'database/factories/AdminUserFactory.php',
+        'database/factories/Brackets/AdminAuth/Models/AdminUserFactory.php',
         'routes/admin.php',
         'routes/admin/admin-users.php',
         'lang/en/admin.php',
@@ -77,7 +77,7 @@ final class GenerateAdminUserTest extends TestCase
             'resources/views/admin/admin-user/edit.blade.php',
             'resources/js/admin/admin-user/Listing.vue',
             'resources/js/admin/admin-user/Form.vue',
-            'database/factories/AdminUserFactory.php',
+            'database/factories/Brackets/AdminAuth/Models/AdminUserFactory.php',
         ];
 
         $this->artisan('admin:generate:admin-user');
@@ -281,7 +281,11 @@ final class GenerateAdminUserTest extends TestCase
             sprintf('resources/views/admin/%s/edit.blade.php', $bladeDir),
             sprintf('resources/js/admin/%s/Listing.vue', $jsDir),
             sprintf('resources/js/admin/%s/Form.vue', $jsDir),
-            sprintf('database/factories/%sFactory.php', $modelBaseName),
+            sprintf(
+                'database/factories/%s/%sFactory.php',
+                self::ucPath(implode('/', array_slice($segments, 0, -1))),
+                $modelBaseName,
+            ),
             'routes/admin.php',
             sprintf('routes/admin/%s.php', $resource),
             'lang/en/admin.php',
@@ -308,7 +312,7 @@ final class GenerateAdminUserTest extends TestCase
             'resources/views/admin/admin-user/edit.blade.php',
             'resources/js/admin/admin-user/Listing.vue',
             'resources/js/admin/admin-user/Form.vue',
-            'database/factories/AdminUserFactory.php',
+            'database/factories/Brackets/AdminAuth/Models/AdminUserFactory.php',
         ];
     }
 

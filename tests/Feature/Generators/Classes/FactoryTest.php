@@ -45,12 +45,12 @@ final class FactoryTest extends TestCase
 
         yield 'categories with model-name Billing\\Cat' => [
             'arguments' => ['table_name' => 'categories', '--model-name' => 'Billing\\Cat'],
-            'expectedFilePath' => 'database/factories/CatFactory.php',
+            'expectedFilePath' => 'database/factories/Billing/CatFactory.php',
         ];
 
         yield 'categories with model-name App\\Billing\\Cat' => [
             'arguments' => ['table_name' => 'categories', '--model-name' => 'App\\Billing\\Cat'],
-            'expectedFilePath' => 'database/factories/CatFactory.php',
+            'expectedFilePath' => 'database/factories/Billing/CatFactory.php',
         ];
 
         yield 'categories with model-with-full-namespace App\\Billing\\Category' => [
@@ -58,7 +58,7 @@ final class FactoryTest extends TestCase
                 'table_name' => 'categories',
                 '--model-with-full-namespace' => 'App\\Billing\\Category',
             ],
-            'expectedFilePath' => 'database/factories/CategoryFactory.php',
+            'expectedFilePath' => 'database/factories/Billing/CategoryFactory.php',
         ];
 
         yield 'posts default' => [
@@ -68,7 +68,7 @@ final class FactoryTest extends TestCase
 
         yield 'posts with model-name Feed\\Article' => [
             'arguments' => ['table_name' => 'posts', '--model-name' => 'Feed\\Article'],
-            'expectedFilePath' => 'database/factories/ArticleFactory.php',
+            'expectedFilePath' => 'database/factories/Feed/ArticleFactory.php',
         ];
 
         yield 'posts with model-with-full-namespace App\\Feed\\Post' => [
@@ -76,7 +76,15 @@ final class FactoryTest extends TestCase
                 'table_name' => 'posts',
                 '--model-with-full-namespace' => 'App\\Feed\\Post',
             ],
-            'expectedFilePath' => 'database/factories/PostFactory.php',
+            'expectedFilePath' => 'database/factories/Feed/PostFactory.php',
+        ];
+
+        yield 'admin-user with vendor namespace' => [
+            'arguments' => [
+                'table_name' => 'admin_users',
+                '--model-with-full-namespace' => 'Brackets\\AdminAuth\\Models\\AdminUser',
+            ],
+            'expectedFilePath' => 'database/factories/Brackets/AdminAuth/Models/AdminUserFactory.php',
         ];
     }
 }

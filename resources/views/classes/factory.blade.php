@@ -51,13 +51,13 @@ final class {{ $modelBaseName }}Factory extends Factory
     public function {{ $column->name }}(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['{{ $column->name }}' => true]);
+        return $this->state(fn (array $attributes) => ['{{ $column->name }}' => true]);
     }
 
     public function not{{ Str::ucfirst($column->name) }}(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['{{ $column->name }}' => false]);
+        return $this->state(fn (array $attributes) => ['{{ $column->name }}' => false]);
     }
 @endforeach
 @if($hasEmailVerifiedAt)
@@ -65,7 +65,7 @@ final class {{ $modelBaseName }}Factory extends Factory
     public function unverified(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['email_verified_at' => null]);
+        return $this->state(fn (array $attributes) => ['email_verified_at' => null]);
     }
 @endif
 @if($hasPublishedAt)
@@ -73,7 +73,7 @@ final class {{ $modelBaseName }}Factory extends Factory
     public function notPublished(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['published_at' => null]);
+        return $this->state(fn (array $attributes) => ['published_at' => null]);
     }
 @endif
 }

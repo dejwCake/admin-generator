@@ -58,7 +58,9 @@ final class GenerateAdminUser extends Command
                 $this->files->delete($this->laravel->path('Exports/AdminUsersExport.php'));
             }
             $this->files->delete($this->laravel->path('Http/Controllers/Admin/AdminUsersController.php'));
-            $this->files->delete($this->laravel->databasePath('Factories/AdminUserFactory.php'));
+            $this->files->delete(
+                $this->laravel->databasePath('Factories/Brackets/AdminAuth/Models/AdminUserFactory.php'),
+            );
             $this->files->deleteDirectory($this->laravel->path('Http/Requests/Admin/AdminUser'));
             $this->files->deleteDirectory($this->laravel->resourcePath('js/admin/admin-user'));
             $this->files->deleteDirectory($this->laravel->resourcePath('views/admin/admin-user'));

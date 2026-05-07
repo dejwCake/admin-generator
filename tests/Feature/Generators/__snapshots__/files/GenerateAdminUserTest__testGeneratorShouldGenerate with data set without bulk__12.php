@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Database\Factories;
+namespace Database\Factories\Brackets\AdminAuth\Models;
 
 use Brackets\AdminAuth\Models\AdminUser;
 use Illuminate\Container\Container;
@@ -35,24 +35,24 @@ final class AdminUserFactory extends Factory
     public function activated(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['activated' => true]);
+        return $this->state(fn (array $attributes) => ['activated' => true]);
     }
 
     public function notActivated(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['activated' => false]);
+        return $this->state(fn (array $attributes) => ['activated' => false]);
     }
 
     public function forbidden(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['forbidden' => true]);
+        return $this->state(fn (array $attributes) => ['forbidden' => true]);
     }
 
     public function notForbidden(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['forbidden' => false]);
+        return $this->state(fn (array $attributes) => ['forbidden' => false]);
     }
 }

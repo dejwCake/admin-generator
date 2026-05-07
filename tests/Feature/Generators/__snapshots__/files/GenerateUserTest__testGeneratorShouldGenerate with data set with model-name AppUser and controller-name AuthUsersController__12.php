@@ -31,6 +31,6 @@ final class UserFactory extends Factory
     public function unverified(): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['email_verified_at' => null]);
+        return $this->state(fn (array $attributes) => ['email_verified_at' => null]);
     }
 }

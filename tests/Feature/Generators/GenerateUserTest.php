@@ -218,8 +218,18 @@ final class GenerateUserTest extends TestCase
 
         yield 'with generate-model and model-name App\\Auth\\User' => [
             'options' => ['--generate-model' => true, '--model-name' => 'App\\Auth\\User'],
-            'expectedFiles' => [...$common, $bulkDestroy, $outsideModel],
-            'missingFiles' => [$exportRequest, $exportClass, $defaultModel, $namespacedModel],
+            'expectedFiles' => [
+                ...self::replaceFactory($common, 'database/factories/Auth/UserFactory.php'),
+                $bulkDestroy,
+                $outsideModel,
+            ],
+            'missingFiles' => [
+                'database/factories/UserFactory.php',
+                $exportRequest,
+                $exportClass,
+                $defaultModel,
+                $namespacedModel,
+            ],
         ];
 
         yield 'with force-permissions' => [
@@ -239,6 +249,20 @@ final class GenerateUserTest extends TestCase
         return array_values(array_map(
             static fn (string $path): string => $path === 'app/Http/Controllers/Admin/UsersController.php'
                 ? $newControllerPath
+                : $path,
+            $files,
+        ));
+    }
+
+    /**
+     * @param array<int, string> $files
+     * @return array<int, string>
+     */
+    private static function replaceFactory(array $files, string $newFactoryPath): array
+    {
+        return array_values(array_map(
+            static fn (string $path): string => str_starts_with($path, 'database/factories/')
+                ? $newFactoryPath
                 : $path,
             $files,
         ));
@@ -288,7 +312,11 @@ final class GenerateUserTest extends TestCase
             sprintf('resources/views/admin/%s/edit.blade.php', $bladeDir),
             sprintf('resources/js/admin/%s/Listing.vue', $jsDir),
             sprintf('resources/js/admin/%s/Form.vue', $jsDir),
-            'database/factories/UserFactory.php',
+            sprintf(
+                'database/factories/%s/%sFactory.php',
+                self::ucPath(implode('/', array_slice($nestedSegments, 0, -1))),
+                ucfirst((string) end($nestedSegments)),
+            ),
             'routes/admin.php',
             sprintf('routes/admin/%s.php', $resource),
             'lang/en/admin.php',
