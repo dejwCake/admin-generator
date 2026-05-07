@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Factories\Billing;
 
 use App\Billing\Cat;
+use Brackets\AdminAuth\Models\AdminUser;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
@@ -16,6 +17,8 @@ final class CatFactory extends Factory
     public function definition(): array
     {
         $hasher = Container::getInstance()->make(Hasher::class);
+
+        $adminUserId = AdminUser::query()->inRandomOrder()->value('id');
 
         return [
             'user_id' => $this->faker->randomNumber(5),
@@ -42,8 +45,8 @@ final class CatFactory extends Factory
             'price' => $this->faker->randomFloat(2, max: 10000),
             'rating' => $this->faker->randomFloat(2),
             'views' => $this->faker->randomNumber(5),
-            'created_by_admin_user_id' => $this->faker->randomNumber(5),
-            'updated_by_admin_user_id' => $this->faker->randomNumber(5),
+            'created_by_admin_user_id' => $adminUserId,
+            'updated_by_admin_user_id' => $adminUserId,
             'created_at' => $this->faker->dateTime,
             'updated_at' => $this->faker->dateTime,
             'deleted_at' => null,

@@ -21,6 +21,9 @@ namespace {{ $namespace }};
         $uses->push('Illuminate\Container\Container');
         $uses->push('Illuminate\Contracts\Hashing\Hasher');
     }
+    if ($hasCreatedByAdminUser || $hasUpdatedByAdminUser) {
+        $uses->push('Brackets\AdminAuth\Models\AdminUser');
+    }
     $uses = $uses->unique()->sort();
 @endphp
 
@@ -37,9 +40,17 @@ final class {{ $modelBaseName }}Factory extends Factory
         $hasher = Container::getInstance()->make(Hasher::class);
 
 @endif
+@if($hasCreatedByAdminUser || $hasUpdatedByAdminUser)
+        $adminUserId = AdminUser::query()->inRandomOrder()->value('id');
+
+@endif
         return [
 @foreach($columns->getNonTranslatable() as $column)
+@if($column->name === 'created_by_admin_user_id' || $column->name === 'updated_by_admin_user_id')
+            '{{ $column->name }}' => $adminUserId,
+@else
             '{{ $column->name }}' => {!! $column->faker !!},
+@endif
 @endforeach
 @foreach($columns->getTranslatable() as $column)
             '{{ $column->name }}' => ['en' => {!! $column->faker !!}],

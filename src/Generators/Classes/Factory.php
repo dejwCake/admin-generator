@@ -96,6 +96,8 @@ final class Factory extends ClassGenerator
             'hasPassword' => $columns->hasByName('password'),
             'hasEmailVerifiedAt' => $columns->hasByName('email_verified_at'),
             'hasPublishedAt' => $columns->hasByName('published_at'),
+            'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
+            'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
             //columns
             'columns' => $columns,
         ])->render();
