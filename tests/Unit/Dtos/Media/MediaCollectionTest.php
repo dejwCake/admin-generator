@@ -18,6 +18,7 @@ final class MediaCollectionTest extends TestCase
             type: MediaCollectionType::Image,
             disk: MediaCollectionDisk::Public,
             maxFiles: 10,
+            maxFileSizeInMb: 10,
             translationKey: 'gallery',
             translationValue: 'Gallery',
         );
@@ -32,6 +33,7 @@ final class MediaCollectionTest extends TestCase
             type: MediaCollectionType::Document,
             disk: MediaCollectionDisk::Public,
             maxFiles: 5,
+            maxFileSizeInMb: 10,
             translationKey: 'documents',
             translationValue: 'Documents',
         );
@@ -46,6 +48,7 @@ final class MediaCollectionTest extends TestCase
             type: MediaCollectionType::Document,
             disk: MediaCollectionDisk::Private,
             maxFiles: 5,
+            maxFileSizeInMb: 10,
             translationKey: 'private_files',
             translationValue: 'Private Files',
         );
@@ -60,6 +63,7 @@ final class MediaCollectionTest extends TestCase
             type: MediaCollectionType::Image,
             disk: MediaCollectionDisk::Public,
             maxFiles: 10,
+            maxFileSizeInMb: 10,
             translationKey: 'gallery',
             translationValue: 'Gallery',
         );

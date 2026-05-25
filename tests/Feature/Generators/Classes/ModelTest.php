@@ -63,6 +63,11 @@ final class ModelTest extends TestCase
             'expectedFilePath' => 'app/Models/Category.php',
         ];
 
+        yield 'categories with media and max file size' => [
+            'arguments' => ['table_name' => 'categories', '--media' => ['gallery:image:public:5000:25']],
+            'expectedFilePath' => 'app/Models/Category.php',
+        ];
+
         yield 'categories with template admin-user' => [
             'arguments' => ['table_name' => 'categories', '--template' => 'admin-user'],
             'expectedFilePath' => 'app/Models/Category.php',

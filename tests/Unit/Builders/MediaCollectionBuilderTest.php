@@ -68,6 +68,24 @@ final class MediaCollectionBuilderTest extends TestCase
         self::assertSame(1, $media->maxFiles);
     }
 
+    public function testBuildParsesOptionalMaxFileSizeWhenProvided(): void
+    {
+        $result = $this->mediaCollectionBuilder->build(['gallery:image:public:5:25']);
+
+        $media = $result->get('gallery');
+        self::assertInstanceOf(MediaCollection::class, $media);
+        self::assertSame(25, $media->maxFileSizeInMb);
+    }
+
+    public function testBuildDefaultsMaxFileSizeToTenWhenOmitted(): void
+    {
+        $result = $this->mediaCollectionBuilder->build(['gallery:image:public:5']);
+
+        $media = $result->get('gallery');
+        self::assertInstanceOf(MediaCollection::class, $media);
+        self::assertSame(10, $media->maxFileSizeInMb);
+    }
+
     public function testBuildSetsTranslationKeyToLcfirstOfName(): void
     {
         $result = $this->mediaCollectionBuilder->build(['MainImage:image:public:1']);

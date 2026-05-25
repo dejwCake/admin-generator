@@ -4,19 +4,23 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Brackets\AdminAuth\Notifications\ResetPassword;
 use Brackets\Craftable\Traits\CreatedByAdminUserTrait;
+use Brackets\Craftable\Traits\PublishableTrait;
 use Brackets\Craftable\Traits\UpdatedByAdminUserTrait;
+use Brackets\Media\HasMedia\AutoProcessMediaTrait;
+use Brackets\Media\HasMedia\HasMediaCollectionsTrait;
+use Brackets\Media\HasMedia\HasMediaThumbsTrait;
+use Brackets\Media\HasMedia\ProcessMediaTrait;
 use Brackets\Translatable\Traits\HasTranslations;
 use Carbon\CarbonInterface;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @property int $id
@@ -54,18 +58,20 @@ use Illuminate\Support\Collection;
  * @property-read Collection<int, Post> $posts
  * @property-read User|null $user
  */
-final class Category extends Authenticatable implements MustVerifyEmail
+final class Category extends Model implements HasMedia
 {
+    use AutoProcessMediaTrait;
     use CreatedByAdminUserTrait;
     use HasFactory;
+    use HasMediaCollectionsTrait;
+    use HasMediaThumbsTrait;
     use HasTranslations;
-    use Notifiable;
+    use ProcessMediaTrait;
+    use PublishableTrait;
     use SoftDeletes;
     use UpdatedByAdminUserTrait;
 
     /**
-     * The attributes that are mass assignable.
-     *
      * @var array<int, string>
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
@@ -118,17 +124,6 @@ final class Category extends Authenticatable implements MustVerifyEmail
         'description',
     ];
 
-    /**
-     * Send the password reset notification.
-     *
-     * @param string $token
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
-     */
-    public function sendPasswordResetNotification($token): void
-    {
-        $this->notify(app(ResetPassword::class, ['token' => $token]));
-    }
-
     public function posts(): BelongsToMany
     {
         return $this->belongsToMany(Post::class, 'category_post', 'category_id', 'post_id');
@@ -137,6 +132,60 @@ final class Category extends Authenticatable implements MustVerifyEmail
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('gallery')
+            ->maxFilesize(25 * 1024 * 1024)
+            ->maxNumberOfFiles(5000)
+            ->accepts('image/*');
+    }
+
+    /**
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->autoRegisterThumb200();
+
+        $converted = [
+            'name' => 'converted',
+            'collection' => 'gallery',
+            'width' => 960,
+            'height' => 360,
+        ];
+
+        $this->addMediaConversion($converted['name'])
+            ->width($converted['width'])
+            ->height($converted['height'])
+            ->crop($converted['width'], $converted['height'])
+            ->performOnCollections($converted['collection'])
+            ->keepOriginalImageFormat()
+            ->nonQueued();
+
+        $this->addMediaConversion($converted['name'] . 'Retina')
+            ->width(2 * $converted['width'])
+            ->height(2 * $converted['height'])
+            ->crop(2 * $converted['width'], 2 * $converted['height'])
+            ->performOnCollections($converted['collection'])
+            ->keepOriginalImageFormat()
+            ->nonQueued();
+
+        $original = [
+            'name' => 'original',
+            'collection' => 'gallery',
+        ];
+
+        $this->addMediaConversion($original['name'])
+            ->performOnCollections($original['collection'])
+            ->keepOriginalImageFormat()
+            ->nonQueued();
+
+        $this->addMediaConversion($original['name'] . 'Retina')
+            ->performOnCollections($original['collection'])
+            ->keepOriginalImageFormat()
+            ->nonQueued();
     }
 
     /**
@@ -155,7 +204,6 @@ final class Category extends Authenticatable implements MustVerifyEmail
             'created_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'updated_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'deleted_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
-            'password' => 'hashed',
         ];
     }
 }
