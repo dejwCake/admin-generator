@@ -41,8 +41,8 @@ final class AdminUsersExport implements FromCollection, WithMapping, WithHeading
             $adminUser->first_name,
             $adminUser->last_name,
             $adminUser->email,
-            $adminUser->activated,
-            $adminUser->forbidden,
+            $adminUser->activated === null ? '' : ($adminUser->activated ? __('Yes') : __('No')),
+            $adminUser->forbidden === null ? '' : ($adminUser->forbidden ? __('Yes') : __('No')),
             $adminUser->language,
         ];
     }
