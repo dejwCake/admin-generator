@@ -81,9 +81,11 @@ use {{ $use }};
 
 /**
 @foreach($columns as $column)
-@php assert($column instanceof Column);
+@php
+    assert($column instanceof Column);
+    $docType = $column->majorType === 'json' ? 'string' : $column->phpType;
 @endphp
- * @property {{ !$column->required ? $column->phpType . '|null' : $column->phpType }} ${{ $column->name }}
+ * @property {{ !$column->required ? $docType . '|null' : $docType }} ${{ $column->name }}
 @endforeach
  */
 final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEmail{{ $mediaCollections->isNotEmpty() ? ', HasMedia' : '' }}

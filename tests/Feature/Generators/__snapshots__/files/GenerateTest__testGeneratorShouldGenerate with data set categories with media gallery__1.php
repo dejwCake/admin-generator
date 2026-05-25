@@ -42,8 +42,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property string|null $time_start
  * @property CarbonInterface|null $date_time_end
  * @property CarbonInterface $released_at
- * @property array $text
- * @property array $description
+ * @property string $text
+ * @property string $description
  * @property bool $enabled
  * @property bool $send
  * @property float|null $price
