@@ -199,7 +199,7 @@ final class {{ $modelBaseName }} extends Authenticatable implements CanActivateC
 @if($collection->isPrivate())
             ->private()
 @endif
-            ->maxFilesize(10 * 1024 * 1024)
+            ->maxFilesize({{ $collection->maxFileSizeInMb }} * 1024 * 1024)
             ->maxNumberOfFiles({{ $collection->maxFiles }})
 @if($collection->isImage())
             ->accepts('image/*');

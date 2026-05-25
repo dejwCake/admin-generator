@@ -24,6 +24,7 @@ final readonly class MediaCollectionBuilder
                     type: MediaCollectionType::from($parts[1]),
                     disk: MediaCollectionDisk::from($parts[2]),
                     maxFiles: (int) $parts[3],
+                    maxFileSizeInMb: isset($parts[4]) ? (int) $parts[4] : 10,
                     translationKey: Str::lcfirst($parts[0]),
                     translationValue: Str::headline($parts[0]),
                 );
