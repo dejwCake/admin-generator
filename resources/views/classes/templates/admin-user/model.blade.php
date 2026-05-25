@@ -41,6 +41,7 @@ namespace {{ $modelNameSpace }};
     }
     if ($relations->hasBelongsToManyWithoutRelatedTable('roles')) {
         $uses->push('Illuminate\Database\Eloquent\Relations\BelongsToMany');
+        $uses->push('Illuminate\Support\Collection');
         foreach ($relations->getBelongsToManyWithoutRelatedTable('roles') as $belongsToMany) {
             $relatedNamespace = implode('\\', array_slice(explode('\\', $belongsToMany->relatedModel), 0, -1));
             if ($relatedNamespace !== $modelNameSpace) {
@@ -68,10 +69,22 @@ use {{ $use }};
 @foreach($columns as $column)
 @php
     assert($column instanceof Column);
-    $docType = $column->majorType === 'json' ? 'string' : $column->phpType;
+    $docType = $column->majorType === 'json'
+        ? 'string'
+        : ($column->phpType === 'array' ? 'array<string>' : $column->phpType);
 @endphp
  * @property {{ !$column->required ? $docType . '|null' : $docType }} ${{ $column->name }}
 @endforeach
+@if($relations->hasBelongsToManyWithoutRelatedTable('roles'))
+@foreach($relations->getBelongsToManyWithoutRelatedTable('roles') as $belongsToMany)
+ * @property-read Collection<int, {{ $belongsToMany->relatedModelName }}> ${{ $belongsToMany->relationMethodName }}
+@endforeach
+@endif
+@if($relations->hasBelongsTo())
+@foreach($relations->getBelongsTo() as $belongsTo)
+ * @property-read {{ $belongsTo->relatedModelName }}|null ${{ $belongsTo->relationMethodName }}
+@endforeach
+@endif
  */
 final class {{ $modelBaseName }} extends Authenticatable implements CanActivateContract
 {

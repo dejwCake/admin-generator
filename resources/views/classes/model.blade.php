@@ -56,6 +56,7 @@ namespace {{ $modelNameSpace }};
     }
     if ($relations->hasBelongsToManyWithoutRelatedTable('roles')) {
         $uses[] = 'Illuminate\Database\Eloquent\Relations\BelongsToMany';
+        $uses[] = 'Illuminate\Support\Collection';
         foreach ($relations->getBelongsToManyWithoutRelatedTable('roles') as $belongsToMany) {
             $relatedNamespace = implode('\\', array_slice(explode('\\', $belongsToMany->relatedModel), 0, -1));
             if ($relatedNamespace !== $modelNameSpace) {
@@ -78,6 +79,7 @@ namespace {{ $modelNameSpace }};
                 continue;
             }
             $uses->push('Illuminate\Database\Eloquent\Relations\HasMany');
+            $uses->push('Illuminate\Support\Collection');
             $relatedNamespace = implode('\\', array_slice(explode('\\', $hasMany->relatedModel), 0, -1));
             if ($relatedNamespace !== $modelNameSpace) {
                 $uses->push($hasMany->relatedModel);
@@ -95,10 +97,29 @@ use {{ $use }};
 @foreach($columns as $column)
 @php
     assert($column instanceof Column);
-    $docType = $column->majorType === 'json' ? 'string' : $column->phpType;
+    $docType = $column->majorType === 'json'
+        ? 'string'
+        : ($column->phpType === 'array' ? 'array<string>' : $column->phpType);
 @endphp
  * @property {{ !$column->required ? $docType . '|null' : $docType }} ${{ $column->name }}
 @endforeach
+@if($relations->hasBelongsToManyWithoutRelatedTable('roles'))
+@foreach($relations->getBelongsToManyWithoutRelatedTable('roles') as $belongsToMany)
+ * @property-read Collection<int, {{ $belongsToMany->relatedModelName }}> ${{ $belongsToMany->relationMethodName }}
+@endforeach
+@endif
+@if($relations->hasBelongsTo())
+@foreach($relations->getBelongsTo() as $belongsTo)
+ * @property-read {{ $belongsTo->relatedModelName }}|null ${{ $belongsTo->relationMethodName }}
+@endforeach
+@endif
+@if($relations->hasHasMany())
+@foreach($relations->getHasMany() as $hasMany)
+@if(!$relations->hasRelationMethodNameInBelongsToMany($hasMany->relationMethodName))
+ * @property-read Collection<int, {{ $hasMany->relatedModelName }}> ${{ $hasMany->relationMethodName }}
+@endif
+@endforeach
+@endif
  */
 final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty() ? ' implements HasMedia' : '' }}
 {
