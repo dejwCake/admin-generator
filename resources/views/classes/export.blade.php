@@ -40,7 +40,13 @@ final class {{ $classBaseName }} implements FromCollection, WithMapping, WithHea
     {
         return [
 @foreach($columns as $column)
+@if($column->phpType === 'bool')
+            ${{ $modelVariableName }}->{{ $column->name }} === null ? '' : (${{ $modelVariableName }}->{{ $column->name }} ? __('Yes') : __('No')),
+@elseif($column->phpType === 'array')
+            is_array(${{ $modelVariableName }}->{{ $column->name }}) ? implode(', ', ${{ $modelVariableName }}->{{ $column->name }}) : ${{ $modelVariableName }}->{{ $column->name }},
+@else
             ${{ $modelVariableName }}->{{ $column->name }},
+@endif
 @endforeach
         ];
     }
