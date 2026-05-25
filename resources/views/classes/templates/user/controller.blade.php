@@ -201,7 +201,7 @@ final class {{ $controllerBaseName }} extends Controller
 @if($relations->hasBelongsToMany())
         ${{ $modelVariableName }} = {{ $modelBaseName }}::create($data);
 @foreach($relations->getBelongsToMany() as $belongsToMany)
-        ${{ $modelVariableName }}->{{ $belongsToMany->relatedTable }}()->sync($request->get{{ $belongsToMany->relatedModelName }}Ids());
+        ${{ $modelVariableName }}->{{ $belongsToMany->relationMethodName }}()->sync($request->get{{ $belongsToMany->relatedModelName }}Ids());
 @endforeach
 @else
         {{ $modelBaseName }}::create($data);
@@ -274,7 +274,7 @@ final class {{ $controllerBaseName }} extends Controller
 @if($relations->hasBelongsToMany())
 @foreach($relations->getBelongsToMany() as $belongsToMany)
         if ($request->get{{ $belongsToMany->relatedModelName }}Ids() !== null) {
-            ${{ $modelVariableName }}->{{ $belongsToMany->relatedTable }}()->sync($request->get{{ $belongsToMany->relatedModelName }}Ids());
+            ${{ $modelVariableName }}->{{ $belongsToMany->relationMethodName }}()->sync($request->get{{ $belongsToMany->relatedModelName }}Ids());
         }
 @endforeach
 @endif
