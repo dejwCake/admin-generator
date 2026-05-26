@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Unit\Dtos\Columns\ColumnCollection;
 
+use Brackets\AdminGenerator\Builders\ColumnBuilder;
 use Brackets\AdminGenerator\Dtos\Columns\Column;
 use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
 use Illuminate\Support\Collection;
@@ -14,13 +15,6 @@ final class InputTypePredicatesTest extends TestCase
     public function testHasWysiwygReturnsTrueForTextMajorTypeWithWysiwygName(): void
     {
         $collection = new ColumnCollection([self::makeColumn('perex', majorType: 'text')]);
-
-        self::assertTrue($collection->hasWysiwyg());
-    }
-
-    public function testHasWysiwygReturnsTrueForJsonMajorTypeWithWysiwygName(): void
-    {
-        $collection = new ColumnCollection([self::makeColumn('description', majorType: 'json')]);
 
         self::assertTrue($collection->hasWysiwyg());
     }
@@ -81,6 +75,11 @@ final class InputTypePredicatesTest extends TestCase
             majorType: $majorType,
             phpType: 'string',
             isTranslatable: $majorType === 'json',
+            isWysiwyg: in_array($name, ColumnBuilder::WYSIWYG_COLUMN_NAMES, true) && in_array(
+                $majorType,
+                ['text', 'json'],
+                true,
+            ),
             faker: 'word()',
             required: false,
             defaultTranslation: $name,

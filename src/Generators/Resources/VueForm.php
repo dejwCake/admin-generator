@@ -164,7 +164,6 @@ final class VueForm extends ResourceGenerator
                 ->map(static fn (string $key): string => sprintf("'%s'", $key))
                 ->implode(', '),
             //other
-            'wysiwygTextColumnNames' => $columns->getWysiwygColumnNames(),
             'isUsedTwoColumnsLayout' => $publishedColumns->isNotEmpty()
                 || $galleryCollections->isNotEmpty()
                 || $hasCreatedByAdminUser

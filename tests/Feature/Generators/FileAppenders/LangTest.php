@@ -67,6 +67,11 @@ final class LangTest extends TestCase
             'expectedFilePath' => 'lang/en/admin.php',
         ];
 
+        yield 'categories with translatable text' => [
+            'arguments' => ['table_name' => 'categories', '--translatable' => 'text'],
+            'expectedFilePath' => 'lang/en/admin.php',
+        ];
+
         yield 'categories with model-name Billing\\Cat' => [
             'arguments' => ['table_name' => 'categories', '--model-name' => 'Billing\\Cat'],
             'expectedFilePath' => 'lang/en/admin.php',

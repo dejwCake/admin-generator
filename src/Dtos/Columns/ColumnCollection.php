@@ -19,9 +19,6 @@ use Traversable;
 /** @implements IteratorAggregate<string, Column> */
 final class ColumnCollection implements IteratorAggregate, Countable
 {
-    public const array WYSIWYG_COLUMN_NAMES = ['perex', 'text', 'body', 'description'];
-
-    private const array WYSIWYG_COLUMN_MAJOR_TYPES = ['text', 'json'];
     private const array PREFERRED_LABEL_COLUMNS = ['title', 'name', 'first_name', 'email'];
 
     /** @var Collection<string, Column> */
@@ -122,7 +119,7 @@ final class ColumnCollection implements IteratorAggregate, Countable
             $this->columns->filter(
                 static fn (Column $column): bool =>
                     in_array($column->majorType, ['text', 'string'], true)
-                        || ($column->majorType === 'json' && $column->isTranslatable)
+                        || $column->isTranslatable
                         || $column->name === 'id',
             )->reject(
                 static fn (Column $column) => in_array($column->name, ['password', 'remember_token'], true),
@@ -146,9 +143,9 @@ final class ColumnCollection implements IteratorAggregate, Countable
     public function getForIndex(): self
     {
         return new self(
-            $this->columns
-                ->filter(static fn (Column $column): bool => $column->priority !== null)
-                ->reject(static fn (Column $column): bool => $column->majorType === 'json' && !$column->isTranslatable),
+            $this->columns->filter(
+                static fn (Column $column): bool => $column->priority !== null,
+            ),
         );
     }
 
@@ -173,9 +170,7 @@ final class ColumnCollection implements IteratorAggregate, Countable
     public function getArrayColumns(): self
     {
         return new self(
-            $this->columns->filter(
-                static fn (Column $column) => $column->majorType === 'json' && !$column->isTranslatable,
-            ),
+            $this->columns->filter(static fn (Column $column) => $column->isArray()),
         );
     }
 
@@ -222,12 +217,6 @@ final class ColumnCollection implements IteratorAggregate, Countable
         );
     }
 
-    /** @return array<int, string> */
-    public function getWysiwygColumnNames(): array
-    {
-        return self::WYSIWYG_COLUMN_NAMES;
-    }
-
     public function hasByName(string ...$names): bool
     {
         return $this->columns->contains(
@@ -247,36 +236,31 @@ final class ColumnCollection implements IteratorAggregate, Countable
         return $this->columns->isNotEmpty();
     }
 
+    public function hasLocalizedWysiwyg(): bool
+    {
+        return $this->columns->contains(
+            static fn (Column $column): bool => $column->isWysiwyg && $column->isTranslatable,
+        );
+    }
+
     public function hasWysiwyg(): bool
     {
         return $this->columns->contains(
-            static fn (Column $column): bool =>
-                in_array($column->majorType, self::WYSIWYG_COLUMN_MAJOR_TYPES, true)
-                    && in_array($column->name, self::WYSIWYG_COLUMN_NAMES, true),
+            static fn (Column $column): bool => $column->isWysiwyg && !$column->isTranslatable,
         );
     }
 
     public function hasTextarea(): bool
     {
         return $this->columns->contains(
-            static fn (Column $column): bool => $column->majorType === 'text'
-                && !in_array($column->name, self::WYSIWYG_COLUMN_NAMES, true),
+            static fn (Column $column): bool => $column->majorType === 'text' && !$column->isWysiwyg,
         );
     }
 
     public function hasLocalizedInput(): bool
     {
         return $this->columns->contains(
-            static fn (Column $column): bool => $column->isTranslatable
-                && !in_array($column->name, self::WYSIWYG_COLUMN_NAMES, true),
-        );
-    }
-
-    public function hasLocalizedWysiwyg(): bool
-    {
-        return $this->columns->contains(
-            static fn (Column $column): bool => $column->isTranslatable
-                && in_array($column->name, self::WYSIWYG_COLUMN_NAMES, true),
+            static fn (Column $column): bool => $column->isTranslatable && !$column->isWysiwyg,
         );
     }
 
@@ -290,7 +274,7 @@ final class ColumnCollection implements IteratorAggregate, Countable
     public function hasTagInput(): bool
     {
         return $this->columns->contains(
-            static fn (Column $column): bool => $column->majorType === 'json' && !$column->isTranslatable,
+            static fn (Column $column): bool => $column->isArray(),
         );
     }
 

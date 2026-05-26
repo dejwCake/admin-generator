@@ -76,6 +76,9 @@
                                 <Sortable v-if="isColumnVisible(10)" :column="'released_at'" :orderBy="orderBy" @sort="onSort">
                                     {{ translations.columns.released_at }}
                                 </Sortable>
+                                <Sortable v-if="isColumnVisible(10)" :column="'description'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.description }}
+                                </Sortable>
                                 <Sortable v-if="isColumnVisible(10)" :column="'enabled'" :orderBy="orderBy" @sort="onSort">
                                     {{ translations.columns.enabled }}
                                 </Sortable>
@@ -153,6 +156,7 @@
                                 <td v-if="isColumnVisible(8)">{{ formatTime(item.time_start) }}</td>
                                 <td v-if="isColumnVisible(9)">{{ formatDatetime(item.date_time_end) }}</td>
                                 <td v-if="isColumnVisible(10)">{{ formatDatetime(item.released_at) }}</td>
+                                <td v-if="isColumnVisible(10)">{{ (item.description ?? []).join(', ') }}</td>
                                 <td v-if="isColumnVisible(10)">
                                     <ToggleSwitch
                                         v-model="collection[index].enabled"

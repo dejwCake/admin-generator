@@ -55,7 +55,7 @@
                             :error="errors.{{ $column->name }}"
                         />
 
-@elseif($column->isTranslatable && in_array($column->name, $wysiwygTextColumnNames, true))
+@elseif($column->isWysiwyg && $column->isTranslatable)
                         <FormLocalizedWysiwyg
                             v-model="form.{{ $column->name }}"
                             name="{{ $column->name }}"
@@ -64,6 +64,15 @@
                             :locales="locales"
                             :shouldShowLangGroup="shouldShowLangGroup"
                             :isFormLocalized="isFormLocalized"
+                            :upload-url="wysiwygUploadUrl"
+                        />
+
+@elseif($column->isWysiwyg && !$column->isTranslatable)
+                        <FormWysiwyg
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
                             :upload-url="wysiwygUploadUrl"
                         />
 
@@ -78,7 +87,7 @@
                             :isFormLocalized="isFormLocalized"
                         />
 
-@elseif($column->majorType === 'json')
+@elseif($column->isArray())
                         <FormTagInput
                             v-model="form.{{ $column->name }}"
                             name="{{ $column->name }}"
@@ -86,15 +95,6 @@
                             :error="errors.{{ $column->name }}"
                             :placeholder="translations.create_tag"
                             :tag-placeholder="translations.create_tag"
-                        />
-
-@elseif($column->majorType === 'text' && in_array($column->name, $wysiwygTextColumnNames, true))
-                        <FormWysiwyg
-                            v-model="form.{{ $column->name }}"
-                            name="{{ $column->name }}"
-                            :label="translations.columns.{{ $column->name }}"
-                            :error="errors.{{ $column->name }}"
-                            :upload-url="wysiwygUploadUrl"
                         />
 
 @elseif($column->majorType === 'text')
@@ -408,7 +408,7 @@ if (!props.data || Object.keys(props.data).length === 0) {
         password_confirmation: '',
 @elseif($column->isTranslatable)
         {{ $column->name }}: getLocalizedFormDefaults(),
-@elseif($column->majorType === 'json')
+@elseif($column->isArray())
         {{ $column->name }}: [],
 @elseif($column->majorType === 'bool')
         {{ $column->name }}: false,

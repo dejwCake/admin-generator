@@ -20,6 +20,7 @@ final readonly class Column
         public string $majorType,
         public string $phpType,
         public bool $isTranslatable,
+        public bool $isWysiwyg,
         public string $faker,
         public bool $required,
         public string $defaultTranslation,
@@ -42,6 +43,11 @@ final readonly class Column
         return sprintf("'%s'", $rules->implode('|'));
     }
 
+    public function isArray(): bool
+    {
+        return $this->majorType === 'json' && $this->isTranslatable === false;
+    }
+
     public function withPriority(?int $priority): self
     {
         return new self(
@@ -49,6 +55,7 @@ final readonly class Column
             majorType: $this->majorType,
             phpType: $this->phpType,
             isTranslatable: $this->isTranslatable,
+            isWysiwyg: $this->isWysiwyg,
             faker: $this->faker,
             required: $this->required,
             defaultTranslation: $this->defaultTranslation,

@@ -32,6 +32,7 @@
                 'time_start' => trans('admin.category.columns.time_start'),
                 'date_time_end' => trans('admin.category.columns.date_time_end'),
                 'released_at' => trans('admin.category.columns.released_at'),
+                'description' => trans('admin.category.columns.description'),
                 'enabled' => trans('admin.category.columns.enabled'),
                 'send' => trans('admin.category.columns.send'),
                 'price' => trans('admin.category.columns.price'),

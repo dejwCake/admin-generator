@@ -44,7 +44,11 @@ final class IndexRequest extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $columns = $this->columnCollectionBuilder->build(
+            $this->tableName,
+            $this->modelVariableName,
+            $this->extractTranslatable(),
+        );
 
         return $this->viewFactory->make('brackets/admin-generator::classes.index-request', [
             //globals
@@ -63,6 +67,12 @@ final class IndexRequest extends ClassGenerator
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
+            [
+                'translatable',
+                'tr',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
+            ],
         ];
     }
 

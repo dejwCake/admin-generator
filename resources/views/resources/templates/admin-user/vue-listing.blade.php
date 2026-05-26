@@ -127,6 +127,8 @@
                                 <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} formatTime(item.{{ $column->name }}) }}</td>
 @elseif(in_array($column->majorType, ['datetime'], true))
                                 <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} formatDatetime(item.{{ $column->name }}) }}</td>
+@elseif($column->isArray())
+                                <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} (item.{{ $column->name }} ?? []).join(', ') }}</td>
 @elseif($column->isForeignKey && $relations->hasBelongsToByColumn($column->name))
 @php $belongsTo = $relations->getBelongsToByColumn($column->name); @endphp
                                 <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} item.{{ $belongsTo->relationMethodName }}?.{{ $belongsTo->relatedLabel }} }}</td>

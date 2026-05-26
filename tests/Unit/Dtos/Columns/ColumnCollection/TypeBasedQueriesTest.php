@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Unit\Dtos\Columns\ColumnCollection;
 
+use Brackets\AdminGenerator\Builders\ColumnBuilder;
 use Brackets\AdminGenerator\Dtos\Columns\Column;
 use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
 use Illuminate\Support\Collection;
@@ -81,13 +82,6 @@ final class TypeBasedQueriesTest extends TestCase
         self::assertArrayHasKey('remember_token', $result->toArray());
     }
 
-    public function testGetWysiwygColumnNamesReturnsConst(): void
-    {
-        $collection = new ColumnCollection();
-
-        self::assertSame(['perex', 'text', 'body', 'description'], $collection->getWysiwygColumnNames());
-    }
-
     private static function makeColumn(string $name, string $majorType = 'string'): Column
     {
         return new Column(
@@ -95,6 +89,11 @@ final class TypeBasedQueriesTest extends TestCase
             majorType: $majorType,
             phpType: 'string',
             isTranslatable: $majorType === 'json',
+            isWysiwyg: in_array($name, ColumnBuilder::WYSIWYG_COLUMN_NAMES, true) && in_array(
+                $majorType,
+                ['text', 'json'],
+                true,
+            ),
             faker: 'word()',
             required: false,
             defaultTranslation: $name,

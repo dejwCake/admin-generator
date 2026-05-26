@@ -71,11 +71,7 @@ final class ColumnCollectionBuilder
                     ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'],
                     true,
                 )
-                && !($column->majorType === 'json' && in_array(
-                    $column->name,
-                    ColumnCollection::WYSIWYG_COLUMN_NAMES,
-                    true,
-                )),
+                && !$column->isWysiwyg,
         );
 
         $fixedPriorities = $indexEligible

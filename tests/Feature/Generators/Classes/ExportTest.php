@@ -43,6 +43,11 @@ final class ExportTest extends TestCase
             'expectedFilePath' => 'app/Exports/CategoriesExport.php',
         ];
 
+        yield 'categories with translatable text' => [
+            'arguments' => ['table_name' => 'categories', '--translatable' => 'text'],
+            'expectedFilePath' => 'app/Exports/CategoriesExport.php',
+        ];
+
         yield 'categories with model-with-full-namespace App\\Billing\\Category' => [
             'arguments' => [
                 'table_name' => 'categories',

@@ -95,6 +95,7 @@ final class GenerateAdminUser extends Command
             'table_name' => $tableName,
             '--model-name' => $modelName,
             '--force' => $force,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:request:store', [
@@ -164,6 +165,7 @@ final class GenerateAdminUser extends Command
             '--template' => 'admin-user',
             '--with-export' => $withExport,
             '--without-bulk' => $withoutBulk,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:vue-listing', [
@@ -212,6 +214,7 @@ final class GenerateAdminUser extends Command
             '--belongs-to-many' => 'roles',
             '--with-export' => $withExport,
             '--media' => $media,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:factory', [

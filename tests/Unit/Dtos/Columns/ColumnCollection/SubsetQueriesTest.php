@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Unit\Dtos\Columns\ColumnCollection;
 
+use Brackets\AdminGenerator\Builders\ColumnBuilder;
 use Brackets\AdminGenerator\Dtos\Columns\Column;
 use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
 use Illuminate\Support\Collection;
@@ -148,19 +149,21 @@ final class SubsetQueriesTest extends TestCase
         self::assertArrayNotHasKey('body', $result);
     }
 
-    public function testGetForIndexOmitsNonTranslatableJson(): void
+    public function testGetForIndexIncludesNonTranslatableJson(): void
     {
         $collection = new ColumnCollection([
             self::makeColumn('tags', majorType: 'json', priority: 1, isTranslatable: false),
             self::makeColumn('body', majorType: 'json', priority: 2, isTranslatable: true),
             self::makeColumn('title', priority: 0),
+            self::makeColumn('slug', priority: null),
         ]);
 
         $result = $collection->getForIndex();
 
+        self::assertArrayHasKey('tags', $result->toArray());
         self::assertArrayHasKey('body', $result->toArray());
         self::assertArrayHasKey('title', $result->toArray());
-        self::assertArrayNotHasKey('tags', $result->toArray());
+        self::assertArrayNotHasKey('slug', $result->toArray());
     }
 
     public function testGetToSearchInExcludesNonTranslatableJson(): void
@@ -206,11 +209,15 @@ final class SubsetQueriesTest extends TestCase
         ?int $priority = null,
         ?bool $isTranslatable = null,
     ): Column {
+        $resolvedTranslatable = $isTranslatable ?? ($majorType === 'json');
+
         return new Column(
             name: $name,
             majorType: $majorType,
             phpType: 'string',
-            isTranslatable: $isTranslatable ?? ($majorType === 'json'),
+            isTranslatable: $resolvedTranslatable,
+            isWysiwyg: in_array($name, ColumnBuilder::WYSIWYG_COLUMN_NAMES, true)
+                && ($majorType === 'text' || ($majorType === 'json' && $resolvedTranslatable)),
             faker: 'word()',
             required: false,
             defaultTranslation: $name,

@@ -137,8 +137,10 @@ mediaCollections.value = ['avatar'];
 if (!props.data || Object.keys(props.data).length === 0) {
     form.value = {
 @foreach($profileColumns as $column)
-@if($column->majorType === 'json')
+@if($column->isTranslatable)
         {{ $column->name }}: getLocalizedFormDefaults(),
+@elseif($column->isArray())
+        {{ $column->name }}: [],
 @elseif($column->majorType === 'bool')
         {{ $column->name }}: false,
 @else

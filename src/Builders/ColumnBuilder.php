@@ -10,6 +10,8 @@ use Illuminate\Support\Str;
 
 final readonly class ColumnBuilder
 {
+    public const array WYSIWYG_COLUMN_NAMES = ['perex', 'text', 'body', 'description'];
+
     public function __construct(
         private ServerStoreRulesBuilder $serverStoreRulesBuilder,
         private ServerUpdateRulesBuilder $serverUpdateRulesBuilder,
@@ -27,28 +29,19 @@ final readonly class ColumnBuilder
         string $modelVariableName,
         ?array $translatable = null,
     ): Column {
-        $hasUniqueIndex = $indexes
-            ->contains(static fn (array $index): bool
-                => in_array($name, $index['columns'], true) && ($index['unique'] && !$index['primary']));
-        $hasUniqueDeleteAtIndex = $indexes
-            ->contains(static fn (array $index): bool
-                => in_array($name, $index['columns'], true)
-                    && ($index['unique'] && !$index['primary'])
-                    && str_contains($index['name'], 'deleted_at'));
-        // TODO add foreign key
+        $hasUniqueIndex = $this->hasUniqueIndex($name, $indexes);
+        $hasUniqueDeleteAtIndex = $this->hasUniqueDeletedAtIndex($name, $indexes);
 
         $majorType = $this->getMajorTypeFromType($type);
-
-        $isForeignKey = str_ends_with($name, '_id')
-            && !in_array($name, ['created_by_admin_user_id', 'updated_by_admin_user_id'], true);
-
-        $isTranslatable = $majorType === 'json' && ($translatable === null || in_array($name, $translatable, true));
+        $isForeignKey = $this->isForeignKey($name);
+        $isTranslatable = $this->isTranslatable($majorType, $name, $translatable);
 
         return new Column(
             name: $name,
             majorType: $majorType,
             phpType: $this->getPhpType($majorType),
             isTranslatable: $isTranslatable,
+            isWysiwyg: $this->isWysiwyg($name, $majorType, $isTranslatable),
             faker: $this->getFaker($name, $majorType, $isTranslatable),
             required: $nullable === false,
             defaultTranslation: $this->getDefaultTranslation($name),
@@ -77,6 +70,37 @@ final readonly class ColumnBuilder
             ),
             frontendRules: $this->frontendRulesBuilder->build($name, $majorType, $nullable === false, $isForeignKey),
         );
+    }
+
+    private function hasUniqueIndex(string $name, Collection $indexes): bool
+    {
+        return $indexes->contains(static fn (array $index): bool
+            => in_array($name, $index['columns'], true) && ($index['unique'] && !$index['primary']));
+    }
+
+    private function hasUniqueDeletedAtIndex(string $name, Collection $indexes): bool
+    {
+        return $indexes->contains(static fn (array $index): bool
+            => in_array($name, $index['columns'], true)
+                && ($index['unique'] && !$index['primary'])
+                && str_contains($index['name'], 'deleted_at'));
+    }
+
+    private function isForeignKey(string $name): bool
+    {
+        return str_ends_with($name, '_id')
+            && !in_array($name, ['created_by_admin_user_id', 'updated_by_admin_user_id'], true);
+    }
+
+    private function isTranslatable(string $majorType, string $name, ?array $translatable): bool
+    {
+        return $majorType === 'json' && ($translatable === null || in_array($name, $translatable, true));
+    }
+
+    private function isWysiwyg(string $name, string $majorType, bool $isTranslatable): bool
+    {
+        return in_array($name, self::WYSIWYG_COLUMN_NAMES, true)
+            && ($majorType === 'text' || ($majorType === 'json' && $isTranslatable));
     }
 
     private function getMajorTypeFromType(string $type): string

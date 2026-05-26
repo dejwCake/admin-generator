@@ -42,7 +42,7 @@ final class {{ $classBaseName }} implements FromCollection, WithMapping, WithHea
 @foreach($columns as $column)
 @if($column->phpType === 'bool')
             ${{ $modelVariableName }}->{{ $column->name }} === null ? '' : (${{ $modelVariableName }}->{{ $column->name }} ? __('Yes') : __('No')),
-@elseif(!$column->isTranslatable && $column->phpType === 'array')
+@elseif($column->isArray())
             is_array(${{ $modelVariableName }}->{{ $column->name }}) ? implode(', ', ${{ $modelVariableName }}->{{ $column->name }}) : ${{ $modelVariableName }}->{{ $column->name }},
 @else
             ${{ $modelVariableName }}->{{ $column->name }},

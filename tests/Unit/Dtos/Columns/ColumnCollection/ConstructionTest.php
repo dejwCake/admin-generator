@@ -48,6 +48,7 @@ final class ConstructionTest extends TestCase
             majorType: 'string',
             phpType: 'string',
             isTranslatable: false,
+            isWysiwyg: false,
             faker: 'word()',
             required: false,
             defaultTranslation: $name,

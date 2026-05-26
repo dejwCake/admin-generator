@@ -79,6 +79,7 @@ final class Generate extends Command
             'table_name' => $tableName,
             '--model-name' => $modelName,
             '--force' => $force,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:request:store', [
@@ -133,6 +134,7 @@ final class Generate extends Command
             '--force' => $force,
             '--with-export' => $withExport,
             '--without-bulk' => $withoutBulk,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:vue-listing', [
@@ -177,6 +179,7 @@ final class Generate extends Command
             '--belongs-to-many' => $belongsToMany,
             '--with-export' => $withExport,
             '--media' => $media,
+            '--translatable' => $translatable,
         ]);
 
         if ($withExport) {

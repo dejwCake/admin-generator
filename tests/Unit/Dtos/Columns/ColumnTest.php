@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Unit\Dtos\Columns;
 
+use Brackets\AdminGenerator\Builders\ColumnBuilder;
 use Brackets\AdminGenerator\Dtos\Columns\Column;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
@@ -127,6 +128,11 @@ final class ColumnTest extends TestCase
             majorType: $majorType,
             phpType: $phpType,
             isTranslatable: $majorType === 'json',
+            isWysiwyg: in_array($name, ColumnBuilder::WYSIWYG_COLUMN_NAMES, true) && in_array(
+                $majorType,
+                ['text', 'json'],
+                true,
+            ),
             faker: $faker,
             required: $required,
             defaultTranslation: $defaultTranslation,

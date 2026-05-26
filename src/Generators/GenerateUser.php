@@ -103,6 +103,7 @@ final class GenerateUser extends Command
             'table_name' => $tableName,
             '--model-name' => $modelName,
             '--force' => $force,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:request:store', [
@@ -167,6 +168,7 @@ final class GenerateUser extends Command
             '--template' => 'user',
             '--with-export' => $withExport,
             '--without-bulk' => $withoutBulk,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:vue-listing', [
@@ -215,6 +217,7 @@ final class GenerateUser extends Command
             '--belongs-to-many' => 'roles',
             '--with-export' => $withExport,
             '--media' => $media,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:factory', [

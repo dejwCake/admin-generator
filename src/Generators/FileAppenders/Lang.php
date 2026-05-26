@@ -100,12 +100,22 @@ final class Lang extends FileAppender
                 'Media collections (format: name:type:disk:maxFiles[:maxFileSizeInMb])',
             ],
             ['locale', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom locale'],
+            [
+                'translatable',
+                'tr',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
+            ],
         ];
     }
 
     protected function buildContent(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $columns = $this->columnCollectionBuilder->build(
+            $this->tableName,
+            $this->modelVariableName,
+            $this->extractTranslatable(),
+        );
 
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
