@@ -228,6 +228,7 @@ final class GenerateUser extends Command
             $this->call('admin:generate:export', [
                 'table_name' => $tableName,
                 '--force' => $force,
+                '--translatable' => $translatable,
             ]);
         }
 

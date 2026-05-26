@@ -227,6 +227,7 @@ final class GenerateAdminUser extends Command
                 'table_name' => $tableName,
                 '--model-with-full-namespace' => $modelWithFullNamespace,
                 '--force' => $force,
+                '--translatable' => $translatable,
             ]);
         }
 
