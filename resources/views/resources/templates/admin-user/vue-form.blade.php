@@ -65,7 +65,7 @@
                             :placeholder="translations.select_an_option"
                         />
 
-@elseif($column->majorType === 'json' && in_array($column->name, $wysiwygTextColumnNames, true))
+@elseif($column->isTranslatable && in_array($column->name, $wysiwygTextColumnNames, true))
                         <FormLocalizedWysiwyg
                             v-model="form.{{ $column->name }}"
                             name="{{ $column->name }}"
@@ -77,7 +77,7 @@
                             :upload-url="wysiwygUploadUrl"
                         />
 
-@elseif($column->majorType === 'json')
+@elseif($column->isTranslatable)
                         <FormLocalizedInput
                             v-model="form.{{ $column->name }}"
                             name="{{ $column->name }}"
@@ -86,6 +86,16 @@
                             :locales="locales"
                             :shouldShowLangGroup="shouldShowLangGroup"
                             :isFormLocalized="isFormLocalized"
+                        />
+
+@elseif($column->majorType === 'json')
+                        <FormTagInput
+                            v-model="form.{{ $column->name }}"
+                            name="{{ $column->name }}"
+                            :label="translations.columns.{{ $column->name }}"
+                            :error="errors.{{ $column->name }}"
+                            :placeholder="translations.create_tag"
+                            :tag-placeholder="translations.create_tag"
                         />
 
 @elseif($column->majorType === 'text' && in_array($column->name, $wysiwygTextColumnNames, true))
@@ -331,6 +341,9 @@
     if ($hasLocalizedInput) {
         $imports->push("FormLocalizedInput from '@craftable/components/form/FormLocalizedInput.vue'");
     }
+    if ($hasTagInput) {
+        $imports->push("FormTagInput from '@craftable/components/form/FormTagInput.vue'");
+    }
     if ($hasLocalizedWysiwyg) {
         $imports->push("FormLocalizedWysiwyg from '@craftable/components/form/FormLocalizedWysiwyg.vue'");
     }
@@ -411,8 +424,10 @@ if (!props.data || Object.keys(props.data).length === 0) {
 @if($column->name === 'password')
         password: '',
         password_confirmation: '',
-@elseif($column->majorType === 'json')
+@elseif($column->isTranslatable)
         {{ $column->name }}: getLocalizedFormDefaults(),
+@elseif($column->majorType === 'json')
+        {{ $column->name }}: [],
 @elseif($column->majorType === 'bool')
         {{ $column->name }}: false,
 @else

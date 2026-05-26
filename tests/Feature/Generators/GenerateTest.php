@@ -111,6 +111,12 @@ final class GenerateTest extends TestCase
             'missingFiles' => [$categoriesExportRequest, $categoriesExportClass],
         ];
 
+        yield 'categories  with translatable text' => [
+            'arguments' => ['table_name' => 'categories', '--translatable' => 'text'],
+            'expectedFiles' => [...$categoriesCommon, $categoriesBulk],
+            'missingFiles' => [$categoriesExportRequest, $categoriesExportClass],
+        ];
+
         yield 'categories with export' => [
             'arguments' => ['table_name' => 'categories', '--with-export' => true],
             'expectedFiles' => [

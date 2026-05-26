@@ -85,13 +85,23 @@ final class BladeForm extends ResourceGenerator
             ['file-name', 'nm', InputOption::VALUE_OPTIONAL, 'Specify a blade file path'],
             ['route', 'r', InputOption::VALUE_OPTIONAL, 'Specify custom route for form'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
+            [
+                'translatable',
+                'tr',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
+            ],
         ];
     }
 
     #[Override]
     protected function buildView(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $columns = $this->columnCollectionBuilder->build(
+            $this->tableName,
+            $this->modelVariableName,
+            $this->extractTranslatable(),
+        );
         $visibleColumns = $columns->getVisible();
 
         $hasCreatedByAdminUser = $columns->hasByName('created_by_admin_user_id');
@@ -120,7 +130,8 @@ final class BladeForm extends ResourceGenerator
             //has
             'hasCreatedByAdminUser' => $hasCreatedByAdminUser,
             'hasUpdatedByAdminUser' => $hasUpdatedByAdminUser,
-            'hasTranslatable' => $columns->hasByMajorType('json'),
+            'hasTranslatable' => $columns->hasTranslatable(),
+            'hasTagInput' => $columns->hasTagInput(),
             'hasPublishedAt' => $columns->hasByName('published_at'),
             'hasWysiwyg' => $leftFormColumns->hasWysiwyg(),
             'hasDateColumns' => $leftFormColumns->hasByMajorType('date'),

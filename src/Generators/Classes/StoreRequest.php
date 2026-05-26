@@ -60,7 +60,11 @@ final class StoreRequest extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $columns = $this->columnCollectionBuilder->build(
+            $this->tableName,
+            $this->modelVariableName,
+            $this->extractTranslatable(),
+        );
         $visibleColumns = $columns->getVisible();
 
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
@@ -91,6 +95,12 @@ final class StoreRequest extends ClassGenerator
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
+            [
+                'translatable',
+                'tr',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
+            ],
         ];
     }
 

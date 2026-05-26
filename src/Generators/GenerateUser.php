@@ -44,6 +44,7 @@ final class GenerateUser extends Command
         $force = $this->option('force');
         $withExport = $this->option('with-export');
         $withoutBulk = $this->option('without-bulk');
+        $translatable = $this->option('translatable');
         $media = $this->option('media');
         $generateModel = $this->option('generate-model');
 
@@ -70,6 +71,7 @@ final class GenerateUser extends Command
                 '--force' => $force,
                 '--template' => 'user',
                 '--belongs-to-many' => 'roles',
+                '--translatable' => $translatable,
                 '--media' => $media,
             ]);
 
@@ -91,6 +93,7 @@ final class GenerateUser extends Command
             '--model-name' => $modelName,
             '--template' => 'user',
             '--belongs-to-many' => 'roles',
+            '--translatable' => $translatable,
             '--with-export' => $withExport,
             '--without-bulk' => $withoutBulk,
             '--media' => $media,
@@ -108,6 +111,7 @@ final class GenerateUser extends Command
             '--force' => $force,
             '--template' => 'user',
             '--belongs-to-many' => 'roles',
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:request:update', [
@@ -116,6 +120,7 @@ final class GenerateUser extends Command
             '--force' => $force,
             '--template' => 'user',
             '--belongs-to-many' => 'roles',
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:request:destroy', [
@@ -171,6 +176,7 @@ final class GenerateUser extends Command
             '--template' => 'user',
             '--with-export' => $withExport,
             '--without-bulk' => $withoutBulk,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:blade-create', [
@@ -179,6 +185,7 @@ final class GenerateUser extends Command
             '--force' => $force,
             '--template' => 'user',
             '--belongs-to-many' => 'roles',
+            '--translatable' => $translatable,
             '--media' => $media,
         ]);
 
@@ -188,6 +195,7 @@ final class GenerateUser extends Command
             '--force' => $force,
             '--template' => 'user',
             '--belongs-to-many' => 'roles',
+            '--translatable' => $translatable,
             '--media' => $media,
         ]);
 
@@ -197,6 +205,7 @@ final class GenerateUser extends Command
             '--force' => $force,
             '--template' => 'user',
             '--belongs-to-many' => 'roles',
+            '--translatable' => $translatable,
             '--media' => $media,
         ]);
 
@@ -212,6 +221,7 @@ final class GenerateUser extends Command
             'table_name' => $tableName,
             '--model-name' => $modelName,
             '--force' => $force,
+            '--translatable' => $translatable,
         ]);
 
         if ($withExport) {
@@ -264,10 +274,26 @@ final class GenerateUser extends Command
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating admin user'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
-            ['media', 'M', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Media collections (format: name:type:disk:maxFiles)'],
+            [
+                'translatable',
+                'tr',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
+            ],
+            [
+                'media',
+                'M',
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Media collections (format: name:type:disk:maxFiles)',
+            ],
             ['seed', 's', InputOption::VALUE_NONE, 'Seeds table with fake data'],
             ['generate-model', 'g', InputOption::VALUE_NONE, 'Generates model'],
-            ['force-permissions', null, InputOption::VALUE_NONE, 'Force generating permissions migration even if the Craftable service provider is not installed'],
+            [
+                'force-permissions',
+                null,
+                InputOption::VALUE_NONE,
+                'Force generating permissions migration even if the Craftable service provider is not installed',
+            ],
         ];
     }
 

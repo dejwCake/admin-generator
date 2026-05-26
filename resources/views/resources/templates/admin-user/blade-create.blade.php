@@ -76,6 +76,9 @@
 @if($relations->hasBelongsTo())
                 'select_an_option' => trans('brackets/admin-ui::admin.forms.select_an_option'),
 @endif
+@if($hasTagInput)
+                'create_tag' => trans('brackets/admin-ui::admin.forms.create_tag'),
+@endif
                 'save' => trans('brackets/admin-ui::admin.btn.save'),
             ]) }}"
 @if($mediaCollections->isNotEmpty())

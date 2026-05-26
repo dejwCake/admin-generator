@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Tests\Unit\Builders\ServerUpdateRulesBuilder;
 
 use Brackets\AdminGenerator\Builders\ServerUpdateRulesBuilder;
+use Brackets\AdminGenerator\Dtos\Columns\Rules\ArrayRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\BooleanRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\DateRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\IntegerRule;
@@ -63,7 +64,17 @@ final class MajorTypeTest extends TestCase
         self::assertInstanceOf(StringRule::class, $this->buildWithMajorType('text')->last());
     }
 
-    private function buildWithMajorType(string $majorType): Collection
+    public function testJsonMajorTypeNonTranslatableAddsArrayRule(): void
+    {
+        self::assertInstanceOf(ArrayRule::class, $this->buildWithMajorType('json')->last());
+    }
+
+    public function testJsonMajorTypeTranslatableAddsStringRule(): void
+    {
+        self::assertInstanceOf(StringRule::class, $this->buildWithMajorType('json', true)->last());
+    }
+
+    private function buildWithMajorType(string $majorType, bool $isTranslatable = false): Collection
     {
         return $this->serverUpdateRulesBuilder->build(
             name: 'field',
@@ -74,6 +85,7 @@ final class MajorTypeTest extends TestCase
             tableName: 'articles',
             excludeDeletedAt: false,
             modelVariableName: 'article',
+            isTranslatable: $isTranslatable,
         );
     }
 }

@@ -96,7 +96,11 @@ final class Controller extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $columns = $this->columnCollectionBuilder->build(
+            $this->tableName,
+            $this->modelVariableName,
+            $this->extractTranslatable(),
+        );
         $visibleColumns = $columns->getVisible();
 
         $indexEagerLoads = new Collection();
@@ -147,7 +151,7 @@ final class Controller extends ClassGenerator
         ])->render();
     }
 
-    /** @return array<array<string|int>> */
+    /** @return array<int, array<string|int|null>> */
     #[Override]
     protected function getOptions(): array
     {
@@ -157,6 +161,12 @@ final class Controller extends ClassGenerator
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating controller'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
+            [
+                'translatable',
+                'tr',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
+            ],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
             [

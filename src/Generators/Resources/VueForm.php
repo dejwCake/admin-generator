@@ -79,6 +79,12 @@ final class VueForm extends ResourceGenerator
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             [
+                'translatable',
+                'tr',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
+            ],
+            [
                 'media',
                 'M',
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
@@ -91,7 +97,11 @@ final class VueForm extends ResourceGenerator
     #[Override]
     protected function buildView(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $columns = $this->columnCollectionBuilder->build(
+            $this->tableName,
+            $this->modelVariableName,
+            $this->extractTranslatable(),
+        );
         $visibleColumns = $columns->getVisible();
 
         $hasCreatedByAdminUser = $columns->hasByName('created_by_admin_user_id');
@@ -123,7 +133,7 @@ final class VueForm extends ResourceGenerator
             //has
             'hasCreatedByAdminUser' => $hasCreatedByAdminUser,
             'hasUpdatedByAdminUser' => $hasUpdatedByAdminUser,
-            'hasTranslatable' => $columns->hasByMajorType('json'),
+            'hasTranslatable' => $columns->hasTranslatable(),
             'hasWysiwyg' => $leftFormColumns->hasWysiwyg(),
             'hasPassword' => $leftFormColumns->hasByName('password'),
             'hasEmail' => $leftFormColumns->hasByName('email'),
@@ -134,6 +144,7 @@ final class VueForm extends ResourceGenerator
             'hasFormInput' => $leftFormColumns->hasFormInput(),
             'hasTextarea' => $leftFormColumns->hasTextarea(),
             'hasLocalizedInput' => $leftFormColumns->hasLocalizedInput(),
+            'hasTagInput' => $leftFormColumns->hasTagInput(),
             'hasLocalizedWysiwyg' => $leftFormColumns->hasLocalizedWysiwyg(),
             'hasUseAppFormOptions' => count($validationRules) > 0 || $this->relations->hasBelongsTo(),
             //columns

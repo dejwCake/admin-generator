@@ -85,7 +85,11 @@ final class Factory extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $columns = $this->columnCollectionBuilder->build(
+            $this->tableName,
+            $this->modelVariableName,
+            $this->extractTranslatable(),
+        );
 
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //global
@@ -113,6 +117,12 @@ final class Factory extends ClassGenerator
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating factory'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['seed', 's', InputOption::VALUE_OPTIONAL, 'Seeds the table with fake data'],
+            [
+                'translatable',
+                'tr',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
+            ],
         ];
     }
 

@@ -126,6 +126,7 @@ final class ColumnTest extends TestCase
             name: $name,
             majorType: $majorType,
             phpType: $phpType,
+            isTranslatable: $majorType === 'json',
             faker: $faker,
             required: $required,
             defaultTranslation: $defaultTranslation,

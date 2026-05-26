@@ -45,6 +45,7 @@ final class GetFrontendValidationRulesTest extends TestCase
             name: $name,
             majorType: $majorType,
             phpType: 'string',
+            isTranslatable: $majorType === 'json',
             faker: 'word()',
             required: false,
             defaultTranslation: $name,

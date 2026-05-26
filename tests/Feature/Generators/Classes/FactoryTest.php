@@ -43,6 +43,11 @@ final class FactoryTest extends TestCase
             'expectedFilePath' => 'database/factories/CategoryFactory.php',
         ];
 
+        yield 'categories with translatable text' => [
+            'arguments' => ['table_name' => 'categories', '--translatable' => 'text'],
+            'expectedFilePath' => 'database/factories/CategoryFactory.php',
+        ];
+
         yield 'categories with model-name Billing\\Cat' => [
             'arguments' => ['table_name' => 'categories', '--model-name' => 'Billing\\Cat'],
             'expectedFilePath' => 'database/factories/Billing/CatFactory.php',

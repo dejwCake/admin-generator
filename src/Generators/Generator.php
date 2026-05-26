@@ -70,6 +70,19 @@ abstract class Generator extends Command
         return $key === null || $this->hasOption($key) ? parent::option($key) : null;
     }
 
+    /**
+     * @return array<int, string>|null
+     */
+    protected function extractTranslatable(): ?array
+    {
+        $translatable = $this->option('translatable');
+        if ($translatable === null) {
+            return null;
+        }
+
+        return array_values(array_filter(array_map('trim', explode(',', (string) $translatable))));
+    }
+
     protected function initCommonNames(
         string $tableName,
         ?string $modelName = null,

@@ -59,6 +59,12 @@ final class BladeEdit extends ResourceGenerator
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             [
+                'translatable',
+                'tr',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
+            ],
+            [
                 'media',
                 'M',
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
@@ -70,7 +76,11 @@ final class BladeEdit extends ResourceGenerator
     #[Override]
     protected function buildView(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $columns = $this->columnCollectionBuilder->build(
+            $this->tableName,
+            $this->modelVariableName,
+            $this->extractTranslatable(),
+        );
         $visibleColumns = $columns->getVisible();
 
         $formColumns = $visibleColumns->rejectByName(
@@ -92,7 +102,8 @@ final class BladeEdit extends ResourceGenerator
             //has
             'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
             'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
-            'hasTranslatable' => $columns->hasByMajorType('json'),
+            'hasTranslatable' => $columns->hasTranslatable(),
+            'hasTagInput' => $columns->hasTagInput(),
             'hasPublishedAt' => $columns->hasByName('published_at'),
             'hasWysiwyg' => $formColumns->hasWysiwyg(),
             'hasDateColumns' => $formColumns->hasByMajorType('date'),

@@ -40,6 +40,7 @@ final class Generate extends Command
         $controllerName = $this->option('controller-name');
         $force = $this->option('force');
         $belongsToMany = $this->option('belongs-to-many');
+        $translatable = $this->option('translatable');
         $withExport = $this->option('with-export');
         $withoutBulk = $this->option('without-bulk');
         $media = $this->option('media');
@@ -50,6 +51,7 @@ final class Generate extends Command
             'class_name' => $modelName,
             '--force' => $force,
             '--belongs-to-many' => $belongsToMany,
+            '--translatable' => $translatable,
             '--media' => $media,
         ]);
 
@@ -58,6 +60,7 @@ final class Generate extends Command
             '--model-name' => $modelName,
             '--force' => $force,
             '--seed' => $seed,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:controller', [
@@ -66,6 +69,7 @@ final class Generate extends Command
             '--model-name' => $modelName,
             '--force' => $force,
             '--belongs-to-many' => $belongsToMany,
+            '--translatable' => $translatable,
             '--with-export' => $withExport,
             '--without-bulk' => $withoutBulk,
             '--media' => $media,
@@ -82,6 +86,7 @@ final class Generate extends Command
             '--model-name' => $modelName,
             '--force' => $force,
             '--belongs-to-many' => $belongsToMany,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:request:update', [
@@ -89,6 +94,7 @@ final class Generate extends Command
             '--model-name' => $modelName,
             '--force' => $force,
             '--belongs-to-many' => $belongsToMany,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:request:destroy', [
@@ -135,6 +141,7 @@ final class Generate extends Command
             '--force' => $force,
             '--with-export' => $withExport,
             '--without-bulk' => $withoutBulk,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:blade-create', [
@@ -142,6 +149,7 @@ final class Generate extends Command
             '--model-name' => $modelName,
             '--force' => $force,
             '--belongs-to-many' => $belongsToMany,
+            '--translatable' => $translatable,
             '--media' => $media,
         ]);
 
@@ -150,6 +158,7 @@ final class Generate extends Command
             '--model-name' => $modelName,
             '--force' => $force,
             '--belongs-to-many' => $belongsToMany,
+            '--translatable' => $translatable,
             '--media' => $media,
         ]);
 
@@ -158,6 +167,7 @@ final class Generate extends Command
             '--model-name' => $modelName,
             '--force' => $force,
             '--belongs-to-many' => $belongsToMany,
+            '--translatable' => $translatable,
             '--media' => $media,
         ]);
 
@@ -213,6 +223,12 @@ final class Generate extends Command
             ['controller-name', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom controller name'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating admin'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
+            [
+                'translatable',
+                'tr',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
+            ],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
             [

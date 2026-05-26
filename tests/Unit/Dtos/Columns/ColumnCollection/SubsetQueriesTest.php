@@ -104,12 +104,113 @@ final class SubsetQueriesTest extends TestCase
         self::assertArrayNotHasKey('slug', $result->toArray());
     }
 
-    private static function makeColumn(string $name, string $majorType = 'string', ?int $priority = null,): Column
+    public function testGetArrayColumnsReturnsOnlyNonTranslatableJson(): void
     {
+        $collection = new ColumnCollection([
+            self::makeColumn('tags', majorType: 'json', isTranslatable: false),
+            self::makeColumn('body', majorType: 'json', isTranslatable: true),
+            self::makeColumn('title'),
+        ]);
+
+        $result = $collection->getArrayColumns();
+
+        self::assertCount(1, $result);
+        self::assertArrayHasKey('tags', $result->toArray());
+    }
+
+    public function testGetTranslatableUsesIsTranslatableFlag(): void
+    {
+        $collection = new ColumnCollection([
+            self::makeColumn('tags', majorType: 'json', isTranslatable: false),
+            self::makeColumn('body', majorType: 'json', isTranslatable: true),
+            self::makeColumn('title'),
+        ]);
+
+        $result = $collection->getTranslatable();
+
+        self::assertCount(1, $result);
+        self::assertArrayHasKey('body', $result->toArray());
+        self::assertArrayNotHasKey('tags', $result->toArray());
+    }
+
+    public function testGetNonTranslatableIncludesNonTranslatableJson(): void
+    {
+        $collection = new ColumnCollection([
+            self::makeColumn('tags', majorType: 'json', isTranslatable: false),
+            self::makeColumn('body', majorType: 'json', isTranslatable: true),
+            self::makeColumn('title'),
+        ]);
+
+        $result = $collection->getNonTranslatable()->toArray();
+
+        self::assertArrayHasKey('tags', $result);
+        self::assertArrayHasKey('title', $result);
+        self::assertArrayNotHasKey('body', $result);
+    }
+
+    public function testGetForIndexOmitsNonTranslatableJson(): void
+    {
+        $collection = new ColumnCollection([
+            self::makeColumn('tags', majorType: 'json', priority: 1, isTranslatable: false),
+            self::makeColumn('body', majorType: 'json', priority: 2, isTranslatable: true),
+            self::makeColumn('title', priority: 0),
+        ]);
+
+        $result = $collection->getForIndex();
+
+        self::assertArrayHasKey('body', $result->toArray());
+        self::assertArrayHasKey('title', $result->toArray());
+        self::assertArrayNotHasKey('tags', $result->toArray());
+    }
+
+    public function testGetToSearchInExcludesNonTranslatableJson(): void
+    {
+        $collection = new ColumnCollection([
+            self::makeColumn('tags', majorType: 'json', isTranslatable: false),
+            self::makeColumn('body', majorType: 'json', isTranslatable: true),
+        ]);
+
+        $names = array_keys($collection->getToSearchIn()->toArray());
+
+        self::assertContains('body', $names);
+        self::assertNotContains('tags', $names);
+    }
+
+    public function testHasTagInputDetectsNonTranslatableJson(): void
+    {
+        self::assertTrue(
+            (new ColumnCollection([self::makeColumn('tags', majorType: 'json', isTranslatable: false)]))->hasTagInput(),
+        );
+        self::assertFalse(
+            (new ColumnCollection([self::makeColumn('body', majorType: 'json', isTranslatable: true)]))->hasTagInput(),
+        );
+    }
+
+    public function testHasTranslatableDetectsTranslatableJson(): void
+    {
+        self::assertTrue(
+            (new ColumnCollection(
+                [self::makeColumn('body', majorType: 'json', isTranslatable: true)],
+            ))->hasTranslatable(),
+        );
+        self::assertFalse(
+            (new ColumnCollection(
+                [self::makeColumn('tags', majorType: 'json', isTranslatable: false)],
+            ))->hasTranslatable(),
+        );
+    }
+
+    private static function makeColumn(
+        string $name,
+        string $majorType = 'string',
+        ?int $priority = null,
+        ?bool $isTranslatable = null,
+    ): Column {
         return new Column(
             name: $name,
             majorType: $majorType,
             phpType: 'string',
+            isTranslatable: $isTranslatable ?? ($majorType === 'json'),
             faker: 'word()',
             required: false,
             defaultTranslation: $name,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Unit\Dtos\Columns\Rules;
 
+use Brackets\AdminGenerator\Dtos\Columns\Rules\ArrayRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\BooleanRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\ConfirmedRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\DateRule;
@@ -19,6 +20,11 @@ use PHPUnit\Framework\TestCase;
 
 final class TrivialRulesTest extends TestCase
 {
+    public function testArrayRule(): void
+    {
+        self::assertSame("'array'", (string) new ArrayRule());
+    }
+
     public function testBooleanRule(): void
     {
         self::assertSame("'boolean'", (string) new BooleanRule());
