@@ -123,21 +123,21 @@
 </template>
 
 <script setup>
-import {ref} from 'vue';
-import {useAppListing} from '../composables/useAppListing.js';
-import {useResponsiveColumns} from '@craftable/composables/useResponsiveColumns.js';
-import Sortable from '@craftable/components/listing/Sortable.vue';
-import Pagination from '@craftable/components/listing/Pagination.vue';
-import Search from '@craftable/components/listing/Search.vue';
-import PerPage from '@craftable/components/listing/PerPage.vue';
-import EmptyState from '@craftable/components/listing/EmptyState.vue';
 import BulkCheckboxHeader from '@craftable/components/listing/BulkCheckboxHeader.vue';
 import BulkCheckboxRow from '@craftable/components/listing/BulkCheckboxRow.vue';
 import BulkOperationsBar from '@craftable/components/listing/BulkOperationsBar.vue';
-import ListingHeader from '@craftable/components/listing/ListingHeader.vue';
-import EditButton from '@craftable/components/listing/EditButton.vue';
-import DeleteButton from '@craftable/components/listing/DeleteButton.vue';
 import ConfirmModal from '@craftable/components/ConfirmModal.vue';
+import DeleteButton from '@craftable/components/listing/DeleteButton.vue';
+import EditButton from '@craftable/components/listing/EditButton.vue';
+import EmptyState from '@craftable/components/listing/EmptyState.vue';
+import ListingHeader from '@craftable/components/listing/ListingHeader.vue';
+import Pagination from '@craftable/components/listing/Pagination.vue';
+import PerPage from '@craftable/components/listing/PerPage.vue';
+import Search from '@craftable/components/listing/Search.vue';
+import Sortable from '@craftable/components/listing/Sortable.vue';
+import {ref} from 'vue';
+import {useAppListing} from '../composables/useAppListing.js';
+import {useResponsiveColumns} from '@craftable/composables/useResponsiveColumns.js';
 
 const props = defineProps({
     url: {type: String, required: true},

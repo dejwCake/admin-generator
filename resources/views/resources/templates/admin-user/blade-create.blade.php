@@ -21,7 +21,7 @@
             :locales="{{'{{'}} json_encode($locales) }}"
             :send-empty-locales="false"
 @endif
-@if($hasWysiwyg)
+@if($hasWysiwyg || $hasLocalizedWysiwyg)
             :wysiwyg-upload-url="'{{'{{'}} $wysiwygUploadUrl }}'"
 @endif
 @foreach($relations->getBelongsToMany() as $belongsToMany)

@@ -83,14 +83,14 @@
 </template>
 
 <script setup>
-import {useAppForm} from '../composables/useAppForm.js';
-import FormInput from '@craftable/components/form/FormInput.vue';
-import FormEmail from '@craftable/components/form/FormEmail.vue';
 import FormDatePicker from '@craftable/components/form/FormDatePicker.vue';
+import FormEmail from '@craftable/components/form/FormEmail.vue';
+import FormInput from '@craftable/components/form/FormInput.vue';
 import FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue';
 import FormPasswordConfirm from '@craftable/components/form/FormPasswordConfirm.vue';
 import FormSubmit from '@craftable/components/form/FormSubmit.vue';
 import MediaUpload from '@craftable/components/form/MediaUpload.vue';
+import {useAppForm} from '../composables/useAppForm.js';
 
 const props = defineProps({
     action: {type: String, required: true},

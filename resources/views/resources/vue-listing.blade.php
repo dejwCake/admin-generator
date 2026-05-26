@@ -226,6 +226,7 @@
         $imports->push("ToggleSwitch from '@craftable/components/listing/ToggleSwitch.vue'");
     }
     $imports->push("ConfirmModal from '@craftable/components/ConfirmModal.vue'");
+    $imports = $imports->unique()->sort();
 @endphp
 <script setup>
 @foreach($imports as $import)

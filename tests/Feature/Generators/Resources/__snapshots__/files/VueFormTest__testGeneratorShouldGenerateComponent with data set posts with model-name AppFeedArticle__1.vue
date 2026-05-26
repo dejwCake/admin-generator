@@ -34,10 +34,10 @@
 </template>
 
 <script setup>
-import {useAppForm} from '../composables/useAppForm.js';
 import FormInput from '@craftable/components/form/FormInput.vue';
 import FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue';
 import FormSubmit from '@craftable/components/form/FormSubmit.vue';
+import {useAppForm} from '../composables/useAppForm.js';
 
 const props = defineProps({
     action: {type: String, required: true},

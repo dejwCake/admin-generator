@@ -63,13 +63,13 @@
 </template>
 
 <script setup>
-import {useAppForm} from '../composables/useAppForm.js';
-import {mediaCollectionProp} from '@craftable/utils/mediaProps.js';
-import MediaUpload from '@craftable/components/form/MediaUpload.vue';
-import FormInput from '@craftable/components/form/FormInput.vue';
 import FormEmail from '@craftable/components/form/FormEmail.vue';
+import FormInput from '@craftable/components/form/FormInput.vue';
 import FormSelect from '@craftable/components/form/FormSelect.vue';
 import FormSubmit from '@craftable/components/form/FormSubmit.vue';
+import MediaUpload from '@craftable/components/form/MediaUpload.vue';
+import {mediaCollectionProp} from '@craftable/utils/mediaProps.js';
+import {useAppForm} from '../composables/useAppForm.js';
 
 const props = defineProps({
     action: { type: String, required: true },

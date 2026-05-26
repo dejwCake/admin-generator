@@ -22,7 +22,7 @@
 @else
             :data="{{'{{'}} ${{ $modelVariableName }}->toJson() }}"
 @endif
-@if($hasWysiwyg)
+@if($hasWysiwyg || $hasLocalizedWysiwyg)
             :wysiwyg-upload-url="'{{'{{'}} $wysiwygUploadUrl }}'"
 @endif
 @if($hasCreatedByAdminUser || $hasUpdatedByAdminUser)

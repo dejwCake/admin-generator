@@ -279,22 +279,22 @@
 </template>
 
 <script setup>
-import {useAppForm} from '../composables/useAppForm.js';
-import UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue';
-import {formatDatetime} from '@craftable/utils/dateFormatters.js';
-import LocalizationBar from '@craftable/components/form/LocalizationBar.vue';
-import FormInput from '@craftable/components/form/FormInput.vue';
-import FormEmail from '@craftable/components/form/FormEmail.vue';
-import FormTextarea from '@craftable/components/form/FormTextarea.vue';
 import FormCheckbox from '@craftable/components/form/FormCheckbox.vue';
 import FormDatePicker from '@craftable/components/form/FormDatePicker.vue';
-import FormWysiwyg from '@craftable/components/form/FormWysiwyg.vue';
-import FormSelect from '@craftable/components/form/FormSelect.vue';
-import FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue';
-import FormTagInput from '@craftable/components/form/FormTagInput.vue';
+import FormEmail from '@craftable/components/form/FormEmail.vue';
+import FormInput from '@craftable/components/form/FormInput.vue';
 import FormLocalizedWysiwyg from '@craftable/components/form/FormLocalizedWysiwyg.vue';
+import FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue';
 import FormPasswordConfirm from '@craftable/components/form/FormPasswordConfirm.vue';
+import FormSelect from '@craftable/components/form/FormSelect.vue';
 import FormSubmit from '@craftable/components/form/FormSubmit.vue';
+import FormTagInput from '@craftable/components/form/FormTagInput.vue';
+import FormTextarea from '@craftable/components/form/FormTextarea.vue';
+import FormWysiwyg from '@craftable/components/form/FormWysiwyg.vue';
+import LocalizationBar from '@craftable/components/form/LocalizationBar.vue';
+import UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue';
+import {formatDatetime} from '@craftable/utils/dateFormatters.js';
+import {useAppForm} from '../composables/useAppForm.js';
 
 const props = defineProps({
     action: {type: String, required: true},

@@ -133,6 +133,7 @@ final class BladeForm extends ResourceGenerator
             'hasTranslatable' => $columns->hasTranslatable(),
             'hasTagInput' => $columns->hasTagInput(),
             'hasPublishedAt' => $columns->hasByName('published_at'),
+            'hasLocalizedWysiwyg' => $leftFormColumns->hasLocalizedWysiwyg(),
             'hasWysiwyg' => $leftFormColumns->hasWysiwyg(),
             'hasDateColumns' => $leftFormColumns->hasByMajorType('date'),
             'hasTimeColumns' => $leftFormColumns->hasByMajorType('time'),

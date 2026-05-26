@@ -134,6 +134,7 @@ final class VueForm extends ResourceGenerator
             'hasCreatedByAdminUser' => $hasCreatedByAdminUser,
             'hasUpdatedByAdminUser' => $hasUpdatedByAdminUser,
             'hasTranslatable' => $columns->hasTranslatable(),
+            'hasLocalizedWysiwyg' => $leftFormColumns->hasLocalizedWysiwyg(),
             'hasWysiwyg' => $leftFormColumns->hasWysiwyg(),
             'hasPassword' => $leftFormColumns->hasByName('password'),
             'hasEmail' => $leftFormColumns->hasByName('email'),
@@ -145,7 +146,6 @@ final class VueForm extends ResourceGenerator
             'hasTextarea' => $leftFormColumns->hasTextarea(),
             'hasLocalizedInput' => $leftFormColumns->hasLocalizedInput(),
             'hasTagInput' => $leftFormColumns->hasTagInput(),
-            'hasLocalizedWysiwyg' => $leftFormColumns->hasLocalizedWysiwyg(),
             'hasUseAppFormOptions' => count($validationRules) > 0 || $this->relations->hasBelongsTo(),
             //columns
             'leftFormColumns' => $leftFormColumns,

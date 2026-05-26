@@ -24,7 +24,7 @@
 @endif
             :activation="!!'@{{ $activation }}'"
             :language-options="{{'{{'}} $locales->toJson() }}"
-@if($hasWysiwyg)
+@if($hasWysiwyg || $hasLocalizedWysiwyg)
             :wysiwyg-upload-url="'{{'{{'}} $wysiwygUploadUrl }}'"
 @endif
 @if($hasCreatedByAdminUser || $hasUpdatedByAdminUser)

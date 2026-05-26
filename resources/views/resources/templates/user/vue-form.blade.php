@@ -316,6 +316,9 @@
     if ($hasWysiwyg) {
         $imports->push("FormWysiwyg from '@craftable/components/form/FormWysiwyg.vue'");
     }
+    if ($hasLocalizedWysiwyg) {
+        $imports->push("FormLocalizedWysiwyg from '@craftable/components/form/FormLocalizedWysiwyg.vue'");
+    }
     if ($relations->hasBelongsTo()) {
         $imports->push("FormSelect from '@craftable/components/form/FormSelect.vue'");
     }
@@ -328,9 +331,6 @@
     if ($hasTagInput) {
         $imports->push("FormTagInput from '@craftable/components/form/FormTagInput.vue'");
     }
-    if ($hasLocalizedWysiwyg) {
-        $imports->push("FormLocalizedWysiwyg from '@craftable/components/form/FormLocalizedWysiwyg.vue'");
-    }
     if ($hasPassword) {
         $imports->push("FormPasswordConfirm from '@craftable/components/form/FormPasswordConfirm.vue'");
     }
@@ -338,6 +338,7 @@
     if ($mediaCollections->isNotEmpty()) {
         $imports->push("MediaUpload from '@craftable/components/form/MediaUpload.vue'");
     }
+    $imports = $imports->unique()->sort();
 @endphp
 <script setup>
 @foreach($imports as $import)
@@ -367,7 +368,7 @@ const props = defineProps({
 @if($hasCreatedByAdminUser || $hasUpdatedByAdminUser)
     showHistory: {type: Boolean, default: false},
 @endif
-@if($hasWysiwyg)
+@if($hasWysiwyg || $hasLocalizedWysiwyg)
     wysiwygUploadUrl: {type: String, default: '/admin/wysiwyg-media'},
 @endif
     responsiveBreakpoint: {type: Number, default: 850},

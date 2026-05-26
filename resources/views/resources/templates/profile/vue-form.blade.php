@@ -94,6 +94,7 @@
         $imports->push("FormCheckbox from '@craftable/components/form/FormCheckbox.vue'");
     }
     $imports->push("FormSubmit from '@craftable/components/form/FormSubmit.vue'");
+    $imports = $imports->unique()->sort();
 @endphp
 <script setup>
 @foreach($imports as $import)

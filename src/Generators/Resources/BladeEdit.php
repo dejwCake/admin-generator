@@ -105,6 +105,7 @@ final class BladeEdit extends ResourceGenerator
             'hasTranslatable' => $columns->hasTranslatable(),
             'hasTagInput' => $columns->hasTagInput(),
             'hasPublishedAt' => $columns->hasByName('published_at'),
+            'hasLocalizedWysiwyg' => $formColumns->hasLocalizedWysiwyg(),
             'hasWysiwyg' => $formColumns->hasWysiwyg(),
             'hasDateColumns' => $formColumns->hasByMajorType('date'),
             'hasTimeColumns' => $formColumns->hasByMajorType('time'),
