@@ -67,7 +67,11 @@ final class Model extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName);
+        $columns = $this->columnCollectionBuilder->build(
+            $this->tableName,
+            $this->modelVariableName,
+            $this->extractTranslatable(),
+        );
 
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
@@ -92,6 +96,7 @@ final class Model extends ClassGenerator
             'fillableColumns' => $columns->getFillable(),
             'hiddenColumns' => $columns->getHidden(),
             'translatableColumns' => $columns->getTranslatable(),
+            'arrayColumns' => $columns->getArrayColumns(),
             //media
             'mediaCollections' => $this->mediaCollections,
         ])->render();
@@ -105,6 +110,12 @@ final class Model extends ClassGenerator
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating model'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
+            [
+                'translatable',
+                'tr',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
+            ],
             [
                 'media',
                 'M',

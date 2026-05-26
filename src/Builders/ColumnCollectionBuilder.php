@@ -19,8 +19,14 @@ final class ColumnCollectionBuilder
         $this->columnCollection = new ColumnCollection();
     }
 
-    public function build(string $tableName, ?string $modelVariableName = null): ColumnCollection
-    {
+    /**
+     * @param array<int, string>|null $translatable
+     */
+    public function build(
+        string $tableName,
+        ?string $modelVariableName = null,
+        ?array $translatable = null,
+    ): ColumnCollection {
         $modelVariableName ??= Naming::variableName($tableName);
         $this->columnCollection = new ColumnCollection();
         $columns = new Collection($this->schema->getColumns($tableName));
@@ -28,19 +34,28 @@ final class ColumnCollectionBuilder
 
         $hasSoftDelete = $columns->contains(static fn (array $column): bool => $column['name'] === 'deleted_at');
 
-        $columns->each(function (array $column) use ($indexes, $hasSoftDelete, $tableName, $modelVariableName): void {
-            $this->columnCollection->push(
-                $this->columnBuilder->build(
-                    $column['name'],
-                    $column['type_name'],
-                    $column['nullable'],
-                    $tableName,
-                    $indexes,
-                    $hasSoftDelete,
-                    $modelVariableName,
-                ),
-            );
-        });
+        $columns->each(
+            function (array $column) use (
+                $indexes,
+                $hasSoftDelete,
+                $tableName,
+                $modelVariableName,
+                $translatable,
+            ): void {
+                $this->columnCollection->push(
+                    $this->columnBuilder->build(
+                        $column['name'],
+                        $column['type_name'],
+                        $column['nullable'],
+                        $tableName,
+                        $indexes,
+                        $hasSoftDelete,
+                        $modelVariableName,
+                        $translatable,
+                    ),
+                );
+            },
+        );
 
         $this->assignPriorities();
 

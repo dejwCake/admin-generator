@@ -43,6 +43,11 @@ final class BladeEditTest extends TestCase
             'expectedFilePath' => 'resources/views/admin/category/edit.blade.php',
         ];
 
+        yield 'categories with translatable text' => [
+            'arguments' => ['table_name' => 'categories', '--translatable' => 'text'],
+            'expectedFilePath' => 'resources/views/admin/category/edit.blade.php',
+        ];
+
         yield 'categories with model-name Billing\\CategOry' => [
             'arguments' => ['table_name' => 'categories', '--model-name' => 'Billing\\CategOry'],
             'expectedFilePath' => 'resources/views/admin/billing/categ-ory/edit.blade.php',

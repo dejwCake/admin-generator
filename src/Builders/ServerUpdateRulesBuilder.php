@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Builders;
 
+use Brackets\AdminGenerator\Dtos\Columns\Rules\ArrayRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\BooleanRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\ConfirmedRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\DateRule;
@@ -39,12 +40,13 @@ final class ServerUpdateRulesBuilder
         string $tableName,
         bool $excludeDeletedAt,
         string $modelVariableName,
+        bool $isTranslatable = false,
     ): Collection {
         $this->serverUpdateRules = new Collection();
         $this->buildByRequire($required);
         $this->buildByName($name);
         $this->getByUnique($name, $type, $unique, $tableName, $excludeDeletedAt, $modelVariableName);
-        $this->getByMajorType($majorType);
+        $this->getByMajorType($majorType, $isTranslatable);
 
         return $this->serverUpdateRules;
     }
@@ -92,8 +94,14 @@ final class ServerUpdateRulesBuilder
         }
     }
 
-    private function getByMajorType(string $majorType): void
+    private function getByMajorType(string $majorType, bool $isTranslatable): void
     {
+        if ($majorType === 'json' && !$isTranslatable) {
+            $this->serverUpdateRules->push(new ArrayRule());
+
+            return;
+        }
+
         $this->serverUpdateRules->push($this->getRuleFromType($majorType));
     }
 

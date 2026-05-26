@@ -25,6 +25,7 @@ final readonly class ColumnBuilder
         Collection $indexes,
         bool $hasSoftDelete,
         string $modelVariableName,
+        ?array $translatable = null,
     ): Column {
         $hasUniqueIndex = $indexes
             ->contains(static fn (array $index): bool
@@ -41,11 +42,14 @@ final readonly class ColumnBuilder
         $isForeignKey = str_ends_with($name, '_id')
             && !in_array($name, ['created_by_admin_user_id', 'updated_by_admin_user_id'], true);
 
+        $isTranslatable = $majorType === 'json' && ($translatable === null || in_array($name, $translatable, true));
+
         return new Column(
             name: $name,
             majorType: $majorType,
             phpType: $this->getPhpType($majorType),
-            faker: $this->getFaker($name, $majorType),
+            isTranslatable: $isTranslatable,
+            faker: $this->getFaker($name, $majorType, $isTranslatable),
             required: $nullable === false,
             defaultTranslation: $this->getDefaultTranslation($name),
             isForeignKey: $isForeignKey,
@@ -58,6 +62,7 @@ final readonly class ColumnBuilder
                 $hasUniqueIndex,
                 $tableName,
                 $hasSoftDelete && $hasUniqueDeleteAtIndex,
+                $isTranslatable,
             ),
             serverUpdateRules: $this->serverUpdateRulesBuilder->build(
                 $name,
@@ -68,6 +73,7 @@ final readonly class ColumnBuilder
                 $tableName,
                 $hasSoftDelete && $hasUniqueDeleteAtIndex,
                 $modelVariableName,
+                $isTranslatable,
             ),
             frontendRules: $this->frontendRulesBuilder->build($name, $majorType, $nullable === false, $isForeignKey),
         );
@@ -144,7 +150,7 @@ final readonly class ColumnBuilder
         };
     }
 
-    private function getFaker(string $name, string $majorType): string
+    private function getFaker(string $name, string $majorType, bool $isTranslatable): string
     {
         if ($name === 'deleted_at') {
             return 'null';
@@ -169,6 +175,10 @@ final readonly class ColumnBuilder
 
         if ($faker !== null) {
             return $faker;
+        }
+
+        if ($majorType === 'json' && !$isTranslatable) {
+            return '[$this->faker->word, $this->faker->word]';
         }
 
         return match ($majorType) {

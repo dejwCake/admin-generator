@@ -67,13 +67,23 @@ final class VueListing extends ResourceGenerator
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+            [
+                'translatable',
+                'tr',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
+            ],
         ];
     }
 
     #[Override]
     protected function buildView(): string
     {
-        $columns = $this->columnCollectionBuilder->build($this->tableName, $this->modelVariableName)
+        $columns = $this->columnCollectionBuilder->build(
+            $this->tableName,
+            $this->modelVariableName,
+            $this->extractTranslatable(),
+        )
             ->getForIndex();
 
         $hasPublishedAt = $columns->hasByName('published_at');

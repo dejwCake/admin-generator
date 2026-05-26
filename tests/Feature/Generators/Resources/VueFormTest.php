@@ -43,6 +43,11 @@ final class VueFormTest extends TestCase
             'expectedFilePath' => 'resources/js/admin/category/Form.vue',
         ];
 
+        yield 'categories with translatable text' => [
+            'arguments' => ['table_name' => 'categories', '--translatable' => 'text'],
+            'expectedFilePath' => 'resources/js/admin/category/Form.vue',
+        ];
+
         yield 'categories with model-name Billing\\CategOry' => [
             'arguments' => ['table_name' => 'categories', '--model-name' => 'Billing\\CategOry'],
             'expectedFilePath' => 'resources/js/admin/billing-categ-ory/Form.vue',

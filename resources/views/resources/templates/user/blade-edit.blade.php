@@ -91,6 +91,9 @@
                 'updated_by' => trans('brackets/admin-ui::admin.forms.updated_by'),
                 'updated_on' => trans('brackets/admin-ui::admin.forms.updated_on'),
 @endif
+@if($hasTagInput)
+                'create_tag' => trans('brackets/admin-ui::admin.forms.create_tag'),
+@endif
                 'save' => trans('brackets/admin-ui::admin.btn.save'),
             ]) }}"
 @if($mediaCollections->isNotEmpty())

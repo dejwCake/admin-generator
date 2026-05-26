@@ -60,7 +60,20 @@ final class FakerByMajorTypeTest extends TestCase
         self::assertSame('$this->faker->sentence', $this->buildColumn(name: 'description', type: 'varchar')->faker);
     }
 
-    private function buildColumn(string $name, string $type): Column
+    public function testFakerJsonTranslatableUsesSentence(): void
+    {
+        self::assertSame('$this->faker->sentence', $this->buildColumn(name: 'data', type: 'json')->faker);
+    }
+
+    public function testFakerJsonNonTranslatableUsesArray(): void
+    {
+        self::assertSame(
+            '[$this->faker->word, $this->faker->word]',
+            $this->buildColumn(name: 'data', type: 'json', translatable: [])->faker,
+        );
+    }
+
+    private function buildColumn(string $name, string $type, ?array $translatable = null): Column
     {
         return $this->columnBuilder->build(
             name: $name,
@@ -70,6 +83,7 @@ final class FakerByMajorTypeTest extends TestCase
             indexes: new Collection(),
             hasSoftDelete: false,
             modelVariableName: 'article',
+            translatable: $translatable,
         );
     }
 }

@@ -43,6 +43,11 @@ final class StoreRequestTest extends TestCase
             'expectedFilePath' => 'app/Http/Requests/Admin/Category/StoreCategory.php',
         ];
 
+        yield 'categories with translatable text' => [
+            'arguments' => ['table_name' => 'categories', '--translatable' => 'text'],
+            'expectedFilePath' => 'app/Http/Requests/Admin/Category/StoreCategory.php',
+        ];
+
         yield 'categories with model-name Billing\\Cat' => [
             'arguments' => ['table_name' => 'categories', '--model-name' => 'Billing\\Cat'],
             'expectedFilePath' => 'app/Http/Requests/Admin/Billing/Cat/StoreCat.php',

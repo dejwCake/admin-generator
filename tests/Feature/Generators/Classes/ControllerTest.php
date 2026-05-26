@@ -43,6 +43,11 @@ final class ControllerTest extends TestCase
             'expectedFilePath' => 'app/Http/Controllers/Admin/CategoriesController.php',
         ];
 
+        yield 'categories with translatable text' => [
+            'arguments' => ['table_name' => 'categories', '--translatable' => 'text'],
+            'expectedFilePath' => 'app/Http/Controllers/Admin/CategoriesController.php',
+        ];
+
         yield 'categories with class_name Billing\\MyNameController' => [
             'arguments' => ['table_name' => 'categories', 'class_name' => 'Billing\\MyNameController'],
             'expectedFilePath' => 'app/Http/Controllers/Admin/Billing/MyNameController.php',

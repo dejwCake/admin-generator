@@ -43,6 +43,11 @@ final class ModelTest extends TestCase
             'expectedFilePath' => 'app/Models/Category.php',
         ];
 
+        yield 'categories with translatable text' => [
+            'arguments' => ['table_name' => 'categories', '--translatable' => 'text'],
+            'expectedFilePath' => 'app/Models/Category.php',
+        ];
+
         yield 'categories with class_name Billing\\Category' => [
             'arguments' => ['table_name' => 'categories', 'class_name' => 'Billing\\Category'],
             'expectedFilePath' => 'app/Models/Billing/Category.php',

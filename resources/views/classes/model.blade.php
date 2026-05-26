@@ -10,6 +10,7 @@
     assert($booleanColumns instanceof ColumnCollection);
     assert($hiddenColumns instanceof ColumnCollection);
     assert($translatableColumns instanceof ColumnCollection);
+    assert($arrayColumns instanceof ColumnCollection);
 @endphp
 @php echo "<?php";
 @endphp
@@ -97,11 +98,11 @@ use {{ $use }};
 @foreach($columns as $column)
 @php
     assert($column instanceof Column);
-    $docType = $column->majorType === 'json'
+    $docType = $column->isTranslatable
         ? 'string'
-        : ($column->phpType === 'array' ? 'array<string>' : $column->phpType);
+        : ($column->phpType === 'array' ? 'array<int, string>' : $column->phpType);
 @endphp
- * @property {{ !$column->required ? $docType . '|null' : $docType }} ${{ $column->name }}
+ * @property {!! !$column->required ? $docType . '|null' : $docType !!} ${{ $column->name }}
 @endforeach
 @if($relations->hasBelongsToManyWithoutRelatedTable('roles'))
 @foreach($relations->getBelongsToManyWithoutRelatedTable('roles') as $belongsToMany)
@@ -315,7 +316,7 @@ final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty()
 @endforeach
     }
 @endif
-@if ($dateColumns->isNotEmpty() || $booleanColumns->isNotEmpty())
+@if ($dateColumns->isNotEmpty() || $booleanColumns->isNotEmpty() || $arrayColumns->isNotEmpty())
 
     /**
      * @return array<string>
@@ -328,6 +329,9 @@ final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty()
 @endforeach
 @foreach($dateColumns as $column)
             '{{ $column->name }}' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
+@endforeach
+@foreach($arrayColumns as $column)
+            '{{ $column->name }}' => 'array',
 @endforeach
         ];
     }

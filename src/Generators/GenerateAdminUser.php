@@ -44,6 +44,7 @@ final class GenerateAdminUser extends Command
         $force = $this->option('force');
         $withExport = $this->option('with-export');
         $withoutBulk = $this->option('without-bulk');
+        $translatable = $this->option('translatable');
         $media = $this->option('media');
 
         if ($modelName === null) {
@@ -84,6 +85,7 @@ final class GenerateAdminUser extends Command
             '--model-with-full-namespace' => $modelWithFullNamespace,
             '--template' => 'admin-user',
             '--belongs-to-many' => 'roles',
+            '--translatable' => $translatable,
             '--with-export' => $withExport,
             '--without-bulk' => $withoutBulk,
             '--media' => $media,
@@ -101,6 +103,7 @@ final class GenerateAdminUser extends Command
             '--force' => $force,
             '--template' => 'admin-user',
             '--belongs-to-many' => 'roles',
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:request:update', [
@@ -110,6 +113,7 @@ final class GenerateAdminUser extends Command
             '--force' => $force,
             '--template' => 'admin-user',
             '--belongs-to-many' => 'roles',
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:request:destroy', [
@@ -169,6 +173,7 @@ final class GenerateAdminUser extends Command
             '--template' => 'admin-user',
             '--with-export' => $withExport,
             '--without-bulk' => $withoutBulk,
+            '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:blade-create', [
@@ -177,6 +182,7 @@ final class GenerateAdminUser extends Command
             '--force' => $force,
             '--template' => 'admin-user',
             '--belongs-to-many' => 'roles',
+            '--translatable' => $translatable,
             '--media' => $media,
         ]);
 
@@ -186,6 +192,7 @@ final class GenerateAdminUser extends Command
             '--force' => $force,
             '--template' => 'admin-user',
             '--belongs-to-many' => 'roles',
+            '--translatable' => $translatable,
             '--media' => $media,
         ]);
 
@@ -195,6 +202,7 @@ final class GenerateAdminUser extends Command
             '--force' => $force,
             '--template' => 'admin-user',
             '--belongs-to-many' => 'roles',
+            '--translatable' => $translatable,
             '--media' => $media,
         ]);
 
@@ -211,6 +219,7 @@ final class GenerateAdminUser extends Command
             '--model-name' => $modelName,
             '--model-with-full-namespace' => $modelWithFullNamespace,
             '--force' => $force,
+            '--translatable' => $translatable,
         ]);
 
         if ($withExport) {
@@ -247,7 +256,18 @@ final class GenerateAdminUser extends Command
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating admin user'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
-            ['media', 'M', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Media collections (format: name:type:disk:maxFiles)'],
+            [
+                'translatable',
+                'tr',
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
+            ],
+            [
+                'media',
+                'M',
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Media collections (format: name:type:disk:maxFiles[:maxFileSizeInMb])',
+            ],
             ['seed', 's', InputOption::VALUE_NONE, 'Seeds table with fake data'],
         ];
     }
