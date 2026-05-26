@@ -97,7 +97,7 @@ final class Lang extends FileAppender
                 'media',
                 'M',
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Media collections (format: name:type:disk:maxFiles)',
+                'Media collections (format: name:type:disk:maxFiles[:maxFileSizeInMb])',
             ],
             ['locale', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom locale'],
         ];

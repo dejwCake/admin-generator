@@ -88,7 +88,7 @@ final class VueForm extends ResourceGenerator
                 'media',
                 'M',
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Media collections (format: name:type:disk:maxFiles)',
+                'Media collections (format: name:type:disk:maxFiles[:maxFileSizeInMb])',
             ],
             ['file-name', 'nm', InputOption::VALUE_OPTIONAL, 'Specify a blade file path'],
         ];

@@ -284,7 +284,7 @@ final class GenerateUser extends Command
                 'media',
                 'M',
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Media collections (format: name:type:disk:maxFiles)',
+                'Media collections (format: name:type:disk:maxFiles[:maxFileSizeInMb])',
             ],
             ['seed', 's', InputOption::VALUE_NONE, 'Seeds table with fake data'],
             ['generate-model', 'g', InputOption::VALUE_NONE, 'Generates model'],
