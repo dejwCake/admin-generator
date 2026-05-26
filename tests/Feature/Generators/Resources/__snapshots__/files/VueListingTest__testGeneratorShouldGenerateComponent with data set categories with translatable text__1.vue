@@ -156,7 +156,7 @@
                                 <td v-if="isColumnVisible(8)">{{ formatTime(item.time_start) }}</td>
                                 <td v-if="isColumnVisible(9)">{{ formatDatetime(item.date_time_end) }}</td>
                                 <td v-if="isColumnVisible(10)">{{ formatDatetime(item.released_at) }}</td>
-                                <td v-if="isColumnVisible(10)">{{ (item.description ?? []).join(', ') }}</td>
+                                <td v-if="isColumnVisible(10)">{{ Object.values(item.description ?? {}).join(', ') }}</td>
                                 <td v-if="isColumnVisible(10)">
                                     <ToggleSwitch
                                         v-model="collection[index].enabled"
