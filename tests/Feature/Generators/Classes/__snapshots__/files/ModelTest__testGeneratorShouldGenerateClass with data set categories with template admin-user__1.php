@@ -9,6 +9,11 @@ use Brackets\AdminAuth\Activation\Traits\CanActivate;
 use Brackets\AdminAuth\Notifications\ResetPassword;
 use Brackets\Translatable\Traits\HasTranslations;
 use Carbon\CarbonInterface;
+use Database\Factories\CategoryFactory;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -53,6 +58,41 @@ use Illuminate\Support\Collection;
  * @property-read Collection<int, Post> $posts
  * @property-read User|null $user
  */
+#[Fillable([
+    'user_id',
+    'title',
+    'name',
+    'first_name',
+    'last_name',
+    'subject',
+    'email',
+    'password',
+    'language',
+    'slug',
+    'perex',
+    'long_text',
+    'published_at',
+    'published_to',
+    'date_start',
+    'time_start',
+    'date_time_end',
+    'released_at',
+    'text',
+    'description',
+    'enabled',
+    'send',
+    'price',
+    'rating',
+    'views',
+    'created_by_admin_user_id',
+    'updated_by_admin_user_id',
+])]
+#[Hidden([
+    'password',
+    'remember_token',
+])]
+#[Appends(['full_name'])]
+#[UseFactory(CategoryFactory::class)]
 final class Category extends Authenticatable implements CanActivateContract
 {
     use CanActivate;
@@ -62,49 +102,6 @@ final class Category extends Authenticatable implements CanActivateContract
     use SoftDeletes;
 
     /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $fillable = [
-        'user_id',
-        'title',
-        'name',
-        'first_name',
-        'last_name',
-        'subject',
-        'email',
-        'password',
-        'language',
-        'slug',
-        'perex',
-        'long_text',
-        'published_at',
-        'published_to',
-        'date_start',
-        'time_start',
-        'date_time_end',
-        'released_at',
-        'text',
-        'description',
-        'enabled',
-        'send',
-        'price',
-        'rating',
-        'views',
-        'created_by_admin_user_id',
-        'updated_by_admin_user_id',
-    ];
-
-    /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    /**
      * These attributes are translatable
      *
      * @var array<int, string>
@@ -112,14 +109,6 @@ final class Category extends Authenticatable implements CanActivateContract
     protected array $translatable = [
         'text',
         'description',
-    ];
-
-    /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $appends = [
-        'full_name',
     ];
 
     public function getFullNameAttribute(): string

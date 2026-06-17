@@ -59,6 +59,18 @@ namespace {{ $modelNameSpace }};
             }
         }
     }
+    $uses->push($factoryFullName);
+    $uses->push('Illuminate\Database\Eloquent\Attributes\Appends');
+    $uses->push('Illuminate\Database\Eloquent\Attributes\UseFactory');
+    if ($tableName !== null || !$hasTimestamps) {
+        $uses->push('Illuminate\Database\Eloquent\Attributes\Table');
+    }
+    if ($fillableColumns->isNotEmpty()) {
+        $uses->push('Illuminate\Database\Eloquent\Attributes\Fillable');
+    }
+    if ($hiddenColumns->isNotEmpty()) {
+        $uses->push('Illuminate\Database\Eloquent\Attributes\Hidden');
+    }
     $uses = $uses->unique()->sort();
 @endphp
 
@@ -87,6 +99,34 @@ use {{ $use }};
 @endforeach
 @endif
  */
+@php
+    $tableArgs = new Collection();
+    if ($tableName !== null) {
+        $tableArgs->push(sprintf("name: '%s'", $tableName));
+    }
+    if (!$hasTimestamps) {
+        $tableArgs->push('timestamps: false');
+    }
+@endphp
+@if($tableArgs->isNotEmpty())
+#[Table({{ $tableArgs->implode(', ') }})]
+@endif
+@if($fillableColumns->isNotEmpty())
+#[Fillable([
+@foreach($fillableColumns as $column)
+    '{{ $column->name }}',
+@endforeach
+])]
+@endif
+@if($hiddenColumns->isNotEmpty())
+#[Hidden([
+@foreach($hiddenColumns as $column)
+    '{{ $column->name }}',
+@endforeach
+])]
+@endif
+#[Appends(['full_name'])]
+#[UseFactory({{ $factoryBaseName }}::class)]
 final class {{ $modelBaseName }} extends Authenticatable implements CanActivateContract
 {
 @php
@@ -111,34 +151,6 @@ final class {{ $modelBaseName }} extends Authenticatable implements CanActivateC
     use {{ $traitUse }};
 @endforeach
 @endif
-@if ($tableName !== null)
-
-    protected $table = '{{ $tableName }}';
-@endif
-@if ($fillableColumns->isNotEmpty())
-
-    /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $fillable = [
-@foreach($fillableColumns as $column)
-        '{{ $column->name }}',
-@endforeach
-    ];
-@endif
-@if ($hiddenColumns->isNotEmpty())
-
-    /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $hidden = [
-@foreach($hiddenColumns as $column)
-        '{{ $column->name }}',
-@endforeach
-    ];
-@endif
 @if ($translatableColumns->isNotEmpty())
 
     /**
@@ -151,18 +163,6 @@ final class {{ $modelBaseName }} extends Authenticatable implements CanActivateC
         '{{ $column->name }}',
 @endforeach
     ];
-@endif
-
-    /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $appends = [
-        'full_name',
-    ];
-@if (!$hasTimestamps)
-
-    public $timestamps = false;
 @endif
 
     public function getFullNameAttribute(): string

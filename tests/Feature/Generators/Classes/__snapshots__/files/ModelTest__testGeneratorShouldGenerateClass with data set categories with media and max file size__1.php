@@ -13,6 +13,10 @@ use Brackets\Media\HasMedia\HasMediaThumbsTrait;
 use Brackets\Media\HasMedia\ProcessMediaTrait;
 use Brackets\Translatable\Traits\HasTranslations;
 use Carbon\CarbonInterface;
+use Database\Factories\CategoryFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -58,6 +62,40 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read Collection<int, Post> $posts
  * @property-read User|null $user
  */
+#[Fillable([
+    'user_id',
+    'title',
+    'name',
+    'first_name',
+    'last_name',
+    'subject',
+    'email',
+    'password',
+    'language',
+    'slug',
+    'perex',
+    'long_text',
+    'published_at',
+    'published_to',
+    'date_start',
+    'time_start',
+    'date_time_end',
+    'released_at',
+    'text',
+    'description',
+    'enabled',
+    'send',
+    'price',
+    'rating',
+    'views',
+    'created_by_admin_user_id',
+    'updated_by_admin_user_id',
+])]
+#[Hidden([
+    'password',
+    'remember_token',
+])]
+#[UseFactory(CategoryFactory::class)]
 final class Category extends Model implements HasMedia
 {
     use AutoProcessMediaTrait;
@@ -70,49 +108,6 @@ final class Category extends Model implements HasMedia
     use PublishableTrait;
     use SoftDeletes;
     use UpdatedByAdminUserTrait;
-
-    /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $fillable = [
-        'user_id',
-        'title',
-        'name',
-        'first_name',
-        'last_name',
-        'subject',
-        'email',
-        'password',
-        'language',
-        'slug',
-        'perex',
-        'long_text',
-        'published_at',
-        'published_to',
-        'date_start',
-        'time_start',
-        'date_time_end',
-        'released_at',
-        'text',
-        'description',
-        'enabled',
-        'send',
-        'price',
-        'rating',
-        'views',
-        'created_by_admin_user_id',
-        'updated_by_admin_user_id',
-    ];
-
-    /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
 
     /**
      * These attributes are translatable

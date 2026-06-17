@@ -18,8 +18,8 @@ use SplFileInfo;
 
 abstract class TestCase extends Orchestra
 {
-    use RefreshDatabase;
     use MatchesSnapshots;
+    use RefreshDatabase;
 
     public function setUp(): void
     {

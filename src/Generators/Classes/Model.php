@@ -73,10 +73,22 @@ final class Model extends ClassGenerator
             $this->extractTranslatable(),
         );
 
+        $appNamespace = trim($this->laravel->getNamespace(), '\\');
+        $modelFullName = sprintf('%s\\%s', $this->classNamespace, $this->classBaseName);
+        if (Str::startsWith($modelFullName, sprintf('%s\\Models\\', $appNamespace))) {
+            $factorySubName = Str::after($modelFullName, sprintf('%s\\Models\\', $appNamespace));
+        } elseif (Str::startsWith($modelFullName, sprintf('%s\\', $appNamespace))) {
+            $factorySubName = Str::after($modelFullName, sprintf('%s\\', $appNamespace));
+        } else {
+            $factorySubName = $modelFullName;
+        }
+
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'modelBaseName' => $this->classBaseName,
             'modelNameSpace' => $this->classNamespace,
+            'factoryFullName' => sprintf('Database\\Factories\\%sFactory', $factorySubName),
+            'factoryBaseName' => sprintf('%sFactory', Str::afterLast($factorySubName, '\\')),
             // if table name differs from the snake case plural form of the classname,
             // then we need to specify the table name
             'tableName' => $this->tableName !== Str::snake(Str::plural($this->classBaseName))

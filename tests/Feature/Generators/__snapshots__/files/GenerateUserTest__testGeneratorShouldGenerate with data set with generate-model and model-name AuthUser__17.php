@@ -6,7 +6,11 @@ namespace App\Models\Auth;
 
 use Brackets\AdminAuth\Notifications\ResetPassword;
 use Carbon\CarbonInterface;
+use Database\Factories\Auth\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,33 +26,22 @@ use Spatie\Permission\Traits\HasRoles;
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
+#[Fillable([
+    'name',
+    'email',
+    'email_verified_at',
+    'password',
+])]
+#[Hidden([
+    'password',
+    'remember_token',
+])]
+#[UseFactory(UserFactory::class)]
 final class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory;
     use HasRoles;
     use Notifiable;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'email_verified_at',
-        'password',
-    ];
-
-    /**
-     * @var array<int, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
 
     /**
      * Send the password reset notification.

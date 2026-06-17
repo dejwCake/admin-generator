@@ -87,6 +87,17 @@ namespace {{ $modelNameSpace }};
             }
         }
     }
+    $uses->push($factoryFullName);
+    $uses->push('Illuminate\Database\Eloquent\Attributes\UseFactory');
+    if ($tableName !== null || !$hasTimestamps) {
+        $uses->push('Illuminate\Database\Eloquent\Attributes\Table');
+    }
+    if ($fillableColumns->isNotEmpty()) {
+        $uses->push('Illuminate\Database\Eloquent\Attributes\Fillable');
+    }
+    if ($hiddenColumns->isNotEmpty()) {
+        $uses->push('Illuminate\Database\Eloquent\Attributes\Hidden');
+    }
     $uses = $uses->unique()->sort();
 @endphp
 
@@ -122,6 +133,33 @@ use {{ $use }};
 @endforeach
 @endif
  */
+@php
+    $tableArgs = new Collection();
+    if ($tableName !== null) {
+        $tableArgs->push(sprintf("name: '%s'", $tableName));
+    }
+    if (!$hasTimestamps) {
+        $tableArgs->push('timestamps: false');
+    }
+@endphp
+@if($tableArgs->isNotEmpty())
+#[Table({{ $tableArgs->implode(', ') }})]
+@endif
+@if($fillableColumns->isNotEmpty())
+#[Fillable([
+@foreach($fillableColumns as $column)
+    '{{ $column->name }}',
+@endforeach
+])]
+@endif
+@if($hiddenColumns->isNotEmpty())
+#[Hidden([
+@foreach($hiddenColumns as $column)
+    '{{ $column->name }}',
+@endforeach
+])]
+@endif
+#[UseFactory({{ $factoryBaseName }}::class)]
 final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty() ? ' implements HasMedia' : '' }}
 {
 @php
@@ -159,34 +197,6 @@ final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty()
     use {{ $traitUse }};
 @endforeach
 @endif
-@if ($tableName !== null)
-
-    protected $table = '{{ $tableName }}';
-@endif
-@if ($fillableColumns->isNotEmpty())
-
-    /**
-     * @var array<int, string>
-     * {{'@'}}phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $fillable = [
-@foreach($fillableColumns as $column)
-        '{{ $column->name }}',
-@endforeach
-    ];
-@endif
-@if ($hiddenColumns->isNotEmpty())
-
-    /**
-     * @var array<int, string>
-     * {{'@'}}phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $hidden = [
-@foreach($hiddenColumns as $column)
-        '{{ $column->name }}',
-@endforeach
-    ];
-@endif
 @if ($translatableColumns->isNotEmpty())
 
     /**
@@ -199,10 +209,6 @@ final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty()
         '{{ $column->name }}',
 @endforeach
     ];
-@endif
-@if (!$hasTimestamps)
-
-    public $timestamps = false;
 @endif
 @if ($relations->hasBelongsToManyWithoutRelatedTable('roles'))
 
