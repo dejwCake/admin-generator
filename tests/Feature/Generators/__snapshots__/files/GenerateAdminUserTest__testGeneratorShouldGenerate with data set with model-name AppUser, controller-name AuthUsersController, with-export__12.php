@@ -34,25 +34,25 @@ final class UserFactory extends Factory
 
     public function activated(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['activated' => true]);
+        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(fn (array $attributes) => ['activated' => true]);
     }
 
     public function notActivated(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['activated' => false]);
+        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(fn (array $attributes) => ['activated' => false]);
     }
 
     public function forbidden(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['forbidden' => true]);
+        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(fn (array $attributes) => ['forbidden' => true]);
     }
 
     public function notForbidden(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['forbidden' => false]);
+        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(fn (array $attributes) => ['forbidden' => false]);
     }
 }

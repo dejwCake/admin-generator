@@ -224,6 +224,7 @@ final class GenerateUser extends Command
             'table_name' => $tableName,
             '--model-name' => $modelName,
             '--force' => $force,
+            '--template' => 'user',
             '--translatable' => $translatable,
         ]);
 

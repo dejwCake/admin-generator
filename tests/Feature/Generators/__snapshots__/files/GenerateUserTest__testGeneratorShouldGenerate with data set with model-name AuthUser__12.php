@@ -28,9 +28,17 @@ final class UserFactory extends Factory
         ];
     }
 
+    public function withPassword(string $password): self
+    {
+        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(fn (array $attributes): array => [
+            'password' => Container::getInstance()->make(Hasher::class)->make($password),
+        ]);
+    }
+
     public function unverified(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(static fn (array $attributes) => ['email_verified_at' => null]);
+        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(fn (array $attributes) => ['email_verified_at' => null]);
     }
 }

@@ -1,7 +1,6 @@
 @php
     use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Illuminate\Support\Collection;
-    use Illuminate\Support\Str;
     assert($columns instanceof ColumnCollection)
 @endphp
 @php echo "<?php";
@@ -12,6 +11,14 @@ declare(strict_types=1);
 
 namespace {{ $namespace }};
 @php
+    // Columns that must never be faked in the default definition:
+    // - current_team_id points at a team that the factory does not create
+    // - the two_factor_* columns must stay empty unless withTwoFactor() is used
+    $skipColumns = ['current_team_id', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at'];
+    $definitionColumns = $columns->getNonTranslatable()->rejectByName(...$skipColumns);
+    $twoFactorColumns = $columns->getNonTranslatable()->filterByName('two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at');
+    $hasTwoFactor = $twoFactorColumns->isNotEmpty();
+
     $uses = new Collection([
         $modelFullName,
         'Illuminate\Database\Eloquent\Factories\Attributes\UseModel',
@@ -20,9 +27,6 @@ namespace {{ $namespace }};
     if ($hasPassword) {
         $uses->push('Illuminate\Container\Container');
         $uses->push('Illuminate\Contracts\Hashing\Hasher');
-    }
-    if ($hasCreatedByAdminUser || $hasUpdatedByAdminUser) {
-        $uses->push('Brackets\AdminAuth\Models\AdminUser');
     }
     $uses = $uses->unique()->sort();
 @endphp
@@ -40,37 +44,25 @@ final class {{ $modelBaseName }}Factory extends Factory
         $hasher = Container::getInstance()->make(Hasher::class);
 
 @endif
-@if($hasCreatedByAdminUser || $hasUpdatedByAdminUser)
-        $adminUserId = AdminUser::query()->inRandomOrder()->value('id');
-
-@endif
         return [
-@foreach($columns->getNonTranslatable() as $column)
-@if($column->name === 'created_by_admin_user_id' || $column->name === 'updated_by_admin_user_id')
-            '{{ $column->name }}' => $adminUserId,
-@else
+@foreach($definitionColumns as $column)
             '{{ $column->name }}' => {!! $column->faker !!},
-@endif
 @endforeach
 @foreach($columns->getTranslatable() as $column)
             '{{ $column->name }}' => ['en' => {!! $column->faker !!}],
 @endforeach
         ];
     }
-@foreach($columns->getBoolean() as $column)
+@if($hasPassword)
 
-    public function {{ $column->name }}(): self
+    public function withPassword(string $password): self
     {
         // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(fn (array $attributes) => ['{{ $column->name }}' => true]);
+        return $this->state(fn (array $attributes): array => [
+            'password' => Container::getInstance()->make(Hasher::class)->make($password),
+        ]);
     }
-
-    public function not{{ Str::ucfirst($column->name) }}(): self
-    {
-        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(fn (array $attributes) => ['{{ $column->name }}' => false]);
-    }
-@endforeach
+@endif
 @if($hasEmailVerifiedAt)
 
     public function unverified(): self
@@ -79,12 +71,16 @@ final class {{ $modelBaseName }}Factory extends Factory
         return $this->state(fn (array $attributes) => ['email_verified_at' => null]);
     }
 @endif
-@if($hasPublishedAt)
+@if($hasTwoFactor)
 
-    public function notPublished(): self
+    public function withTwoFactor(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(fn (array $attributes) => ['published_at' => null]);
+        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+        return $this->state(fn (array $attributes): array => [
+@foreach($twoFactorColumns as $column)
+            '{{ $column->name }}' => {!! $column->faker !!},
+@endforeach
+        ]);
     }
 @endif
 }
