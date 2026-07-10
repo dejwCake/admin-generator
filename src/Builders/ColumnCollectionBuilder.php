@@ -71,6 +71,7 @@ final class ColumnCollectionBuilder
                     ['password', 'remember_token', 'slug', 'created_at', 'updated_at', 'deleted_at'],
                     true,
                 )
+                && !in_array($column->name, ColumnCollection::SETUP_ONLY_COLUMNS, true)
                 && !$column->isWysiwyg,
         );
 

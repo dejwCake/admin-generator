@@ -23,6 +23,10 @@ use Spatie\Permission\Traits\HasRoles;
  * @property CarbonInterface|null $email_verified_at
  * @property string $password
  * @property string|null $remember_token
+ * @property int|null $current_team_id
+ * @property string|null $two_factor_secret
+ * @property string|null $two_factor_recovery_codes
+ * @property CarbonInterface|null $two_factor_confirmed_at
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
@@ -31,10 +35,16 @@ use Spatie\Permission\Traits\HasRoles;
     'email',
     'email_verified_at',
     'password',
+    'current_team_id',
+    'two_factor_secret',
+    'two_factor_recovery_codes',
+    'two_factor_confirmed_at',
 ])]
 #[Hidden([
     'password',
     'remember_token',
+    'two_factor_secret',
+    'two_factor_recovery_codes',
 ])]
 #[UseFactory(UserFactory::class)]
 final class User extends Authenticatable implements MustVerifyEmail
@@ -61,6 +71,7 @@ final class User extends Authenticatable implements MustVerifyEmail
     {
         return [
             'email_verified_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
+            'two_factor_confirmed_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'created_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'updated_at' => 'date:' . CarbonInterface::DEFAULT_TO_STRING_FORMAT,
             'password' => 'hashed',

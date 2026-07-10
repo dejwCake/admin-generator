@@ -203,6 +203,58 @@ final class SubsetQueriesTest extends TestCase
         );
     }
 
+    public function testSetupOnlyColumnsAreExcludedFromGeneratedArtifacts(): void
+    {
+        $collection = new ColumnCollection([
+            self::makeColumn('title', priority: 0),
+            self::makeColumn('current_team_id', majorType: 'integer', priority: 1),
+            self::makeColumn('two_factor_secret', majorType: 'text', priority: 2),
+            self::makeColumn('two_factor_recovery_codes', majorType: 'text', priority: 3),
+            self::makeColumn('two_factor_confirmed_at', majorType: 'datetime', priority: 4),
+        ]);
+
+        foreach (
+            [
+                $collection->getVisible(),
+                $collection->getToExport(),
+                $collection->getForIndex(),
+                $collection->getToQuery(),
+                $collection->getToSearchIn(),
+            ] as $result
+        ) {
+            $names = array_keys($result->toArray());
+            self::assertContains('title', $names);
+            self::assertNotContains('current_team_id', $names);
+            self::assertNotContains('two_factor_secret', $names);
+            self::assertNotContains('two_factor_recovery_codes', $names);
+            self::assertNotContains('two_factor_confirmed_at', $names);
+        }
+    }
+
+    public function testSetupOnlyColumnsAreRetainedForModelAndFactory(): void
+    {
+        $collection = new ColumnCollection([
+            self::makeColumn('title', priority: 0),
+            self::makeColumn('current_team_id', majorType: 'integer'),
+            self::makeColumn('two_factor_secret', majorType: 'text'),
+            self::makeColumn('two_factor_recovery_codes', majorType: 'text'),
+            self::makeColumn('two_factor_confirmed_at', majorType: 'datetime'),
+        ]);
+
+        $fillable = array_keys($collection->getFillable()->toArray());
+        self::assertContains('current_team_id', $fillable);
+        self::assertContains('two_factor_secret', $fillable);
+        self::assertContains('two_factor_recovery_codes', $fillable);
+        self::assertContains('two_factor_confirmed_at', $fillable);
+
+        $nonTranslatable = array_keys($collection->getNonTranslatable()->toArray());
+        self::assertContains('two_factor_confirmed_at', $nonTranslatable);
+
+        $hidden = array_keys($collection->getHidden()->toArray());
+        self::assertContains('two_factor_secret', $hidden);
+        self::assertContains('two_factor_recovery_codes', $hidden);
+    }
+
     private static function makeColumn(
         string $name,
         string $majorType = 'string',

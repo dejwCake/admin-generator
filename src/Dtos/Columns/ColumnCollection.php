@@ -19,6 +19,18 @@ use Traversable;
 /** @implements IteratorAggregate<string, Column> */
 final class ColumnCollection implements IteratorAggregate, Countable
 {
+    /**
+     * Columns that only exist for the user's own account setup (two-factor auth, current team).
+     * They are managed by the framework, never edited or displayed through the admin, so they are
+     * excluded from every generated artifact except the Model and factory.
+     */
+    public const array SETUP_ONLY_COLUMNS = [
+        'current_team_id',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
+    ];
+
     private const array PREFERRED_LABEL_COLUMNS = ['title', 'name', 'first_name', 'email'];
 
     /** @var Collection<string, Column> */
@@ -77,7 +89,8 @@ final class ColumnCollection implements IteratorAggregate, Countable
                     $column->name,
                     ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token', 'last_login_at'],
                     true,
-                )),
+                ))
+                ->reject(static fn (Column $column): bool => in_array($column->name, self::SETUP_ONLY_COLUMNS, true)),
         );
     }
 
@@ -110,7 +123,8 @@ final class ColumnCollection implements IteratorAggregate, Countable
         return new self($this->columns
             ->reject(
                 static fn (Column $column) => $column->majorType === 'text' || in_array($column->name, $haystack, true),
-            ));
+            )
+            ->reject(static fn (Column $column) => in_array($column->name, self::SETUP_ONLY_COLUMNS, true)));
     }
 
     public function getToSearchIn(): self
@@ -123,6 +137,8 @@ final class ColumnCollection implements IteratorAggregate, Countable
                         || $column->name === 'id',
             )->reject(
                 static fn (Column $column) => in_array($column->name, ['password', 'remember_token'], true),
+            )->reject(
+                static fn (Column $column) => in_array($column->name, self::SETUP_ONLY_COLUMNS, true),
             ),
         );
     }
@@ -136,6 +152,8 @@ final class ColumnCollection implements IteratorAggregate, Countable
                     ['password', 'remember_token', 'updated_at', 'created_at', 'deleted_at'],
                     true,
                 ),
+            )->reject(
+                static fn (Column $column) => in_array($column->name, self::SETUP_ONLY_COLUMNS, true),
             ),
         );
     }
@@ -145,6 +163,8 @@ final class ColumnCollection implements IteratorAggregate, Countable
         return new self(
             $this->columns->filter(
                 static fn (Column $column): bool => $column->priority !== null,
+            )->reject(
+                static fn (Column $column) => in_array($column->name, self::SETUP_ONLY_COLUMNS, true),
             ),
         );
     }
@@ -194,7 +214,11 @@ final class ColumnCollection implements IteratorAggregate, Countable
     {
         return new self(
             $this->columns->filter(
-                static fn (Column $column) => in_array($column->name, ['password', 'remember_token'], true),
+                static fn (Column $column) => in_array(
+                    $column->name,
+                    ['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'],
+                    true,
+                ),
             ),
         );
     }

@@ -91,7 +91,11 @@ final class RelationBuilder
 
         $columns->filter(
             static fn (array $column): bool => str_ends_with($column['name'], '_id')
-                && !in_array($column['name'], ['created_by_admin_user_id', 'updated_by_admin_user_id'], true),
+                && !in_array(
+                    $column['name'],
+                    ['created_by_admin_user_id', 'updated_by_admin_user_id', 'current_team_id'],
+                    true,
+                ),
         )->each(function (array $column): void {
             $relatedTable = Str::plural(Str::beforeLast($column['name'], '_id'));
 
