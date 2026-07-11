@@ -173,6 +173,10 @@ final class {{ $classBaseName }} extends FormRequest
 
     /**
      * Modify input data
+@if(!$relations->hasBelongsToMany() && !$hasPassword && !$hasPublishedAt && !$hasUpdatedByAdminUser)
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Variables.UselessVariable.UselessVariable
+@endif
      */
     public function getModifiedData(): array
     {
