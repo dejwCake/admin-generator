@@ -7,6 +7,7 @@ namespace Brackets\AdminGenerator\Generators;
 use Brackets\AdminGenerator\Generators\Traits\FileManipulations;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -42,6 +43,17 @@ final class GenerateUser extends Command
         $modelName = $this->option('model-name');
         $controllerName = $this->option('controller-name');
         $force = $this->option('force');
+        $belongsToMany = $this->option('belongs-to-many');
+        // Keep backward compatibility: unless explicitly ignored, the user model always gets the `roles` relation.
+        if (!$this->option('ignore-roles')) {
+            $relations = (new Collection($belongsToMany !== null ? explode(',', $belongsToMany) : []))
+                ->map(static fn (string $relation): string => trim($relation))
+                ->filter();
+            if (!$relations->contains('roles')) {
+                $relations->push('roles');
+            }
+            $belongsToMany = $relations->implode(',');
+        }
         $withExport = $this->option('with-export');
         $withoutBulk = $this->option('without-bulk');
         $translatable = $this->option('translatable');
@@ -70,7 +82,7 @@ final class GenerateUser extends Command
                 'class_name' => $modelName,
                 '--force' => $force,
                 '--template' => 'user',
-                '--belongs-to-many' => 'roles',
+                '--belongs-to-many' => $belongsToMany,
                 '--translatable' => $translatable,
                 '--media' => $media,
             ]);
@@ -92,7 +104,7 @@ final class GenerateUser extends Command
             'class_name' => $controllerName,
             '--model-name' => $modelName,
             '--template' => 'user',
-            '--belongs-to-many' => 'roles',
+            '--belongs-to-many' => $belongsToMany,
             '--translatable' => $translatable,
             '--with-export' => $withExport,
             '--without-bulk' => $withoutBulk,
@@ -111,7 +123,7 @@ final class GenerateUser extends Command
             '--model-name' => $modelName,
             '--force' => $force,
             '--template' => 'user',
-            '--belongs-to-many' => 'roles',
+            '--belongs-to-many' => $belongsToMany,
             '--translatable' => $translatable,
         ]);
 
@@ -120,7 +132,7 @@ final class GenerateUser extends Command
             '--model-name' => $modelName,
             '--force' => $force,
             '--template' => 'user',
-            '--belongs-to-many' => 'roles',
+            '--belongs-to-many' => $belongsToMany,
             '--translatable' => $translatable,
         ]);
 
@@ -186,7 +198,7 @@ final class GenerateUser extends Command
             '--model-name' => $modelName,
             '--force' => $force,
             '--template' => 'user',
-            '--belongs-to-many' => 'roles',
+            '--belongs-to-many' => $belongsToMany,
             '--translatable' => $translatable,
             '--media' => $media,
         ]);
@@ -196,7 +208,7 @@ final class GenerateUser extends Command
             '--model-name' => $modelName,
             '--force' => $force,
             '--template' => 'user',
-            '--belongs-to-many' => 'roles',
+            '--belongs-to-many' => $belongsToMany,
             '--translatable' => $translatable,
             '--media' => $media,
         ]);
@@ -206,7 +218,7 @@ final class GenerateUser extends Command
             '--model-name' => $modelName,
             '--force' => $force,
             '--template' => 'user',
-            '--belongs-to-many' => 'roles',
+            '--belongs-to-many' => $belongsToMany,
             '--translatable' => $translatable,
             '--media' => $media,
         ]);
@@ -214,7 +226,7 @@ final class GenerateUser extends Command
         $this->call('admin:generate:lang', [
             'table_name' => $tableName,
             '--model-name' => $modelName,
-            '--belongs-to-many' => 'roles',
+            '--belongs-to-many' => $belongsToMany,
             '--with-export' => $withExport,
             '--media' => $media,
             '--translatable' => $translatable,
@@ -277,6 +289,8 @@ final class GenerateUser extends Command
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Specify custom model name'],
             ['controller-name', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom controller name'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating admin user'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
+            ['ignore-roles', null, InputOption::VALUE_NONE, 'Do not add the default roles belongs-to-many relation'],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
             [

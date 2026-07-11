@@ -232,6 +232,28 @@ final class GenerateUserTest extends TestCase
             ],
         ];
 
+        yield 'with generate-model and belongs-to-many posts' => [
+            'options' => ['--generate-model' => true, '--belongs-to-many' => 'posts'],
+            'expectedFiles' => [...$common, $bulkDestroy, $defaultModel],
+            'missingFiles' => [$exportRequest, $exportClass],
+        ];
+
+        yield 'with generate-model and ignore-roles' => [
+            'options' => ['--generate-model' => true, '--ignore-roles' => true],
+            'expectedFiles' => [...$common, $bulkDestroy, $defaultModel],
+            'missingFiles' => [$exportRequest, $exportClass],
+        ];
+
+        yield 'with generate-model, belongs-to-many posts and ignore-roles' => [
+            'options' => [
+                '--generate-model' => true,
+                '--belongs-to-many' => 'posts',
+                '--ignore-roles' => true,
+            ],
+            'expectedFiles' => [...$common, $bulkDestroy, $defaultModel],
+            'missingFiles' => [$exportRequest, $exportClass],
+        ];
+
         yield 'with force-permissions' => [
             'options' => ['--force-permissions' => true],
             'expectedFiles' => [...$common, $bulkDestroy],
