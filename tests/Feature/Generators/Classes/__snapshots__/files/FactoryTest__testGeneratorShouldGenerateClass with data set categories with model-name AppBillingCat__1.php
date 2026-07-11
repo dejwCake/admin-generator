@@ -11,6 +11,9 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Cat>
+ */
 #[UseModel(Cat::class)]
 final class CatFactory extends Factory
 {

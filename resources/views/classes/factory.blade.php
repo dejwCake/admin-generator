@@ -31,6 +31,9 @@ namespace {{ $namespace }};
 use {{ $use }};
 @endforeach
 
+/**
+ * @@extends Factory<{{ $modelBaseName }}>
+ */
 #[UseModel({{ $modelBaseName }}::class)]
 final class {{ $modelBaseName }}Factory extends Factory
 {

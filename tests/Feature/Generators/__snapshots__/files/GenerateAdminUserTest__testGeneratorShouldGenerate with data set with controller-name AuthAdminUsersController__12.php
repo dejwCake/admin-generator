@@ -10,6 +10,9 @@ use Illuminate\Contracts\Hashing\Hasher;
 use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<AdminUser>
+ */
 #[UseModel(AdminUser::class)]
 final class AdminUserFactory extends Factory
 {
