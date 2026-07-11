@@ -45,15 +45,18 @@ final class Generate extends Command
         $withoutBulk = $this->option('without-bulk');
         $media = $this->option('media');
         $seed = $this->option('seed');
+        $withoutModel = $this->option('without-model');
 
-        $this->call('admin:generate:model', [
-            'table_name' => $tableName,
-            'class_name' => $modelName,
-            '--force' => $force,
-            '--belongs-to-many' => $belongsToMany,
-            '--translatable' => $translatable,
-            '--media' => $media,
-        ]);
+        if (!$withoutModel) {
+            $this->call('admin:generate:model', [
+                'table_name' => $tableName,
+                'class_name' => $modelName,
+                '--force' => $force,
+                '--belongs-to-many' => $belongsToMany,
+                '--translatable' => $translatable,
+                '--media' => $media,
+            ]);
+        }
 
         $this->call('admin:generate:factory', [
             'table_name' => $tableName,
@@ -235,6 +238,7 @@ final class Generate extends Command
             ],
             ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+            ['without-model', 'wm', InputOption::VALUE_NONE, 'Skip generating the model class (use an existing one)'],
             [
                 'media',
                 'M',

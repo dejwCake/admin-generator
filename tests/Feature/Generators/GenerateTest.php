@@ -101,9 +101,11 @@ final class GenerateTest extends TestCase
     {
         $categoriesCommon = self::commonForTable('Category');
         $defaultCategoriesController = 'app/Http/Controllers/Admin/CategoriesController.php';
+        $categoriesModel = 'app/Models/Category.php';
         $categoriesBulk = 'app/Http/Requests/Admin/Category/BulkDestroyCategory.php';
         $categoriesExportRequest = 'app/Http/Requests/Admin/Category/ExportCategory.php';
         $categoriesExportClass = 'app/Exports/CategoriesExport.php';
+        $categoriesCommonWithoutModel = self::without($categoriesCommon, $categoriesModel);
 
         yield 'categories default' => [
             'arguments' => ['table_name' => 'categories'],
@@ -142,6 +144,18 @@ final class GenerateTest extends TestCase
             ],
             'expectedFiles' => [...$categoriesCommon, $categoriesExportRequest, $categoriesExportClass],
             'missingFiles' => [$categoriesBulk],
+        ];
+
+        yield 'categories without model' => [
+            'arguments' => ['table_name' => 'categories', '--without-model' => true],
+            'expectedFiles' => [...$categoriesCommonWithoutModel, $categoriesBulk],
+            'missingFiles' => [$categoriesModel, $categoriesExportRequest, $categoriesExportClass],
+        ];
+
+        yield 'categories force without model' => [
+            'arguments' => ['table_name' => 'categories', '--without-model' => true, '--force' => true],
+            'expectedFiles' => [...$categoriesCommonWithoutModel, $categoriesBulk],
+            'missingFiles' => [$categoriesModel, $categoriesExportRequest, $categoriesExportClass],
         ];
 
         yield 'categories with media gallery' => [
@@ -393,6 +407,18 @@ final class GenerateTest extends TestCase
                 ? $newControllerPath
                 : $path,
             $files,
+        ));
+    }
+
+    /**
+     * @param array<int, string> $files
+     * @return array<int, string>
+     */
+    private static function without(array $files, string $excluded): array
+    {
+        return array_values(array_filter(
+            $files,
+            static fn (string $path): bool => $path !== $excluded,
         ));
     }
 
