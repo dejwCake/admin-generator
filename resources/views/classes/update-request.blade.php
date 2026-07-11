@@ -173,13 +173,12 @@ final class {{ $classBaseName }} extends FormRequest
 
     /**
      * Modify input data
-@if(!$relations->hasBelongsToMany() && !$hasPassword && !$hasPublishedAt && !$hasUpdatedByAdminUser)
-     *
-     * @phpcsSuppress SlevomatCodingStandard.Variables.UselessVariable.UselessVariable
-@endif
      */
     public function getModifiedData(): array
     {
+@if(!$relations->hasBelongsToMany() && !$hasPassword && !$hasPublishedAt && !$hasUpdatedByAdminUser)
+        //phpcs:ignore SlevomatCodingStandard.Variables.UselessVariable.UselessVariable
+@endif
         $data = $this->validated();
 @if($relations->hasBelongsToMany())
 @foreach($relations->getBelongsToMany() as $belongsToMany)
