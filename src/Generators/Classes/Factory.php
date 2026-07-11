@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Classes;
 
+use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
 use Illuminate\Support\Str;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
@@ -91,6 +92,12 @@ final class Factory extends ClassGenerator
             $this->extractTranslatable(),
         );
 
+        $skipColumns = array_values(
+            array_diff(ColumnCollection::SETUP_ONLY_COLUMNS, ColumnCollection::TWO_FACTOR_COLUMNS),
+        );
+        $twoFactorColumns = $columns->getNonTranslatable()->filterByName(...ColumnCollection::TWO_FACTOR_COLUMNS);
+        $definitionColumns = $columns->getNonTranslatable()->rejectByName(...$skipColumns);
+
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //global
             'namespace' => $this->classNamespace,
@@ -102,8 +109,12 @@ final class Factory extends ClassGenerator
             'hasPublishedAt' => $columns->hasByName('published_at'),
             'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
             'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
+            'hasTwoFactor' => $twoFactorColumns->isNotEmpty(),
             //columns
             'columns' => $columns,
+            'definitionColumns' => $definitionColumns,
+            'twoFactorColumns' => $twoFactorColumns,
+            'skipColumns' => $skipColumns,
         ])->render();
     }
 

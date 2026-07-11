@@ -19,11 +19,12 @@ use Traversable;
 /** @implements IteratorAggregate<string, Column> */
 final class ColumnCollection implements IteratorAggregate, Countable
 {
-    /**
-     * Columns that only exist for the user's own account setup (two-factor auth, current team).
-     * They are managed by the framework, never edited or displayed through the admin, so they are
-     * excluded from every generated artifact except the Model and factory.
-     */
+    public const array TWO_FACTOR_COLUMNS = [
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
+    ];
+
     public const array SETUP_ONLY_COLUMNS = [
         'current_team_id',
         'two_factor_secret',
