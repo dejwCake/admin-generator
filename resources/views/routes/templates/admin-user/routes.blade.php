@@ -17,22 +17,22 @@ Route::prefix('{{ $resource }}')
             ->name('create');
         Route::post('/', 'store')
             ->name('store');
-        Route::get('/{{ '{' }}{{ $modelVariableName }}}/edit', 'edit')
+        Route::get('/{{ '{' }}{{ $modelVariableName }}:id}/edit', 'edit')
             ->name('edit');
 @if($hasBulk)
         Route::post('/bulk-destroy', 'bulkDestroy')
             ->name('bulk-destroy');
 @endif
-        Route::post('/{{ '{' }}{{ $modelVariableName }}}', 'update')
+        Route::post('/{{ '{' }}{{ $modelVariableName }}:id}', 'update')
             ->name('update');
-        Route::delete('/{{ '{' }}{{ $modelVariableName }}}', 'destroy')
+        Route::delete('/{{ '{' }}{{ $modelVariableName }}:id}', 'destroy')
             ->name('destroy');
 @if($hasExport)
         Route::get('/export', 'export')
             ->name('export');
 @endif
-        Route::get('/{{ '{' }}{{ $modelVariableName }}}/impersonal-login', 'impersonalLogin')
+        Route::get('/{{ '{' }}{{ $modelVariableName }}:id}/impersonal-login', 'impersonalLogin')
             ->name('impersonal-login');
-        Route::get('/{{ '{' }}{{ $modelVariableName }}}/resend-activation', 'resendActivationEmail')
+        Route::get('/{{ '{' }}{{ $modelVariableName }}:id}/resend-activation', 'resendActivationEmail')
             ->name('resend-activation-email');
     });

@@ -15,16 +15,16 @@ Route::prefix('users')
             ->name('create');
         Route::post('/', 'store')
             ->name('store');
-        Route::get('/{user}/edit', 'edit')
+        Route::get('/{user:id}/edit', 'edit')
             ->name('edit');
-        Route::post('/{user}', 'update')
+        Route::post('/{user:id}', 'update')
             ->name('update');
-        Route::delete('/{user}', 'destroy')
+        Route::delete('/{user:id}', 'destroy')
             ->name('destroy');
         Route::get('/export', 'export')
             ->name('export');
-        Route::get('/{user}/resend-verify-email', 'resendVerifyEmail')
+        Route::get('/{user:id}/resend-verify-email', 'resendVerifyEmail')
             ->name('resend-verify-email');
-        Route::get('/{user}/impersonal-login', 'impersonalLogin')
+        Route::get('/{user:id}/impersonal-login', 'impersonalLogin')
             ->name('impersonal-login');
     });

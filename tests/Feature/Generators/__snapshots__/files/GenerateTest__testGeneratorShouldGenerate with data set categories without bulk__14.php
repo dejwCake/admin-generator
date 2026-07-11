@@ -15,10 +15,10 @@ Route::prefix('categories')
             ->name('create');
         Route::post('/', 'store')
             ->name('store');
-        Route::get('/{category}/edit', 'edit')
+        Route::get('/{category:id}/edit', 'edit')
             ->name('edit');
-        Route::post('/{category}', 'update')
+        Route::post('/{category:id}', 'update')
             ->name('update');
-        Route::delete('/{category}', 'destroy')
+        Route::delete('/{category:id}', 'destroy')
             ->name('destroy');
     });

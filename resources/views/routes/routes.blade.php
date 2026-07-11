@@ -17,15 +17,15 @@ Route::prefix('{{ $resource }}')
             ->name('create');
         Route::post('/', 'store')
             ->name('store');
-        Route::get('/{{ '{' }}{{ $modelVariableName }}}/edit', 'edit')
+        Route::get('/{{ '{' }}{{ $modelVariableName }}:id}/edit', 'edit')
             ->name('edit');
 @if($hasBulk)
         Route::post('/bulk-destroy', 'bulkDestroy')
             ->name('bulk-destroy');
 @endif
-        Route::post('/{{ '{' }}{{ $modelVariableName }}}', 'update')
+        Route::post('/{{ '{' }}{{ $modelVariableName }}:id}', 'update')
             ->name('update');
-        Route::delete('/{{ '{' }}{{ $modelVariableName }}}', 'destroy')
+        Route::delete('/{{ '{' }}{{ $modelVariableName }}:id}', 'destroy')
             ->name('destroy');
 @if($hasExport)
         Route::get('/export', 'export')

@@ -15,10 +15,10 @@ Route::prefix('posts')
             ->name('create');
         Route::post('/', 'store')
             ->name('store');
-        Route::get('/{post}/edit', 'edit')
+        Route::get('/{post:id}/edit', 'edit')
             ->name('edit');
-        Route::post('/{post}', 'update')
+        Route::post('/{post:id}', 'update')
             ->name('update');
-        Route::delete('/{post}', 'destroy')
+        Route::delete('/{post:id}', 'destroy')
             ->name('destroy');
     });

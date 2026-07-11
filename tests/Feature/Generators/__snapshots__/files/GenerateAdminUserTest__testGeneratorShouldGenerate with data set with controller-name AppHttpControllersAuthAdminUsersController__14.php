@@ -15,16 +15,16 @@ Route::prefix('admin-users')
             ->name('create');
         Route::post('/', 'store')
             ->name('store');
-        Route::get('/{adminUser}/edit', 'edit')
+        Route::get('/{adminUser:id}/edit', 'edit')
             ->name('edit');
         Route::post('/bulk-destroy', 'bulkDestroy')
             ->name('bulk-destroy');
-        Route::post('/{adminUser}', 'update')
+        Route::post('/{adminUser:id}', 'update')
             ->name('update');
-        Route::delete('/{adminUser}', 'destroy')
+        Route::delete('/{adminUser:id}', 'destroy')
             ->name('destroy');
-        Route::get('/{adminUser}/impersonal-login', 'impersonalLogin')
+        Route::get('/{adminUser:id}/impersonal-login', 'impersonalLogin')
             ->name('impersonal-login');
-        Route::get('/{adminUser}/resend-activation', 'resendActivationEmail')
+        Route::get('/{adminUser:id}/resend-activation', 'resendActivationEmail')
             ->name('resend-activation-email');
     });

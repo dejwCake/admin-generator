@@ -15,12 +15,12 @@ Route::prefix('articles')
             ->name('create');
         Route::post('/', 'store')
             ->name('store');
-        Route::get('/{article}/edit', 'edit')
+        Route::get('/{article:id}/edit', 'edit')
             ->name('edit');
         Route::post('/bulk-destroy', 'bulkDestroy')
             ->name('bulk-destroy');
-        Route::post('/{article}', 'update')
+        Route::post('/{article:id}', 'update')
             ->name('update');
-        Route::delete('/{article}', 'destroy')
+        Route::delete('/{article:id}', 'destroy')
             ->name('destroy');
     });

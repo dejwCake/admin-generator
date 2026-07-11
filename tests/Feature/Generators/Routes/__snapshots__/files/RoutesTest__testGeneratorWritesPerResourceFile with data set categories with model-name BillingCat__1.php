@@ -15,12 +15,12 @@ Route::prefix('billing-cats')
             ->name('create');
         Route::post('/', 'store')
             ->name('store');
-        Route::get('/{cat}/edit', 'edit')
+        Route::get('/{cat:id}/edit', 'edit')
             ->name('edit');
         Route::post('/bulk-destroy', 'bulkDestroy')
             ->name('bulk-destroy');
-        Route::post('/{cat}', 'update')
+        Route::post('/{cat:id}', 'update')
             ->name('update');
-        Route::delete('/{cat}', 'destroy')
+        Route::delete('/{cat:id}', 'destroy')
             ->name('destroy');
     });

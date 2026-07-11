@@ -15,16 +15,16 @@ Route::prefix('categories')
             ->name('create');
         Route::post('/', 'store')
             ->name('store');
-        Route::get('/{category}/edit', 'edit')
+        Route::get('/{category:id}/edit', 'edit')
             ->name('edit');
         Route::post('/bulk-destroy', 'bulkDestroy')
             ->name('bulk-destroy');
-        Route::post('/{category}', 'update')
+        Route::post('/{category:id}', 'update')
             ->name('update');
-        Route::delete('/{category}', 'destroy')
+        Route::delete('/{category:id}', 'destroy')
             ->name('destroy');
-        Route::get('/{category}/resend-verify-email', 'resendVerifyEmail')
+        Route::get('/{category:id}/resend-verify-email', 'resendVerifyEmail')
             ->name('resend-verify-email');
-        Route::get('/{category}/impersonal-login', 'impersonalLogin')
+        Route::get('/{category:id}/impersonal-login', 'impersonalLogin')
             ->name('impersonal-login');
     });
