@@ -44,27 +44,9 @@ final class Generate extends Command
         $withExport = $this->option('with-export');
         $withoutBulk = $this->option('without-bulk');
         $media = $this->option('media');
-        $seed = $this->option('seed');
-        $withoutModel = $this->option('without-model');
 
-        if (!$withoutModel) {
-            $this->call('admin:generate:model', [
-                'table_name' => $tableName,
-                'class_name' => $modelName,
-                '--force' => $force,
-                '--belongs-to-many' => $belongsToMany,
-                '--translatable' => $translatable,
-                '--media' => $media,
-            ]);
-        }
-
-        $this->call('admin:generate:factory', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--seed' => $seed,
-            '--translatable' => $translatable,
-        ]);
+        $this->generateModel();
+        $this->generateFactory();
 
         $this->call('admin:generate:controller', [
             'table_name' => $tableName,
@@ -240,6 +222,12 @@ final class Generate extends Command
             ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
             ['without-model', 'wm', InputOption::VALUE_NONE, 'Skip generating the model class (use an existing one)'],
             [
+                'without-factory',
+                'wf',
+                InputOption::VALUE_NONE,
+                'Skip generating the factory class (use an existing one)',
+            ],
+            [
                 'media',
                 'M',
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
@@ -253,6 +241,43 @@ final class Generate extends Command
                 'Force generating permissions migration even if the Craftable service provider is not installed',
             ],
         ];
+    }
+
+    private function generateModel(): void
+    {
+        if ($this->option('without-model')) {
+            return;
+        }
+
+        $this->call('admin:generate:model', [
+            'table_name' => $this->argument('table_name'),
+            'class_name' => $this->option('model-name'),
+            '--force' => $this->option('force'),
+            '--belongs-to-many' => $this->option('belongs-to-many'),
+            '--translatable' => $this->option('translatable'),
+            '--media' => $this->option('media'),
+        ]);
+    }
+
+    private function generateFactory(): void
+    {
+        $seed = $this->option('seed');
+
+        if ($this->option('without-factory')) {
+            if ($seed) {
+                $this->warn('Skipping seeding: --seed requires the factory, which is skipped by --without-factory.');
+            }
+
+            return;
+        }
+
+        $this->call('admin:generate:factory', [
+            'table_name' => $this->argument('table_name'),
+            '--model-name' => $this->option('model-name'),
+            '--force' => $this->option('force'),
+            '--seed' => $seed,
+            '--translatable' => $this->option('translatable'),
+        ]);
     }
 
     private function shouldGeneratePermissionsMigration(): bool

@@ -102,10 +102,12 @@ final class GenerateTest extends TestCase
         $categoriesCommon = self::commonForTable('Category');
         $defaultCategoriesController = 'app/Http/Controllers/Admin/CategoriesController.php';
         $categoriesModel = 'app/Models/Category.php';
+        $categoriesFactory = 'database/factories/CategoryFactory.php';
         $categoriesBulk = 'app/Http/Requests/Admin/Category/BulkDestroyCategory.php';
         $categoriesExportRequest = 'app/Http/Requests/Admin/Category/ExportCategory.php';
         $categoriesExportClass = 'app/Exports/CategoriesExport.php';
         $categoriesCommonWithoutModel = self::without($categoriesCommon, $categoriesModel);
+        $categoriesCommonWithoutFactory = self::without($categoriesCommon, $categoriesFactory);
 
         yield 'categories default' => [
             'arguments' => ['table_name' => 'categories'],
@@ -156,6 +158,30 @@ final class GenerateTest extends TestCase
             'arguments' => ['table_name' => 'categories', '--without-model' => true, '--force' => true],
             'expectedFiles' => [...$categoriesCommonWithoutModel, $categoriesBulk],
             'missingFiles' => [$categoriesModel, $categoriesExportRequest, $categoriesExportClass],
+        ];
+
+        yield 'categories without factory' => [
+            'arguments' => ['table_name' => 'categories', '--without-factory' => true],
+            'expectedFiles' => [...$categoriesCommonWithoutFactory, $categoriesBulk],
+            'missingFiles' => [$categoriesFactory, $categoriesExportRequest, $categoriesExportClass],
+        ];
+
+        yield 'categories without model and factory' => [
+            'arguments' => [
+                'table_name' => 'categories',
+                '--without-model' => true,
+                '--without-factory' => true,
+            ],
+            'expectedFiles' => [
+                ...self::without($categoriesCommonWithoutModel, $categoriesFactory),
+                $categoriesBulk,
+            ],
+            'missingFiles' => [
+                $categoriesModel,
+                $categoriesFactory,
+                $categoriesExportRequest,
+                $categoriesExportClass,
+            ],
         ];
 
         yield 'categories with media gallery' => [
