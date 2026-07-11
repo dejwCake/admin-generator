@@ -185,7 +185,7 @@ final readonly class ColumnBuilder
         }
 
         $faker = match ($name) {
-            'email' => '$this->faker->email',
+            'email' => '$this->faker->unique()->email',
             'name',
             'first_name' => '$this->faker->firstName',
             'surname',

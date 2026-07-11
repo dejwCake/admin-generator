@@ -20,7 +20,7 @@ final class UserFactory extends Factory
         return [
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
-            'email' => $this->faker->email,
+            'email' => $this->faker->unique()->email,
             'password' => $hasher->make($this->faker->password),
             'remember_token' => null,
             'activated' => $this->faker->boolean(),

@@ -28,7 +28,7 @@ final class UserFactory extends Factory
 
         return [
             'name' => $this->faker->firstName,
-            'email' => $this->faker->email,
+            'email' => $this->faker->unique()->email,
             'email_verified_at' => $this->faker->dateTime,
             'password' => $hasher->make($this->faker->password),
             'remember_token' => null,

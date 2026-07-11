@@ -27,7 +27,7 @@ final class CategoryFactory extends Factory
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
             'subject' => $this->faker->sentence,
-            'email' => $this->faker->email,
+            'email' => $this->faker->unique()->email,
             'password' => $hasher->make($this->faker->password),
             'remember_token' => null,
             'language' => 'en',

@@ -37,7 +37,7 @@ final class FakerByNameTest extends TestCase
 
     public function testFakerEmail(): void
     {
-        self::assertSame('$this->faker->email', $this->buildColumn(name: 'email')->faker);
+        self::assertSame('$this->faker->unique()->email', $this->buildColumn(name: 'email')->faker);
     }
 
     public function testFakerName(): void
