@@ -12,6 +12,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Env;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\Snapshots\MatchesSnapshots;
 use SplFileInfo;
@@ -64,7 +65,7 @@ abstract class TestCase extends Orchestra
             $table->unique(['email', 'deleted_at']);
         });
 
-        if (env('DB_CONNECTION') === 'pgsql') {
+        if (Env::get('DB_CONNECTION') === 'pgsql') {
             $app->get(DatabaseManager::class)->statement(
                 'CREATE UNIQUE INDEX admin_users_email_null_deleted_at ON admin_users (email) '
                 . 'WHERE deleted_at IS NULL;',
@@ -213,29 +214,29 @@ abstract class TestCase extends Orchestra
 
         $filesystem->copyDirectory(__DIR__ . '/../fixtures/resources', $app->resourcePath());
 
-        if (env('DB_CONNECTION') === 'pgsql') {
+        if (Env::get('DB_CONNECTION') === 'pgsql') {
             $app->get(Config::class)->set('database.default', 'pgsql');
             $app->get(Config::class)->set('database.connections.pgsql', [
                 'driver' => 'pgsql',
                 'host' => 'pgsql',
                 'port' => '5432',
-                'database' => env('DB_DATABASE', 'laravel'),
-                'username' => env('DB_USERNAME', 'root'),
-                'password' => env('DB_PASSWORD', 'bestsecret'),
+                'database' => Env::get('DB_DATABASE', 'laravel'),
+                'username' => Env::get('DB_USERNAME', 'root'),
+                'password' => Env::get('DB_PASSWORD', 'bestsecret'),
                 'charset' => 'utf8',
                 'prefix' => '',
                 'schema' => 'public',
                 'sslmode' => 'prefer',
             ]);
-        } elseif (env('DB_CONNECTION') === 'mysql') {
+        } elseif (Env::get('DB_CONNECTION') === 'mysql') {
             $app->get(Config::class)->set('database.default', 'mysql');
             $app->get(Config::class)->set('database.connections.mysql', [
                 'driver' => 'mysql',
                 'host' => 'mysql',
                 'port' => '3306',
-                'database' => env('DB_DATABASE', 'laravel'),
-                'username' => env('DB_USERNAME', 'root'),
-                'password' => env('DB_PASSWORD', 'bestsecret'),
+                'database' => Env::get('DB_DATABASE', 'laravel'),
+                'username' => Env::get('DB_USERNAME', 'root'),
+                'password' => Env::get('DB_PASSWORD', 'bestsecret'),
                 'charset' => 'utf8',
                 'prefix' => '',
                 'schema' => 'public',
