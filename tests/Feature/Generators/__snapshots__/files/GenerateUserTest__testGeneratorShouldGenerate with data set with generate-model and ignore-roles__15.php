@@ -10,6 +10,7 @@ return [
             'index' => 'Users',
             'create' => 'New User',
             'edit' => 'Edit :name',
+            'resend_verify_email' => 'Resend verification email',
         ],
 
         'columns' => [

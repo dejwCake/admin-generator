@@ -226,6 +226,7 @@ final class GenerateUser extends Command
         $this->call('admin:generate:lang', [
             'table_name' => $tableName,
             '--model-name' => $modelName,
+            '--template' => 'user',
             '--belongs-to-many' => $belongsToMany,
             '--with-export' => $withExport,
             '--media' => $media,

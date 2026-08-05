@@ -11,6 +11,7 @@ return [
             'create' => 'New User',
             'edit' => 'Edit :name',
             'export' => 'Export',
+            'resend_verify_email' => 'Resend verification email',
         ],
 
         'columns' => [

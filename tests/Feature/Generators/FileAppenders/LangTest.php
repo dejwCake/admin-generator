@@ -60,6 +60,31 @@ final class LangTest extends TestCase
         self::assertSame($originalContent, file_get_contents($filePath));
     }
 
+    public function testUserTemplateAppendsItsOwnActionKeys(): void
+    {
+        $this->artisan('admin:generate:lang', [
+            'table_name' => 'categories',
+            '--template' => 'user',
+        ]);
+
+        self::assertStringContainsString(
+            "'resend_verify_email' => 'Resend verification email',",
+            (string) file_get_contents($this->app->langPath('en/admin.php')),
+        );
+    }
+
+    public function testDefaultTemplateDoesNotAppendUserSpecificActionKeys(): void
+    {
+        $this->artisan('admin:generate:lang', [
+            'table_name' => 'categories',
+        ]);
+
+        self::assertStringNotContainsString(
+            'resend_verify_email',
+            (string) file_get_contents($this->app->langPath('en/admin.php')),
+        );
+    }
+
     public static function getCases(): iterable
     {
         yield 'categories default' => [
@@ -100,6 +125,11 @@ final class LangTest extends TestCase
         yield 'categories with locale nl' => [
             'arguments' => ['table_name' => 'categories', '--locale' => 'nl'],
             'expectedFilePath' => 'lang/nl/admin.php',
+        ];
+
+        yield 'categories with template user' => [
+            'arguments' => ['table_name' => 'categories', '--template' => 'user'],
+            'expectedFilePath' => 'lang/en/admin.php',
         ];
 
         yield 'posts default' => [
