@@ -22,6 +22,7 @@ namespace {{ $modelNameSpace }};
 @php
     $uses = new Collection([
         'Brackets\AdminAuth\Notifications\ResetPassword',
+        'Illuminate\Container\Container',
         'Illuminate\Contracts\Auth\MustVerifyEmail',
         'Illuminate\Database\Eloquent\Factories\HasFactory',
         'Illuminate\Foundation\Auth\User as Authenticatable',
@@ -197,7 +198,7 @@ final class {{ $modelBaseName }} extends Authenticatable implements MustVerifyEm
      */
     public function sendPasswordResetNotification($token): void
     {
-        $this->notify(app(ResetPassword::class, ['token' => $token]));
+        $this->notify(Container::getInstance()->make(ResetPassword::class, ['token' => $token]));
     }
 @if ($relations->hasBelongsToManyWithoutRelatedTable('roles'))
 

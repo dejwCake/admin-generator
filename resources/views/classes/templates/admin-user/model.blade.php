@@ -24,6 +24,7 @@ namespace {{ $modelNameSpace }};
         'Brackets\AdminAuth\Activation\Traits\CanActivate',
         'Brackets\AdminAuth\Activation\Contracts\CanActivate as CanActivateContract',
         'Brackets\AdminAuth\Notifications\ResetPassword',
+        'Illuminate\Container\Container',
         'Illuminate\Database\Eloquent\Factories\HasFactory',
         'Illuminate\Foundation\Auth\User as Authenticatable',
         'Illuminate\Notifications\Notifiable',
@@ -178,7 +179,7 @@ final class {{ $modelBaseName }} extends Authenticatable implements CanActivateC
      */
     public function sendPasswordResetNotification($token): void
     {
-        $this->notify(app(ResetPassword::class, ['token' => $token]));
+        $this->notify(Container::getInstance()->make(ResetPassword::class, ['token' => $token]));
     }
 @if ($relations->hasBelongsToManyWithoutRelatedTable('roles'))
 

@@ -10,6 +10,7 @@ use Brackets\AdminAuth\Notifications\ResetPassword;
 use Brackets\Translatable\Traits\HasTranslations;
 use Carbon\CarbonInterface;
 use Database\Factories\CategoryFactory;
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -124,7 +125,7 @@ final class Category extends Authenticatable implements CanActivateContract
      */
     public function sendPasswordResetNotification($token): void
     {
-        $this->notify(app(ResetPassword::class, ['token' => $token]));
+        $this->notify(Container::getInstance()->make(ResetPassword::class, ['token' => $token]));
     }
 
     public function posts(): BelongsToMany

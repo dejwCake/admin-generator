@@ -7,6 +7,7 @@ namespace App\Models;
 use Brackets\AdminAuth\Notifications\ResetPassword;
 use Carbon\CarbonInterface;
 use Database\Factories\UserFactory;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -65,7 +66,7 @@ final class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendPasswordResetNotification($token): void
     {
-        $this->notify(app(ResetPassword::class, ['token' => $token]));
+        $this->notify(Container::getInstance()->make(ResetPassword::class, ['token' => $token]));
     }
 
     public function posts(): BelongsToMany
