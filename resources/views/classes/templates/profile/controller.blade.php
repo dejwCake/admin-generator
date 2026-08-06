@@ -157,7 +157,7 @@ final class {{ $controllerBaseName }} extends Controller
         if ($request->user($this->guard) === null) {
             throw NotFoundHttpException::fromStatusCode(
                 404,
-                trans('Admin User not found'),
+                trans('brackets/admin-ui::admin.operation.admin_user_not_found'),
             );
         }
 
