@@ -243,9 +243,6 @@ final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty()
         return $this->hasMany({{ $hasMany->relatedModelName }}::class);
     }
 @endif
-@if(!$loop->last)
-
-@endif
 @endforeach
 @endif
 @if($mediaCollections->isNotEmpty())
