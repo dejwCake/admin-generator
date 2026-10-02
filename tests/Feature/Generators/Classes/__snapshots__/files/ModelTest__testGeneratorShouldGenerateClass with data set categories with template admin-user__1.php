@@ -59,6 +59,7 @@ use Illuminate\Support\Collection;
  * @property-read Collection<int, Post> $posts
  * @property-read User|null $user
  */
+#[Appends(['full_name'])]
 #[Fillable([
     'user_id',
     'title',
@@ -92,7 +93,6 @@ use Illuminate\Support\Collection;
     'password',
     'remember_token',
 ])]
-#[Appends(['full_name'])]
 #[UseFactory(CategoryFactory::class)]
 final class Category extends Authenticatable implements CanActivateContract
 {

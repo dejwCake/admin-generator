@@ -19,10 +19,10 @@ use Illuminate\Support\Collection;
  * @property string $title
  * @property-read Collection<int, Category> $categories
  */
-#[Table(name: &#039;posts&#039;, timestamps: false)]
 #[Fillable([
     'title',
 ])]
+#[Table(name: 'posts', timestamps: false)]
 #[UseFactory(ArticleFactory::class)]
 final class Article extends Model
 {

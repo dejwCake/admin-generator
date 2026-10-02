@@ -109,9 +109,7 @@ use {{ $use }};
         $tableArgs->push('timestamps: false');
     }
 @endphp
-@if($tableArgs->isNotEmpty())
-#[Table({{ $tableArgs->implode(', ') }})]
-@endif
+#[Appends(['full_name'])]
 @if($fillableColumns->isNotEmpty())
 #[Fillable([
 @foreach($fillableColumns as $column)
@@ -126,7 +124,9 @@ use {{ $use }};
 @endforeach
 ])]
 @endif
-#[Appends(['full_name'])]
+@if($tableArgs->isNotEmpty())
+#[Table({!! $tableArgs->implode(', ') !!})]
+@endif
 #[UseFactory({{ $factoryBaseName }}::class)]
 final class {{ $modelBaseName }} extends Authenticatable implements CanActivateContract
 {

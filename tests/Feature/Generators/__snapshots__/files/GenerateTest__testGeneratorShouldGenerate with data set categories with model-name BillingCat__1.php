@@ -59,7 +59,6 @@ use Illuminate\Support\Collection;
  * @property-read Collection<int, Post> $posts
  * @property-read User|null $user
  */
-#[Table(name: &#039;categories&#039;)]
 #[Fillable([
     'user_id',
     'title',
@@ -93,6 +92,7 @@ use Illuminate\Support\Collection;
     'password',
     'remember_token',
 ])]
+#[Table(name: 'categories')]
 #[UseFactory(CatFactory::class)]
 final class Cat extends Model
 {

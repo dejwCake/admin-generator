@@ -137,9 +137,6 @@ use {{ $use }};
         $tableArgs->push('timestamps: false');
     }
 @endphp
-@if($tableArgs->isNotEmpty())
-#[Table({{ $tableArgs->implode(', ') }})]
-@endif
 @if($fillableColumns->isNotEmpty())
 #[Fillable([
 @foreach($fillableColumns as $column)
@@ -153,6 +150,9 @@ use {{ $use }};
     '{{ $column->name }}',
 @endforeach
 ])]
+@endif
+@if($tableArgs->isNotEmpty())
+#[Table({!! $tableArgs->implode(', ') !!})]
 @endif
 #[UseFactory({{ $factoryBaseName }}::class)]
 final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty() ? ' implements HasMedia' : '' }}
