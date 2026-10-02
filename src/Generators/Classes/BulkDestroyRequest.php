@@ -25,6 +25,11 @@ final class BulkDestroyRequest extends ClassGenerator
      */
     protected $description = 'Generate a Bulk Destroy request class';
 
+    /**
+     * Path for view
+     */
+    protected string $view = 'classes.bulk-destroy-request';
+
     public function handle(): void
     {
         $force = $this->option('force');
@@ -44,7 +49,7 @@ final class BulkDestroyRequest extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        return $this->viewFactory->make('brackets/admin-generator::classes.bulk-destroy-request', [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,

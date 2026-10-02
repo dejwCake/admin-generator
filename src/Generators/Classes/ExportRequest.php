@@ -25,6 +25,11 @@ final class ExportRequest extends ClassGenerator
      */
     protected $description = 'Generate a Export request class';
 
+    /**
+     * Path for view
+     */
+    protected string $view = 'classes.export-request';
+
     public function handle(): void
     {
         $force = $this->option('force');
@@ -44,7 +49,7 @@ final class ExportRequest extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        return $this->viewFactory->make('brackets/admin-generator::classes.export-request', [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,

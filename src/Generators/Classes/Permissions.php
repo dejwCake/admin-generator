@@ -26,6 +26,11 @@ final class Permissions extends ClassGenerator
     protected $description = 'Generate permissions migration';
 
     /**
+     * Path for view
+     */
+    protected string $view = 'classes.permissions';
+
+    /**
      * Permissions has also bulk options
      */
     protected bool $withoutBulk = false;
@@ -104,7 +109,7 @@ final class Permissions extends ClassGenerator
     #[Override]
     protected function buildClass(): string
     {
-        return $this->viewFactory->make('brackets/admin-generator::classes.permissions', [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'modelDotNotation' => $this->modelDotNotation,
             //has

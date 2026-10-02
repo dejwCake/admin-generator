@@ -25,6 +25,11 @@ final class IndexRequest extends ClassGenerator
      */
     protected $description = 'Generate an Index request class';
 
+    /**
+     * Path for view
+     */
+    protected string $view = 'classes.index-request';
+
     public function handle(): void
     {
         $force = $this->option('force');
@@ -50,7 +55,7 @@ final class IndexRequest extends ClassGenerator
             $this->extractTranslatable(),
         );
 
-        return $this->viewFactory->make('brackets/admin-generator::classes.index-request', [
+        return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,
