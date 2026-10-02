@@ -1,7 +1,6 @@
 @php
     use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Illuminate\Support\Collection;
-    use Illuminate\Support\Str;
     assert($columns instanceof ColumnCollection)
 @endphp
 @php echo "<?php";
@@ -62,16 +61,14 @@ final class {{ $modelBaseName }}Factory extends Factory
     }
 @foreach($columns->getBoolean() as $column)
 
-    public function {{ $column->name }}(): self
+    public function {{ $column->stateMethodName() }}(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(fn (array $attributes) => ['{{ $column->name }}' => true]);
+        return $this->state(static fn (): array => ['{{ $column->name }}' => true]);
     }
 
-    public function not{{ Str::ucfirst($column->name) }}(): self
+    public function {{ $column->negatedStateMethodName() }}(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(fn (array $attributes) => ['{{ $column->name }}' => false]);
+        return $this->state(static fn (): array => ['{{ $column->name }}' => false]);
     }
 @endforeach
 @if($hasEmailVerifiedAt)

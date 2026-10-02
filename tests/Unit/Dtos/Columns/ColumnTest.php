@@ -7,6 +7,7 @@ namespace Brackets\AdminGenerator\Tests\Unit\Dtos\Columns;
 use Brackets\AdminGenerator\Builders\ColumnBuilder;
 use Brackets\AdminGenerator\Dtos\Columns\Column;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class ColumnTest extends TestCase
@@ -104,6 +105,37 @@ final class ColumnTest extends TestCase
         $updated = $original->withPriority(null);
 
         self::assertNull($updated->priority);
+    }
+
+    // -------------------------------------------------------------------------
+    // stateMethodName / negatedStateMethodName
+    // -------------------------------------------------------------------------
+
+    #[DataProvider('getStateMethodNameCases')]
+    public function testStateMethodNameIsCamelCase(string $columnName, string $expected): void
+    {
+        self::assertSame($expected, self::makeColumn(name: $columnName)->stateMethodName());
+    }
+
+    #[DataProvider('getNegatedStateMethodNameCases')]
+    public function testNegatedStateMethodNameIsCamelCase(string $columnName, string $expected): void
+    {
+        self::assertSame($expected, self::makeColumn(name: $columnName)->negatedStateMethodName());
+    }
+
+    public static function getStateMethodNameCases(): iterable
+    {
+        yield 'single word' => ['enabled', 'enabled'];
+        yield 'snake case' => ['up_event_enabled', 'upEventEnabled'];
+        yield 'is prefix is kept' => ['is_url_owner', 'isUrlOwner'];
+    }
+
+    public static function getNegatedStateMethodNameCases(): iterable
+    {
+        yield 'single word' => ['enabled', 'notEnabled'];
+        yield 'snake case' => ['up_event_enabled', 'notUpEventEnabled'];
+        yield 'is prefix negates inside the phrase' => ['is_url_owner', 'isNotUrlOwner'];
+        yield 'is on its own word' => ['island', 'notIsland'];
     }
 
     // -------------------------------------------------------------------------

@@ -7,6 +7,7 @@ namespace Brackets\AdminGenerator\Dtos\Columns;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\ServerStoreRule;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\ServerUpdateRule;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 final readonly class Column
 {
@@ -46,6 +47,20 @@ final readonly class Column
     public function isArray(): bool
     {
         return $this->majorType === 'json' && $this->isTranslatable === false;
+    }
+
+    public function stateMethodName(): string
+    {
+        return Str::camel($this->name);
+    }
+
+    public function negatedStateMethodName(): string
+    {
+        if (Str::startsWith($this->name, 'is_')) {
+            return Str::camel('is_not_' . Str::after($this->name, 'is_'));
+        }
+
+        return Str::camel('not_' . $this->name);
     }
 
     public function withPriority(?int $priority): self

@@ -60,26 +60,22 @@ final class CategoryFactory extends Factory
 
     public function enabled(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(fn (array $attributes) => ['enabled' => true]);
+        return $this->state(static fn (): array => ['enabled' => true]);
     }
 
     public function notEnabled(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(fn (array $attributes) => ['enabled' => false]);
+        return $this->state(static fn (): array => ['enabled' => false]);
     }
 
     public function send(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(fn (array $attributes) => ['send' => true]);
+        return $this->state(static fn (): array => ['send' => true]);
     }
 
     public function notSend(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(fn (array $attributes) => ['send' => false]);
+        return $this->state(static fn (): array => ['send' => false]);
     }
 
     public function notPublished(): self
