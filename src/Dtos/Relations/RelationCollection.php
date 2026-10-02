@@ -117,4 +117,19 @@ final class RelationCollection
     {
         return $this->hasMany;
     }
+
+    public function hasHasManyWithoutBelongsToManyConflict(): bool
+    {
+        return $this->getHasManyWithoutBelongsToManyConflict()->isNotEmpty();
+    }
+
+    /** @return Collection<string, HasMany> */
+    public function getHasManyWithoutBelongsToManyConflict(): Collection
+    {
+        return $this->hasMany->reject(
+            fn (HasMany $hasMany): bool => $this->hasRelationMethodNameInBelongsToMany(
+                $hasMany->relationMethodName,
+            ),
+        );
+    }
 }

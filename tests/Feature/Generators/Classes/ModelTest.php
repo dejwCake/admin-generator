@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\Classes;
 
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
+use Illuminate\Database\Schema\Blueprint;
 use PHPUnit\Framework\Attributes\DataProvider;
+
+use function file_get_contents;
 
 final class ModelTest extends TestCase
 {
@@ -34,6 +37,27 @@ final class ModelTest extends TestCase
             '--force' => true,
         ]);
         self::assertFileExists($filePath);
+    }
+
+    public function testGeneratorShouldSeparateConsecutiveHasManyRelationsWithOneBlankLine(): void
+    {
+        $schemaBuilder = $this->app['db']->connection()->getSchemaBuilder();
+        foreach (['comments', 'ratings'] as $childTable) {
+            $schemaBuilder->create($childTable, static function (Blueprint $table): void {
+                $table->increments('id');
+                $table->unsignedInteger('post_id');
+                $table->foreign('post_id')->references('id')->on('posts');
+            });
+        }
+
+        $this->artisan('admin:generate:model', ['table_name' => 'posts']);
+
+        $contents = (string) file_get_contents($this->app->basePath('app/Models/Post.php'));
+
+        self::assertStringContainsString('public function comments(): HasMany', $contents);
+        self::assertStringContainsString('public function ratings(): HasMany', $contents);
+        // A blank line is "\n\n"; three in a row is the double blank line the sniff rejects.
+        self::assertStringNotContainsString("\n\n\n", $contents);
     }
 
     public static function getCases(): iterable

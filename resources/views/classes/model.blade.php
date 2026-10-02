@@ -74,11 +74,8 @@ namespace {{ $modelNameSpace }};
             }
         }
     }
-    if ($relations->hasHasMany()) {
-        foreach ($relations->getHasMany() as $hasMany) {
-            if($relations->hasRelationMethodNameInBelongsToMany($hasMany->relationMethodName)) {
-                continue;
-            }
+    if ($relations->hasHasManyWithoutBelongsToManyConflict()) {
+        foreach ($relations->getHasManyWithoutBelongsToManyConflict() as $hasMany) {
             $uses->push('Illuminate\Database\Eloquent\Relations\HasMany');
             $uses->push('Illuminate\Support\Collection');
             $relatedNamespace = implode('\\', array_slice(explode('\\', $hasMany->relatedModel), 0, -1));
@@ -125,11 +122,9 @@ use {{ $use }};
  * @property-read {{ $belongsTo->relatedModelName }}|null ${{ $belongsTo->relationMethodName }}
 @endforeach
 @endif
-@if($relations->hasHasMany())
-@foreach($relations->getHasMany() as $hasMany)
-@if(!$relations->hasRelationMethodNameInBelongsToMany($hasMany->relationMethodName))
+@if($relations->hasHasManyWithoutBelongsToManyConflict())
+@foreach($relations->getHasManyWithoutBelongsToManyConflict() as $hasMany)
  * @property-read Collection<int, {{ $hasMany->relatedModelName }}> ${{ $hasMany->relationMethodName }}
-@endif
 @endforeach
 @endif
  */
@@ -234,14 +229,15 @@ final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty()
 @endif
 @endforeach
 @endif
-@if($relations->hasHasMany())
-@foreach($relations->getHasMany() as $hasMany)
-@if(!$relations->hasRelationMethodNameInBelongsToMany($hasMany->relationMethodName))
+@if($relations->hasHasManyWithoutBelongsToManyConflict())
 
+@foreach($relations->getHasManyWithoutBelongsToManyConflict() as $hasMany)
     public function {{ $hasMany->relationMethodName }}(): HasMany
     {
         return $this->hasMany({{ $hasMany->relatedModelName }}::class);
     }
+@if(!$loop->last)
+
 @endif
 @endforeach
 @endif

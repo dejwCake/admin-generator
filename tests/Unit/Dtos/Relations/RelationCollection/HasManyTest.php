@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Unit\Dtos\Relations\RelationCollection;
 
+use Brackets\AdminGenerator\Dtos\Relations\BelongsToMany;
 use Brackets\AdminGenerator\Dtos\Relations\HasMany;
 use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
 use PHPUnit\Framework\TestCase;
@@ -37,16 +38,69 @@ final class HasManyTest extends TestCase
         self::assertFalse($collection->hasHasMany());
     }
 
+    public function testGetHasManyWithoutBelongsToManyConflictExcludesTheConflictingRelation(): void
+    {
+        $collection = new RelationCollection();
+        $collection->pushBelongsToMany(self::makeBelongsToMany('tags'));
+        $collection->pushHasMany(self::makeHasMany('comments'));
+        $collection->pushHasMany(self::makeHasMany('tags', relationMethodName: 'tags'));
+
+        $result = $collection->getHasManyWithoutBelongsToManyConflict();
+
+        self::assertCount(1, $result);
+        self::assertTrue($result->has('comments'));
+        self::assertFalse($result->has('tags'));
+    }
+
+    public function testGetHasManyWithoutBelongsToManyConflictKeepsEverythingWhenNothingConflicts(): void
+    {
+        $collection = new RelationCollection();
+        $collection->pushBelongsToMany(self::makeBelongsToMany('tags'));
+        $collection->pushHasMany(self::makeHasMany('comments'));
+
+        self::assertCount(1, $collection->getHasManyWithoutBelongsToManyConflict());
+        self::assertTrue($collection->hasHasManyWithoutBelongsToManyConflict());
+    }
+
+    public function testHasHasManyWithoutBelongsToManyConflictIsFalseWhenEveryRelationConflicts(): void
+    {
+        $collection = new RelationCollection();
+        $collection->pushBelongsToMany(self::makeBelongsToMany('tags'));
+        $collection->pushHasMany(self::makeHasMany('tags', relationMethodName: 'tags'));
+
+        self::assertTrue($collection->hasHasMany());
+        self::assertFalse($collection->hasHasManyWithoutBelongsToManyConflict());
+    }
+
     private static function makeHasMany(
         string $relatedTable = 'comments',
         string $foreignKeyColumn = 'post_id',
+        string $relationMethodName = 'comments',
     ): HasMany {
         return new HasMany(
             relatedTable: $relatedTable,
             relatedModel: 'App\\Models\\Comment',
             relatedModelName: 'Comment',
-            relationMethodName: 'comments',
+            relationMethodName: $relationMethodName,
             foreignKeyColumn: $foreignKeyColumn,
+        );
+    }
+
+    private static function makeBelongsToMany(string $relatedTable = 'tags'): BelongsToMany
+    {
+        return new BelongsToMany(
+            relatedTable: $relatedTable,
+            relatedModel: 'App\\Models\\Tag',
+            relatedModelName: 'Tag',
+            relatedLabel: 'name',
+            relationTable: 'post_tag',
+            relationMethodName: $relatedTable,
+            relationTranslationKey: $relatedTable,
+            relationTranslationValue: 'Tags',
+            optionsAttributeName: 'tagOptions',
+            optionsPropName: 'tagOptions',
+            foreignKey: 'post_id',
+            relatedKey: 'tag_id',
         );
     }
 }
