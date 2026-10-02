@@ -57,10 +57,10 @@ final readonly class Column
     public function negatedStateMethodName(): string
     {
         if (Str::startsWith($this->name, 'is_')) {
-            return Str::camel('is_not_' . Str::after($this->name, 'is_'));
+            return Str::camel(sprintf('is_not_%s', Str::after($this->name, 'is_')));
         }
 
-        return Str::camel('not_' . $this->name);
+        return Str::camel(sprintf('not_%s', $this->name));
     }
 
     public function withPriority(?int $priority): self
