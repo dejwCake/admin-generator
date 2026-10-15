@@ -1,30 +1,21 @@
 <?xml version="1.0"?>
 <phpmd-baseline>
   <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="src/AdminGeneratorServiceProvider.php"/>
-  <violation rule="PHPMD\Rule\CyclomaticComplexity" file="src/Builders/ColumnBuilder.php" method="build"/>
   <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="src/Builders/ServerStoreRulesBuilder.php"/>
   <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="src/Builders/ServerUpdateRulesBuilder.php"/>
-  <violation rule="PHPMD\Rule\Design\LongParameterList" file="src/Dtos/Columns/Column.php" method="__construct"/>
-  <violation rule="PHPMD\Rule\Design\WeightedMethodCount" file="src/Dtos/Columns/ColumnCollection.php"/>
-  <violation rule="PHPMD\Rule\Design\LongParameterList" file="src/Dtos/Relations/BelongsToMany.php" method="__construct"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/Generate.php" method="handle"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/GenerateAdminUser.php" method="handle"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveParameterList" file="src/Dtos/Columns/Column.php" method="__construct"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveClassComplexity" file="src/Dtos/Columns/ColumnCollection.php"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveParameterList" file="src/Dtos/Relations/BelongsToMany.php" method="__construct"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveMethodLength" file="src/Generators/Generate.php" method="handle"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveMethodLength" file="src/Generators/GenerateAdminUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\CyclomaticComplexity" file="src/Generators/GenerateUser.php" method="handle"/>
-  <violation rule="PHPMD\Rule\Design\NpathComplexity" file="src/Generators/GenerateUser.php" method="handle"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Generators/GenerateUser.php" method="handle"/>
+  <violation rule="PHPMD\Rule\Design\NPathComplexity" file="src/Generators/GenerateUser.php" method="handle"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveMethodLength" file="src/Generators/GenerateUser.php" method="handle"/>
   <violation rule="PHPMD\Rule\Design\TooManyFields" file="src/Generators/Generator.php"/>
-  <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Feature/Builders/RelationBuilderTest.php"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/Generators/Classes/ControllerTest.php" method="getCases"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/Generators/GenerateTest.php" method="getCases"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/Generators/GenerateUserTest.php" method="getCases"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveMethodLength" file="tests/Feature/Generators/Classes/ControllerTest.php" method="getCases"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveMethodLength" file="tests/Feature/Generators/GenerateTest.php" method="getCases"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveMethodLength" file="tests/Feature/Generators/GenerateUserTest.php" method="getCases"/>
   <violation rule="PHPMD\Rule\Design\NumberOfChildren" file="tests/Feature/TestCase.php"/>
-  <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Feature/TestCase.php" method="setUpDatabase"/>
-  <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Builders/ColumnBuilder/FakerByNameTest.php"/>
-  <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Builders/ColumnBuilder/MajorTypeTest.php"/>
-  <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Builders/FrontendRulesBuilderTest.php"/>
-  <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Dtos/Columns/ColumnCollection/HasFormInputTest.php"/>
-  <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Dtos/Columns/ColumnCollection/SubsetQueriesTest.php"/>
-  <violation rule="PHPMD\Rule\Design\LongParameterList" file="tests/Unit/Dtos/Columns/ColumnTest.php" method="makeColumn"/>
-  <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Dtos/Columns/Rules/TrivialRulesTest.php"/>
-  <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Dtos/Relations/RelationCollection/BelongsToManyTest.php"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveMethodLength" file="tests/Feature/TestCase.php" method="setUpDatabase"/>
+  <violation rule="PHPMD\Rule\Design\ExcessiveParameterList" file="tests/Unit/Dtos/Columns/ColumnTest.php" method="makeColumn"/>
 </phpmd-baseline>
