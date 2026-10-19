@@ -46,12 +46,15 @@ final class Generate extends Command
         $force = $this->option('force');
         $belongsToMany = $this->option('belongs-to-many');
         $translatable = $this->option('translatable');
-        $actionOptions = [
-            '--only' => $this->option('only'),
-            '--except' => $this->option('except'),
-            '--with-export' => $this->option('with-export'),
-            '--without-bulk' => $this->option('without-bulk'),
-        ];
+        $actionOptions = array_filter(
+            [
+                '--only' => $this->option('only'),
+                '--except' => $this->option('except'),
+                '--with-export' => $this->option('with-export'),
+                '--without-bulk' => $this->option('without-bulk'),
+            ],
+            static fn (mixed $value): bool => $value !== null,
+        );
         $media = $this->option('media');
         $actions = $this->resolveGeneratedActions();
 
@@ -235,7 +238,7 @@ final class Generate extends Command
 
     /**
      * @param array<string> $media
-     * @param array<string, string|bool|null> $actionOptions
+     * @param array<string, string|bool> $actionOptions
      */
     private function generateViews(
         GeneratedActions $actions,

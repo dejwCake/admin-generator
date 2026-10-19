@@ -93,10 +93,18 @@ final class GeneratedActionsTest extends TestCase
         );
     }
 
-    public function testAnEmptyValueIsRejected(): void
+    public function testAnEmptyOnlyIsRejected(): void
     {
         $this->assertThrows(
             static fn (): GeneratedActions => GeneratedActions::fromOptions('', null, false, false),
+            'needs at least one action',
+        );
+    }
+
+    public function testAnEmptyExceptIsRejected(): void
+    {
+        $this->assertThrows(
+            static fn (): GeneratedActions => GeneratedActions::fromOptions(null, '', false, false),
             'needs at least one action',
         );
     }

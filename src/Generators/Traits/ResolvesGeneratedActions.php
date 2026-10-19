@@ -35,13 +35,13 @@ trait ResolvesGeneratedActions
             [
                 'only',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Generate only these actions: create, show, edit, delete, export, bulk-delete (plus index)',
             ],
             [
                 'except',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Generate every action except these (index is always generated)',
             ],
             [

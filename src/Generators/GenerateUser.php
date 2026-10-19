@@ -49,12 +49,15 @@ final class GenerateUser extends Command
         $controllerName = $this->option('controller-name');
         $force = $this->option('force');
         $belongsToMany = $this->resolveBelongsToMany();
-        $actionOptions = [
-            '--only' => $this->option('only'),
-            '--except' => $this->option('except'),
-            '--with-export' => $this->option('with-export'),
-            '--without-bulk' => $this->option('without-bulk'),
-        ];
+        $actionOptions = array_filter(
+            [
+                '--only' => $this->option('only'),
+                '--except' => $this->option('except'),
+                '--with-export' => $this->option('with-export'),
+                '--without-bulk' => $this->option('without-bulk'),
+            ],
+            static fn (mixed $value): bool => $value !== null,
+        );
         $translatable = $this->option('translatable');
         $media = $this->option('media');
         $generateModel = $this->option('generate-model');
@@ -272,7 +275,7 @@ final class GenerateUser extends Command
 
     /**
      * @param array<string> $media
-     * @param array<string, string|bool|null> $actionOptions
+     * @param array<string, string|bool> $actionOptions
      */
     private function generateViews(
         GeneratedActions $actions,

@@ -6,6 +6,7 @@ namespace Brackets\AdminGenerator\Tests\Feature\Generators;
 
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use InvalidArgumentException;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 
 use function escapeshellarg;
 use function exec;
@@ -101,6 +102,34 @@ final class ActionSelectionTest extends TestCase
             self::fail('Combining --only and --except should be rejected.');
         } catch (InvalidArgumentException $exception) {
             self::assertStringContainsString('cannot be combined', $exception->getMessage());
+        }
+    }
+
+    public function testOnlyWithoutValueIsRejected(): void
+    {
+        try {
+            $this->artisan('admin:generate', [
+                'table_name' => 'categories',
+                '--only' => null,
+            ]);
+
+            self::fail('--only without a value should be rejected.');
+        } catch (InvalidOptionException $exception) {
+            self::assertStringContainsString('"--only" option requires a value', $exception->getMessage());
+        }
+    }
+
+    public function testExceptWithoutValueIsRejected(): void
+    {
+        try {
+            $this->artisan('admin:generate', [
+                'table_name' => 'categories',
+                '--except' => null,
+            ]);
+
+            self::fail('--except without a value should be rejected.');
+        } catch (InvalidOptionException $exception) {
+            self::assertStringContainsString('"--except" option requires a value', $exception->getMessage());
         }
     }
 
