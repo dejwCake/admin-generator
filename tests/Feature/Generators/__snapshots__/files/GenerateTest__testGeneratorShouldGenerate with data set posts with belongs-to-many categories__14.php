@@ -2,25 +2,22 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Admin\PostsController;
-use Illuminate\Support\Facades\Route;
+namespace Database\Factories;
 
-Route::prefix('posts')
-    ->name('posts/')
-    ->controller(PostsController::class)
-    ->group(static function (): void {
-        Route::get('/', 'index')
-            ->name('index');
-        Route::get('/create', 'create')
-            ->name('create');
-        Route::post('/', 'store')
-            ->name('store');
-        Route::get('/{post:id}/edit', 'edit')
-            ->name('edit');
-        Route::post('/bulk-destroy', 'bulkDestroy')
-            ->name('bulk-destroy');
-        Route::post('/{post:id}', 'update')
-            ->name('update');
-        Route::delete('/{post:id}', 'destroy')
-            ->name('destroy');
-    });
+use App\Models\Post;
+use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Post>
+ */
+#[UseModel(Post::class)]
+final class PostFactory extends Factory
+{
+    public function definition(): array
+    {
+        return [
+            'title' => $this->faker->sentence,
+        ];
+    }
+}

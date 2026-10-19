@@ -2,46 +2,59 @@
 
 declare(strict_types=1);
 
-use Brackets\Craftable\Database\Migrations\PermissionMigration;
-use Illuminate\Support\Collection;
+return [
+    'category' => [
+        'title' => 'Categories',
 
-return new class extends PermissionMigration
-{
-    public function __construct()
-    {
-        parent::__construct();
+        'actions' => [
+            'index' => 'Categories',
+            'create' => 'New Category',
+            'edit' => 'Edit :name',
+            'show' => 'Category :name',
+            'will_be_published' => 'Category will be published at',
+        ],
 
-        $this->setPermissionsAndRoles(
-            new Collection([
-                'admin.category',
-                'admin.category.index',
-                'admin.category.create',
-                'admin.category.show',
-                'admin.category.edit',
-                'admin.category.delete',
-                'admin.category.bulk-delete',
-            ]),
-            new Collection(),
-        );
-    }
+        'columns' => [
+            'id' => 'ID',
+            'user_id' => 'User',
+            'title' => 'Title',
+            'name' => 'Name',
+            'first_name' => 'First name',
+            'last_name' => 'Last name',
+            'subject' => 'Subject',
+            'email' => 'Email',
+            'password' => 'Password',
+            'password_repeat' => 'Password Confirmation',
+            'remember_token' => 'Remember token',
+            'language' => 'Language',
+            'slug' => 'Slug',
+            'perex' => 'Perex',
+            'long_text' => 'Long text',
+            'published_at' => 'Published at',
+            'published_to' => 'Published to',
+            'date_start' => 'Date start',
+            'time_start' => 'Time start',
+            'date_time_end' => 'Date time end',
+            'released_at' => 'Released at',
+            'text' => 'Text',
+            'description' => 'Description',
+            'enabled' => 'Enabled',
+            'send' => 'Send',
+            'price' => 'Price',
+            'rating' => 'Rating',
+            'views' => 'Views',
+            'created_by_admin_user_id' => 'Created by admin user',
+            'updated_by_admin_user_id' => 'Updated by admin user',
+            'created_at' => 'Created at',
+            'updated_at' => 'Updated at',
+            'deleted_at' => 'Deleted at',
+        ],
 
-    /**
-     * Run the migrations.
-     *
-     * @throws Exception
-     */
-    public function up(): void
-    {
-        $this->migrateUp();
-    }
+        //Belongs to many relations
+        'relations' => [
+            'posts' => 'Posts',
+        ],
+    ],
 
-    /**
-     * Reverse the migrations.
-     *
-     * @throws Exception
-     */
-    public function down(): void
-    {
-        $this->migrateDown();
-    }
-};
+    //-- Do not delete me :) I'm used for auto-generation language arrays --
+];

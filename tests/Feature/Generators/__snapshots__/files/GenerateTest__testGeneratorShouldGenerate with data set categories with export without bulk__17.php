@@ -2,88 +2,60 @@
 
 declare(strict_types=1);
 
-namespace App\Exports;
+return [
+    'category' => [
+        'title' => 'Categories',
 
-use App\Models\Category;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+        'actions' => [
+            'index' => 'Categories',
+            'create' => 'New Category',
+            'edit' => 'Edit :name',
+            'show' => 'Category :name',
+            'export' => 'Export',
+            'will_be_published' => 'Category will be published at',
+        ],
 
-final class CategoriesExport implements FromCollection, WithMapping, WithHeadings
-{
-    public function collection(): Collection
-    {
-        return Category::all();
-    }
+        'columns' => [
+            'id' => 'ID',
+            'user_id' => 'User',
+            'title' => 'Title',
+            'name' => 'Name',
+            'first_name' => 'First name',
+            'last_name' => 'Last name',
+            'subject' => 'Subject',
+            'email' => 'Email',
+            'password' => 'Password',
+            'password_repeat' => 'Password Confirmation',
+            'remember_token' => 'Remember token',
+            'language' => 'Language',
+            'slug' => 'Slug',
+            'perex' => 'Perex',
+            'long_text' => 'Long text',
+            'published_at' => 'Published at',
+            'published_to' => 'Published to',
+            'date_start' => 'Date start',
+            'time_start' => 'Time start',
+            'date_time_end' => 'Date time end',
+            'released_at' => 'Released at',
+            'text' => 'Text',
+            'description' => 'Description',
+            'enabled' => 'Enabled',
+            'send' => 'Send',
+            'price' => 'Price',
+            'rating' => 'Rating',
+            'views' => 'Views',
+            'created_by_admin_user_id' => 'Created by admin user',
+            'updated_by_admin_user_id' => 'Updated by admin user',
+            'created_at' => 'Created at',
+            'updated_at' => 'Updated at',
+            'deleted_at' => 'Deleted at',
+        ],
 
-    public function headings(): array
-    {
-        return [
-            trans('admin.category.columns.id'),
-            trans('admin.category.columns.user_id'),
-            trans('admin.category.columns.title'),
-            trans('admin.category.columns.name'),
-            trans('admin.category.columns.first_name'),
-            trans('admin.category.columns.last_name'),
-            trans('admin.category.columns.subject'),
-            trans('admin.category.columns.email'),
-            trans('admin.category.columns.language'),
-            trans('admin.category.columns.slug'),
-            trans('admin.category.columns.perex'),
-            trans('admin.category.columns.long_text'),
-            trans('admin.category.columns.published_at'),
-            trans('admin.category.columns.published_to'),
-            trans('admin.category.columns.date_start'),
-            trans('admin.category.columns.time_start'),
-            trans('admin.category.columns.date_time_end'),
-            trans('admin.category.columns.released_at'),
-            trans('admin.category.columns.text'),
-            trans('admin.category.columns.description'),
-            trans('admin.category.columns.enabled'),
-            trans('admin.category.columns.send'),
-            trans('admin.category.columns.price'),
-            trans('admin.category.columns.rating'),
-            trans('admin.category.columns.views'),
-            trans('admin.category.columns.created_by_admin_user_id'),
-            trans('admin.category.columns.updated_by_admin_user_id'),
-        ];
-    }
+        //Belongs to many relations
+        'relations' => [
+            'posts' => 'Posts',
+        ],
+    ],
 
-    /**
-     * @param Category $category
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
-     */
-    public function map($category): array
-    {
-        return [
-            $category->id,
-            $category->user_id,
-            $category->title,
-            $category->name,
-            $category->first_name,
-            $category->last_name,
-            $category->subject,
-            $category->email,
-            $category->language,
-            $category->slug,
-            $category->perex,
-            $category->long_text,
-            $category->published_at,
-            $category->published_to,
-            $category->date_start,
-            $category->time_start,
-            $category->date_time_end,
-            $category->released_at,
-            $category->text,
-            $category->description,
-            $category->enabled === null ? '' : ($category->enabled ? __('Yes') : __('No')),
-            $category->send === null ? '' : ($category->send ? __('Yes') : __('No')),
-            $category->price,
-            $category->rating,
-            $category->views,
-            $category->created_by_admin_user_id,
-            $category->updated_by_admin_user_id,
-        ];
-    }
-}
+    //-- Do not delete me :) I'm used for auto-generation language arrays --
+];

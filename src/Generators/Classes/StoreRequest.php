@@ -65,7 +65,7 @@ final class StoreRequest extends ClassGenerator
             $this->modelVariableName,
             $this->extractTranslatable(),
         );
-        $visibleColumns = $columns->getVisible();
+        $formColumns = $columns->getForForm();
 
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
@@ -74,14 +74,14 @@ final class StoreRequest extends ClassGenerator
             'modelDotNotation' => $this->modelDotNotation,
             'relations' => $this->relations,
             //has
-            'hasRuleUsage' => $visibleColumns->hasStoreRuleUsage(),
-            'hasPasswordUsage' => $visibleColumns->hasStorePasswordUsage(),
+            'hasRuleUsage' => $formColumns->hasStoreRuleUsage(),
+            'hasPasswordUsage' => $formColumns->hasStorePasswordUsage(),
             'hasPassword' => $columns->hasByName('password'),
             'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
             'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
             //columns
             // validation in store/update
-            'visibleColumns' => $visibleColumns,
+            'formColumns' => $formColumns,
             'translatableColumns' => $columns->getTranslatable(),
         ])->render();
     }

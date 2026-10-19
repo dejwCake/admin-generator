@@ -2,26 +2,13 @@
 
 declare(strict_types=1);
 
-return [
-    'post' => [
-        'title' => 'Posts',
+use Illuminate\Support\Facades\Route;
 
-        'actions' => [
-            'index' => 'Posts',
-            'create' => 'New Post',
-            'edit' => 'Edit :name',
-        ],
-
-        'columns' => [
-            'id' => 'ID',
-            'title' => 'Title',
-        ],
-
-        //Belongs to many relations
-        'relations' => [
-            'categories' => 'Categories',
-        ],
-    ],
-
-    //-- Do not delete me :) I'm used for auto-generation language arrays --
-];
+Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
+    ->prefix('admin')
+    ->name('admin/')
+    ->group(static function (): void {
+        foreach (glob(__DIR__ . '/admin/*.php') as $file) {
+            require $file;
+        }
+    });

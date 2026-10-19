@@ -81,14 +81,14 @@ final class BladeEdit extends ResourceGenerator
             $this->modelVariableName,
             $this->extractTranslatable(),
         );
-        $visibleColumns = $columns->getVisible();
+        $formColumns = $columns->getForForm();
 
-        $formColumns = $visibleColumns->rejectByName(
+        $leftFormColumns = $formColumns->rejectByName(
             'published_at',
             'created_by_admin_user_id',
             'updated_by_admin_user_id',
         );
-        $publishedColumns = $visibleColumns->filterByName('published_at');
+        $publishedColumns = $formColumns->filterByName('published_at');
         $galleryCollections = $this->mediaCollections->filter(
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
@@ -105,13 +105,13 @@ final class BladeEdit extends ResourceGenerator
             'hasTranslatable' => $columns->hasTranslatable(),
             'hasTagInput' => $columns->hasTagInput(),
             'hasPublishedAt' => $columns->hasByName('published_at'),
-            'hasLocalizedWysiwyg' => $formColumns->hasLocalizedWysiwyg(),
-            'hasWysiwyg' => $formColumns->hasWysiwyg(),
-            'hasDateColumns' => $formColumns->hasByMajorType('date'),
-            'hasTimeColumns' => $formColumns->hasByMajorType('time'),
-            'hasDatetimeColumns' => $formColumns->hasByMajorType('datetime'),
+            'hasLocalizedWysiwyg' => $leftFormColumns->hasLocalizedWysiwyg(),
+            'hasWysiwyg' => $leftFormColumns->hasWysiwyg(),
+            'hasDateColumns' => $leftFormColumns->hasByMajorType('date'),
+            'hasTimeColumns' => $leftFormColumns->hasByMajorType('time'),
+            'hasDatetimeColumns' => $leftFormColumns->hasByMajorType('datetime'),
             //columns
-            'columns' => $visibleColumns,
+            'columns' => $formColumns,
             'publishedColumns' => $publishedColumns,
             //media
             'mediaCollections' => $this->mediaCollections,

@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 final class SubsetQueriesTest extends TestCase
 {
-    public function testGetVisibleRejectsSystemColumns(): void
+    public function testGetForFormRejectsSystemColumns(): void
     {
         $collection = new ColumnCollection([
             self::makeColumn('id'),
@@ -24,10 +24,10 @@ final class SubsetQueriesTest extends TestCase
             self::makeColumn('title'),
         ]);
 
-        $visible = $collection->getVisible();
+        $formColumns = $collection->getForForm();
 
-        self::assertCount(1, $visible);
-        self::assertArrayHasKey('title', $visible->toArray());
+        self::assertCount(1, $formColumns);
+        self::assertArrayHasKey('title', $formColumns->toArray());
     }
 
     public function testGetFillableRejectsSystemColumnsButKeepsLastLoginAt(): void
@@ -215,7 +215,7 @@ final class SubsetQueriesTest extends TestCase
 
         foreach (
             [
-                $collection->getVisible(),
+                $collection->getForForm(),
                 $collection->getToExport(),
                 $collection->getForIndex(),
                 $collection->getToQuery(),

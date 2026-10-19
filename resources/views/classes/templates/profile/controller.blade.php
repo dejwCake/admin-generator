@@ -1,7 +1,7 @@
 @php
     use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
     use Illuminate\Support\Collection;
-    assert($visibleColumns instanceof ColumnCollection);
+    assert($formColumns instanceof ColumnCollection);
 @endphp
 @php echo "<?php";
 @endphp
@@ -77,7 +77,7 @@ final class {{ $controllerBaseName }} extends Controller
         $this->{{ $modelVariableName }} = $this->getUser($request);
 
         $data = $request->validate([
-@foreach($visibleColumns->rejectByName('password', 'activated', 'forbidden') as $column)
+@foreach($formColumns->rejectByName('password', 'activated', 'forbidden') as $column)
             '{{ $column->name }}' => [
 @foreach($column->serverUpdateRules as $rule)
                 {!! (string) $rule !!},
@@ -124,7 +124,7 @@ final class {{ $controllerBaseName }} extends Controller
         $this->{{ $modelVariableName }} = $this->getUser($request);
 
         $data = $request->validate([
-@foreach($visibleColumns->filterByName('password') as $column)
+@foreach($formColumns->filterByName('password') as $column)
             '{{ $column->name }}' => [
 @foreach($column->serverUpdateRules as $rule)
                 {!! (string) $rule !!},

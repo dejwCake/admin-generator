@@ -23,4 +23,6 @@ Route::prefix('posts')
             ->name('update');
         Route::delete('/{post:id}', 'destroy')
             ->name('destroy');
+        Route::get('/{post:id}', 'show')
+            ->name('show');
     });

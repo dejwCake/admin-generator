@@ -25,4 +25,6 @@ Route::prefix('posts')
             ->name('destroy');
         Route::get('/export', 'export')
             ->name('export');
+        Route::get('/{post:id}', 'show')
+            ->name('show');
     });

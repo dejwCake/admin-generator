@@ -131,6 +131,20 @@ final class Generate extends Command
             '--translatable' => $translatable,
         ]);
 
+        $this->call('admin:generate:blade-show', [
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--translatable' => $translatable,
+        ]);
+
+        $this->call('admin:generate:vue-show', [
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--translatable' => $translatable,
+        ]);
+
         $this->call('admin:generate:blade-create', [
             'table_name' => $tableName,
             '--model-name' => $modelName,

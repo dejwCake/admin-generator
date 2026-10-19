@@ -80,6 +80,7 @@ final class PostsController extends Controller
                 'data' => $data,
                 'url' => $this->urlGenerator->route('admin/posts/index'),
                 'createUrl' => $this->urlGenerator->route('admin/posts/create'),
+                'showUrlTemplate' => $this->urlGenerator->route('admin/posts/show', ['post' => ':id']),
                 'editUrlTemplate' => $this->urlGenerator->route('admin/posts/edit', ['post' => ':id']),
                 'updateUrlTemplate' => $this->urlGenerator->route('admin/posts/update', ['post' => ':id']),
                 'destroyUrlTemplate' => $this->urlGenerator->route('admin/posts/destroy', ['post' => ':id']),
@@ -126,6 +127,27 @@ final class PostsController extends Controller
         }
 
         return $this->redirector->route('admin/posts/index');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @throws AuthorizationException
+     */
+    public function show(Post $post): View
+    {
+        $this->gate->authorize('admin.post.show', $post);
+
+        $post->load([
+            'categories',
+        ]);
+
+        return $this->viewFactory->make(
+            'admin.post.show',
+            [
+                'post' => $post,
+            ],
+        );
     }
 
     /**

@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'post' => [
+        'title' => 'Posts',
+
+        'actions' => [
+            'index' => 'Posts',
+            'create' => 'New Post',
+            'edit' => 'Edit :name',
+            'show' => 'Post :name',
+        ],
+
+        'columns' => [
+            'id' => 'ID',
+            'title' => 'Title',
+        ],
+
+        //Belongs to many relations
+        'relations' => [
+            'categories' => 'Categories',
+        ],
+    ],
+
+    //-- Do not delete me :) I'm used for auto-generation language arrays --
+];

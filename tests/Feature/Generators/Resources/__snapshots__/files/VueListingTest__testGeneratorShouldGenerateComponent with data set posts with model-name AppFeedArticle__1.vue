@@ -75,6 +75,10 @@
 
                                 <td>
                                     <div class="d-flex gap-1 justify-content-center">
+                                        <ShowButton
+                                            :url="resolveUrl(showUrlTemplate, item)"
+                                            :translations="translations"
+                                        />
                                         <EditButton
                                             :url="resolveUrl(editUrlTemplate, item)"
                                             :translations="translations"
@@ -134,6 +138,7 @@ import ListingHeader from '@craftable/components/listing/ListingHeader.vue';
 import Pagination from '@craftable/components/listing/Pagination.vue';
 import PerPage from '@craftable/components/listing/PerPage.vue';
 import Search from '@craftable/components/listing/Search.vue';
+import ShowButton from '@craftable/components/listing/ShowButton.vue';
 import Sortable from '@craftable/components/listing/Sortable.vue';
 import {ref} from 'vue';
 import {useAppListing} from '../composables/useAppListing.js';
@@ -145,6 +150,7 @@ const props = defineProps({
     timezone: {type: String, default: 'UTC'},
     translations: {type: Object, default: () => ({})},
     createUrl: {type: String, default: ''},
+    showUrlTemplate: {type: String, required: true},
     editUrlTemplate: {type: String, required: true},
     updateUrlTemplate: {type: String, required: true},
     destroyUrlTemplate: {type: String, required: true},
@@ -153,6 +159,10 @@ const props = defineProps({
 });
 
 const cardBody = ref(null);
+// The numbers passed to isColumnVisible() are priorities, not column positions: a lower number
+// survives a narrower card, columns sharing a number appear and disappear together, and anything
+// above 3 is hidden once the card is under 1200px -- which an ordinary laptop already is. The
+// generator can only guess, so tune them to this resource rather than leaving them in column order.
 const {isColumnVisible} = useResponsiveColumns(cardBody);
 
 const {

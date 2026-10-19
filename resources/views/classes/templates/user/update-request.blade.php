@@ -3,7 +3,7 @@
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
     use Illuminate\Support\Collection;
     assert($relations instanceof RelationCollection);
-    assert($visibleColumns instanceof ColumnCollection);
+    assert($formColumns instanceof ColumnCollection);
     assert($translatableColumns instanceof ColumnCollection);
 @endphp
 @php echo "<?php";
@@ -65,7 +65,7 @@ final class {{ $classBaseName }} extends FormRequest
     public function untranslatableRules(): array
     {
         return [
-@foreach($visibleColumns->getNonTranslatable() as $column)
+@foreach($formColumns->getNonTranslatable() as $column)
 @if(!($column->name === "updated_by_admin_user_id" || $column->name === "created_by_admin_user_id" ))
             '{{ $column->name }}' => [
 @foreach($column->serverUpdateRules as $rule)
@@ -114,7 +114,7 @@ final class {{ $classBaseName }} extends FormRequest
     public function rules(): array
     {
         return [
-@foreach($visibleColumns as $column)
+@foreach($formColumns as $column)
 @if(!($column->name === "updated_by_admin_user_id" || $column->name === "created_by_admin_user_id" ))
             '{{ $column->name }}' => [
 @foreach($column->serverUpdateRules as $rule)

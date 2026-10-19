@@ -82,7 +82,7 @@ final class ColumnCollection implements IteratorAggregate, Countable
         return new ArrayIterator($this->columns->all());
     }
 
-    public function getVisible(): self
+    public function getForForm(): self
     {
         return new self(
             $this->columns
@@ -126,6 +126,19 @@ final class ColumnCollection implements IteratorAggregate, Countable
                 static fn (Column $column) => $column->majorType === 'text' || in_array($column->name, $haystack, true),
             )
             ->reject(static fn (Column $column) => in_array($column->name, self::SETUP_ONLY_COLUMNS, true)));
+    }
+
+    public function getForShow(): self
+    {
+        return new self(
+            $this->columns
+                ->reject(static fn (Column $column): bool => in_array(
+                    $column->name,
+                    ['password', 'remember_token', 'deleted_at'],
+                    true,
+                ))
+                ->reject(static fn (Column $column): bool => in_array($column->name, self::SETUP_ONLY_COLUMNS, true)),
+        );
     }
 
     public function getToSearchIn(): self

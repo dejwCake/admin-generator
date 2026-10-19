@@ -31,4 +31,6 @@ Route::prefix('{{ $resource }}')
         Route::get('/export', 'export')
             ->name('export');
 @endif
+        Route::get('/{{ '{' }}{{ $modelVariableName }}:id}', 'show')
+            ->name('show');
     });

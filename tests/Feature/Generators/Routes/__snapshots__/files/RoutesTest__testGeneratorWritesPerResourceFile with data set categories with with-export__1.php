@@ -25,4 +25,6 @@ Route::prefix('categories')
             ->name('destroy');
         Route::get('/export', 'export')
             ->name('export');
+        Route::get('/{category:id}', 'show')
+            ->name('show');
     });

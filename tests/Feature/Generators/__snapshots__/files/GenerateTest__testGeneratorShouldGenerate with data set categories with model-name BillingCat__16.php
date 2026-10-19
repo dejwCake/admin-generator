@@ -2,38 +2,27 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\Admin\Billing\Cat;
+use App\Http\Controllers\Admin\CategoriesController;
+use Illuminate\Support\Facades\Route;
 
-use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Collection;
-
-final class BulkDestroyCat extends FormRequest
-{
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(Gate $gate): bool
-    {
-        return $gate->allows('admin.billing.cat.bulk-delete');
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     */
-    public function rules(): array
-    {
-        return [
-            'ids.*' => [
-                'integer',
-            ],
-        ];
-    }
-
-    public function getIds(): Collection
-    {
-        $data = $this->validated();
-
-        return new Collection($data['ids'] ?? []);
-    }
-}
+Route::prefix('billing-cats')
+    ->name('billing-cats/')
+    ->controller(CategoriesController::class)
+    ->group(static function (): void {
+        Route::get('/', 'index')
+            ->name('index');
+        Route::get('/create', 'create')
+            ->name('create');
+        Route::post('/', 'store')
+            ->name('store');
+        Route::get('/{cat:id}/edit', 'edit')
+            ->name('edit');
+        Route::post('/bulk-destroy', 'bulkDestroy')
+            ->name('bulk-destroy');
+        Route::post('/{cat:id}', 'update')
+            ->name('update');
+        Route::delete('/{cat:id}', 'destroy')
+            ->name('destroy');
+        Route::get('/{cat:id}', 'show')
+            ->name('show');
+    });

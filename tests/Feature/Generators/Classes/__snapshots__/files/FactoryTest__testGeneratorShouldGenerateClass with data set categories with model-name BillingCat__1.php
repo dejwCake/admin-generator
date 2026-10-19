@@ -60,27 +60,26 @@ final class CatFactory extends Factory
 
     public function enabled(): self
     {
-        return $this->state(static fn (): array => ['enabled' => true]);
+        return $this->state(['enabled' => true]);
     }
 
     public function notEnabled(): self
     {
-        return $this->state(static fn (): array => ['enabled' => false]);
+        return $this->state(['enabled' => false]);
     }
 
     public function send(): self
     {
-        return $this->state(static fn (): array => ['send' => true]);
+        return $this->state(['send' => true]);
     }
 
     public function notSend(): self
     {
-        return $this->state(static fn (): array => ['send' => false]);
+        return $this->state(['send' => false]);
     }
 
     public function notPublished(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(fn (array $attributes) => ['published_at' => null]);
+        return $this->state(['published_at' => null]);
     }
 }

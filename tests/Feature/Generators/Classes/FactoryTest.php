@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\Classes;
 
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Schema\Blueprint;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Throwable;
 
 use function file_get_contents;
 
@@ -70,6 +72,59 @@ final class FactoryTest extends TestCase
 
         self::assertStringNotContainsString('function up_event_enabled', $contents);
         self::assertStringNotContainsString('notIs_url_owner', $contents);
+    }
+
+    public function testGeneratedBooleanStatesUseTheArrayForm(): void
+    {
+        $this->artisan('admin:generate:factory', ['table_name' => 'categories']);
+
+        $contents = (string) file_get_contents($this->app->basePath('database/factories/CategoryFactory.php'));
+
+        self::assertStringContainsString("return \$this->state(['enabled' => true]);", $contents);
+        self::assertStringNotContainsString('static fn', $contents);
+    }
+
+    public function testTheEmittedStateShapeCanActuallyBeCalled(): void
+    {
+        $arrayState = new class extends Factory {
+            public function definition(): array
+            {
+                return ['enabled' => false];
+            }
+
+            public function enabled(): self
+            {
+                return $this->state(['enabled' => true]);
+            }
+        };
+
+        self::assertSame(['enabled' => true], $arrayState->enabled()->raw());
+    }
+
+    public function testAStaticClosureStateWouldThrow(): void
+    {
+        $staticClosureState = new class extends Factory {
+            public function definition(): array
+            {
+                return ['enabled' => false];
+            }
+
+            public function enabled(): self
+            {
+                return $this->state(static fn (): array => ['enabled' => true]);
+            }
+        };
+
+        try {
+            $staticClosureState->enabled()->raw();
+
+            self::fail('A static closure state should not survive Factory::getRawAttributes().');
+        } catch (Throwable $throwable) {
+            self::assertStringContainsString(
+                'Cannot bind an instance to a static closure',
+                $throwable->getMessage(),
+            );
+        }
     }
 
     public static function getCases(): iterable

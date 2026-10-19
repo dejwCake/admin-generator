@@ -6,7 +6,6 @@
     assert($relations instanceof RelationCollection);
     assert($queryColumns instanceof ColumnCollection);
     assert($searchInColumns instanceof ColumnCollection);
-    assert($visibleColumns instanceof ColumnCollection);
 @endphp
 @php echo "<?php";
 @endphp
@@ -129,6 +128,7 @@ final class {{ $controllerBaseName }} extends Controller
                 'data' => $data,
                 'url' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
                 'createUrl' => $this->urlGenerator->route('admin/{{ $resource }}/create'),
+                'showUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/show', ['{{ $modelVariableName }}' => ':id']),
                 'editUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/edit', ['{{ $modelVariableName }}' => ':id']),
                 'updateUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/update', ['{{ $modelVariableName }}' => ':id']),
                 'destroyUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/destroy', ['{{ $modelVariableName }}' => ':id']),
@@ -202,6 +202,31 @@ final class {{ $controllerBaseName }} extends Controller
     }
 
     /**
+     * Display the specified resource.
+     *
+     * @throws AuthorizationException
+     */
+    public function show({{ $modelBaseName }} ${{ $modelVariableName }}): View
+    {
+        $this->gate->authorize('admin.{{ $modelDotNotation }}.show', ${{ $modelVariableName }});
+
+@if($modelEagerLoads->isNotEmpty())
+        ${{ $modelVariableName }}->load([
+@foreach($modelEagerLoads as $eagerLoad)
+            '{{ $eagerLoad }}',
+@endforeach
+        ]);
+
+@endif
+        return $this->viewFactory->make(
+            'admin.{{ $modelDotNotation }}.show',
+            [
+                '{{ $modelVariableName }}' => ${{ $modelVariableName }},
+            ],
+        );
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @throws AuthorizationException
@@ -210,9 +235,9 @@ final class {{ $controllerBaseName }} extends Controller
     {
         $this->gate->authorize('admin.{{ $modelDotNotation }}.edit', ${{ $modelVariableName }});
 
-@if($editEagerLoads->isNotEmpty())
+@if($modelEagerLoads->isNotEmpty())
         ${{ $modelVariableName }}->load([
-@foreach($editEagerLoads as $eagerLoad)
+@foreach($modelEagerLoads as $eagerLoad)
             '{{ $eagerLoad }}',
 @endforeach
         ]);

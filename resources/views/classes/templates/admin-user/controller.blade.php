@@ -6,7 +6,6 @@
     assert($relations instanceof RelationCollection);
     assert($queryColumns instanceof ColumnCollection);
     assert($searchInColumns instanceof ColumnCollection);
-    assert($visibleColumns instanceof ColumnCollection);
 @endphp
 @php echo "<?php";
 @endphp
@@ -233,9 +232,9 @@ final class {{ $controllerBaseName }} extends Controller
     {
         $this->gate->authorize('admin.{{ $modelDotNotation }}.edit', ${{ $modelVariableName }});
 
-@if($editEagerLoads->isNotEmpty())
+@if($modelEagerLoads->isNotEmpty())
         ${{ $modelVariableName }}->load([
-@foreach($editEagerLoads as $eagerLoad)
+@foreach($modelEagerLoads as $eagerLoad)
             '{{ $eagerLoad }}',
 @endforeach
         ]);

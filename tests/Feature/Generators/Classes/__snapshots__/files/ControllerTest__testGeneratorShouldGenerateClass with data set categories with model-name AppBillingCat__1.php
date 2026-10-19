@@ -119,6 +119,7 @@ final class CategoriesController extends Controller
                 'data' => $data,
                 'url' => $this->urlGenerator->route('admin/cats/index'),
                 'createUrl' => $this->urlGenerator->route('admin/cats/create'),
+                'showUrlTemplate' => $this->urlGenerator->route('admin/cats/show', ['cat' => ':id']),
                 'editUrlTemplate' => $this->urlGenerator->route('admin/cats/edit', ['cat' => ':id']),
                 'updateUrlTemplate' => $this->urlGenerator->route('admin/cats/update', ['cat' => ':id']),
                 'destroyUrlTemplate' => $this->urlGenerator->route('admin/cats/destroy', ['cat' => ':id']),
@@ -165,6 +166,30 @@ final class CategoriesController extends Controller
         }
 
         return $this->redirector->route('admin/cats/index');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @throws AuthorizationException
+     */
+    public function show(Cat $cat): View
+    {
+        $this->gate->authorize('admin.cat.show', $cat);
+
+        $cat->load([
+            'createdByAdminUser',
+            'updatedByAdminUser',
+            'user',
+            'posts',
+        ]);
+
+        return $this->viewFactory->make(
+            'admin.cat.show',
+            [
+                'cat' => $cat,
+            ],
+        );
     }
 
     /**

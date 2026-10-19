@@ -25,8 +25,10 @@ use Brackets\AdminGenerator\Generators\Resources\BladeCreate;
 use Brackets\AdminGenerator\Generators\Resources\BladeEdit;
 use Brackets\AdminGenerator\Generators\Resources\BladeForm;
 use Brackets\AdminGenerator\Generators\Resources\BladeIndex;
+use Brackets\AdminGenerator\Generators\Resources\BladeShow;
 use Brackets\AdminGenerator\Generators\Resources\VueForm;
 use Brackets\AdminGenerator\Generators\Resources\VueListing;
+use Brackets\AdminGenerator\Generators\Resources\VueShow;
 use Brackets\AdminGenerator\Generators\Routes\Routes;
 use Illuminate\Support\ServiceProvider;
 use Override;
@@ -67,8 +69,10 @@ final class AdminGeneratorServiceProvider extends ServiceProvider
             BladeEdit::class,
             BladeForm::class,
             BladeIndex::class,
+            BladeShow::class,
             VueForm::class,
             VueListing::class,
+            VueShow::class,
             //Routes
             Routes::class,
         ]);

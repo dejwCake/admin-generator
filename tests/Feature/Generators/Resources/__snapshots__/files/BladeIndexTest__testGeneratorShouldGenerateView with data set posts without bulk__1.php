@@ -8,6 +8,7 @@
         :data="{{ $data->toJson() }}"
         :url="'{{ $url }}'"
         :create-url="'{{ $createUrl }}'"
+        :show-url-template="'{{ $showUrlTemplate }}'"
         :edit-url-template="'{{ $editUrlTemplate }}'"
         :update-url-template="'{{ $updateUrlTemplate }}'"
         :destroy-url-template="'{{ $destroyUrlTemplate }}'"
@@ -20,6 +21,7 @@
             ],
             'search_placeholder' => trans('brackets/admin-ui::admin.placeholder.search'),
             'search_btn' => trans('brackets/admin-ui::admin.btn.search'),
+            'show_btn' => trans('brackets/admin-ui::admin.btn.show'),
             'edit_btn' => trans('brackets/admin-ui::admin.btn.edit'),
             'delete_btn' => trans('brackets/admin-ui::admin.btn.delete'),
             'confirm_delete_title' => trans('brackets/admin-ui::admin.operation.confirm_delete_title'),

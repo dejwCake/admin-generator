@@ -5,16 +5,27 @@ declare(strict_types=1);
 namespace App\Exports;
 
 use App\Models\Category;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-final class CategoriesExport implements FromCollection, WithMapping, WithHeadings
+final class CategoriesExport implements FromQuery, WithMapping, WithHeadings, WithChunkReading
 {
-    public function collection(): Collection
+    private const int CHUNK = 1000;
+
+    /**
+     * @return Builder<Category>
+     */
+    public function query(): Builder
     {
-        return Category::all();
+        return Category::query()->orderBy('id');
+    }
+
+    public function chunkSize(): int
+    {
+        return self::CHUNK;
     }
 
     public function headings(): array

@@ -23,4 +23,6 @@ Route::prefix('billing-cats')
             ->name('update');
         Route::delete('/{cat:id}', 'destroy')
             ->name('destroy');
+        Route::get('/{cat:id}', 'show')
+            ->name('show');
     });

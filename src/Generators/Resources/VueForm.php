@@ -102,26 +102,26 @@ final class VueForm extends ResourceGenerator
             $this->modelVariableName,
             $this->extractTranslatable(),
         );
-        $visibleColumns = $columns->getVisible();
+        $formColumns = $columns->getForForm();
 
         $hasCreatedByAdminUser = $columns->hasByName('created_by_admin_user_id');
         $hasUpdatedByAdminUser = $columns->hasByName('updated_by_admin_user_id');
 
         // Columns to display in the main form body (excluding sidebar/system columns)
-        $leftFormColumns = $visibleColumns->rejectByName(
+        $leftFormColumns = $formColumns->rejectByName(
             'published_at',
             'created_by_admin_user_id',
             'updated_by_admin_user_id',
         );
         // Right column: only published_at
-        $publishedColumns = $visibleColumns->filterByName('published_at');
+        $publishedColumns = $formColumns->filterByName('published_at');
 
         // Split media collections: gallery goes right, rest left
         $galleryCollections = $this->mediaCollections->filter(
             static fn (object $collection): bool => $collection->collectionName === 'gallery',
         );
 
-        $validationRules = $visibleColumns->rejectByName(
+        $validationRules = $formColumns->rejectByName(
             'published_at',
             'created_by_admin_user_id',
             'updated_by_admin_user_id',

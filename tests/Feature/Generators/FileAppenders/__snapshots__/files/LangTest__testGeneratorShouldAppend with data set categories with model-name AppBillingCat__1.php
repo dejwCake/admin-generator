@@ -10,6 +10,7 @@ return [
             'index' => 'Categories',
             'create' => 'New Category',
             'edit' => 'Edit :name',
+            'show' => 'Category :name',
             'will_be_published' => 'Cat will be published at',
         ],
 

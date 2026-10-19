@@ -21,4 +21,6 @@ Route::prefix('categories')
             ->name('update');
         Route::delete('/{category:id}', 'destroy')
             ->name('destroy');
+        Route::get('/{category:id}', 'show')
+            ->name('show');
     });

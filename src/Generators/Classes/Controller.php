@@ -101,25 +101,24 @@ final class Controller extends ClassGenerator
             $this->modelVariableName,
             $this->extractTranslatable(),
         );
-        $visibleColumns = $columns->getVisible();
 
         $indexEagerLoads = new Collection();
-        $editEagerLoads = new Collection();
+        $modelEagerLoads = new Collection();
 
-        if ($visibleColumns->hasByName('created_by_admin_user_id')) {
+        if ($columns->hasByName('created_by_admin_user_id')) {
             $indexEagerLoads->push('createdByAdminUser');
-            $editEagerLoads->push('createdByAdminUser');
+            $modelEagerLoads->push('createdByAdminUser');
         }
-        if ($visibleColumns->hasByName('updated_by_admin_user_id')) {
+        if ($columns->hasByName('updated_by_admin_user_id')) {
             $indexEagerLoads->push('updatedByAdminUser');
-            $editEagerLoads->push('updatedByAdminUser');
+            $modelEagerLoads->push('updatedByAdminUser');
         }
         foreach ($this->relations->getBelongsTo() as $belongsTo) {
             $indexEagerLoads->push($belongsTo->relationMethodName);
-            $editEagerLoads->push($belongsTo->relationMethodName);
+            $modelEagerLoads->push($belongsTo->relationMethodName);
         }
         foreach ($this->relations->getBelongsToMany() as $belongsToMany) {
-            $editEagerLoads->push($belongsToMany->relationMethodName);
+            $modelEagerLoads->push($belongsToMany->relationMethodName);
         }
 
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
@@ -135,19 +134,19 @@ final class Controller extends ClassGenerator
             'resource' => $this->resource,
             'relations' => $this->relations,
             //has
-            'hasActivation' => $visibleColumns->hasByName('activated'),
+            'hasActivation' => $columns->hasByName('activated'),
             'hasExport' => $this->export,
             'hasBulk' => !$this->withoutBulk,
             'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns
             'queryColumns' => $columns->getToQuery(),
             'searchInColumns' => $columns->getToSearchIn(),
-            'visibleColumns' => $visibleColumns,
+            'formColumns' => $columns->getForForm(),
             //media
             'mediaCollections' => $this->mediaCollections,
             //eager loads
             'indexEagerLoads' => $indexEagerLoads,
-            'editEagerLoads' => $editEagerLoads,
+            'modelEagerLoads' => $modelEagerLoads,
         ])->render();
     }
 

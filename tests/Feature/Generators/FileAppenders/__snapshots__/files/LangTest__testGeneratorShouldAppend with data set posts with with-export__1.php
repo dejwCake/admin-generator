@@ -10,6 +10,7 @@ return [
             'index' => 'Posts',
             'create' => 'New Post',
             'edit' => 'Edit :name',
+            'show' => 'Post :name',
             'export' => 'Export',
         ],
 

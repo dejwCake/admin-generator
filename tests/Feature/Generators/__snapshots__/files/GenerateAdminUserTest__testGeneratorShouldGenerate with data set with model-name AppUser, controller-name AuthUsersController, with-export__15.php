@@ -10,6 +10,7 @@ return [
             'index' => 'Admin Users',
             'create' => 'New Admin User',
             'edit' => 'Edit :name',
+            'show' => 'Admin User :name',
             'edit_profile' => 'Edit Profile',
             'edit_password' => 'Edit Password',
             'export' => 'Export',

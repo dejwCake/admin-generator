@@ -63,28 +63,26 @@ final class {{ $modelBaseName }}Factory extends Factory
 
     public function {{ $column->stateMethodName() }}(): self
     {
-        return $this->state(static fn (): array => ['{{ $column->name }}' => true]);
+        return $this->state(['{{ $column->name }}' => true]);
     }
 
     public function {{ $column->negatedStateMethodName() }}(): self
     {
-        return $this->state(static fn (): array => ['{{ $column->name }}' => false]);
+        return $this->state(['{{ $column->name }}' => false]);
     }
 @endforeach
 @if($hasEmailVerifiedAt)
 
     public function unverified(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(fn (array $attributes) => ['email_verified_at' => null]);
+        return $this->state(['email_verified_at' => null]);
     }
 @endif
 @if($hasPublishedAt)
 
     public function notPublished(): self
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic, SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-        return $this->state(fn (array $attributes) => ['published_at' => null]);
+        return $this->state(['published_at' => null]);
     }
 @endif
 }

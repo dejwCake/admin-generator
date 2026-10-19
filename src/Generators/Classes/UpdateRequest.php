@@ -65,7 +65,7 @@ final class UpdateRequest extends ClassGenerator
             $this->modelVariableName,
             $this->extractTranslatable(),
         );
-        $visibleColumns = $columns->getVisible();
+        $formColumns = $columns->getForForm();
 
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
@@ -77,14 +77,14 @@ final class UpdateRequest extends ClassGenerator
             'modelDotNotation' => $this->modelDotNotation,
             'relations' => $this->relations,
             //has
-            'hasRuleUsage' => $visibleColumns->hasUpdateRuleUsage(),
-            'hasPasswordUsage' => $visibleColumns->hasUpdatePasswordUsage(),
+            'hasRuleUsage' => $formColumns->hasUpdateRuleUsage(),
+            'hasPasswordUsage' => $formColumns->hasUpdatePasswordUsage(),
             'hasPassword' => $columns->hasByName('password'),
             'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
             'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns
             // validation in store/update
-            'visibleColumns' => $visibleColumns,
+            'formColumns' => $formColumns,
             'translatableColumns' => $columns->getTranslatable(),
         ])->render();
     }

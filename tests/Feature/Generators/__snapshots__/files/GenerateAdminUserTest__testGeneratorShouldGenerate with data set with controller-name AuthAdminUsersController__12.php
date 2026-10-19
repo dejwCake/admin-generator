@@ -37,21 +37,21 @@ final class AdminUserFactory extends Factory
 
     public function activated(): self
     {
-        return $this->state(static fn (): array => ['activated' => true]);
+        return $this->state(['activated' => true]);
     }
 
     public function notActivated(): self
     {
-        return $this->state(static fn (): array => ['activated' => false]);
+        return $this->state(['activated' => false]);
     }
 
     public function forbidden(): self
     {
-        return $this->state(static fn (): array => ['forbidden' => true]);
+        return $this->state(['forbidden' => true]);
     }
 
     public function notForbidden(): self
     {
-        return $this->state(static fn (): array => ['forbidden' => false]);
+        return $this->state(['forbidden' => false]);
     }
 }

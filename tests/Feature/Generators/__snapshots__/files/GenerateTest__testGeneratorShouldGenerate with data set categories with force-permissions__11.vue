@@ -1,378 +1,295 @@
 <template>
-    <form class="form-horizontal" method="post" @submit.prevent="onSubmit" :action="action" novalidate>
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fa" :class="data && Object.keys(data).length > 0 ? 'fa-pencil' : 'fa-plus'"></i>
-                        {{ translations.form_title }}
-                    </div>
-                    <div class="card-body">
-                        <LocalizationBar
-                            :translations="translations"
-                            :locales="locales"
-                            :default-locale="defaultLocale"
-                            :other-locales="otherLocales"
-                            :is-form-localized="isFormLocalized"
-                            :current-locale="currentLocale"
-                            :on-small-screen="onSmallScreen"
-                            :show-localized-validation-error="showLocalizedValidationError"
-                            @show-localization="showLocalization"
-                            @hide-localization="hideLocalization"
-                            @update:current-locale="currentLocale = $event"
-                        />
-
-                        <FormSelect
-                            v-model="form.user_id"
-                            name="user_id"
-                            :label="translations.columns.user_id"
-                            :error="errors.user_id"
-                            :options="userOptions"
-                            trackBy="id"
-                            optionLabel="name"
-                            :placeholder="translations.select_an_option"
-                        />
-
-                        <FormInput
-                            v-model="form.title"
-                            name="title"
-                            :label="translations.columns.title"
-                            :error="errors.title"
-                        />
-
-                        <FormInput
-                            v-model="form.name"
-                            name="name"
-                            :label="translations.columns.name"
-                            :error="errors.name"
-                        />
-
-                        <FormInput
-                            v-model="form.first_name"
-                            name="first_name"
-                            :label="translations.columns.first_name"
-                            :error="errors.first_name"
-                        />
-
-                        <FormInput
-                            v-model="form.last_name"
-                            name="last_name"
-                            :label="translations.columns.last_name"
-                            :error="errors.last_name"
-                        />
-
-                        <FormInput
-                            v-model="form.subject"
-                            name="subject"
-                            :label="translations.columns.subject"
-                            :error="errors.subject"
-                        />
-
-                        <FormEmail
-                            v-model="form.email"
-                            name="email"
-                            :label="translations.columns.email"
-                            :error="errors.email"
-                        />
-
-                        <FormPasswordConfirm
-                            v-model:password="form.password"
-                            v-model:passwordConfirmation="form.password_confirmation"
-                            :passwordError="errors.password"
-                            :confirmationError="errors.password_confirmation"
-                            :translations="{
-                                password: translations.columns.password,
-                                password_repeat: translations.columns.password_repeat
-                            }"
-                        />
-
-                        <FormInput
-                            v-model="form.language"
-                            name="language"
-                            :label="translations.columns.language"
-                            :error="errors.language"
-                        />
-
-                        <FormInput
-                            v-model="form.slug"
-                            name="slug"
-                            :label="translations.columns.slug"
-                            :error="errors.slug"
-                        />
-
-                        <FormWysiwyg
-                            v-model="form.perex"
-                            name="perex"
-                            :label="translations.columns.perex"
-                            :error="errors.perex"
-                            :upload-url="wysiwygUploadUrl"
-                        />
-
-                        <FormTextarea
-                            v-model="form.long_text"
-                            name="long_text"
-                            :label="translations.columns.long_text"
-                            :error="errors.long_text"
-                        />
-
-                        <FormDatePicker
-                            v-model="form.published_to"
-                            name="published_to"
-                            :label="translations.columns.published_to"
-                            :error="errors.published_to"
-                            :config="datePickerConfig"
-                            :placeholder="translations.select_a_date"
-                        />
-
-                        <FormDatePicker
-                            v-model="form.date_start"
-                            name="date_start"
-                            :label="translations.columns.date_start"
-                            :error="errors.date_start"
-                            :config="datePickerConfig"
-                            :placeholder="translations.select_a_date"
-                        />
-
-                        <FormDatePicker
-                            v-model="form.time_start"
-                            name="time_start"
-                            :label="translations.columns.time_start"
-                            :error="errors.time_start"
-                            :config="timePickerConfig"
-                            icon="fa-clock"
-                            :placeholder="translations.select_a_time"
-                        />
-
-                        <FormDatePicker
-                            v-model="form.date_time_end"
-                            name="date_time_end"
-                            :label="translations.columns.date_time_end"
-                            :error="errors.date_time_end"
-                            :config="datetimePickerConfig"
-                            :placeholder="translations.select_date_and_time"
-                        />
-
-                        <FormDatePicker
-                            v-model="form.released_at"
-                            name="released_at"
-                            :label="translations.columns.released_at"
-                            :error="errors.released_at"
-                            :config="datetimePickerConfig"
-                            :placeholder="translations.select_date_and_time"
-                        />
-
-                        <FormLocalizedWysiwyg
-                            v-model="form.text"
-                            name="text"
-                            :label="translations.columns.text"
-                            :errors="errors"
-                            :locales="locales"
-                            :shouldShowLangGroup="shouldShowLangGroup"
-                            :isFormLocalized="isFormLocalized"
-                            :upload-url="wysiwygUploadUrl"
-                        />
-
-                        <FormLocalizedWysiwyg
-                            v-model="form.description"
-                            name="description"
-                            :label="translations.columns.description"
-                            :errors="errors"
-                            :locales="locales"
-                            :shouldShowLangGroup="shouldShowLangGroup"
-                            :isFormLocalized="isFormLocalized"
-                            :upload-url="wysiwygUploadUrl"
-                        />
-
-                        <FormCheckbox
-                            v-model="form.enabled"
-                            name="enabled"
-                            :label="translations.columns.enabled"
-                            :error="errors.enabled"
-                        />
-
-                        <FormCheckbox
-                            v-model="form.send"
-                            name="send"
-                            :label="translations.columns.send"
-                            :error="errors.send"
-                        />
-
-                        <FormInput
-                            v-model="form.price"
-                            name="price"
-                            :label="translations.columns.price"
-                            :error="errors.price"
-                        />
-
-                        <FormInput
-                            v-model="form.rating"
-                            name="rating"
-                            :label="translations.columns.rating"
-                            :error="errors.rating"
-                        />
-
-                        <FormInput
-                            v-model="form.views"
-                            name="views"
-                            :label="translations.columns.views"
-                            :error="errors.views"
-                        />
-
-                        <FormMultiSelect
-                            v-model="form.posts"
-                            name="posts"
-                            :label="translations.relations.posts"
-                            :error="errors.posts"
-                            :options="postOptions"
-                            trackBy="id"
-                            optionLabel="title"
-                            :placeholder="translations.select_options"
-                        />
-
-                        <FormSubmit :submitting="submitting" :label="translations.save" />
-                    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <ListingHeader
+                        :createUrl="createUrl"
+                        :translations="translations"
+                    />
                 </div>
-            </div>
-
-            <div class="col-md-12 col-lg-12 col-xl-5 col-xxl-4">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fa fa-check"></i> {{ translations.publish }}
-                    </div>
-                    <div class="card-body">
-                        <FormDatePicker
-                            v-model="form.published_at"
-                            name="published_at"
-                            :label="translations.columns.published_at"
-                            :error="errors.published_at"
-                            :config="datetimePickerConfig"
-                            :placeholder="translations.select_date_and_time"
-                        />
-                    </div>
-                </div>
-
-                <div class="card mt-2" v-if="showHistory">
-                    <div class="card-header">
-                        <i class="fa fa-history"></i> {{ translations.history }}
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3 row align-items-center" v-if="form.created_by_admin_user">
-                            <UserDetailTooltip
-                                :user="form.created_by_admin_user"
-                                :datetime="formatDatetime(form.created_at)"
-                                :label="translations.created_by"
-                                :datetime-text="translations.created_on + ' ' + formatDatetime(form.created_at)"
+                <div class="card-body" ref="cardBody">
+                    <div class="row justify-content-md-between">
+                        <div class="col col-lg-7 col-xl-5 mb-3">
+                            <Search
+                                v-model:search="search"
+                                :filterFn="filter"
+                                :translations="translations"
                             />
                         </div>
-
-                        <div class="mb-3 row align-items-center" v-if="form.updated_by_admin_user">
-                            <UserDetailTooltip
-                                :user="form.updated_by_admin_user"
-                                :datetime="formatDatetime(form.updated_at)"
-                                :label="translations.updated_by"
-                                :datetime-text="translations.updated_on + ' ' + formatDatetime(form.updated_at)"
-                            />
+                        <div class="col-sm-auto mb-3">
+                            <PerPage v-model="pagination.state.per_page"/>
                         </div>
                     </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-listing">
+                            <thead>
+                            <tr>
+                                <th class="bulk-checkbox">
+                                    <BulkCheckboxHeader :isClickedAll="isClickedAll"
+                                                        :onToggleAll="onBulkItemsClickedAllWithPagination"/>
+                                </th>
+
+                                <Sortable v-if="isColumnVisible(2)" :column="'id'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.id }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(4)" :column="'user_id'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.user_id }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(0)" :column="'title'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.title }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(0)" :column="'name'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.name }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(1)" :column="'first_name'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.first_name }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(0)" :column="'last_name'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.last_name }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(0)" :column="'subject'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.subject }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(1)" :column="'email'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.email }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(5)" :column="'language'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.language }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(3)" :column="'published_at'" class="text-center" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.published_at }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(6)" :column="'published_to'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.published_to }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(7)" :column="'date_start'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.date_start }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(8)" :column="'time_start'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.time_start }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(9)" :column="'date_time_end'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.date_time_end }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(10)" :column="'released_at'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.released_at }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(10)" :column="'enabled'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.enabled }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(10)" :column="'send'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.send }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(10)" :column="'price'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.price }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(10)" :column="'rating'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.rating }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(10)" :column="'views'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.views }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(10)" :column="'created_by_admin_user_id'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.created_by_admin_user_id }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(10)" :column="'updated_by_admin_user_id'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.updated_by_admin_user_id }}
+                                </Sortable>
+
+                                <th></th>
+                            </tr>
+                            <tr v-show="clickedBulkItemsCount > 0 || isClickedAll">
+                                <td class="bg-bulk-info d-table-cell text-center" :colspan="99">
+                                    <BulkOperationsBar
+                                        :selectedCount="clickedBulkItemsCount"
+                                        :totalCount="pagination.state.total"
+                                        :loading="bulkCheckingAllLoader"
+                                        :onCheckAll="() => onBulkItemsClickedAll(bulkAllUrl)"
+                                        :onUncheckAll="onBulkItemsClickedAllUncheck"
+                                        :onBulkDelete="() => bulkDelete(bulkDestroyUrl, {
+                                            ...translations,
+                                            confirm_title: translations.confirm_delete_title,
+                                            confirm_text: translations.confirm_delete_text_multiple,
+                                            confirm_btn: translations.delete_btn,
+                                        })"
+                                        :translations="translations"
+                                    />
+                                </td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr
+                                v-for="(item, index) in collection"
+                                :key="item.id"
+                                :class="bulkItems[item.id] ? 'bg-bulk' : ''"
+                            >
+                                <td class="bulk-checkbox">
+                                    <BulkCheckboxRow :itemId="item.id" :checked="!!bulkItems[item.id]"
+                                                     :disabled="bulkCheckingAllLoader" :onToggle="onBulkItemClicked"/>
+                                </td>
+
+                                <td v-if="isColumnVisible(2)">{{ item.id }}</td>
+                                <td v-if="isColumnVisible(4)">{{ item.user?.name }}</td>
+                                <td v-if="isColumnVisible(0)">{{ item.title }}</td>
+                                <td v-if="isColumnVisible(0)">{{ item.name }}</td>
+                                <td v-if="isColumnVisible(1)">{{ item.first_name }}</td>
+                                <td v-if="isColumnVisible(0)">{{ item.last_name }}</td>
+                                <td v-if="isColumnVisible(0)">{{ item.subject }}</td>
+                                <td v-if="isColumnVisible(1)">{{ item.email }}</td>
+                                <td v-if="isColumnVisible(5)">{{ item.language }}</td>
+                                <td v-if="isColumnVisible(3)" class="text-center text-nowrap" style="position: relative;">
+                                    <PublishedAtColumn
+                                        :item="item"
+                                        :url="resolveUrl(updateUrlTemplate, item)"
+                                        :now="now"
+                                        :translations="translations"
+                                        @update:item="onUpdateItem"
+                                    />
+                                </td>
+                                <td v-if="isColumnVisible(6)">{{ formatDate(item.published_to) }}</td>
+                                <td v-if="isColumnVisible(7)">{{ formatDate(item.date_start) }}</td>
+                                <td v-if="isColumnVisible(8)">{{ formatTime(item.time_start) }}</td>
+                                <td v-if="isColumnVisible(9)">{{ formatDatetime(item.date_time_end) }}</td>
+                                <td v-if="isColumnVisible(10)">{{ formatDatetime(item.released_at) }}</td>
+                                <td v-if="isColumnVisible(10)">
+                                    <ToggleSwitch
+                                        v-model="collection[index].enabled"
+                                        :url="resolveUrl(updateUrlTemplate, item)"
+                                        column="enabled"
+                                        :row="collection[index]"
+                                    />
+                                </td>
+                                <td v-if="isColumnVisible(10)">
+                                    <ToggleSwitch
+                                        v-model="collection[index].send"
+                                        :url="resolveUrl(updateUrlTemplate, item)"
+                                        column="send"
+                                        :row="collection[index]"
+                                    />
+                                </td>
+                                <td v-if="isColumnVisible(10)">{{ item.price }}</td>
+                                <td v-if="isColumnVisible(10)">{{ item.rating }}</td>
+                                <td v-if="isColumnVisible(10)">{{ item.views }}</td>
+                                <td v-if="isColumnVisible(10)">
+                                    <UserDetailTooltip
+                                        v-if="item.created_by_admin_user"
+                                        :user="item.created_by_admin_user"
+                                        :datetime-text="translations.created_on + ' ' + formatDatetime(item.created_at)"
+                                    />
+                                </td>
+                                <td v-if="isColumnVisible(10)">
+                                    <UserDetailTooltip
+                                        v-if="item.updated_by_admin_user"
+                                        :user="item.updated_by_admin_user"
+                                        :datetime-text="translations.updated_on + ' ' + formatDatetime(item.updated_at)"
+                                    />
+                                </td>
+
+                                <td>
+                                    <div class="d-flex gap-1 justify-content-center">
+                                        <ShowButton
+                                            :url="resolveUrl(showUrlTemplate, item)"
+                                            :translations="translations"
+                                        />
+                                        <EditButton
+                                            :url="resolveUrl(editUrlTemplate, item)"
+                                            :translations="translations"
+                                        />
+                                        <DeleteButton
+                                            :url="resolveUrl(destroyUrlTemplate, item)"
+                                            :translations="{
+                                              ...translations,
+                                              confirm_title: translations.confirm_delete_title,
+                                              confirm_text: translations.confirm_delete_text,
+                                              confirm_btn: translations.delete_btn,
+                                            }"
+                                            @deleted="loadData"
+                                        />
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <Pagination
+                        :pagination="pagination.state"
+                        :options="pagination.options"
+                        :translations="translations"
+                        @page-change="onPageChange"
+                        @per-page-change="onPerPageChange"
+                    />
+
+                    <EmptyState
+                        :show="!collection?.length"
+                        :createUrl="createUrl"
+                        :translations="translations"
+                    />
                 </div>
             </div>
         </div>
-    </form>
+
+        <ConfirmModal
+            :show="confirmModal.show"
+            :translations="confirmModal.translations"
+            @confirm="confirmModal.onConfirm"
+            @cancel="confirmModal.show = false"
+        />
+    </div>
 </template>
 
 <script setup>
-import FormCheckbox from '@craftable/components/form/FormCheckbox.vue';
-import FormDatePicker from '@craftable/components/form/FormDatePicker.vue';
-import FormEmail from '@craftable/components/form/FormEmail.vue';
-import FormInput from '@craftable/components/form/FormInput.vue';
-import FormLocalizedWysiwyg from '@craftable/components/form/FormLocalizedWysiwyg.vue';
-import FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue';
-import FormPasswordConfirm from '@craftable/components/form/FormPasswordConfirm.vue';
-import FormSelect from '@craftable/components/form/FormSelect.vue';
-import FormSubmit from '@craftable/components/form/FormSubmit.vue';
-import FormTextarea from '@craftable/components/form/FormTextarea.vue';
-import FormWysiwyg from '@craftable/components/form/FormWysiwyg.vue';
-import LocalizationBar from '@craftable/components/form/LocalizationBar.vue';
+import BulkCheckboxHeader from '@craftable/components/listing/BulkCheckboxHeader.vue';
+import BulkCheckboxRow from '@craftable/components/listing/BulkCheckboxRow.vue';
+import BulkOperationsBar from '@craftable/components/listing/BulkOperationsBar.vue';
+import ConfirmModal from '@craftable/components/ConfirmModal.vue';
+import DeleteButton from '@craftable/components/listing/DeleteButton.vue';
+import EditButton from '@craftable/components/listing/EditButton.vue';
+import EmptyState from '@craftable/components/listing/EmptyState.vue';
+import ListingHeader from '@craftable/components/listing/ListingHeader.vue';
+import Pagination from '@craftable/components/listing/Pagination.vue';
+import PerPage from '@craftable/components/listing/PerPage.vue';
+import PublishedAtColumn from '@craftable/components/listing/PublishedAtColumn.vue';
+import Search from '@craftable/components/listing/Search.vue';
+import ShowButton from '@craftable/components/listing/ShowButton.vue';
+import Sortable from '@craftable/components/listing/Sortable.vue';
+import ToggleSwitch from '@craftable/components/listing/ToggleSwitch.vue';
 import UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue';
-import {formatDatetime} from '@craftable/utils/dateFormatters.js';
-import {useAppForm} from '../composables/useAppForm.js';
+import {formatDate, formatDatetime, formatTime} from '@craftable/utils/dateFormatters.js';
+import {ref} from 'vue';
+import {useAppListing} from '../composables/useAppListing.js';
+import {useResponsiveColumns} from '@craftable/composables/useResponsiveColumns.js';
 
 const props = defineProps({
-    action: {type: String, required: true},
-    data: {type: Object, default: () => ({})},
+    url: {type: String, required: true},
+    data: {type: Object, default: null},
+    timezone: {type: String, default: 'UTC'},
     translations: {type: Object, default: () => ({})},
-    postOptions: {type: Array, default: () => []},
-    userOptions: {type: Array, default: () => []},
-    locales: {type: Array, default: () => []},
-    defaultLocale: {type: String, default: ''},
-    sendEmptyLocales: {type: Boolean, default: true},
-    showHistory: {type: Boolean, default: false},
-    wysiwygUploadUrl: {type: String, default: '/admin/wysiwyg-media'},
-    responsiveBreakpoint: {type: Number, default: 850},
+    createUrl: {type: String, default: ''},
+    showUrlTemplate: {type: String, required: true},
+    editUrlTemplate: {type: String, required: true},
+    updateUrlTemplate: {type: String, required: true},
+    destroyUrlTemplate: {type: String, required: true},
+    bulkAllUrl: {type: String, default: ''},
+    bulkDestroyUrl: {type: String, default: ''},
 });
+
+const cardBody = ref(null);
+// The numbers passed to isColumnVisible() are priorities, not column positions: a lower number
+// survives a narrower card, columns sharing a number appear and disappear together, and anything
+// above 3 is hidden once the card is under 1200px -- which an ordinary laptop already is. The
+// generator can only guess, so tune them to this resource rather than leaving them in column order.
+const {isColumnVisible} = useResponsiveColumns(cardBody);
 
 const {
-    form, wysiwygMedia, mediaCollections, isFormLocalized, currentLocale,
-    submitting, onSmallScreen, errors, datePickerConfig, timePickerConfig,
-    datetimePickerConfig, locales, defaultLocale, otherLocales,
-    showLocalizedValidationError, getPostData, onSubmit, onSuccess, onFail,
-    getLocalizedFormDefaults, showLocalization, hideLocalization,
-    shouldShowLangGroup,
-} = useAppForm(props, {
-    validationSchema: {
-        title: 'required',
-        email: 'email',
-        language: 'required',
-        slug: 'required',
-        released_at: 'required',
-        text: 'required',
-        description: 'required',
-        views: 'required|integer',
-    },
-    transformData: (data) => {
-        if (data.user_id && typeof data.user_id === 'object') {
-            data.user_id = data.user_id.id;
-        }
-        return data;
-    },
-});
-
-if (!props.data || Object.keys(props.data).length === 0) {
-    form.value = {
-        user_id: '',
-        title: '',
-        name: '',
-        first_name: '',
-        last_name: '',
-        subject: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-        language: '',
-        slug: '',
-        perex: '',
-        long_text: '',
-        published_to: '',
-        date_start: '',
-        time_start: '',
-        date_time_end: '',
-        released_at: '',
-        text: getLocalizedFormDefaults(),
-        description: getLocalizedFormDefaults(),
-        enabled: false,
-        send: false,
-        price: '',
-        rating: '',
-        views: '',
-        published_at: '',
-        created_by_admin_user_id: '',
-        updated_by_admin_user_id: '',
-        posts: [],
-    };
-} else {
-    if (form.value.user_id) {
-        const match = props.userOptions.find(p => p.id === form.value.user_id);
-        if (match) form.value.user_id = match;
-    }
-}
+    pagination, orderBy, filters, search, collection, now,
+    bulkItems, bulkCheckingAllLoader,
+    isClickedAll, clickedBulkItemsCount, loadData, filter, resolveUrl,
+    onBulkItemClicked,
+    onBulkItemsClickedAll, onBulkItemsClickedAllWithPagination,
+    onBulkItemsClickedAllUncheck, bulkDelete, confirmModal,
+    onSort, onPageChange, onPerPageChange, onUpdateItem,
+} = useAppListing(props);
 </script>

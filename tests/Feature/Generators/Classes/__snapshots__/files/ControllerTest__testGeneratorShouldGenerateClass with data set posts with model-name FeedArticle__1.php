@@ -75,6 +75,7 @@ final class PostsController extends Controller
                 'data' => $data,
                 'url' => $this->urlGenerator->route('admin/feed-articles/index'),
                 'createUrl' => $this->urlGenerator->route('admin/feed-articles/create'),
+                'showUrlTemplate' => $this->urlGenerator->route('admin/feed-articles/show', ['article' => ':id']),
                 'editUrlTemplate' => $this->urlGenerator->route('admin/feed-articles/edit', ['article' => ':id']),
                 'updateUrlTemplate' => $this->urlGenerator->route('admin/feed-articles/update', ['article' => ':id']),
                 'destroyUrlTemplate' => $this->urlGenerator->route('admin/feed-articles/destroy', ['article' => ':id']),
@@ -120,6 +121,27 @@ final class PostsController extends Controller
         }
 
         return $this->redirector->route('admin/feed-articles/index');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @throws AuthorizationException
+     */
+    public function show(Article $article): View
+    {
+        $this->gate->authorize('admin.feed.article.show', $article);
+
+        $article->load([
+            'categories',
+        ]);
+
+        return $this->viewFactory->make(
+            'admin.feed.article.show',
+            [
+                'article' => $article,
+            ],
+        );
     }
 
     /**
