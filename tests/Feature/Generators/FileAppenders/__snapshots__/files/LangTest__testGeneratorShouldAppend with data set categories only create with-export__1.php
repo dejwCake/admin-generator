@@ -10,7 +10,6 @@ return [
             'index' => 'Categories',
             'create' => 'New Category',
             'export' => 'Export',
-            'will_be_published' => 'Category will be published at',
         ],
 
         'columns' => [

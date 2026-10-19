@@ -11,7 +11,6 @@ return [
             'create' => 'New Category',
             'show' => 'Category :name',
             'export' => 'Export',
-            'will_be_published' => 'Category will be published at',
         ],
 
         'columns' => [

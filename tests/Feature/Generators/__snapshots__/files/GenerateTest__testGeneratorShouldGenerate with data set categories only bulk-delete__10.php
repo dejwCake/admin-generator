@@ -8,7 +8,6 @@ return [
 
         'actions' => [
             'index' => 'Categories',
-            'will_be_published' => 'Category will be published at',
         ],
 
         'columns' => [

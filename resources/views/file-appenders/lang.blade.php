@@ -25,7 +25,7 @@
 @if($hasExport)
             'export' => 'Export',
 @endif
-@if($hasPublishedAt)
+@if($hasPublishedAt && $hasEdit)
             'will_be_published' => '{{$modelBaseName}} will be published at',
 @endif
         ],

@@ -9,7 +9,6 @@ return [
         'actions' => [
             'index' => 'Categories',
             'show' => 'Category :name',
-            'will_be_published' => 'Category will be published at',
         ],
 
         'columns' => [
