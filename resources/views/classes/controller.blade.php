@@ -19,8 +19,6 @@ namespace {{ $controllerNamespace }};
         'App\Http\Controllers\Controller',
         'Brackets\AdminListing\Builders\ListingBuilder',
         'Brackets\AdminListing\Builders\ListingQueryBuilder',
-        'Exception',
-        'Illuminate\Auth\Access\AuthorizationException',
         'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Contracts\Routing\UrlGenerator',
         'Illuminate\Contracts\View\Factory as ViewFactory',
@@ -28,6 +26,12 @@ namespace {{ $controllerNamespace }};
         sprintf('App\Http\Requests\Admin\%s\Index%s', $modelWithNamespaceFromDefault, $modelBaseName),
         $modelFullName,
     ]);
+    if ($hasCreate || $hasShow || $hasEdit) {
+        $uses->push('Illuminate\Auth\Access\AuthorizationException');
+    }
+    if ($hasDelete || $hasBulkDelete) {
+        $uses->push('Exception');
+    }
 
     if ($hasCreate || $hasEdit || $hasDelete || $hasBulkDelete) {
         $uses->push('Illuminate\Http\RedirectResponse');

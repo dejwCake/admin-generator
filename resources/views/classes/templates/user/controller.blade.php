@@ -19,8 +19,6 @@ namespace {{ $controllerNamespace }};
         'App\Http\Controllers\Controller',
         'Brackets\AdminListing\Builders\ListingBuilder',
         'Brackets\AdminListing\Builders\ListingQueryBuilder',
-        'Exception',
-        'Illuminate\Auth\Access\AuthorizationException',
         'Illuminate\Contracts\Auth\Access\Gate',
         'Illuminate\Contracts\Auth\Factory as AuthFactory',
         'Illuminate\Contracts\Auth\MustVerifyEmail',
@@ -36,6 +34,12 @@ namespace {{ $controllerNamespace }};
         sprintf('App\Http\Requests\Admin\%s\Index%s', $modelWithNamespaceFromDefault, $modelBaseName),
         $modelFullName,
     ]);
+    if ($hasCreate || $hasShow || $hasEdit) {
+        $uses->push('Illuminate\Auth\Access\AuthorizationException');
+    }
+    if ($hasDelete || $hasBulkDelete) {
+        $uses->push('Exception');
+    }
     if ($hasExport) {
         $uses->push(sprintf('App\Exports\%s', $exportBaseName));
         $uses->push('Maatwebsite\Excel\Excel');
