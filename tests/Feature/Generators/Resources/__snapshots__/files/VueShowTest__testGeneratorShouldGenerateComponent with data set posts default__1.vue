@@ -7,6 +7,10 @@
         <div class="card-body">
             <ShowRow :label="translations.columns.id" :value="data.id"/>
             <ShowRow :label="translations.columns.title" :value="data.title"/>
+            <ShowRow
+                :label="translations.relations.categories"
+                :value="(data.categories ?? []).map((item) => item.title).join(', ')"
+            />
         </div>
         <div class="card-footer">
             <BackButton :url="backUrl" :translations="translations"/>

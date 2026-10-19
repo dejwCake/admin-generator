@@ -19,6 +19,9 @@
                     'created_at' => trans('admin.user.columns.created_at'),
                     'updated_at' => trans('admin.user.columns.updated_at'),
                 ],
+                'relations' => [
+                    'posts' => trans('admin.user.relations.posts'),
+                ],
                 'back' => trans('brackets/admin-ui::admin.btn.back'),
             ]) }}"
             v-cloak

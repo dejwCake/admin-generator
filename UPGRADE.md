@@ -307,7 +307,7 @@ below only matter when you **regenerate** scaffolds.
   --without-bulk` is still accepted but no longer leaves out bulk-delete.
 - **Overridden generator templates.** If you override the package's Blade templates under
   `resources/views/vendor/brackets/admin-generator`, update the renamed variables: `$visibleColumns` →
-  `$formColumns`, `$editEagerLoads` → `$modelEagerLoads`, `$hasBulk` → `$hasBulkDelete`.
+  `$formColumns`, `$hasBulk` → `$hasBulkDelete`.
 - **Deprecated:** `ColumnCollection::getVisible()`, use `getForForm()`.
 
 ## Reference

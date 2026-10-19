@@ -306,6 +306,7 @@ final class GenerateUser extends Command
                 'table_name' => self::TABLE_NAME,
                 '--model-name' => $modelName,
                 '--force' => $force,
+                '--belongs-to-many' => $belongsToMany,
                 '--translatable' => $translatable,
             ]);
 
@@ -313,6 +314,7 @@ final class GenerateUser extends Command
                 'table_name' => self::TABLE_NAME,
                 '--model-name' => $modelName,
                 '--force' => $force,
+                '--belongs-to-many' => $belongsToMany,
                 '--translatable' => $translatable,
             ]);
         }

@@ -269,6 +269,7 @@ final class GenerateAdminUser extends Command
                 'table_name' => self::TABLE_NAME,
                 '--model-name' => $modelName,
                 '--force' => $force,
+                '--belongs-to-many' => 'roles',
                 '--translatable' => $translatable,
             ]);
 
@@ -276,6 +277,7 @@ final class GenerateAdminUser extends Command
                 'table_name' => self::TABLE_NAME,
                 '--model-name' => $modelName,
                 '--force' => $force,
+                '--belongs-to-many' => 'roles',
                 '--translatable' => $translatable,
             ]);
         }

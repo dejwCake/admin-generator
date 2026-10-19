@@ -257,9 +257,9 @@ final class {{ $controllerBaseName }} extends Controller
     {
         $this->gate->authorize('admin.{{ $modelDotNotation }}.show', ${{ $modelVariableName }});
 
-@if($modelEagerLoads->isNotEmpty())
+@if($showEagerLoads->isNotEmpty())
         ${{ $modelVariableName }}->load([
-@foreach($modelEagerLoads as $eagerLoad)
+@foreach($showEagerLoads as $eagerLoad)
             '{{ $eagerLoad }}',
 @endforeach
         ]);
@@ -285,9 +285,9 @@ final class {{ $controllerBaseName }} extends Controller
     {
         $this->gate->authorize('admin.{{ $modelDotNotation }}.edit', ${{ $modelVariableName }});
 
-@if($modelEagerLoads->isNotEmpty())
+@if($editEagerLoads->isNotEmpty())
         ${{ $modelVariableName }}->load([
-@foreach($modelEagerLoads as $eagerLoad)
+@foreach($editEagerLoads as $eagerLoad)
             '{{ $eagerLoad }}',
 @endforeach
         ]);

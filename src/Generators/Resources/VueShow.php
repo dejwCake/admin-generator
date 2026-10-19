@@ -40,6 +40,8 @@ final class VueShow extends ResourceGenerator
             $this->view = sprintf('resources.templates.%s.vue-show', $template);
         }
 
+        $this->relations = $this->relationBuilder->build($this->tableName, $this->option('belongs-to-many'));
+
         $path = $this->laravel->resourcePath(sprintf('js/admin/%s/Show.vue', $this->modelJSName));
 
         $this->generate($path, $force);
@@ -58,6 +60,7 @@ final class VueShow extends ResourceGenerator
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating form'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             [
                 'translatable',
                 'tr',
@@ -76,6 +79,9 @@ final class VueShow extends ResourceGenerator
             $this->extractTranslatable(),
         )->getForShow();
 
+        $hasUserDetailTooltip = $columns->hasByName('created_by_admin_user_id')
+            || $columns->hasByName('updated_by_admin_user_id');
+
         $dateImports = new Collection();
         if ($columns->hasByMajorType('date')) {
             $dateImports->push('formatDate');
@@ -83,13 +89,16 @@ final class VueShow extends ResourceGenerator
         if ($columns->hasByMajorType('time')) {
             $dateImports->push('formatTime');
         }
-        if ($columns->hasByMajorType('datetime')) {
+        if ($columns->hasByMajorType('datetime') || $hasUserDetailTooltip) {
             $dateImports->push('formatDatetime');
         }
 
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
+            //globals
+            'relations' => $this->relations,
             //has
             'hasBoolean' => $columns->hasByMajorType('bool'),
+            'hasUserDetailTooltip' => $hasUserDetailTooltip,
             //columns
             'columns' => $columns,
             //other

@@ -11,6 +11,10 @@
             <ShowRow :label="translations.columns.email_verified_at" :value="formatDatetime(data.email_verified_at)"/>
             <ShowRow :label="translations.columns.created_at" :value="formatDatetime(data.created_at)"/>
             <ShowRow :label="translations.columns.updated_at" :value="formatDatetime(data.updated_at)"/>
+            <ShowRow
+                :label="translations.relations.posts"
+                :value="(data.posts ?? []).map((item) => item.title).join(', ')"
+            />
         </div>
         <div class="card-footer">
             <BackButton :url="backUrl" :translations="translations"/>

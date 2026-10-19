@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Generators\Classes;
 
 use Brackets\AdminGenerator\Dtos\GeneratedActions;
+use Brackets\AdminGenerator\Dtos\Relations\BelongsToMany;
 use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Generators\Traits\FileManipulations;
 use Brackets\AdminGenerator\Generators\Traits\ResolvesGeneratedActions;
@@ -90,24 +91,23 @@ final class Controller extends ClassGenerator
             $this->extractTranslatable(),
         );
 
+        /** @var Collection<int, string> $indexEagerLoads */
         $indexEagerLoads = new Collection();
-        $modelEagerLoads = new Collection();
-
         if ($columns->hasByName('created_by_admin_user_id')) {
             $indexEagerLoads->push('createdByAdminUser');
-            $modelEagerLoads->push('createdByAdminUser');
         }
         if ($columns->hasByName('updated_by_admin_user_id')) {
             $indexEagerLoads->push('updatedByAdminUser');
-            $modelEagerLoads->push('updatedByAdminUser');
         }
         foreach ($this->relations->getBelongsTo() as $belongsTo) {
             $indexEagerLoads->push($belongsTo->relationMethodName);
-            $modelEagerLoads->push($belongsTo->relationMethodName);
         }
-        foreach ($this->relations->getBelongsToMany() as $belongsToMany) {
-            $modelEagerLoads->push($belongsToMany->relationMethodName);
-        }
+
+        $belongsToManyEagerLoads = $this->relations->getBelongsToMany()
+            ->map(static fn (BelongsToMany $belongsToMany): string => $belongsToMany->relationMethodName)
+            ->values();
+        $showEagerLoads = $indexEagerLoads->merge($belongsToManyEagerLoads);
+        $editEagerLoads = $indexEagerLoads->merge($belongsToManyEagerLoads);
 
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
@@ -138,7 +138,8 @@ final class Controller extends ClassGenerator
             'mediaCollections' => $this->mediaCollections,
             //eager loads
             'indexEagerLoads' => $indexEagerLoads,
-            'modelEagerLoads' => $modelEagerLoads,
+            'showEagerLoads' => $showEagerLoads,
+            'editEagerLoads' => $editEagerLoads,
         ])->render();
     }
 

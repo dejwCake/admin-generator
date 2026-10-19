@@ -15,6 +15,9 @@
                     'id' => trans('admin.post.columns.id'),
                     'title' => trans('admin.post.columns.title'),
                 ],
+                'relations' => [
+                    'categories' => trans('admin.post.relations.categories'),
+                ],
                 'back' => trans('brackets/admin-ui::admin.btn.back'),
             ]) }}"
             v-cloak

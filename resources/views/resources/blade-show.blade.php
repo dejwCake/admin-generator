@@ -1,6 +1,8 @@
 @php
     use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
+    use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
     assert($columns instanceof ColumnCollection);
+    assert($relations instanceof RelationCollection);
 @endphp
 {{'@'}}extends('brackets/admin-ui::admin.layout.default')
 
@@ -20,7 +22,20 @@
                     '{{ $column->name }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ $column->name }}'),
 @endforeach
                 ],
+@if($relations->hasBelongsToMany())
+                'relations' => [
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+                    '{{ $belongsToMany->relationTranslationKey }}' => trans('admin.{{ $modelLangFormat }}.relations.{{ $belongsToMany->relationTranslationKey }}'),
+@endforeach
+                ],
+@endif
                 'back' => trans('brackets/admin-ui::admin.btn.back'),
+@if($hasCreatedByAdminUser)
+                'created_on' => trans('brackets/admin-ui::admin.forms.created_on'),
+@endif
+@if($hasUpdatedByAdminUser)
+                'updated_on' => trans('brackets/admin-ui::admin.forms.updated_on'),
+@endif
             ]) }}"
             v-cloak
         ></{{ $modelJSName }}-show>

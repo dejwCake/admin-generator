@@ -1,6 +1,7 @@
 @php
     use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
     use Illuminate\Support\Collection;
+    use Illuminate\Support\Str;
     assert($relations instanceof RelationCollection);
 @endphp
 <template>
@@ -141,7 +142,7 @@
                                 <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} Object.values(item.{{ $column->name }} ?? {}).join(', ') }}</td>
 @elseif($column->isForeignKey && $relations->hasBelongsToByColumn($column->name))
 @php $belongsTo = $relations->getBelongsToByColumn($column->name); @endphp
-                                <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} item.{{ $belongsTo->relationMethodName }}?.{{ $belongsTo->relatedLabel }} }}</td>
+                                <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} item.{{ Str::snake($belongsTo->relationMethodName) }}?.{{ $belongsTo->relatedLabel }} }}</td>
 @else
                                 <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} item.{{ $column->name }} }}</td>
 @endif

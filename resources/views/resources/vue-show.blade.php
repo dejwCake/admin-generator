@@ -1,6 +1,9 @@
 @php
     use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
+    use Brackets\AdminGenerator\Dtos\Relations\RelationCollection;
+    use Illuminate\Support\Str;
     assert($columns instanceof ColumnCollection);
+    assert($relations instanceof RelationCollection);
 @endphp
 <template>
     <div class="card">
@@ -10,7 +13,26 @@
         </div>
         <div class="card-body">
 @foreach($columns as $column)
-@if(in_array($column->majorType, ['bool'], true))
+@if($column->name === 'created_by_admin_user_id')
+            <ShowRow :label="translations.columns.{{ $column->name }}">
+                <UserDetailTooltip
+                    v-if="data.created_by_admin_user"
+                    :user="data.created_by_admin_user"
+                    :datetime-text="translations.created_on + ' ' + formatDatetime(data.created_at)"
+                />
+            </ShowRow>
+@elseif($column->name === 'updated_by_admin_user_id')
+            <ShowRow :label="translations.columns.{{ $column->name }}">
+                <UserDetailTooltip
+                    v-if="data.updated_by_admin_user"
+                    :user="data.updated_by_admin_user"
+                    :datetime-text="translations.updated_on + ' ' + formatDatetime(data.updated_at)"
+                />
+            </ShowRow>
+@elseif($column->isForeignKey && $relations->hasBelongsToByColumn($column->name))
+@php $belongsTo = $relations->getBelongsToByColumn($column->name); @endphp
+            <ShowRow :label="translations.columns.{{ $column->name }}" :value="data.{{ Str::snake($belongsTo->relationMethodName) }}?.{{ $belongsTo->relatedLabel }}"/>
+@elseif(in_array($column->majorType, ['bool'], true))
             <ShowRow :label="translations.columns.{{ $column->name }}">
                 <ReadOnlySwitch :modelValue="data.{{ $column->name }}"/>
             </ShowRow>
@@ -25,6 +47,12 @@
 @else
             <ShowRow :label="translations.columns.{{ $column->name }}" :value="data.{{ $column->name }}"/>
 @endif
+@endforeach
+@foreach($relations->getBelongsToMany() as $belongsToMany)
+            <ShowRow
+                :label="translations.relations.{{ $belongsToMany->relationTranslationKey }}"
+                :value="(data.{{ Str::snake($belongsToMany->relationMethodName) }} ?? []).map((item) => item.{{ $belongsToMany->relatedLabel }}).join(', ')"
+            />
 @endforeach
         </div>
         <div class="card-footer">
@@ -43,6 +71,9 @@
     }
     if ($hasBoolean) {
         $imports->push("ReadOnlySwitch from '@craftable/components/ReadOnlySwitch.vue'");
+    }
+    if ($hasUserDetailTooltip) {
+        $imports->push("UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue'");
     }
     $imports->push("BackButton from '@craftable/components/BackButton.vue'");
     $imports->push("ShowRow from '@craftable/components/show/ShowRow.vue'");

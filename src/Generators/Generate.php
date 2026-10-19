@@ -268,6 +268,7 @@ final class Generate extends Command
                 'table_name' => $tableName,
                 '--model-name' => $modelName,
                 '--force' => $force,
+                '--belongs-to-many' => $belongsToMany,
                 '--translatable' => $translatable,
             ]);
 
@@ -275,6 +276,7 @@ final class Generate extends Command
                 'table_name' => $tableName,
                 '--model-name' => $modelName,
                 '--force' => $force,
+                '--belongs-to-many' => $belongsToMany,
                 '--translatable' => $translatable,
             ]);
         }

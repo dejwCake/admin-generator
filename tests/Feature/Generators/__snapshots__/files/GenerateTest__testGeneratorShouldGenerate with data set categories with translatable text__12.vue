@@ -6,7 +6,7 @@
         </div>
         <div class="card-body">
             <ShowRow :label="translations.columns.id" :value="data.id"/>
-            <ShowRow :label="translations.columns.user_id" :value="data.user_id"/>
+            <ShowRow :label="translations.columns.user_id" :value="data.user?.name"/>
             <ShowRow :label="translations.columns.title" :value="data.title"/>
             <ShowRow :label="translations.columns.name" :value="data.name"/>
             <ShowRow :label="translations.columns.first_name" :value="data.first_name"/>
@@ -34,10 +34,26 @@
             <ShowRow :label="translations.columns.price" :value="data.price"/>
             <ShowRow :label="translations.columns.rating" :value="data.rating"/>
             <ShowRow :label="translations.columns.views" :value="data.views"/>
-            <ShowRow :label="translations.columns.created_by_admin_user_id" :value="data.created_by_admin_user_id"/>
-            <ShowRow :label="translations.columns.updated_by_admin_user_id" :value="data.updated_by_admin_user_id"/>
+            <ShowRow :label="translations.columns.created_by_admin_user_id">
+                <UserDetailTooltip
+                    v-if="data.created_by_admin_user"
+                    :user="data.created_by_admin_user"
+                    :datetime-text="translations.created_on + ' ' + formatDatetime(data.created_at)"
+                />
+            </ShowRow>
+            <ShowRow :label="translations.columns.updated_by_admin_user_id">
+                <UserDetailTooltip
+                    v-if="data.updated_by_admin_user"
+                    :user="data.updated_by_admin_user"
+                    :datetime-text="translations.updated_on + ' ' + formatDatetime(data.updated_at)"
+                />
+            </ShowRow>
             <ShowRow :label="translations.columns.created_at" :value="formatDatetime(data.created_at)"/>
             <ShowRow :label="translations.columns.updated_at" :value="formatDatetime(data.updated_at)"/>
+            <ShowRow
+                :label="translations.relations.posts"
+                :value="(data.posts ?? []).map((item) => item.title).join(', ')"
+            />
         </div>
         <div class="card-footer">
             <BackButton :url="backUrl" :translations="translations"/>
@@ -49,6 +65,7 @@
 import BackButton from '@craftable/components/BackButton.vue';
 import ReadOnlySwitch from '@craftable/components/ReadOnlySwitch.vue';
 import ShowRow from '@craftable/components/show/ShowRow.vue';
+import UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue';
 import {formatDate, formatDatetime, formatTime} from '@craftable/utils/dateFormatters.js';
 
 defineProps({

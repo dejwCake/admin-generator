@@ -18,6 +18,10 @@
             <ShowRow :label="translations.columns.language" :value="data.language"/>
             <ShowRow :label="translations.columns.created_at" :value="formatDatetime(data.created_at)"/>
             <ShowRow :label="translations.columns.updated_at" :value="formatDatetime(data.updated_at)"/>
+            <ShowRow
+                :label="translations.relations.roles"
+                :value="(data.roles ?? []).map((item) => item.name).join(', ')"
+            />
         </div>
         <div class="card-footer">
             <BackButton :url="backUrl" :translations="translations"/>

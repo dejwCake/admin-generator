@@ -42,7 +42,12 @@
                     'created_at' => trans('admin.billing_cat.columns.created_at'),
                     'updated_at' => trans('admin.billing_cat.columns.updated_at'),
                 ],
+                'relations' => [
+                    'posts' => trans('admin.billing_cat.relations.posts'),
+                ],
                 'back' => trans('brackets/admin-ui::admin.btn.back'),
+                'created_on' => trans('brackets/admin-ui::admin.forms.created_on'),
+                'updated_on' => trans('brackets/admin-ui::admin.forms.updated_on'),
             ]) }}"
             v-cloak
         ></billing-cat-show>

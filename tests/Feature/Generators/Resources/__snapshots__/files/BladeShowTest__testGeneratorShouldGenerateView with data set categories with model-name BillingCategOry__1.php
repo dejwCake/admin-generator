@@ -42,7 +42,12 @@
                     'created_at' => trans('admin.billing_categ-ory.columns.created_at'),
                     'updated_at' => trans('admin.billing_categ-ory.columns.updated_at'),
                 ],
+                'relations' => [
+                    'posts' => trans('admin.billing_categ-ory.relations.posts'),
+                ],
                 'back' => trans('brackets/admin-ui::admin.btn.back'),
+                'created_on' => trans('brackets/admin-ui::admin.forms.created_on'),
+                'updated_on' => trans('brackets/admin-ui::admin.forms.updated_on'),
             ]) }}"
             v-cloak
         ></billing-categ-ory-show>

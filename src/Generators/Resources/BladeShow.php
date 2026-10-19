@@ -38,6 +38,8 @@ final class BladeShow extends ResourceGenerator
             $this->view = sprintf('resources.templates.%s.blade-show', $template);
         }
 
+        $this->relations = $this->relationBuilder->build($this->tableName, $this->option('belongs-to-many'));
+
         $path = $this->laravel->resourcePath(sprintf('views/admin/%s/show.blade.php', $this->modelViewsDirectory));
 
         $this->generate($path, $force);
@@ -51,6 +53,7 @@ final class BladeShow extends ResourceGenerator
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating form'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
+            ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
             [
                 'translatable',
                 'tr',
@@ -68,6 +71,7 @@ final class BladeShow extends ResourceGenerator
             $this->modelVariableName,
             $this->extractTranslatable(),
         );
+        $showColumns = $columns->getForShow();
 
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
@@ -75,8 +79,12 @@ final class BladeShow extends ResourceGenerator
             'modelJSName' => $this->modelJSName,
             'modelLangFormat' => $this->modelLangFormat,
             'resource' => $this->resource,
+            'relations' => $this->relations,
             //columns
-            'columns' => $columns->getForShow(),
+            'columns' => $showColumns,
+            //has
+            'hasCreatedByAdminUser' => $showColumns->hasByName('created_by_admin_user_id'),
+            'hasUpdatedByAdminUser' => $showColumns->hasByName('updated_by_admin_user_id'),
             //other
             'modelLabelColumn' => $columns->getLabelColumn(),
         ])->render();
