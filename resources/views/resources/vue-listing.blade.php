@@ -286,8 +286,6 @@ const props = defineProps({
 @endif
 @if($hasEdit)
     editUrlTemplate: {type: String, required: true},
-@endif
-@if($hasEdit)
     updateUrlTemplate: {type: String, required: true},
 @endif
 @if($hasDelete)
