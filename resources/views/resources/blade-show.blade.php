@@ -12,7 +12,7 @@
 
         <{{ $modelJSName }}-show
             :data="{{'{{'}} ${{ $modelVariableName }}->toJson() }}"
-            :back-url="'{{'{{'}} route('admin/{{ $resource }}/index') }}'"
+            :back-url="'{{'{{'}} $backUrl }}'"
             :translations="{{'{{'}} json_encode([
                 'show_title' => trans('admin.{{ $modelLangFormat }}.actions.show', ['name' => ${{ $modelVariableName }}->{{ $modelLabelColumn }}]),
                 'columns' => [

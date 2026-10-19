@@ -8,7 +8,7 @@
 
         <billing-categ-ory-show
             :data="{{ $categOry->toJson() }}"
-            :back-url="'{{ route('admin/billing-categ-ories/index') }}'"
+            :back-url="'{{ $backUrl }}'"
             :translations="{{ json_encode([
                 'show_title' => trans('admin.billing_categ-ory.actions.show', ['name' => $categOry->title]),
                 'columns' => [

@@ -8,7 +8,7 @@
 
         <post-show
             :data="{{ $post->toJson() }}"
-            :back-url="'{{ route('admin/posts/index') }}'"
+            :back-url="'{{ $backUrl }}'"
             :translations="{{ json_encode([
                 'show_title' => trans('admin.post.actions.show', ['name' => $post->title]),
                 'columns' => [

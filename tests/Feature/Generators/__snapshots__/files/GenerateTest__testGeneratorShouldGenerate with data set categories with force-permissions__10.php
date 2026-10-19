@@ -8,7 +8,7 @@
 
         <category-show
             :data="{{ $category->toJson() }}"
-            :back-url="'{{ route('admin/categories/index') }}'"
+            :back-url="'{{ $backUrl }}'"
             :translations="{{ json_encode([
                 'show_title' => trans('admin.category.actions.show', ['name' => $category->title]),
                 'columns' => [

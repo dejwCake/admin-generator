@@ -188,6 +188,7 @@ final class CategoriesController extends Controller
             'admin.billing.cat.show',
             [
                 'cat' => $cat,
+                'backUrl' => $this->urlGenerator->route('admin/billing-cats/index'),
             ],
         );
     }

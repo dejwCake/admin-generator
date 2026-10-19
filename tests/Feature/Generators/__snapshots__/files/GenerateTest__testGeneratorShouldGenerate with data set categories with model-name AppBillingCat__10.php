@@ -8,7 +8,7 @@
 
         <cat-show
             :data="{{ $cat->toJson() }}"
-            :back-url="'{{ route('admin/cats/index') }}'"
+            :back-url="'{{ $backUrl }}'"
             :translations="{{ json_encode([
                 'show_title' => trans('admin.cat.actions.show', ['name' => $cat->title]),
                 'columns' => [

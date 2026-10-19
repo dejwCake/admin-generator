@@ -140,6 +140,7 @@ final class FeedController extends Controller
             'admin.post.show',
             [
                 'post' => $post,
+                'backUrl' => $this->urlGenerator->route('admin/posts/index'),
             ],
         );
     }

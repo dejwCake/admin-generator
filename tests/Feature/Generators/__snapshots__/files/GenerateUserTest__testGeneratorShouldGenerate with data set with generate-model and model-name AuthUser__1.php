@@ -162,6 +162,7 @@ final class UsersController extends Controller
             'admin.auth.user.show',
             [
                 'user' => $user,
+                'backUrl' => $this->urlGenerator->route('admin/auth-users/index'),
             ],
         );
     }

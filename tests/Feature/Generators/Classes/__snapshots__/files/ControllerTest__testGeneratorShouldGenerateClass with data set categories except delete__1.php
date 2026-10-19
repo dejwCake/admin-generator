@@ -192,6 +192,7 @@ final class CategoriesController extends Controller
             'admin.category.show',
             [
                 'category' => $category,
+                'backUrl' => $this->urlGenerator->route('admin/categories/index'),
             ],
         );
     }

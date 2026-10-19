@@ -265,6 +265,7 @@ final class {{ $controllerBaseName }} extends Controller
             'admin.{{ $modelDotNotation }}.show',
             [
                 '{{ $modelVariableName }}' => ${{ $modelVariableName }},
+                'backUrl' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
             ],
         );
     }

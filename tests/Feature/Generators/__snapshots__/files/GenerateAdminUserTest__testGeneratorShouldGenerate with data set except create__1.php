@@ -135,6 +135,7 @@ final class AdminUsersController extends Controller
             'admin.admin-user.show',
             [
                 'adminUser' => $adminUser,
+                'backUrl' => $this->urlGenerator->route('admin/admin-users/index'),
             ],
         );
     }

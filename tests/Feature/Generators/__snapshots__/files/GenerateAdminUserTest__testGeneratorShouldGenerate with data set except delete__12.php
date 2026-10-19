@@ -8,7 +8,7 @@
 
         <admin-user-show
             :data="{{ $adminUser->toJson() }}"
-            :back-url="'{{ route('admin/admin-users/index') }}'"
+            :back-url="'{{ $backUrl }}'"
             :translations="{{ json_encode([
                 'show_title' => trans('admin.admin-user.actions.show', ['name' => $adminUser->first_name]),
                 'columns' => [

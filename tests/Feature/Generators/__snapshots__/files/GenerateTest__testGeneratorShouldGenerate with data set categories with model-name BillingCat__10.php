@@ -8,7 +8,7 @@
 
         <billing-cat-show
             :data="{{ $cat->toJson() }}"
-            :back-url="'{{ route('admin/billing-cats/index') }}'"
+            :back-url="'{{ $backUrl }}'"
             :translations="{{ json_encode([
                 'show_title' => trans('admin.billing_cat.actions.show', ['name' => $cat->title]),
                 'columns' => [
