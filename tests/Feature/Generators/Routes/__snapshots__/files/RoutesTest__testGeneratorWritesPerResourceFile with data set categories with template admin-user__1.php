@@ -27,4 +27,6 @@ Route::prefix('categories')
             ->name('impersonal-login');
         Route::get('/{category:id}/resend-activation', 'resendActivationEmail')
             ->name('resend-activation-email');
+        Route::get('/{category:id}', 'show')
+            ->name('show');
     });

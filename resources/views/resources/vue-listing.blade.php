@@ -8,7 +8,9 @@
             <div class="card">
                 <div class="card-header">
                     <ListingHeader
+@if($hasCreate)
                         :createUrl="createUrl"
+@endif
 @if($hasExport)
                         :exportUrl="exportUrl"
 @endif
@@ -33,7 +35,7 @@
                         <table class="table table-hover table-listing">
                             <thead>
                             <tr>
-@if($hasBulk)
+@if($hasBulkDelete)
                                 <th class="bulk-checkbox">
                                     <BulkCheckboxHeader :isClickedAll="isClickedAll"
                                                         :onToggleAll="onBulkItemsClickedAllWithPagination"/>
@@ -54,7 +56,7 @@
 
                                 <th></th>
                             </tr>
-@if($hasBulk)
+@if($hasBulkDelete)
                             <tr v-show="clickedBulkItemsCount > 0 || isClickedAll">
                                 <td class="bg-bulk-info d-table-cell text-center" :colspan="99">
                                     <BulkOperationsBar
@@ -79,11 +81,11 @@
                             <tr
                                 v-for="(item, index) in collection"
                                 :key="item.id"
-@if($hasBulk)
+@if($hasBulkDelete)
                                 :class="bulkItems[item.id] ? 'bg-bulk' : ''"
 @endif
                             >
-@if($hasBulk)
+@if($hasBulkDelete)
                                 <td class="bulk-checkbox">
                                     <BulkCheckboxRow :itemId="item.id" :checked="!!bulkItems[item.id]"
                                                      :disabled="bulkCheckingAllLoader" :onToggle="onBulkItemClicked"/>
@@ -93,6 +95,7 @@
 @foreach($columns as $column)
 @if($column->name === 'published_at')
                                 <td v-if="isColumnVisible({{ $column->priority }})" class="text-center text-nowrap" style="position: relative;">
+@if($hasEdit)
                                     <PublishedAtColumn
                                         :item="item"
                                         :url="resolveUrl(updateUrlTemplate, item)"
@@ -100,6 +103,9 @@
                                         :translations="translations"
                                         @update:item="onUpdateItem"
                                     />
+@else
+                                    {{ '{{' }} formatDatetime(item.{{ $column->name }}) }}
+@endif
                                 </td>
 @elseif($column->name === 'created_by_admin_user_id')
                                 <td v-if="isColumnVisible({{ $column->priority }})">
@@ -119,12 +125,16 @@
                                 </td>
 @elseif(in_array($column->majorType, ['bool'], true))
                                 <td v-if="isColumnVisible({{ $column->priority }})">
+@if($hasEdit)
                                     <ToggleSwitch
                                         v-model="collection[index].{{ $column->name }}"
                                         :url="resolveUrl(updateUrlTemplate, item)"
                                         column="{{ $column->name }}"
                                         :row="collection[index]"
                                     />
+@else
+                                    <ReadOnlySwitch :modelValue="item.{{ $column->name }}"/>
+@endif
                                 </td>
 @elseif(in_array($column->majorType, ['date'], true))
                                 <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} formatDate(item.{{ $column->name }}) }}</td>
@@ -144,14 +154,19 @@
 
                                 <td>
                                     <div class="d-flex gap-1 justify-content-center">
+@if($hasShow)
                                         <ShowButton
                                             :url="resolveUrl(showUrlTemplate, item)"
                                             :translations="translations"
                                         />
+@endif
+@if($hasEdit)
                                         <EditButton
                                             :url="resolveUrl(editUrlTemplate, item)"
                                             :translations="translations"
                                         />
+@endif
+@if($hasDelete)
                                         <DeleteButton
                                             :url="resolveUrl(destroyUrlTemplate, item)"
                                             :translations="{
@@ -162,6 +177,7 @@
                                             }"
                                             @deleted="loadData"
                                         />
+@endif
                                     </div>
                                 </td>
                             </tr>
@@ -179,19 +195,23 @@
 
                     <EmptyState
                         :show="!collection?.length"
+@if($hasCreate)
                         :createUrl="createUrl"
+@endif
                         :translations="translations"
                     />
                 </div>
             </div>
         </div>
 
+@if($hasBulkDelete)
         <ConfirmModal
             :show="confirmModal.show"
             :translations="confirmModal.translations"
             @confirm="confirmModal.onConfirm"
             @cancel="confirmModal.show = false"
         />
+@endif
     </div>
 </template>
 
@@ -212,25 +232,37 @@
     $imports->push("Search from '@craftable/components/listing/Search.vue'");
     $imports->push("PerPage from '@craftable/components/listing/PerPage.vue'");
     $imports->push("EmptyState from '@craftable/components/listing/EmptyState.vue'");
-    if ($hasBulk) {
+    if ($hasBulkDelete) {
         $imports->push("BulkCheckboxHeader from '@craftable/components/listing/BulkCheckboxHeader.vue'");
         $imports->push("BulkCheckboxRow from '@craftable/components/listing/BulkCheckboxRow.vue'");
         $imports->push("BulkOperationsBar from '@craftable/components/listing/BulkOperationsBar.vue'");
     }
-    if ($hasPublishedAt) {
+    if ($hasPublishedAt && $hasEdit) {
         $imports->push("PublishedAtColumn from '@craftable/components/listing/PublishedAtColumn.vue'");
     }
     $imports->push("ListingHeader from '@craftable/components/listing/ListingHeader.vue'");
-    $imports->push("ShowButton from '@craftable/components/listing/ShowButton.vue'");
-    $imports->push("EditButton from '@craftable/components/listing/EditButton.vue'");
-    $imports->push("DeleteButton from '@craftable/components/listing/DeleteButton.vue'");
+    if ($hasShow) {
+        $imports->push("ShowButton from '@craftable/components/listing/ShowButton.vue'");
+    }
+    if ($hasEdit) {
+        $imports->push("EditButton from '@craftable/components/listing/EditButton.vue'");
+    }
+    if ($hasDelete) {
+        $imports->push("DeleteButton from '@craftable/components/listing/DeleteButton.vue'");
+    }
     if ($hasUserDetailTooltip) {
         $imports->push("UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue'");
     }
     if ($hasSwitchColumns) {
-        $imports->push("ToggleSwitch from '@craftable/components/listing/ToggleSwitch.vue'");
+        $imports->push(
+            $hasEdit
+                ? "ToggleSwitch from '@craftable/components/listing/ToggleSwitch.vue'"
+                : "ReadOnlySwitch from '@craftable/components/ReadOnlySwitch.vue'",
+        );
     }
-    $imports->push("ConfirmModal from '@craftable/components/ConfirmModal.vue'");
+    if ($hasBulkDelete) {
+        $imports->push("ConfirmModal from '@craftable/components/ConfirmModal.vue'");
+    }
     $imports = $imports->unique()->sort();
 @endphp
 <script setup>
@@ -243,15 +275,25 @@ const props = defineProps({
     data: {type: Object, default: null},
     timezone: {type: String, default: 'UTC'},
     translations: {type: Object, default: () => ({})},
+@if($hasCreate)
     createUrl: {type: String, default: ''},
+@endif
 @if($hasExport)
     exportUrl: {type: String, default: ''},
 @endif
+@if($hasShow)
     showUrlTemplate: {type: String, required: true},
+@endif
+@if($hasEdit)
     editUrlTemplate: {type: String, required: true},
+@endif
+@if($hasEdit)
     updateUrlTemplate: {type: String, required: true},
+@endif
+@if($hasDelete)
     destroyUrlTemplate: {type: String, required: true},
-@if($hasBulk)
+@endif
+@if($hasBulkDelete)
     bulkAllUrl: {type: String, default: ''},
     bulkDestroyUrl: {type: String, default: ''},
 @endif
@@ -266,15 +308,15 @@ const {isColumnVisible} = useResponsiveColumns(cardBody);
 
 const {
     pagination, orderBy, filters, search, collection, now,
-@if($hasBulk)
+@if($hasBulkDelete)
     bulkItems, bulkCheckingAllLoader,
     isClickedAll, clickedBulkItemsCount, loadData, filter, resolveUrl,
     onBulkItemClicked,
     onBulkItemsClickedAll, onBulkItemsClickedAllWithPagination,
     onBulkItemsClickedAllUncheck, bulkDelete, confirmModal,
 @else
-    loadData, filter, resolveUrl, confirmModal,
+    loadData, filter, resolveUrl,
 @endif
-    onSort, onPageChange, onPerPageChange,{{ $hasPublishedAt ? ' onUpdateItem,' : '' }}
+    onSort, onPageChange, onPerPageChange,{{ $hasPublishedAt && $hasEdit ? ' onUpdateItem,' : '' }}
 } = useAppListing(props);
 </script>

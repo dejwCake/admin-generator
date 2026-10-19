@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators;
 
+use Brackets\AdminGenerator\Dtos\GeneratedActions;
+use Brackets\AdminGenerator\Enums\GeneratedAction;
+use Brackets\AdminGenerator\Generators\Traits\ResolvesGeneratedActions;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Override;
@@ -12,6 +15,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 final class Generate extends Command
 {
+    use ResolvesGeneratedActions;
+
     /**
      * The name and signature of the console command.
      *
@@ -41,12 +46,17 @@ final class Generate extends Command
         $force = $this->option('force');
         $belongsToMany = $this->option('belongs-to-many');
         $translatable = $this->option('translatable');
-        $withExport = $this->option('with-export');
-        $withoutBulk = $this->option('without-bulk');
+        $actionOptions = [
+            '--only' => $this->option('only'),
+            '--except' => $this->option('except'),
+            '--with-export' => $this->option('with-export'),
+            '--without-bulk' => $this->option('without-bulk'),
+        ];
         $media = $this->option('media');
+        $actions = $this->resolveGeneratedActions();
 
-        $this->generateModel();
-        $this->generateFactory();
+        $this->generateModel($tableName, $modelName, $force, $belongsToMany, $translatable, $media);
+        $this->generateFactory($tableName, $modelName, $force, $translatable);
 
         $this->call('admin:generate:controller', [
             'table_name' => $tableName,
@@ -55,133 +65,40 @@ final class Generate extends Command
             '--force' => $force,
             '--belongs-to-many' => $belongsToMany,
             '--translatable' => $translatable,
-            '--with-export' => $withExport,
-            '--without-bulk' => $withoutBulk,
+            ...$actionOptions,
             '--media' => $media,
         ]);
 
-        $this->call('admin:generate:request:index', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--translatable' => $translatable,
-        ]);
-
-        $this->call('admin:generate:request:store', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--belongs-to-many' => $belongsToMany,
-            '--translatable' => $translatable,
-        ]);
-
-        $this->call('admin:generate:request:update', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--belongs-to-many' => $belongsToMany,
-            '--translatable' => $translatable,
-        ]);
-
-        $this->call('admin:generate:request:destroy', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-        ]);
-
-        if (!$withoutBulk) {
-            $this->call('admin:generate:request:bulk-destroy', [
-                'table_name' => $tableName,
-                '--model-name' => $modelName,
-                '--force' => $force,
-            ]);
-        }
-
-        if ($withExport) {
-            $this->call('admin:generate:request:export', [
-                'table_name' => $tableName,
-                '--model-name' => $modelName,
-                '--force' => $force,
-            ]);
-        }
+        $this->generateRequests($actions, $tableName, $modelName, $force, $belongsToMany, $translatable);
 
         $this->call('admin:generate:routes', [
             'table_name' => $tableName,
             '--model-name' => $modelName,
             '--controller-name' => $controllerName,
-            '--with-export' => $withExport,
-            '--without-bulk' => $withoutBulk,
+            ...$actionOptions,
         ]);
 
-        $this->call('admin:generate:blade-index', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--with-export' => $withExport,
-            '--without-bulk' => $withoutBulk,
-            '--translatable' => $translatable,
-        ]);
-
-        $this->call('admin:generate:vue-listing', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--with-export' => $withExport,
-            '--without-bulk' => $withoutBulk,
-            '--translatable' => $translatable,
-        ]);
-
-        $this->call('admin:generate:blade-show', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--translatable' => $translatable,
-        ]);
-
-        $this->call('admin:generate:vue-show', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--translatable' => $translatable,
-        ]);
-
-        $this->call('admin:generate:blade-create', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--belongs-to-many' => $belongsToMany,
-            '--translatable' => $translatable,
-            '--media' => $media,
-        ]);
-
-        $this->call('admin:generate:blade-edit', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--belongs-to-many' => $belongsToMany,
-            '--translatable' => $translatable,
-            '--media' => $media,
-        ]);
-
-        $this->call('admin:generate:vue-form', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--belongs-to-many' => $belongsToMany,
-            '--translatable' => $translatable,
-            '--media' => $media,
-        ]);
+        $this->generateViews(
+            $actions,
+            $tableName,
+            $modelName,
+            $force,
+            $belongsToMany,
+            $translatable,
+            $media,
+            $actionOptions,
+        );
 
         $this->call('admin:generate:lang', [
             'table_name' => $tableName,
             '--model-name' => $modelName,
             '--belongs-to-many' => $belongsToMany,
-            '--with-export' => $withExport,
+            ...$actionOptions,
             '--media' => $media,
             '--translatable' => $translatable,
         ]);
 
-        if ($withExport) {
+        if ($actions->has(GeneratedAction::Export)) {
             $this->call('admin:generate:export', [
                 'table_name' => $tableName,
                 '--force' => $force,
@@ -194,7 +111,7 @@ final class Generate extends Command
                 'table_name' => $tableName,
                 '--model-name' => $modelName,
                 '--force' => $force,
-                '--without-bulk' => $withoutBulk,
+                '--without-bulk' => $actionOptions['--without-bulk'],
             ]);
 
             if (
@@ -232,8 +149,7 @@ final class Generate extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
             ],
-            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
-            ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+            ...$this->getGeneratedActionOptions(),
             ['without-model', 'wm', InputOption::VALUE_NONE, 'Skip generating the model class (use an existing one)'],
             [
                 'without-factory',
@@ -257,23 +173,172 @@ final class Generate extends Command
         ];
     }
 
-    private function generateModel(): void
-    {
+    private function generateRequests(
+        GeneratedActions $actions,
+        string $tableName,
+        ?string $modelName,
+        bool $force,
+        ?string $belongsToMany,
+        ?string $translatable,
+    ): void {
+        $this->call('admin:generate:request:index', [
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--translatable' => $translatable,
+        ]);
+
+        if ($actions->has(GeneratedAction::Create)) {
+            $this->call('admin:generate:request:store', [
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--belongs-to-many' => $belongsToMany,
+                '--translatable' => $translatable,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::Edit)) {
+            $this->call('admin:generate:request:update', [
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--belongs-to-many' => $belongsToMany,
+                '--translatable' => $translatable,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::Delete)) {
+            $this->call('admin:generate:request:destroy', [
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::BulkDelete)) {
+            $this->call('admin:generate:request:bulk-destroy', [
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::Export)) {
+            $this->call('admin:generate:request:export', [
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
+            ]);
+        }
+    }
+
+    /**
+     * @param array<string> $media
+     * @param array<string, string|bool|null> $actionOptions
+     */
+    private function generateViews(
+        GeneratedActions $actions,
+        string $tableName,
+        ?string $modelName,
+        bool $force,
+        ?string $belongsToMany,
+        ?string $translatable,
+        array $media,
+        array $actionOptions,
+    ): void {
+        $this->call('admin:generate:blade-index', [
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            ...$actionOptions,
+            '--translatable' => $translatable,
+        ]);
+
+        $this->call('admin:generate:vue-listing', [
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            ...$actionOptions,
+            '--translatable' => $translatable,
+        ]);
+
+        if ($actions->has(GeneratedAction::Show)) {
+            $this->call('admin:generate:blade-show', [
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--translatable' => $translatable,
+            ]);
+
+            $this->call('admin:generate:vue-show', [
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--translatable' => $translatable,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::Create)) {
+            $this->call('admin:generate:blade-create', [
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--belongs-to-many' => $belongsToMany,
+                '--translatable' => $translatable,
+                '--media' => $media,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::Edit)) {
+            $this->call('admin:generate:blade-edit', [
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--belongs-to-many' => $belongsToMany,
+                '--translatable' => $translatable,
+                '--media' => $media,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::Create) || $actions->has(GeneratedAction::Edit)) {
+            $this->call('admin:generate:vue-form', [
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--belongs-to-many' => $belongsToMany,
+                '--translatable' => $translatable,
+                '--media' => $media,
+            ]);
+        }
+    }
+
+    /**
+     * @param array<string> $media
+     */
+    private function generateModel(
+        string $tableName,
+        ?string $modelName,
+        bool $force,
+        ?string $belongsToMany,
+        ?string $translatable,
+        array $media,
+    ): void {
         if ($this->option('without-model')) {
             return;
         }
 
         $this->call('admin:generate:model', [
-            'table_name' => $this->argument('table_name'),
-            'class_name' => $this->option('model-name'),
-            '--force' => $this->option('force'),
-            '--belongs-to-many' => $this->option('belongs-to-many'),
-            '--translatable' => $this->option('translatable'),
-            '--media' => $this->option('media'),
+            'table_name' => $tableName,
+            'class_name' => $modelName,
+            '--force' => $force,
+            '--belongs-to-many' => $belongsToMany,
+            '--translatable' => $translatable,
+            '--media' => $media,
         ]);
     }
 
-    private function generateFactory(): void
+    private function generateFactory(string $tableName, ?string $modelName, bool $force, ?string $translatable): void
     {
         $seed = $this->option('seed');
 
@@ -286,11 +351,11 @@ final class Generate extends Command
         }
 
         $this->call('admin:generate:factory', [
-            'table_name' => $this->argument('table_name'),
-            '--model-name' => $this->option('model-name'),
-            '--force' => $this->option('force'),
+            'table_name' => $tableName,
+            '--model-name' => $modelName,
+            '--force' => $force,
             '--seed' => $seed,
-            '--translatable' => $this->option('translatable'),
+            '--translatable' => $translatable,
         ]);
     }
 

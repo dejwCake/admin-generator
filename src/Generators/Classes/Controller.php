@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Classes;
 
+use Brackets\AdminGenerator\Dtos\GeneratedActions;
+use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Generators\Traits\FileManipulations;
+use Brackets\AdminGenerator\Generators\Traits\ResolvesGeneratedActions;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -15,6 +18,9 @@ use Symfony\Component\Console\Input\InputOption;
 final class Controller extends ClassGenerator
 {
     use FileManipulations;
+    use ResolvesGeneratedActions;
+
+    protected GeneratedActions $generatedActions;
 
     /**
      * The name and signature of the console command.
@@ -37,23 +43,11 @@ final class Controller extends ClassGenerator
      */
     protected string $view = 'classes.controller';
 
-    /**
-     * Controller has also export method
-     */
-    protected bool $export = false;
-
-    /**
-     * Controller has also bulk options method
-     */
-    protected bool $withoutBulk = false;
-
     public function handle(): void
     {
         $force = $this->option('force');
         $template = $this->option('template');
         $belongsToMany = $this->option('belongs-to-many');
-        $withExport = $this->option('with-export');
-        $withoutBulk = $this->option('without-bulk');
         $media = $this->option('media');
 
         // TODO test the case, if someone passes a class_name outside Laravel's
@@ -68,13 +62,7 @@ final class Controller extends ClassGenerator
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);
 
-        if ($withExport) {
-            $this->export = true;
-        }
-
-        if ($withoutBulk) {
-            $this->withoutBulk = true;
-        }
+        $this->generatedActions = $this->resolveGeneratedActions();
 
         if ($media !== null && $media !== []) {
             $this->mediaCollections = $this->mediaCollectionBuilder->build($media);
@@ -134,9 +122,13 @@ final class Controller extends ClassGenerator
             'resource' => $this->resource,
             'relations' => $this->relations,
             //has
+            'hasCreate' => $this->generatedActions->has(GeneratedAction::Create),
+            'hasShow' => $this->generatedActions->has(GeneratedAction::Show),
+            'hasEdit' => $this->generatedActions->has(GeneratedAction::Edit),
+            'hasDelete' => $this->generatedActions->has(GeneratedAction::Delete),
+            'hasBulkDelete' => $this->generatedActions->has(GeneratedAction::BulkDelete),
+            'hasExport' => $this->generatedActions->has(GeneratedAction::Export),
             'hasActivation' => $columns->hasByName('activated'),
-            'hasExport' => $this->export,
-            'hasBulk' => !$this->withoutBulk,
             'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns
             'queryColumns' => $columns->getToQuery(),
@@ -166,8 +158,7 @@ final class Controller extends ClassGenerator
                 InputOption::VALUE_OPTIONAL,
                 'Comma-separated list of columns to treat as translatable (defaults to all json/jsonb columns)',
             ],
-            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
-            ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+            ...$this->getGeneratedActionOptions(),
             [
                 'media',
                 'M',

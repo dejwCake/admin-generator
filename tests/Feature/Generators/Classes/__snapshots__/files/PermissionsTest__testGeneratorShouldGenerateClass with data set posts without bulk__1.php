@@ -19,6 +19,7 @@ return new class extends PermissionMigration
                 'admin.post.show',
                 'admin.post.edit',
                 'admin.post.delete',
+                'admin.post.bulk-delete',
             ]),
             new Collection(),
         );

@@ -95,6 +95,14 @@ final class ColumnCollection implements IteratorAggregate, Countable
         );
     }
 
+    /**
+     * @deprecated use getForForm()
+     */
+    public function getVisible(): self
+    {
+        return $this->getForForm();
+    }
+
     public function getFillable(): self
     {
         return new self(

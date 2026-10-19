@@ -32,11 +32,8 @@ namespace {{ $controllerNamespace }};
         'Illuminate\Http\Request',
         'Illuminate\Routing\Redirector',
         'Symfony\Component\HttpKernel\Exception\HttpException',
-        sprintf('App\Http\Requests\Admin\%s\Destroy%s', $modelWithNamespaceFromDefault, $modelBaseName),
         sprintf('App\Http\Requests\Admin\%s\ImpersonalLogin%s', $modelWithNamespaceFromDefault, $modelBaseName),
         sprintf('App\Http\Requests\Admin\%s\Index%s', $modelWithNamespaceFromDefault, $modelBaseName),
-        sprintf('App\Http\Requests\Admin\%s\Store%s', $modelWithNamespaceFromDefault, $modelBaseName),
-        sprintf('App\Http\Requests\Admin\%s\Update%s', $modelWithNamespaceFromDefault, $modelBaseName),
         $modelFullName,
     ]);
     if ($hasExport) {
@@ -47,12 +44,24 @@ namespace {{ $controllerNamespace }};
         $uses->push(sprintf('App\Http\Requests\Admin\%s\Export%s', $modelWithNamespaceFromDefault, $modelBaseName));
     }
 
-    if ($relations->hasBelongsToMany()) {
+    if ($hasCreate) {
+        $uses->push(sprintf('App\Http\Requests\Admin\%s\Store%s', $modelWithNamespaceFromDefault, $modelBaseName));
+    }
+    if ($hasEdit) {
+        $uses->push(sprintf('App\Http\Requests\Admin\%s\Update%s', $modelWithNamespaceFromDefault, $modelBaseName));
+    }
+    if ($hasDelete) {
+        $uses->push(sprintf('App\Http\Requests\Admin\%s\Destroy%s', $modelWithNamespaceFromDefault, $modelBaseName));
+    }
+    if ($hasCreate || $hasEdit) {
         foreach ($relations->getBelongsToMany() as $belongsToMany) {
             $uses->push($belongsToMany->relatedModel);
         }
+        foreach ($relations->getBelongsTo() as $belongsTo) {
+            $uses->push($belongsTo->relatedModel);
+        }
     }
-    if ($hasBulk) {
+    if ($hasBulkDelete) {
         $uses->push(sprintf('App\Http\Requests\Admin\%s\BulkDestroy%s', $modelWithNamespaceFromDefault, $modelBaseName));
         $uses->push('Illuminate\Database\DatabaseManager');
     }
@@ -112,7 +121,7 @@ final class {{ $controllerBaseName }} extends Controller
             );
 
         if ($request->ajax()) {
-@if($hasBulk)
+@if($hasBulkDelete)
             if ($request->has('bulk')) {
                 return [
                     'bulkItems' => $data->pluck('id'),
@@ -130,11 +139,20 @@ final class {{ $controllerBaseName }} extends Controller
             [
                 'data' => $data,
                 'url' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
+@if($hasCreate)
                 'createUrl' => $this->urlGenerator->route('admin/{{ $resource }}/create'),
+@endif
+@if($hasShow)
+                'showUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/show', ['{{ $modelVariableName }}' => ':id']),
+@endif
+@if($hasEdit)
                 'editUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/edit', ['{{ $modelVariableName }}' => ':id']),
                 'updateUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/update', ['{{ $modelVariableName }}' => ':id']),
+@endif
+@if($hasDelete)
                 'destroyUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/destroy', ['{{ $modelVariableName }}' => ':id']),
-@if($hasBulk)
+@endif
+@if($hasBulkDelete)
                 'bulkAllUrl' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
                 'bulkDestroyUrl' => $this->urlGenerator->route('admin/{{ $resource }}/bulk-destroy'),
 @endif
@@ -153,6 +171,7 @@ final class {{ $controllerBaseName }} extends Controller
             ],
         );
     }
+@if($hasCreate)
 
     /**
      * Show the form for creating a new resource.
@@ -215,6 +234,35 @@ final class {{ $controllerBaseName }} extends Controller
 
         return $this->redirector->route('admin/{{ $resource }}/index');
     }
+@endif
+@if($hasShow)
+
+    /**
+     * Display the specified resource.
+     *
+     * @throws AuthorizationException
+     */
+    public function show({{ $modelBaseName }} ${{ $modelVariableName }}): View
+    {
+        $this->gate->authorize('admin.{{ $modelDotNotation }}.show', ${{ $modelVariableName }});
+
+@if($modelEagerLoads->isNotEmpty())
+        ${{ $modelVariableName }}->load([
+@foreach($modelEagerLoads as $eagerLoad)
+            '{{ $eagerLoad }}',
+@endforeach
+        ]);
+
+@endif
+        return $this->viewFactory->make(
+            'admin.{{ $modelDotNotation }}.show',
+            [
+                '{{ $modelVariableName }}' => ${{ $modelVariableName }},
+            ],
+        );
+    }
+@endif
+@if($hasEdit)
 
     /**
      * Show the form for editing the specified resource.
@@ -287,6 +335,8 @@ final class {{ $controllerBaseName }} extends Controller
 
         return $this->redirector->route('admin/{{ $resource }}/index');
     }
+@endif
+@if($hasDelete)
 
     /**
      * Remove the specified resource from storage.
@@ -305,7 +355,8 @@ final class {{ $controllerBaseName }} extends Controller
 
         return $this->redirector->back();
     }
-@if($hasBulk)
+@endif
+@if($hasBulkDelete)
 
     /**
      * Remove the specified resources from storage.

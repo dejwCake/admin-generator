@@ -9,9 +9,15 @@
 
         'actions' => [
             'index' => '{{ $titlePlural }}',
+@if($hasCreate)
             'create' => 'New {{ $titleSingular }}',
-            'edit' => 'Edit :name',
+@endif
+@if($hasShow)
             'show' => '{{ $titleSingular }} :name',
+@endif
+@if($hasEdit)
+            'edit' => 'Edit :name',
+@endif
 @if($hasProfile)
             'edit_profile' => 'Edit Profile',
             'edit_password' => 'Edit Password',

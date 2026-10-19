@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\FileAppenders;
 
+use Brackets\AdminGenerator\Tests\Feature\Generators\GeneratedActionCases;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+
+use function sprintf;
 
 final class LangTest extends TestCase
 {
     #[DataProvider('getCases')]
+    #[DataProvider('getGeneratedActionCases')]
     public function testGeneratorShouldAppend(array $arguments, string $expectedFilePath): void
     {
         $filePath = $this->app->basePath($expectedFilePath);
@@ -161,5 +165,15 @@ final class LangTest extends TestCase
             'arguments' => ['table_name' => 'posts', '--locale' => 'nl'],
             'expectedFilePath' => 'lang/nl/admin.php',
         ];
+    }
+
+    public static function getGeneratedActionCases(): iterable
+    {
+        foreach (GeneratedActionCases::get() as $caseName => $case) {
+            yield sprintf('categories %s', $caseName) => [
+                'arguments' => ['table_name' => 'categories', ...$case['options']],
+                'expectedFilePath' => 'lang/en/admin.php',
+            ];
+        }
     }
 }

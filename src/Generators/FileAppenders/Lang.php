@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\FileAppenders;
 
+use Brackets\AdminGenerator\Dtos\GeneratedActions;
+use Brackets\AdminGenerator\Enums\GeneratedAction;
+use Brackets\AdminGenerator\Generators\Traits\ResolvesGeneratedActions;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
 final class Lang extends FileAppender
 {
+    use ResolvesGeneratedActions;
+
+    protected GeneratedActions $generatedActions;
+
     /**
      * The name and signature of the console command.
      *
@@ -33,13 +40,10 @@ final class Lang extends FileAppender
     /**
      * Lang has also export translation
      */
-    protected bool $export = false;
-
     public function handle(): void
     {
         $template = $this->option('template');
         $belongsToMany = $this->option('belongs-to-many');
-        $withExport = $this->option('with-export');
         $media = $this->option('media');
         $locale = $this->option('locale');
 
@@ -52,9 +56,7 @@ final class Lang extends FileAppender
 
         $this->relations = $this->relationBuilder->build($this->tableName, $belongsToMany);
 
-        if ($withExport) {
-            $this->export = true;
-        }
+        $this->generatedActions = $this->resolveGeneratedActions();
 
         if ($media !== null && $media !== []) {
             $this->mediaCollections = $this->mediaCollectionBuilder->build($media);
@@ -92,7 +94,7 @@ final class Lang extends FileAppender
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a controller for the given model'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             ['belongs-to-many', 'btm', InputOption::VALUE_OPTIONAL, 'Specify belongs to many relations'],
-            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
+            ...$this->getGeneratedActionOptions(),
             [
                 'media',
                 'M',
@@ -125,7 +127,12 @@ final class Lang extends FileAppender
             'titlePlural' => $this->titlePlural,
             'relations' => $this->relations,
             //has
-            'hasExport' => $this->export,
+            'hasCreate' => $this->generatedActions->has(GeneratedAction::Create),
+            'hasShow' => $this->generatedActions->has(GeneratedAction::Show),
+            'hasEdit' => $this->generatedActions->has(GeneratedAction::Edit),
+            'hasDelete' => $this->generatedActions->has(GeneratedAction::Delete),
+            'hasBulkDelete' => $this->generatedActions->has(GeneratedAction::BulkDelete),
+            'hasExport' => $this->generatedActions->has(GeneratedAction::Export),
             'hasProfile' => $this->tableName === 'admin_users',
             'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns

@@ -9,6 +9,7 @@ return [
         'actions' => [
             'index' => 'Categories',
             'create' => 'New Category',
+            'show' => 'Category :name',
             'edit' => 'Edit :name',
             'will_be_published' => 'Category will be published at',
             'resend_verify_email' => 'Resend verification email',

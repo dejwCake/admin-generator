@@ -2,40 +2,13 @@
 
 declare(strict_types=1);
 
-return [
-    'auth_user' => [
-        'title' => 'Admin Users',
+use Illuminate\Support\Facades\Route;
 
-        'actions' => [
-            'index' => 'Admin Users',
-            'create' => 'New Admin User',
-            'edit' => 'Edit :name',
-            'show' => 'Admin User :name',
-            'edit_profile' => 'Edit Profile',
-            'edit_password' => 'Edit Password',
-        ],
-
-        'columns' => [
-            'id' => 'ID',
-            'first_name' => 'First name',
-            'last_name' => 'Last name',
-            'email' => 'Email',
-            'password' => 'Password',
-            'password_repeat' => 'Password Confirmation',
-            'remember_token' => 'Remember token',
-            'activated' => 'Activated',
-            'forbidden' => 'Forbidden',
-            'language' => 'Language',
-            'deleted_at' => 'Deleted at',
-            'created_at' => 'Created at',
-            'updated_at' => 'Updated at',
-        ],
-
-        //Belongs to many relations
-        'relations' => [
-            'roles' => 'Roles',
-        ],
-    ],
-
-    //-- Do not delete me :) I'm used for auto-generation language arrays --
-];
+Route::middleware(['auth:' . config('admin-auth.defaults.guard'), 'admin'])
+    ->prefix('admin')
+    ->name('admin/')
+    ->group(static function (): void {
+        foreach (glob(__DIR__ . '/admin/*.php') as $file) {
+            require $file;
+        }
+    });

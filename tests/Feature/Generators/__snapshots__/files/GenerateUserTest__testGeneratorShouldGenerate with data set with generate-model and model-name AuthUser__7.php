@@ -8,6 +8,7 @@
         :data="{{ $data->toJson() }}"
         :url="'{{ $url }}'"
         :create-url="'{{ $createUrl }}'"
+        :show-url-template="'{{ $showUrlTemplate }}'"
         :edit-url-template="'{{ $editUrlTemplate }}'"
         :update-url-template="'{{ $updateUrlTemplate }}'"
         :destroy-url-template="'{{ $destroyUrlTemplate }}'"
@@ -29,6 +30,7 @@
             'impersonal_login_btn' => trans('brackets/admin-ui::admin.operation.impersonal_login'),
             'search_placeholder' => trans('brackets/admin-ui::admin.placeholder.search'),
             'search_btn' => trans('brackets/admin-ui::admin.btn.search'),
+            'show_btn' => trans('brackets/admin-ui::admin.btn.show'),
             'edit_btn' => trans('brackets/admin-ui::admin.btn.edit'),
             'delete_btn' => trans('brackets/admin-ui::admin.btn.delete'),
             'confirm_delete_title' => trans('brackets/admin-ui::admin.operation.confirm_delete_title'),
@@ -42,7 +44,7 @@
             'previous' => trans('brackets/admin-ui::admin.pagination.previous'),
             'next' => trans('brackets/admin-ui::admin.pagination.next'),
             'no_items' => trans('brackets/admin-ui::admin.index.no_items'),
-            'try_changing_items' => trans('brackets/admin-ui::admin.index.try_changing_items'),
+            'try_changing_items' => trans('brackets/admin-ui::admin.index.try_changing_filters_or_add_new'),
         ]) }}"
         v-cloak
     ></auth-user-listing>

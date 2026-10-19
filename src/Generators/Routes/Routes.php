@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Routes;
 
+use Brackets\AdminGenerator\Dtos\GeneratedActions;
+use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Generators\Generator;
+use Brackets\AdminGenerator\Generators\Traits\ResolvesGeneratedActions;
 use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,6 +16,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class Routes extends Generator
 {
+    use ResolvesGeneratedActions;
+
     private const string UMBRELLA_FILE = <<<'PHP'
         <?php
 
@@ -30,6 +35,8 @@ final class Routes extends Generator
             });
 
         PHP;
+
+    protected GeneratedActions $generatedActions;
 
     /**
      * The name and signature of the console command.
@@ -53,16 +60,6 @@ final class Routes extends Generator
     protected string $view = 'routes.routes';
 
     /**
-     * Routes have also export route
-     */
-    protected bool $export = false;
-
-    /**
-     * Routes have also bulk options route
-     */
-    protected bool $withoutBulk = false;
-
-    /**
      * Resource name
      */
     protected string $resource = '';
@@ -70,20 +67,12 @@ final class Routes extends Generator
     public function handle(): void
     {
         $template = $this->option('template');
-        $withExport = $this->option('with-export');
-        $withoutBulk = $this->option('without-bulk');
 
         if ($template !== null) {
             $this->view = sprintf('routes.templates.%s.routes', $template);
         }
 
-        if ($withExport) {
-            $this->export = true;
-        }
-
-        if ($withoutBulk) {
-            $this->withoutBulk = true;
-        }
+        $this->generatedActions = $this->resolveGeneratedActions();
 
         $this->resource = $this->option('resource') ?? $this->resource;
 
@@ -108,8 +97,7 @@ final class Routes extends Generator
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a controller for the given model'],
             ['controller-name', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom controller name'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
-            ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+            ...$this->getGeneratedActionOptions(),
             ['resource', 'r', InputOption::VALUE_OPTIONAL, 'Specify custom resource name for route identification'],
         ];
     }
@@ -156,8 +144,13 @@ final class Routes extends Generator
             'controllerBaseName' => basename(str_replace('\\', '/', $this->controllerFullName)),
             'modelVariableName' => $this->modelVariableName,
             'resource' => $this->resource,
-            'hasExport' => $this->export,
-            'hasBulk' => !$this->withoutBulk,
+            //has
+            'hasCreate' => $this->generatedActions->has(GeneratedAction::Create),
+            'hasShow' => $this->generatedActions->has(GeneratedAction::Show),
+            'hasEdit' => $this->generatedActions->has(GeneratedAction::Edit),
+            'hasDelete' => $this->generatedActions->has(GeneratedAction::Delete),
+            'hasBulkDelete' => $this->generatedActions->has(GeneratedAction::BulkDelete),
+            'hasExport' => $this->generatedActions->has(GeneratedAction::Export),
         ])->render();
     }
 }

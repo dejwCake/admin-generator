@@ -2,29 +2,56 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Admin\AdminUsersController;
-use Illuminate\Support\Facades\Route;
+namespace Database\Factories\Auth;
 
-Route::prefix('auth-users')
-    ->name('auth-users/')
-    ->controller(AdminUsersController::class)
-    ->group(static function (): void {
-        Route::get('/', 'index')
-            ->name('index');
-        Route::get('/create', 'create')
-            ->name('create');
-        Route::post('/', 'store')
-            ->name('store');
-        Route::get('/{user:id}/edit', 'edit')
-            ->name('edit');
-        Route::post('/bulk-destroy', 'bulkDestroy')
-            ->name('bulk-destroy');
-        Route::post('/{user:id}', 'update')
-            ->name('update');
-        Route::delete('/{user:id}', 'destroy')
-            ->name('destroy');
-        Route::get('/{user:id}/impersonal-login', 'impersonalLogin')
-            ->name('impersonal-login');
-        Route::get('/{user:id}/resend-activation', 'resendActivationEmail')
-            ->name('resend-activation-email');
-    });
+use App\Models\Auth\User;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Database\Eloquent\Factories\Attributes\UseModel;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<User>
+ */
+#[UseModel(User::class)]
+final class UserFactory extends Factory
+{
+    public function definition(): array
+    {
+        $hasher = Container::getInstance()->make(Hasher::class);
+
+        return [
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName,
+            'email' => $this->faker->unique()->email,
+            'password' => $hasher->make($this->faker->password),
+            'remember_token' => null,
+            'activated' => $this->faker->boolean(),
+            'forbidden' => $this->faker->boolean(),
+            'language' => 'en',
+            'deleted_at' => null,
+            'created_at' => $this->faker->dateTime,
+            'updated_at' => $this->faker->dateTime,
+        ];
+    }
+
+    public function activated(): self
+    {
+        return $this->state(['activated' => true]);
+    }
+
+    public function notActivated(): self
+    {
+        return $this->state(['activated' => false]);
+    }
+
+    public function forbidden(): self
+    {
+        return $this->state(['forbidden' => true]);
+    }
+
+    public function notForbidden(): self
+    {
+        return $this->state(['forbidden' => false]);
+    }
+}

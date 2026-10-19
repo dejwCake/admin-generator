@@ -33,18 +33,11 @@ final class Permissions extends ClassGenerator
     /**
      * Permissions has also bulk options
      */
-    protected bool $withoutBulk = false;
-
     protected bool $withImpersonalLogin = false;
 
     public function handle(): void
     {
         $force = $this->option('force');
-        $withoutBulk = $this->option('without-bulk');
-
-        if ($withoutBulk) {
-            $this->withoutBulk = true;
-        }
 
         if ($this->option('with-impersonal-login')) {
             $this->withImpersonalLogin = true;
@@ -113,7 +106,6 @@ final class Permissions extends ClassGenerator
             //globals
             'modelDotNotation' => $this->modelDotNotation,
             //has
-            'hasBulk' => !$this->withoutBulk,
             'hasImpersonalLogin' => $this->withImpersonalLogin,
         ])->render();
     }
@@ -124,8 +116,13 @@ final class Permissions extends ClassGenerator
     {
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
+            [
+                'without-bulk',
+                'wb',
+                InputOption::VALUE_NONE,
+                'Deprecated and ignored: the permission set is always complete',
+            ],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
-            ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
             [
                 'with-impersonal-login',
                 null,

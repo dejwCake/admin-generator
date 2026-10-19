@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
+use Brackets\AdminGenerator\Dtos\GeneratedActions;
+use Brackets\AdminGenerator\Enums\GeneratedAction;
+use Brackets\AdminGenerator\Generators\Traits\ResolvesGeneratedActions;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
 final class BladeIndex extends ResourceGenerator
 {
+    use ResolvesGeneratedActions;
+
+    protected GeneratedActions $generatedActions;
+
     /**
      * The name and signature of the console command.
      *
@@ -27,10 +34,6 @@ final class BladeIndex extends ResourceGenerator
 
     protected string $view = 'resources.blade-index';
 
-    protected bool $hasExport = false;
-
-    protected bool $hasBulk = true;
-
     public function handle(): void
     {
         $force = (bool) $this->option('force');
@@ -40,13 +43,7 @@ final class BladeIndex extends ResourceGenerator
             $this->view = sprintf('resources.templates.%s.blade-index', $template);
         }
 
-        if ($this->option('with-export')) {
-            $this->hasExport = true;
-        }
-
-        if ($this->option('without-bulk')) {
-            $this->hasBulk = false;
-        }
+        $this->generatedActions = $this->resolveGeneratedActions();
 
         $path = $this->laravel->resourcePath(sprintf('views/admin/%s/index.blade.php', $this->modelViewsDirectory));
 
@@ -61,8 +58,7 @@ final class BladeIndex extends ResourceGenerator
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating index'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
-            ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+            ...$this->getGeneratedActionOptions(),
             [
                 'translatable',
                 'tr',
@@ -86,8 +82,12 @@ final class BladeIndex extends ResourceGenerator
             'modelJSName' => $this->modelJSName,
             'modelLangFormat' => $this->modelLangFormat,
             //has
-            'hasExport' => $this->hasExport,
-            'hasBulk' => $this->hasBulk,
+            'hasCreate' => $this->generatedActions->has(GeneratedAction::Create),
+            'hasShow' => $this->generatedActions->has(GeneratedAction::Show),
+            'hasEdit' => $this->generatedActions->has(GeneratedAction::Edit),
+            'hasDelete' => $this->generatedActions->has(GeneratedAction::Delete),
+            'hasBulkDelete' => $this->generatedActions->has(GeneratedAction::BulkDelete),
+            'hasExport' => $this->generatedActions->has(GeneratedAction::Export),
             'hasPublishedAt' => $columns->hasByName('published_at'),
             'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
             'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),

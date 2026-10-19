@@ -2,53 +2,40 @@
 
 declare(strict_types=1);
 
-namespace App\Exports;
+return [
+    'user' => [
+        'title' => 'Users',
 
-use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+        'actions' => [
+            'index' => 'Users',
+            'create' => 'New User',
+            'show' => 'User :name',
+            'edit' => 'Edit :name',
+            'export' => 'Export',
+            'resend_verify_email' => 'Resend verification email',
+        ],
 
-final class UsersExport implements FromQuery, WithMapping, WithHeadings, WithChunkReading
-{
-    private const int CHUNK = 1000;
+        'columns' => [
+            'id' => 'ID',
+            'name' => 'Name',
+            'email' => 'Email',
+            'email_verified_at' => 'Email verified at',
+            'password' => 'Password',
+            'password_repeat' => 'Password Confirmation',
+            'remember_token' => 'Remember token',
+            'current_team_id' => 'Current team',
+            'two_factor_secret' => 'Two factor secret',
+            'two_factor_recovery_codes' => 'Two factor recovery codes',
+            'two_factor_confirmed_at' => 'Two factor confirmed at',
+            'created_at' => 'Created at',
+            'updated_at' => 'Updated at',
+        ],
 
-    /**
-     * @return Builder<User>
-     */
-    public function query(): Builder
-    {
-        return User::query()->orderBy('id');
-    }
+        //Belongs to many relations
+        'relations' => [
+            'roles' => 'Roles',
+        ],
+    ],
 
-    public function chunkSize(): int
-    {
-        return self::CHUNK;
-    }
-
-    public function headings(): array
-    {
-        return [
-            trans('admin.user.columns.id'),
-            trans('admin.user.columns.name'),
-            trans('admin.user.columns.email'),
-            trans('admin.user.columns.email_verified_at'),
-        ];
-    }
-
-    /**
-     * @param User $user
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
-     */
-    public function map($user): array
-    {
-        return [
-            $user->id,
-            $user->name,
-            $user->email,
-            $user->email_verified_at,
-        ];
-    }
-}
+    //-- Do not delete me :) I'm used for auto-generation language arrays --
+];

@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
+use Brackets\AdminGenerator\Dtos\GeneratedActions;
+use Brackets\AdminGenerator\Enums\GeneratedAction;
+use Brackets\AdminGenerator\Generators\Traits\ResolvesGeneratedActions;
 use Illuminate\Support\Collection;
 use Override;
 use Symfony\Component\Console\Input\InputOption;
 
 final class VueListing extends ResourceGenerator
 {
+    use ResolvesGeneratedActions;
+
+    protected GeneratedActions $generatedActions;
+
     /**
      * The name and signature of the console command.
      *
@@ -28,10 +35,6 @@ final class VueListing extends ResourceGenerator
 
     protected string $view = 'resources.vue-listing';
 
-    protected bool $hasExport = false;
-
-    protected bool $hasBulk = true;
-
     public function handle(): void
     {
         $force = (bool) $this->option('force');
@@ -41,13 +44,7 @@ final class VueListing extends ResourceGenerator
             $this->view = sprintf('resources.templates.%s.vue-listing', $template);
         }
 
-        if ($this->option('with-export')) {
-            $this->hasExport = true;
-        }
-
-        if ($this->option('without-bulk')) {
-            $this->hasBulk = false;
-        }
+        $this->generatedActions = $this->resolveGeneratedActions();
 
         $this->relations = $this->relationBuilder->build($this->tableName, null);
 
@@ -65,8 +62,7 @@ final class VueListing extends ResourceGenerator
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating listing'],
             ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
-            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
-            ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+            ...$this->getGeneratedActionOptions(),
             [
                 'translatable',
                 'tr',
@@ -110,8 +106,12 @@ final class VueListing extends ResourceGenerator
             //globals
             'relations' => $this->relations,
             //has
-            'hasExport' => $this->hasExport,
-            'hasBulk' => $this->hasBulk,
+            'hasCreate' => $this->generatedActions->has(GeneratedAction::Create),
+            'hasShow' => $this->generatedActions->has(GeneratedAction::Show),
+            'hasEdit' => $this->generatedActions->has(GeneratedAction::Edit),
+            'hasDelete' => $this->generatedActions->has(GeneratedAction::Delete),
+            'hasBulkDelete' => $this->generatedActions->has(GeneratedAction::BulkDelete),
+            'hasExport' => $this->generatedActions->has(GeneratedAction::Export),
             'hasPublishedAt' => $hasPublishedAt,
             'hasUserDetailTooltip' => $hasUserDetailTooltip,
             'hasSwitchColumns' => $columns->hasByMajorType('bool'),

@@ -2,47 +2,39 @@
 
 declare(strict_types=1);
 
-use Brackets\Craftable\Database\Migrations\PermissionMigration;
-use Illuminate\Support\Collection;
+return [
+    'user' => [
+        'title' => 'Users',
 
-return new class extends PermissionMigration
-{
-    public function __construct()
-    {
-        parent::__construct();
+        'actions' => [
+            'index' => 'Users',
+            'create' => 'New User',
+            'show' => 'User :name',
+            'edit' => 'Edit :name',
+            'resend_verify_email' => 'Resend verification email',
+        ],
 
-        $this->setPermissionsAndRoles(
-            new Collection([
-                'admin.user',
-                'admin.user.index',
-                'admin.user.create',
-                'admin.user.show',
-                'admin.user.edit',
-                'admin.user.delete',
-                'admin.user.bulk-delete',
-                'admin.user.impersonal-login',
-            ]),
-            new Collection(),
-        );
-    }
+        'columns' => [
+            'id' => 'ID',
+            'name' => 'Name',
+            'email' => 'Email',
+            'email_verified_at' => 'Email verified at',
+            'password' => 'Password',
+            'password_repeat' => 'Password Confirmation',
+            'remember_token' => 'Remember token',
+            'current_team_id' => 'Current team',
+            'two_factor_secret' => 'Two factor secret',
+            'two_factor_recovery_codes' => 'Two factor recovery codes',
+            'two_factor_confirmed_at' => 'Two factor confirmed at',
+            'created_at' => 'Created at',
+            'updated_at' => 'Updated at',
+        ],
 
-    /**
-     * Run the migrations.
-     *
-     * @throws Exception
-     */
-    public function up(): void
-    {
-        $this->migrateUp();
-    }
+        //Belongs to many relations
+        'relations' => [
+            'roles' => 'Roles',
+        ],
+    ],
 
-    /**
-     * Reverse the migrations.
-     *
-     * @throws Exception
-     */
-    public function down(): void
-    {
-        $this->migrateDown();
-    }
-};
+    //-- Do not delete me :) I'm used for auto-generation language arrays --
+];

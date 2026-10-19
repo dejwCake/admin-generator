@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\Routes;
 
+use Brackets\AdminGenerator\Tests\Feature\Generators\GeneratedActionCases;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+
+use function sprintf;
 
 final class RoutesTest extends TestCase
 {
@@ -13,6 +16,7 @@ final class RoutesTest extends TestCase
      * @param array<string, string|bool> $arguments
      */
     #[DataProvider('getCases')]
+    #[DataProvider('getGeneratedActionCases')]
     public function testGeneratorWritesPerResourceFile(array $arguments, string $expectedFilePath): void
     {
         $this->artisan('admin:generate:routes', $arguments);
@@ -169,5 +173,15 @@ final class RoutesTest extends TestCase
             'arguments' => ['table_name' => 'posts', '--without-bulk' => true],
             'expectedFilePath' => 'routes/admin/posts.php',
         ];
+    }
+
+    public static function getGeneratedActionCases(): iterable
+    {
+        foreach (GeneratedActionCases::get() as $caseName => $case) {
+            yield sprintf('categories %s', $caseName) => [
+                'arguments' => ['table_name' => 'categories', ...$case['options']],
+                'expectedFilePath' => 'routes/admin/categories.php',
+            ];
+        }
     }
 }

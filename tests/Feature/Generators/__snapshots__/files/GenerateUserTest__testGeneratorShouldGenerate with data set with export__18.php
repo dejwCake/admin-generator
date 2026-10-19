@@ -2,53 +2,38 @@
 
 declare(strict_types=1);
 
-namespace App\Exports;
+namespace App\Http\Requests\Admin\User;
 
-use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Collection;
 
-final class UsersExport implements FromQuery, WithMapping, WithHeadings, WithChunkReading
+final class BulkDestroyUser extends FormRequest
 {
-    private const int CHUNK = 1000;
-
     /**
-     * @return Builder<User>
+     * Determine if the user is authorized to make this request.
      */
-    public function query(): Builder
+    public function authorize(Gate $gate): bool
     {
-        return User::query()->orderBy('id');
-    }
-
-    public function chunkSize(): int
-    {
-        return self::CHUNK;
-    }
-
-    public function headings(): array
-    {
-        return [
-            trans('admin.user.columns.id'),
-            trans('admin.user.columns.name'),
-            trans('admin.user.columns.email'),
-            trans('admin.user.columns.email_verified_at'),
-        ];
+        return $gate->allows('admin.user.bulk-delete');
     }
 
     /**
-     * @param User $user
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * Get the validation rules that apply to the request.
      */
-    public function map($user): array
+    public function rules(): array
     {
         return [
-            $user->id,
-            $user->name,
-            $user->email,
-            $user->email_verified_at,
+            'ids.*' => [
+                'integer',
+            ],
         ];
+    }
+
+    public function getIds(): Collection
+    {
+        $data = $this->validated();
+
+        return new Collection($data['ids'] ?? []);
     }
 }

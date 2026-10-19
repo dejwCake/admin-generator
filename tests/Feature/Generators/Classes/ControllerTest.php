@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\Classes;
 
+use Brackets\AdminGenerator\Tests\Feature\Generators\GeneratedActionCases;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+
+use function sprintf;
 
 final class ControllerTest extends TestCase
 {
     #[DataProvider('getCases')]
+    #[DataProvider('getGeneratedActionCases')]
     public function testGeneratorShouldGenerateClass(array $arguments, string $expectedFilePath): void
     {
         $filePath = $this->app->basePath($expectedFilePath);
@@ -146,5 +150,15 @@ final class ControllerTest extends TestCase
             'arguments' => ['table_name' => 'posts', '--without-bulk' => true],
             'expectedFilePath' => 'app/Http/Controllers/Admin/PostsController.php',
         ];
+    }
+
+    public static function getGeneratedActionCases(): iterable
+    {
+        foreach (GeneratedActionCases::get() as $caseName => $case) {
+            yield sprintf('categories %s', $caseName) => [
+                'arguments' => ['table_name' => 'categories', ...$case['options']],
+                'expectedFilePath' => 'app/Http/Controllers/Admin/CategoriesController.php',
+            ];
+        }
     }
 }

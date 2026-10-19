@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\Resources;
 
+use Brackets\AdminGenerator\Tests\Feature\Generators\GeneratedActionCases;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+
+use function sprintf;
 
 final class BladeIndexTest extends TestCase
 {
     #[DataProvider('getCases')]
+    #[DataProvider('getGeneratedActionCases')]
     public function testGeneratorShouldGenerateView(array $arguments, string $expectedFilePath): void
     {
         $filePath = $this->app->basePath($expectedFilePath);
@@ -102,5 +106,15 @@ final class BladeIndexTest extends TestCase
             'arguments' => ['table_name' => 'posts', '--without-bulk' => true],
             'expectedFilePath' => 'resources/views/admin/post/index.blade.php',
         ];
+    }
+
+    public static function getGeneratedActionCases(): iterable
+    {
+        foreach (GeneratedActionCases::get() as $caseName => $case) {
+            yield sprintf('categories %s', $caseName) => [
+                'arguments' => ['table_name' => 'categories', ...$case['options']],
+                'expectedFilePath' => 'resources/views/admin/category/index.blade.php',
+            ];
+        }
     }
 }

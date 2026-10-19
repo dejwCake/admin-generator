@@ -27,4 +27,6 @@ Route::prefix('categories')
             ->name('resend-verify-email');
         Route::get('/{category:id}/impersonal-login', 'impersonalLogin')
             ->name('impersonal-login');
+        Route::get('/{category:id}', 'show')
+            ->name('show');
     });

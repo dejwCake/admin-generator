@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators;
 
+use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -24,8 +25,10 @@ final class GenerateUserTest extends TestCase
         'resources/views/admin/user/index.blade.php',
         'resources/views/admin/user/create.blade.php',
         'resources/views/admin/user/edit.blade.php',
+        'resources/views/admin/user/show.blade.php',
         'resources/js/admin/user/Listing.vue',
         'resources/js/admin/user/Form.vue',
+        'resources/js/admin/user/Show.vue',
         'database/factories/UserFactory.php',
         'routes/admin.php',
         'routes/admin/users.php',
@@ -38,6 +41,7 @@ final class GenerateUserTest extends TestCase
      * @param list<string> $missingFiles
      */
     #[DataProvider('getCases')]
+    #[DataProvider('getGeneratedActionCases')]
     public function testGeneratorShouldGenerate(
         array $options,
         array $expectedFiles,
@@ -93,8 +97,10 @@ final class GenerateUserTest extends TestCase
             'resources/views/admin/user/index.blade.php',
             'resources/views/admin/user/create.blade.php',
             'resources/views/admin/user/edit.blade.php',
+            'resources/views/admin/user/show.blade.php',
             'resources/js/admin/user/Listing.vue',
             'resources/js/admin/user/Form.vue',
+            'resources/js/admin/user/Show.vue',
             'database/factories/UserFactory.php',
         ];
 
@@ -262,6 +268,51 @@ final class GenerateUserTest extends TestCase
         ];
     }
 
+    public static function getGeneratedActionCases(): iterable
+    {
+        foreach (GeneratedActionCases::get() as $caseName => $case) {
+            $files = GeneratedActionCases::splitFiles($case['actions'], self::filesByAction());
+
+            yield $caseName => [
+                'options' => $case['options'],
+                'expectedFiles' => $files['expectedFiles'],
+                'missingFiles' => [...$files['missingFiles'], 'app/Models/User.php'],
+            ];
+        }
+    }
+
+    /**
+     * @return array<string, list<GeneratedAction>>
+     */
+    private static function filesByAction(): array
+    {
+        $create = GeneratedAction::Create;
+        $edit = GeneratedAction::Edit;
+
+        return [
+            'app/Http/Controllers/Admin/UsersController.php' => [],
+            'app/Http/Requests/Admin/User/IndexUser.php' => [],
+            'app/Http/Requests/Admin/User/StoreUser.php' => [$create],
+            'app/Http/Requests/Admin/User/UpdateUser.php' => [$edit],
+            'app/Http/Requests/Admin/User/DestroyUser.php' => [GeneratedAction::Delete],
+            'app/Http/Requests/Admin/User/BulkDestroyUser.php' => [GeneratedAction::BulkDelete],
+            'app/Http/Requests/Admin/User/ExportUser.php' => [GeneratedAction::Export],
+            'app/Http/Requests/Admin/User/ImpersonalLoginUser.php' => [],
+            'app/Exports/UsersExport.php' => [GeneratedAction::Export],
+            'resources/views/admin/user/index.blade.php' => [],
+            'resources/views/admin/user/create.blade.php' => [$create],
+            'resources/views/admin/user/edit.blade.php' => [$edit],
+            'resources/views/admin/user/show.blade.php' => [GeneratedAction::Show],
+            'resources/js/admin/user/Listing.vue' => [],
+            'resources/js/admin/user/Form.vue' => [$create, $edit],
+            'resources/js/admin/user/Show.vue' => [GeneratedAction::Show],
+            'database/factories/UserFactory.php' => [],
+            'routes/admin.php' => [],
+            'routes/admin/users.php' => [],
+            'lang/en/admin.php' => [],
+        ];
+    }
+
     /**
      * @param array<int, string> $files
      * @return array<int, string>
@@ -332,8 +383,10 @@ final class GenerateUserTest extends TestCase
             sprintf('resources/views/admin/%s/index.blade.php', $bladeDir),
             sprintf('resources/views/admin/%s/create.blade.php', $bladeDir),
             sprintf('resources/views/admin/%s/edit.blade.php', $bladeDir),
+            sprintf('resources/views/admin/%s/show.blade.php', $bladeDir),
             sprintf('resources/js/admin/%s/Listing.vue', $jsDir),
             sprintf('resources/js/admin/%s/Form.vue', $jsDir),
+            sprintf('resources/js/admin/%s/Show.vue', $jsDir),
             sprintf(
                 'database/factories/%s/%sFactory.php',
                 self::ucPath(implode('/', array_slice($nestedSegments, 0, -1))),
@@ -363,8 +416,10 @@ final class GenerateUserTest extends TestCase
             'resources/views/admin/user/index.blade.php',
             'resources/views/admin/user/create.blade.php',
             'resources/views/admin/user/edit.blade.php',
+            'resources/views/admin/user/show.blade.php',
             'resources/js/admin/user/Listing.vue',
             'resources/js/admin/user/Form.vue',
+            'resources/js/admin/user/Show.vue',
         ];
     }
 

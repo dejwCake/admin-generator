@@ -91,6 +91,7 @@ final class AdminUsersController extends Controller
                 'data' => $data,
                 'url' => $this->urlGenerator->route('admin/admin-users/index'),
                 'createUrl' => $this->urlGenerator->route('admin/admin-users/create'),
+                'showUrlTemplate' => $this->urlGenerator->route('admin/admin-users/show', ['adminUser' => ':id']),
                 'editUrlTemplate' => $this->urlGenerator->route('admin/admin-users/edit', ['adminUser' => ':id']),
                 'updateUrlTemplate' => $this->urlGenerator->route('admin/admin-users/update', ['adminUser' => ':id']),
                 'destroyUrlTemplate' => $this->urlGenerator->route('admin/admin-users/destroy', ['adminUser' => ':id']),
@@ -146,6 +147,27 @@ final class AdminUsersController extends Controller
         }
 
         return $this->redirector->route('admin/admin-users/index');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @throws AuthorizationException
+     */
+    public function show(AdminUser $adminUser): View
+    {
+        $this->gate->authorize('admin.admin-user.show', $adminUser);
+
+        $adminUser->load([
+            'roles',
+        ]);
+
+        return $this->viewFactory->make(
+            'admin.admin-user.show',
+            [
+                'adminUser' => $adminUser,
+            ],
+        );
     }
 
     /**

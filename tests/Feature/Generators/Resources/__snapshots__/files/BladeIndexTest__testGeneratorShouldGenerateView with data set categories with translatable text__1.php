@@ -58,7 +58,7 @@
             'previous' => trans('brackets/admin-ui::admin.pagination.previous'),
             'next' => trans('brackets/admin-ui::admin.pagination.next'),
             'no_items' => trans('brackets/admin-ui::admin.index.no_items'),
-            'try_changing_items' => trans('brackets/admin-ui::admin.index.try_changing_items'),
+            'try_changing_items' => trans('brackets/admin-ui::admin.index.try_changing_filters_or_add_new'),
             'publish_now' => trans('brackets/admin-ui::admin.operation.publish_now'),
             'unpublish_now' => trans('brackets/admin-ui::admin.operation.unpublish_now'),
             'publish_later' => trans('brackets/admin-ui::admin.operation.publish_later'),

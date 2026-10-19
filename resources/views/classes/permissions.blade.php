@@ -21,9 +21,7 @@ return new class extends PermissionMigration
                 'admin.{{ $modelDotNotation }}.show',
                 'admin.{{ $modelDotNotation }}.edit',
                 'admin.{{ $modelDotNotation }}.delete',
-@if($hasBulk)
                 'admin.{{ $modelDotNotation }}.bulk-delete',
-@endif
 @if($hasImpersonalLogin)
                 'admin.{{ $modelDotNotation }}.impersonal-login',
 @endif

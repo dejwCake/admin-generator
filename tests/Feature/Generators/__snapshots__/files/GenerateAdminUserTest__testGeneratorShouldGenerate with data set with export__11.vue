@@ -1,130 +1,235 @@
 <template>
-    <form class="form-horizontal" method="post" @submit.prevent="onSubmit" :action="action" novalidate>
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fa" :class="data && Object.keys(data).length > 0 ? 'fa-pencil' : 'fa-plus'"></i>
-                        {{ translations.form_title }}
-                    </div>
-                    <div class="card-body">
-                        <FormInput
-                            v-model="form.first_name"
-                            name="first_name"
-                            :label="translations.columns.first_name"
-                            :error="errors.first_name"
-                        />
-
-                        <FormInput
-                            v-model="form.last_name"
-                            name="last_name"
-                            :label="translations.columns.last_name"
-                            :error="errors.last_name"
-                        />
-
-                        <FormEmail
-                            v-model="form.email"
-                            name="email"
-                            :label="translations.columns.email"
-                            :error="errors.email"
-                        />
-
-                        <FormPasswordConfirm
-                            v-model:password="form.password"
-                            v-model:passwordConfirmation="form.password_confirmation"
-                            :passwordError="errors.password"
-                            :confirmationError="errors.password_confirmation"
-                            :translations="{
-                                password: translations.columns.password,
-                                password_repeat: translations.columns.password_repeat
-                            }"
-                        />
-
-                        <FormCheckbox
-                            v-model="form.activated"
-                            name="activated"
-                            :label="translations.columns.activated"
-                            :error="errors.activated"
-                        />
-
-                        <FormCheckbox
-                            v-model="form.forbidden"
-                            name="forbidden"
-                            :label="translations.columns.forbidden"
-                            :error="errors.forbidden"
-                        />
-
-                        <FormSelect
-                            v-model="form.language"
-                            name="language"
-                            :label="translations.columns.language"
-                            :error="errors.language"
-                            :options="languageOptions"
-                            :placeholder="translations.select_an_option"
-                        />
-
-                        <FormMultiSelect
-                            v-model="form.roles"
-                            name="roles"
-                            :label="translations.relations.roles"
-                            :error="errors.roles"
-                            :options="roleOptions"
-                            trackBy="id" optionLabel="name"
-                            :placeholder="translations.select_options"
-                        />
-
-                    </div>
-
-                    <div class="card-footer">
-                        <FormSubmit :submitting="submitting" :label="translations.save" />
-                    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <ListingHeader
+                        :createUrl="createUrl"
+                        :exportUrl="exportUrl"
+                        :translations="translations"
+                    />
                 </div>
-    </form>
+                <div class="card-body" ref="cardBody">
+                    <div class="row justify-content-md-between">
+                        <div class="col col-lg-7 col-xl-5 mb-3">
+                            <Search
+                                v-model:search="search"
+                                :filterFn="filter"
+                                :translations="translations"
+                            />
+                        </div>
+                        <div class="col-sm-auto mb-3">
+                            <PerPage v-model="pagination.state.per_page"/>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover table-listing">
+                            <thead>
+                            <tr>
+                                <th class="bulk-checkbox">
+                                    <BulkCheckboxHeader :isClickedAll="isClickedAll"
+                                                        :onToggleAll="onBulkItemsClickedAllWithPagination"/>
+                                </th>
+
+                                <Sortable v-if="isColumnVisible(2)" :column="'id'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.id }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(1)" :column="'first_name'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.first_name }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(0)" :column="'last_name'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.last_name }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(1)" :column="'email'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.email }}
+                                </Sortable>
+                                <Sortable v-if="activation && isColumnVisible(3)" :column="'activated'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.activated }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(4)" :column="'forbidden'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.forbidden }}
+                                </Sortable>
+                                <Sortable v-if="isColumnVisible(5)" :column="'language'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.language }}
+                                </Sortable>
+
+                                <th></th>
+                            </tr>
+                            <tr v-show="clickedBulkItemsCount > 0 || isClickedAll">
+                                <td class="bg-bulk-info d-table-cell text-center" :colspan="99">
+                                    <BulkOperationsBar
+                                        :selectedCount="clickedBulkItemsCount"
+                                        :totalCount="pagination.state.total"
+                                        :loading="bulkCheckingAllLoader"
+                                        :onCheckAll="() => onBulkItemsClickedAll(bulkAllUrl)"
+                                        :onUncheckAll="onBulkItemsClickedAllUncheck"
+                                        :onBulkDelete="() => bulkDelete(bulkDestroyUrl, {
+                                            ...translations,
+                                            confirm_title: translations.confirm_delete_title,
+                                            confirm_text: translations.confirm_delete_text_multiple,
+                                            confirm_btn: translations.delete_btn,
+                                        })"
+                                        :translations="translations"
+                                    />
+                                </td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr
+                                v-for="(item, index) in collection"
+                                :key="item.id"
+                                :class="bulkItems[item.id] ? 'bg-bulk' : ''"
+                            >
+                                <td class="bulk-checkbox">
+                                    <BulkCheckboxRow :itemId="item.id" :checked="!!bulkItems[item.id]"
+                                                     :disabled="bulkCheckingAllLoader" :onToggle="onBulkItemClicked"/>
+                                </td>
+
+                                <td v-if="isColumnVisible(2)">{{ item.id }}</td>
+                                <td v-if="isColumnVisible(1)">{{ item.first_name }}</td>
+                                <td v-if="isColumnVisible(0)">{{ item.last_name }}</td>
+                                <td v-if="isColumnVisible(1)">{{ item.email }}</td>
+                                <td v-if="activation && isColumnVisible(3)">
+                                    <ToggleSwitch
+                                        v-model="collection[index].activated"
+                                        :url="resolveUrl(updateUrlTemplate, item)"
+                                        column="activated"
+                                        :row="collection[index]"
+                                        variant="success"
+                                    />
+                                </td>
+                                <td v-if="isColumnVisible(4)">
+                                    <ToggleSwitch
+                                        v-model="collection[index].forbidden"
+                                        :url="resolveUrl(updateUrlTemplate, item)"
+                                        column="forbidden"
+                                        :row="collection[index]"
+                                        variant="danger"
+                                    />
+                                </td>
+                                <td v-if="isColumnVisible(5)">{{ item.language }}</td>
+
+                                <td>
+                                    <div class="d-flex gap-1 justify-content-center">
+                                        <button
+                                            v-if="canImpersonalLogin"
+                                            class="btn btn-sm btn-success"
+                                            v-show="item.activated"
+                                            @click="getAction(resolveUrl(impersonalLoginUrlTemplate, item))"
+                                            :title="translations.impersonal_login_btn"
+                                            role="button"
+                                        >
+                                            <i class="fa fa-user"></i>
+                                        </button>
+                                        <button
+                                            class="btn btn-sm btn-warning"
+                                            v-show="!item.activated"
+                                            @click="getAction(resolveUrl(resendActivationUrlTemplate, item))"
+                                            :title="translations.resend_activation_btn"
+                                            role="button"
+                                        >
+                                            <i class="fa fa-envelope"></i>
+                                        </button>
+                                        <ShowButton
+                                            :url="resolveUrl(showUrlTemplate, item)"
+                                            :translations="translations"
+                                        />
+                                        <EditButton
+                                            :url="resolveUrl(editUrlTemplate, item)"
+                                            :translations="translations"
+                                        />
+                                        <DeleteButton
+                                            :url="resolveUrl(destroyUrlTemplate, item)"
+                                            :translations="{
+                                              ...translations,
+                                              confirm_title: translations.confirm_delete_title,
+                                              confirm_text: translations.confirm_delete_text,
+                                              confirm_btn: translations.delete_btn,
+                                            }"
+                                            @deleted="loadData"
+                                        />
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <Pagination
+                        :pagination="pagination.state"
+                        :options="pagination.options"
+                        :translations="translations"
+                        @page-change="onPageChange"
+                        @per-page-change="onPerPageChange"
+                    />
+
+                    <EmptyState
+                        :show="!collection?.length"
+                        :createUrl="createUrl"
+                        :translations="translations"
+                    />
+                </div>
+            </div>
+        </div>
+
+        <ConfirmModal
+            :show="confirmModal.show"
+            :translations="confirmModal.translations"
+            @confirm="confirmModal.onConfirm"
+            @cancel="confirmModal.show = false"
+        />
+    </div>
 </template>
 
 <script setup>
-import FormCheckbox from '@craftable/components/form/FormCheckbox.vue';
-import FormEmail from '@craftable/components/form/FormEmail.vue';
-import FormInput from '@craftable/components/form/FormInput.vue';
-import FormMultiSelect from '@craftable/components/form/FormMultiSelect.vue';
-import FormPasswordConfirm from '@craftable/components/form/FormPasswordConfirm.vue';
-import FormSelect from '@craftable/components/form/FormSelect.vue';
-import FormSubmit from '@craftable/components/form/FormSubmit.vue';
-import {useAppForm} from '../composables/useAppForm.js';
+import BulkCheckboxHeader from '@craftable/components/listing/BulkCheckboxHeader.vue';
+import BulkCheckboxRow from '@craftable/components/listing/BulkCheckboxRow.vue';
+import BulkOperationsBar from '@craftable/components/listing/BulkOperationsBar.vue';
+import ConfirmModal from '@craftable/components/ConfirmModal.vue';
+import DeleteButton from '@craftable/components/listing/DeleteButton.vue';
+import EditButton from '@craftable/components/listing/EditButton.vue';
+import EmptyState from '@craftable/components/listing/EmptyState.vue';
+import ListingHeader from '@craftable/components/listing/ListingHeader.vue';
+import Pagination from '@craftable/components/listing/Pagination.vue';
+import PerPage from '@craftable/components/listing/PerPage.vue';
+import Search from '@craftable/components/listing/Search.vue';
+import ShowButton from '@craftable/components/listing/ShowButton.vue';
+import Sortable from '@craftable/components/listing/Sortable.vue';
+import ToggleSwitch from '@craftable/components/listing/ToggleSwitch.vue';
+import {ref} from 'vue';
+import {useAppListing} from '../composables/useAppListing.js';
+import {useResponsiveColumns} from '@craftable/composables/useResponsiveColumns.js';
 
 const props = defineProps({
-    action: {type: String, required: true},
-    data: {type: Object, default: () => ({})},
-    activation: {type: Boolean, default: false},
-    languageOptions: {type: Array, default: () => []},
+    url: {type: String, required: true},
+    data: {type: Object, default: null},
+    timezone: {type: String, default: 'UTC'},
+    activation: {type: Boolean, required: true},
     translations: {type: Object, default: () => ({})},
-    roleOptions: {type: Array, default: () => []},
-    responsiveBreakpoint: {type: Number, default: 850},
+    createUrl: {type: String, default: ''},
+    exportUrl: {type: String, default: ''},
+    showUrlTemplate: {type: String, required: true},
+    editUrlTemplate: {type: String, required: true},
+    updateUrlTemplate: {type: String, required: true},
+    destroyUrlTemplate: {type: String, required: true},
+    bulkAllUrl: {type: String, default: ''},
+    bulkDestroyUrl: {type: String, default: ''},
+    resendActivationUrlTemplate: {type: String, default: ''},
+    impersonalLoginUrlTemplate: {type: String, default: ''},
+    canImpersonalLogin: {type: Boolean, default: false},
 });
+
+const cardBody = ref(null);
+const {isColumnVisible} = useResponsiveColumns(cardBody);
 
 const {
-    form, wysiwygMedia, mediaCollections, isFormLocalized, currentLocale,
-    submitting, onSmallScreen, errors, datePickerConfig, timePickerConfig,
-    datetimePickerConfig, locales, defaultLocale, otherLocales,
-    showLocalizedValidationError, getPostData, onSubmit, onSuccess, onFail,
-    getLocalizedFormDefaults, showLocalization, hideLocalization,
-    shouldShowLangGroup,
-} = useAppForm(props, {
-    validationSchema: {
-        email: 'required|email',
-        language: 'required',
-    },
-});
-
-if (!props.data || Object.keys(props.data).length === 0) {
-    form.value = {
-        first_name: '',
-        last_name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-        activated: false,
-        forbidden: false,
-        language: '',
-        roles: [],
-    };
-}
+    pagination, orderBy, filters, search, collection, now,
+    bulkItems, bulkCheckingAllLoader,
+    isClickedAll, clickedBulkItemsCount, loadData, filter, resolveUrl,
+    onBulkItemClicked,
+    onBulkItemsClickedAll, onBulkItemsClickedAllWithPagination,
+    onBulkItemsClickedAllUncheck, bulkDelete, getAction, confirmModal,
+    onSort, onPageChange, onPerPageChange,
+} = useAppListing(props);
 </script>

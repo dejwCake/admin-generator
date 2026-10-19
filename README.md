@@ -12,6 +12,59 @@ This package is part of [Craftable](https://github.com/dejwCake/craftable) (`dej
 ## Documentation
 You can find full documentation at https://docs.getcraftable.com/#/admin-generator
 
+## Choosing which actions to generate
+
+By default `admin:generate` scaffolds every action except export. Use `--only` or `--except` with a
+comma-separated list to choose the actions for a resource:
+
+```shell
+php artisan admin:generate posts --only=show,export      # a read-only resource with export
+php artisan admin:generate posts --except=delete,bulk-delete
+```
+
+| Action | What it generates |
+|---|---|
+| `create` | `store` request, `create`/`store` controller methods and routes, create page, form component, the listing's create button |
+| `edit` | `update` request, `edit`/`update` controller methods and routes, edit page, form component, the listing's edit button |
+| `show` | `show` controller method and route, show page and component, the listing's show button |
+| `delete` | `destroy` request, controller method and route, the listing's delete button |
+| `bulk-delete` | `bulk-destroy` request, controller method and route, the listing's bulk-operations bar |
+| `export` | `export` request, controller method and route, the `Export` class, the listing's export button |
+
+- **`--only`** generates exactly the listed actions.
+- **`--except`** generates every action except the listed ones. It starts from *all* actions,
+  export included, so `--except=delete` turns export on, while omitting both options leaves it off.
+- The two options can't be combined, and each needs at least one action. An unknown action name is
+  an error.
+- The form component is generated when the resource has `create` or `edit`.
+
+**`index` is always generated and can't be listed.** The listing is the resource's admin page: the
+menu link points to it, and it hosts the buttons for every other action. A resource without it would
+have nothing to navigate to, so `--only=index,…` is rejected rather than silently ignored.
+
+**What's generated regardless of the selection:** the model and factory, the controller with its
+`index` method, the `index` request, the listing (Blade page and Vue component), routes, translations
+and the permissions migration. The routes, translations and listing only contain entries for the
+selected actions.
+
+**The permissions migration is always complete**, with every action's permission. Its rows are
+referenced by `role_has_permissions`, so regenerating a resource with a narrower set would delete
+grants roles already have. A permission for an action that isn't generated is harmless.
+
+### Deprecated flags
+
+`--with-export` (`-e`) and `--without-bulk` (`-wb`) still work, and are applied on top of
+`--only`/`--except`. `--with-export` can only add export, and `--without-bulk` can only remove
+bulk-delete. `admin:generate:permissions` accepts `--without-bulk` but ignores it.
+
+`admin:generate:user` and `admin:generate:admin-user` accept the same options.
+`admin:generate:admin-user:profile` does not take them.
+
+The generators whose output depends on the selection (`admin:generate:controller`,
+`admin:generate:routes`, `admin:generate:blade-index`, `admin:generate:vue-listing` and
+`admin:generate:lang`) accept the same options, so each one can be run on its own. The others
+generate one action's files and are simply not called when that action is left out.
+
 ## Issues
 Where do I report issues?
 If something is not working as expected, please open an issue in the main repository https://github.com/dejwCake/craftable.

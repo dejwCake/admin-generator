@@ -9,8 +9,8 @@ return [
         'actions' => [
             'index' => 'Categories',
             'create' => 'New Category',
-            'edit' => 'Edit :name',
             'show' => 'Category :name',
+            'edit' => 'Edit :name',
             'will_be_published' => 'Category will be published at',
         ],
 

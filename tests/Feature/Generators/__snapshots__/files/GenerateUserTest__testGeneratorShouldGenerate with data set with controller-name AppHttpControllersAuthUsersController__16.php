@@ -2,38 +2,31 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\Admin\User;
+use App\Http\Controllers\Auth\UsersController;
+use Illuminate\Support\Facades\Route;
 
-use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Collection;
-
-final class BulkDestroyUser extends FormRequest
-{
-    /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(Gate $gate): bool
-    {
-        return $gate->allows('admin.user.bulk-delete');
-    }
-
-    /**
-     * Get the validation rules that apply to the request.
-     */
-    public function rules(): array
-    {
-        return [
-            'ids.*' => [
-                'integer',
-            ],
-        ];
-    }
-
-    public function getIds(): Collection
-    {
-        $data = $this->validated();
-
-        return new Collection($data['ids'] ?? []);
-    }
-}
+Route::prefix('users')
+    ->name('users/')
+    ->controller(UsersController::class)
+    ->group(static function (): void {
+        Route::get('/', 'index')
+            ->name('index');
+        Route::get('/create', 'create')
+            ->name('create');
+        Route::post('/', 'store')
+            ->name('store');
+        Route::get('/{user:id}/edit', 'edit')
+            ->name('edit');
+        Route::post('/bulk-destroy', 'bulkDestroy')
+            ->name('bulk-destroy');
+        Route::post('/{user:id}', 'update')
+            ->name('update');
+        Route::delete('/{user:id}', 'destroy')
+            ->name('destroy');
+        Route::get('/{user:id}/resend-verify-email', 'resendVerifyEmail')
+            ->name('resend-verify-email');
+        Route::get('/{user:id}/impersonal-login', 'impersonalLogin')
+            ->name('impersonal-login');
+        Route::get('/{user:id}', 'show')
+            ->name('show');
+    });

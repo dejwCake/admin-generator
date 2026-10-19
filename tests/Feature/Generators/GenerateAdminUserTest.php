@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators;
 
+use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -24,8 +25,10 @@ final class GenerateAdminUserTest extends TestCase
         'resources/views/admin/admin-user/index.blade.php',
         'resources/views/admin/admin-user/create.blade.php',
         'resources/views/admin/admin-user/edit.blade.php',
+        'resources/views/admin/admin-user/show.blade.php',
         'resources/js/admin/admin-user/Listing.vue',
         'resources/js/admin/admin-user/Form.vue',
+        'resources/js/admin/admin-user/Show.vue',
         'database/factories/Brackets/AdminAuth/Models/AdminUserFactory.php',
         'routes/admin.php',
         'routes/admin/admin-users.php',
@@ -38,6 +41,7 @@ final class GenerateAdminUserTest extends TestCase
      * @param list<string> $missingFiles
      */
     #[DataProvider('getCases')]
+    #[DataProvider('getGeneratedActionCases')]
     public function testGeneratorShouldGenerate(array $options, array $expectedFiles, array $missingFiles,): void
     {
         foreach ($expectedFiles as $relativePath) {
@@ -75,8 +79,10 @@ final class GenerateAdminUserTest extends TestCase
             'resources/views/admin/admin-user/index.blade.php',
             'resources/views/admin/admin-user/create.blade.php',
             'resources/views/admin/admin-user/edit.blade.php',
+            'resources/views/admin/admin-user/show.blade.php',
             'resources/js/admin/admin-user/Listing.vue',
             'resources/js/admin/admin-user/Form.vue',
+            'resources/js/admin/admin-user/Show.vue',
             'database/factories/Brackets/AdminAuth/Models/AdminUserFactory.php',
         ];
 
@@ -193,6 +199,51 @@ final class GenerateAdminUserTest extends TestCase
         ];
     }
 
+    public static function getGeneratedActionCases(): iterable
+    {
+        foreach (GeneratedActionCases::get() as $caseName => $case) {
+            $files = GeneratedActionCases::splitFiles($case['actions'], self::filesByAction());
+
+            yield $caseName => [
+                'options' => $case['options'],
+                'expectedFiles' => $files['expectedFiles'],
+                'missingFiles' => $files['missingFiles'],
+            ];
+        }
+    }
+
+    /**
+     * @return array<string, list<GeneratedAction>>
+     */
+    private static function filesByAction(): array
+    {
+        $create = GeneratedAction::Create;
+        $edit = GeneratedAction::Edit;
+
+        return [
+            'app/Http/Controllers/Admin/AdminUsersController.php' => [],
+            'app/Http/Requests/Admin/AdminUser/IndexAdminUser.php' => [],
+            'app/Http/Requests/Admin/AdminUser/StoreAdminUser.php' => [$create],
+            'app/Http/Requests/Admin/AdminUser/UpdateAdminUser.php' => [$edit],
+            'app/Http/Requests/Admin/AdminUser/DestroyAdminUser.php' => [GeneratedAction::Delete],
+            'app/Http/Requests/Admin/AdminUser/BulkDestroyAdminUser.php' => [GeneratedAction::BulkDelete],
+            'app/Http/Requests/Admin/AdminUser/ExportAdminUser.php' => [GeneratedAction::Export],
+            'app/Http/Requests/Admin/AdminUser/ImpersonalLoginAdminUser.php' => [],
+            'app/Exports/AdminUsersExport.php' => [GeneratedAction::Export],
+            'resources/views/admin/admin-user/index.blade.php' => [],
+            'resources/views/admin/admin-user/create.blade.php' => [$create],
+            'resources/views/admin/admin-user/edit.blade.php' => [$edit],
+            'resources/views/admin/admin-user/show.blade.php' => [GeneratedAction::Show],
+            'resources/js/admin/admin-user/Listing.vue' => [],
+            'resources/js/admin/admin-user/Form.vue' => [$create, $edit],
+            'resources/js/admin/admin-user/Show.vue' => [GeneratedAction::Show],
+            'database/factories/Brackets/AdminAuth/Models/AdminUserFactory.php' => [],
+            'routes/admin.php' => [],
+            'routes/admin/admin-users.php' => [],
+            'lang/en/admin.php' => [],
+        ];
+    }
+
     /**
      * @param array<int, string> $files
      * @return array<int, string>
@@ -233,8 +284,10 @@ final class GenerateAdminUserTest extends TestCase
             sprintf('resources/views/admin/%s/index.blade.php', $kebab),
             sprintf('resources/views/admin/%s/create.blade.php', $kebab),
             sprintf('resources/views/admin/%s/edit.blade.php', $kebab),
+            sprintf('resources/views/admin/%s/show.blade.php', $kebab),
             sprintf('resources/js/admin/%s/Listing.vue', $kebab),
             sprintf('resources/js/admin/%s/Form.vue', $kebab),
+            sprintf('resources/js/admin/%s/Show.vue', $kebab),
             sprintf('database/factories/%sFactory.php', $modelBaseName),
             'routes/admin.php',
             sprintf('routes/admin/%s.php', $resource),
@@ -279,8 +332,10 @@ final class GenerateAdminUserTest extends TestCase
             sprintf('resources/views/admin/%s/index.blade.php', $bladeDir),
             sprintf('resources/views/admin/%s/create.blade.php', $bladeDir),
             sprintf('resources/views/admin/%s/edit.blade.php', $bladeDir),
+            sprintf('resources/views/admin/%s/show.blade.php', $bladeDir),
             sprintf('resources/js/admin/%s/Listing.vue', $jsDir),
             sprintf('resources/js/admin/%s/Form.vue', $jsDir),
+            sprintf('resources/js/admin/%s/Show.vue', $jsDir),
             sprintf(
                 'database/factories/%s/%sFactory.php',
                 self::ucPath(implode('/', array_slice($segments, 0, -1))),
@@ -310,8 +365,10 @@ final class GenerateAdminUserTest extends TestCase
             'resources/views/admin/admin-user/index.blade.php',
             'resources/views/admin/admin-user/create.blade.php',
             'resources/views/admin/admin-user/edit.blade.php',
+            'resources/views/admin/admin-user/show.blade.php',
             'resources/js/admin/admin-user/Listing.vue',
             'resources/js/admin/admin-user/Form.vue',
+            'resources/js/admin/admin-user/Show.vue',
             'database/factories/Brackets/AdminAuth/Models/AdminUserFactory.php',
         ];
     }

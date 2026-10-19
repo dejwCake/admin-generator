@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators;
 
+use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -21,6 +22,7 @@ final class GenerateTest extends TestCase
      * @param list<string> $missingFiles
      */
     #[DataProvider('getCases')]
+    #[DataProvider('getGeneratedActionCases')]
     public function testGeneratorShouldGenerate(
         array $arguments,
         array $expectedFiles,
@@ -281,6 +283,48 @@ final class GenerateTest extends TestCase
             'arguments' => ['table_name' => 'posts', '--belongs-to-many' => 'categories'],
             'expectedFiles' => [...$postsCommon, $postsBulk],
             'missingFiles' => [$postsExportRequest, $postsExportClass],
+        ];
+    }
+
+    public static function getGeneratedActionCases(): iterable
+    {
+        foreach (GeneratedActionCases::get() as $caseName => $case) {
+            yield sprintf('categories %s', $caseName) => [
+                'arguments' => ['table_name' => 'categories', ...$case['options']],
+                ...GeneratedActionCases::splitFiles($case['actions'], self::categoriesFilesByAction()),
+            ];
+        }
+    }
+
+    /**
+     * @return array<string, list<GeneratedAction>>
+     */
+    private static function categoriesFilesByAction(): array
+    {
+        $create = GeneratedAction::Create;
+        $edit = GeneratedAction::Edit;
+
+        return [
+            'app/Models/Category.php' => [],
+            'app/Http/Controllers/Admin/CategoriesController.php' => [],
+            'app/Http/Requests/Admin/Category/IndexCategory.php' => [],
+            'app/Http/Requests/Admin/Category/StoreCategory.php' => [$create],
+            'app/Http/Requests/Admin/Category/UpdateCategory.php' => [$edit],
+            'app/Http/Requests/Admin/Category/DestroyCategory.php' => [GeneratedAction::Delete],
+            'app/Http/Requests/Admin/Category/BulkDestroyCategory.php' => [GeneratedAction::BulkDelete],
+            'app/Http/Requests/Admin/Category/ExportCategory.php' => [GeneratedAction::Export],
+            'app/Exports/CategoriesExport.php' => [GeneratedAction::Export],
+            'resources/views/admin/category/index.blade.php' => [],
+            'resources/views/admin/category/create.blade.php' => [$create],
+            'resources/views/admin/category/edit.blade.php' => [$edit],
+            'resources/views/admin/category/show.blade.php' => [GeneratedAction::Show],
+            'resources/js/admin/category/Listing.vue' => [],
+            'resources/js/admin/category/Show.vue' => [GeneratedAction::Show],
+            'resources/js/admin/category/Form.vue' => [$create, $edit],
+            'database/factories/CategoryFactory.php' => [],
+            'routes/admin.php' => [],
+            'routes/admin/categories.php' => [],
+            'lang/en/admin.php' => [],
         ];
     }
 

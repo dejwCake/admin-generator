@@ -204,17 +204,10 @@
             </div>
         </div>
 
-        <ConfirmModal
-            :show="confirmModal.show"
-            :translations="confirmModal.translations"
-            @confirm="confirmModal.onConfirm"
-            @cancel="confirmModal.show = false"
-        />
     </div>
 </template>
 
 <script setup>
-import ConfirmModal from '@craftable/components/ConfirmModal.vue';
 import DeleteButton from '@craftable/components/listing/DeleteButton.vue';
 import EditButton from '@craftable/components/listing/EditButton.vue';
 import EmptyState from '@craftable/components/listing/EmptyState.vue';
@@ -253,7 +246,7 @@ const {isColumnVisible} = useResponsiveColumns(cardBody);
 
 const {
     pagination, orderBy, filters, search, collection, now,
-    loadData, filter, resolveUrl, confirmModal,
+    loadData, filter, resolveUrl,
     onSort, onPageChange, onPerPageChange, onUpdateItem,
 } = useAppListing(props);
 </script>

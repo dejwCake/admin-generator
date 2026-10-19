@@ -2,59 +2,38 @@
 
 declare(strict_types=1);
 
-namespace App\Exports;
+namespace App\Http\Requests\Admin\AdminUser;
 
-use Brackets\AdminAuth\Models\AdminUser;
-use Illuminate\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Collection;
 
-final class AdminUsersExport implements FromQuery, WithMapping, WithHeadings, WithChunkReading
+final class BulkDestroyAdminUser extends FormRequest
 {
-    private const int CHUNK = 1000;
-
     /**
-     * @return Builder<AdminUser>
+     * Determine if the user is authorized to make this request.
      */
-    public function query(): Builder
+    public function authorize(Gate $gate): bool
     {
-        return AdminUser::query()->orderBy('id');
-    }
-
-    public function chunkSize(): int
-    {
-        return self::CHUNK;
-    }
-
-    public function headings(): array
-    {
-        return [
-            trans('admin.admin-user.columns.id'),
-            trans('admin.admin-user.columns.first_name'),
-            trans('admin.admin-user.columns.last_name'),
-            trans('admin.admin-user.columns.email'),
-            trans('admin.admin-user.columns.activated'),
-            trans('admin.admin-user.columns.forbidden'),
-            trans('admin.admin-user.columns.language'),
-        ];
+        return $gate->allows('admin.admin-user.bulk-delete');
     }
 
     /**
-     * @param AdminUser $adminUser
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * Get the validation rules that apply to the request.
      */
-    public function map($adminUser): array
+    public function rules(): array
     {
         return [
-            $adminUser->id,
-            $adminUser->first_name,
-            $adminUser->last_name,
-            $adminUser->email,
-            $adminUser->activated === null ? '' : ($adminUser->activated ? __('Yes') : __('No')),
-            $adminUser->forbidden === null ? '' : ($adminUser->forbidden ? __('Yes') : __('No')),
-            $adminUser->language,
+            'ids.*' => [
+                'integer',
+            ],
         ];
+    }
+
+    public function getIds(): Collection
+    {
+        $data = $this->validated();
+
+        return new Collection($data['ids'] ?? []);
     }
 }

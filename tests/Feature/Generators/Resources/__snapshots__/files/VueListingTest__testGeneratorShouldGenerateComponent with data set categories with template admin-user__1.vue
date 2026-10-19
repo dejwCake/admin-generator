@@ -188,6 +188,10 @@
                                         >
                                             <i class="fa fa-envelope"></i>
                                         </button>
+                                        <ShowButton
+                                            :url="resolveUrl(showUrlTemplate, item)"
+                                            :translations="translations"
+                                        />
                                         <EditButton
                                             :url="resolveUrl(editUrlTemplate, item)"
                                             :translations="translations"
@@ -247,6 +251,7 @@ import ListingHeader from '@craftable/components/listing/ListingHeader.vue';
 import Pagination from '@craftable/components/listing/Pagination.vue';
 import PerPage from '@craftable/components/listing/PerPage.vue';
 import Search from '@craftable/components/listing/Search.vue';
+import ShowButton from '@craftable/components/listing/ShowButton.vue';
 import Sortable from '@craftable/components/listing/Sortable.vue';
 import ToggleSwitch from '@craftable/components/listing/ToggleSwitch.vue';
 import {formatDate, formatDatetime, formatTime} from '@craftable/utils/dateFormatters.js';
@@ -261,6 +266,7 @@ const props = defineProps({
     activation: {type: Boolean, required: true},
     translations: {type: Object, default: () => ({})},
     createUrl: {type: String, default: ''},
+    showUrlTemplate: {type: String, required: true},
     editUrlTemplate: {type: String, required: true},
     updateUrlTemplate: {type: String, required: true},
     destroyUrlTemplate: {type: String, required: true},

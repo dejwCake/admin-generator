@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators;
 
+use Brackets\AdminGenerator\Dtos\GeneratedActions;
+use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Generators\Traits\FileManipulations;
+use Brackets\AdminGenerator\Generators\Traits\ResolvesGeneratedActions;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Override;
@@ -13,6 +16,9 @@ use Symfony\Component\Console\Input\InputOption;
 final class GenerateAdminUser extends Command
 {
     use FileManipulations;
+    use ResolvesGeneratedActions;
+
+    private const string TABLE_NAME = 'admin_users';
 
     /**
      * The name and signature of the console command.
@@ -38,35 +44,22 @@ final class GenerateAdminUser extends Command
 
     public function handle(): void
     {
-        $tableName = 'admin_users';
-        $modelName = $this->option('model-name');
+        $modelName = $this->resolveModelName();
+        $modelWithFullNamespace = $this->resolveModelWithFullNamespace();
         $controllerName = $this->option('controller-name');
         $force = $this->option('force');
-        $withExport = $this->option('with-export');
-        $withoutBulk = $this->option('without-bulk');
+        $actionOptions = [
+            '--only' => $this->option('only'),
+            '--except' => $this->option('except'),
+            '--with-export' => $this->option('with-export'),
+            '--without-bulk' => $this->option('without-bulk'),
+        ];
         $translatable = $this->option('translatable');
         $media = $this->option('media');
-
-        if ($modelName === null) {
-            $modelName = 'AdminUser';
-            $modelWithFullNamespace = 'Brackets\AdminAuth\Models\AdminUser';
-        } else {
-            $modelWithFullNamespace = null;
-        }
+        $actions = $this->resolveGeneratedActions();
 
         if ($force) {
-            if ($withExport) {
-                $this->files->delete($this->laravel->path('Exports/AdminUsersExport.php'));
-            }
-            $this->files->delete($this->laravel->path('Http/Controllers/Admin/AdminUsersController.php'));
-            $this->files->delete(
-                $this->laravel->databasePath('Factories/Brackets/AdminAuth/Models/AdminUserFactory.php'),
-            );
-            $this->files->deleteDirectory($this->laravel->path('Http/Requests/Admin/AdminUser'));
-            $this->files->deleteDirectory($this->laravel->resourcePath('js/admin/admin-user'));
-            $this->files->deleteDirectory($this->laravel->resourcePath('views/admin/admin-user'));
-
-            $this->info('Deleting previous files finished.');
+            $this->deletePreviousFiles($actions);
         }
 
         // we need to replace this before controller generation happens
@@ -79,155 +72,49 @@ final class GenerateAdminUser extends Command
         );
 
         $this->call('admin:generate:controller', [
-            'table_name' => $tableName,
+            'table_name' => self::TABLE_NAME,
             'class_name' => $controllerName,
             '--model-name' => $modelName,
             '--model-with-full-namespace' => $modelWithFullNamespace,
             '--template' => 'admin-user',
             '--belongs-to-many' => 'roles',
             '--translatable' => $translatable,
-            '--with-export' => $withExport,
-            '--without-bulk' => $withoutBulk,
+            ...$actionOptions,
             '--media' => $media,
         ]);
 
-        $this->call('admin:generate:request:index', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--translatable' => $translatable,
-        ]);
-
-        $this->call('admin:generate:request:store', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--template' => 'admin-user',
-            '--belongs-to-many' => 'roles',
-            '--translatable' => $translatable,
-        ]);
-
-        $this->call('admin:generate:request:update', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--model-with-full-namespace' => $modelWithFullNamespace,
-            '--force' => $force,
-            '--template' => 'admin-user',
-            '--belongs-to-many' => 'roles',
-            '--translatable' => $translatable,
-        ]);
-
-        $this->call('admin:generate:request:destroy', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--model-with-full-namespace' => $modelWithFullNamespace,
-            '--force' => $force,
-        ]);
-
-        if (!$withoutBulk) {
-            $this->call('admin:generate:request:bulk-destroy', [
-                'table_name' => $tableName,
-                '--model-name' => $modelName,
-                '--model-with-full-namespace' => $modelWithFullNamespace,
-                '--force' => $force,
-            ]);
-        }
-
-        if ($withExport) {
-            $this->call('admin:generate:request:export', [
-                'table_name' => $tableName,
-                '--model-name' => $modelName,
-                '--model-with-full-namespace' => $modelWithFullNamespace,
-                '--force' => $force,
-            ]);
-        }
-
-        $this->call('admin:generate:request:impersonal-login', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--model-with-full-namespace' => $modelWithFullNamespace,
-            '--force' => $force,
-        ]);
+        $this->generateRequests($actions, $modelName, $modelWithFullNamespace, $force, $translatable);
 
         $this->call('admin:generate:routes', [
-            'table_name' => $tableName,
+            'table_name' => self::TABLE_NAME,
             '--model-name' => $modelName,
             '--controller-name' => $controllerName,
             '--template' => 'admin-user',
-            '--with-export' => $withExport,
-            '--without-bulk' => $withoutBulk,
+            ...$actionOptions,
         ]);
 
-        $this->call('admin:generate:blade-index', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--template' => 'admin-user',
-            '--with-export' => $withExport,
-            '--without-bulk' => $withoutBulk,
-            '--translatable' => $translatable,
-        ]);
-
-        $this->call('admin:generate:vue-listing', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--template' => 'admin-user',
-            '--with-export' => $withExport,
-            '--without-bulk' => $withoutBulk,
-            '--translatable' => $translatable,
-        ]);
-
-        $this->call('admin:generate:blade-create', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--template' => 'admin-user',
-            '--belongs-to-many' => 'roles',
-            '--translatable' => $translatable,
-            '--media' => $media,
-        ]);
-
-        $this->call('admin:generate:blade-edit', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--template' => 'admin-user',
-            '--belongs-to-many' => 'roles',
-            '--translatable' => $translatable,
-            '--media' => $media,
-        ]);
-
-        $this->call('admin:generate:vue-form', [
-            'table_name' => $tableName,
-            '--model-name' => $modelName,
-            '--force' => $force,
-            '--template' => 'admin-user',
-            '--belongs-to-many' => 'roles',
-            '--translatable' => $translatable,
-            '--media' => $media,
-        ]);
+        $this->generateViews($actions, $modelName, $force, $translatable, $media, $actionOptions);
 
         $this->call('admin:generate:lang', [
-            'table_name' => $tableName,
+            'table_name' => self::TABLE_NAME,
             '--model-name' => $modelName,
             '--belongs-to-many' => 'roles',
-            '--with-export' => $withExport,
+            ...$actionOptions,
             '--media' => $media,
             '--translatable' => $translatable,
         ]);
 
         $this->call('admin:generate:factory', [
-            'table_name' => $tableName,
+            'table_name' => self::TABLE_NAME,
             '--model-name' => $modelName,
             '--model-with-full-namespace' => $modelWithFullNamespace,
             '--force' => $force,
             '--translatable' => $translatable,
         ]);
 
-        if ($withExport) {
+        if ($actions->has(GeneratedAction::Export)) {
             $this->call('admin:generate:export', [
-                'table_name' => $tableName,
+                'table_name' => self::TABLE_NAME,
                 '--model-with-full-namespace' => $modelWithFullNamespace,
                 '--force' => $force,
                 '--translatable' => $translatable,
@@ -258,8 +145,7 @@ final class GenerateAdminUser extends Command
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Specify custom model name'],
             ['controller-name', 'c', InputOption::VALUE_OPTIONAL, 'Specify custom controller name'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating admin user'],
-            ['with-export', 'e', InputOption::VALUE_NONE, 'Generate an option to Export as Excel'],
-            ['without-bulk', 'wb', InputOption::VALUE_NONE, 'Generate without bulk options'],
+            ...$this->getGeneratedActionOptions(),
             [
                 'translatable',
                 'tr',
@@ -274,5 +160,188 @@ final class GenerateAdminUser extends Command
             ],
             ['seed', 's', InputOption::VALUE_NONE, 'Seeds table with fake data'],
         ];
+    }
+
+    private function generateRequests(
+        GeneratedActions $actions,
+        string $modelName,
+        ?string $modelWithFullNamespace,
+        bool $force,
+        ?string $translatable,
+    ): void {
+        $this->call('admin:generate:request:index', [
+            'table_name' => self::TABLE_NAME,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--translatable' => $translatable,
+        ]);
+
+        if ($actions->has(GeneratedAction::Create)) {
+            $this->call('admin:generate:request:store', [
+                'table_name' => self::TABLE_NAME,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--template' => 'admin-user',
+                '--belongs-to-many' => 'roles',
+                '--translatable' => $translatable,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::Edit)) {
+            $this->call('admin:generate:request:update', [
+                'table_name' => self::TABLE_NAME,
+                '--model-name' => $modelName,
+                '--model-with-full-namespace' => $modelWithFullNamespace,
+                '--force' => $force,
+                '--template' => 'admin-user',
+                '--belongs-to-many' => 'roles',
+                '--translatable' => $translatable,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::Delete)) {
+            $this->call('admin:generate:request:destroy', [
+                'table_name' => self::TABLE_NAME,
+                '--model-name' => $modelName,
+                '--model-with-full-namespace' => $modelWithFullNamespace,
+                '--force' => $force,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::BulkDelete)) {
+            $this->call('admin:generate:request:bulk-destroy', [
+                'table_name' => self::TABLE_NAME,
+                '--model-name' => $modelName,
+                '--model-with-full-namespace' => $modelWithFullNamespace,
+                '--force' => $force,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::Export)) {
+            $this->call('admin:generate:request:export', [
+                'table_name' => self::TABLE_NAME,
+                '--model-name' => $modelName,
+                '--model-with-full-namespace' => $modelWithFullNamespace,
+                '--force' => $force,
+            ]);
+        }
+
+        $this->call('admin:generate:request:impersonal-login', [
+            'table_name' => self::TABLE_NAME,
+            '--model-name' => $modelName,
+            '--model-with-full-namespace' => $modelWithFullNamespace,
+            '--force' => $force,
+        ]);
+    }
+
+    /**
+     * @param array<string> $media
+     * @param array<string, string|bool|null> $actionOptions
+     */
+    private function generateViews(
+        GeneratedActions $actions,
+        string $modelName,
+        bool $force,
+        ?string $translatable,
+        array $media,
+        array $actionOptions,
+    ): void {
+        $this->call('admin:generate:blade-index', [
+            'table_name' => self::TABLE_NAME,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--template' => 'admin-user',
+            ...$actionOptions,
+            '--translatable' => $translatable,
+        ]);
+
+        $this->call('admin:generate:vue-listing', [
+            'table_name' => self::TABLE_NAME,
+            '--model-name' => $modelName,
+            '--force' => $force,
+            '--template' => 'admin-user',
+            ...$actionOptions,
+            '--translatable' => $translatable,
+        ]);
+
+        if ($actions->has(GeneratedAction::Show)) {
+            $this->call('admin:generate:blade-show', [
+                'table_name' => self::TABLE_NAME,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--translatable' => $translatable,
+            ]);
+
+            $this->call('admin:generate:vue-show', [
+                'table_name' => self::TABLE_NAME,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--translatable' => $translatable,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::Create)) {
+            $this->call('admin:generate:blade-create', [
+                'table_name' => self::TABLE_NAME,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--template' => 'admin-user',
+                '--belongs-to-many' => 'roles',
+                '--translatable' => $translatable,
+                '--media' => $media,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::Edit)) {
+            $this->call('admin:generate:blade-edit', [
+                'table_name' => self::TABLE_NAME,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--template' => 'admin-user',
+                '--belongs-to-many' => 'roles',
+                '--translatable' => $translatable,
+                '--media' => $media,
+            ]);
+        }
+
+        if ($actions->has(GeneratedAction::Create) || $actions->has(GeneratedAction::Edit)) {
+            $this->call('admin:generate:vue-form', [
+                'table_name' => self::TABLE_NAME,
+                '--model-name' => $modelName,
+                '--force' => $force,
+                '--template' => 'admin-user',
+                '--belongs-to-many' => 'roles',
+                '--translatable' => $translatable,
+                '--media' => $media,
+            ]);
+        }
+    }
+
+    private function resolveModelName(): string
+    {
+        $modelName = $this->option('model-name');
+
+        return is_string($modelName) ? $modelName : 'AdminUser';
+    }
+
+    private function resolveModelWithFullNamespace(): ?string
+    {
+        return $this->option('model-name') === null ? 'Brackets\AdminAuth\Models\AdminUser' : null;
+    }
+
+    private function deletePreviousFiles(GeneratedActions $actions): void
+    {
+        if ($actions->has(GeneratedAction::Export)) {
+            $this->files->delete($this->laravel->path('Exports/AdminUsersExport.php'));
+        }
+        $this->files->delete($this->laravel->path('Http/Controllers/Admin/AdminUsersController.php'));
+        $this->files->delete(
+            $this->laravel->databasePath('Factories/Brackets/AdminAuth/Models/AdminUserFactory.php'),
+        );
+        $this->files->deleteDirectory($this->laravel->path('Http/Requests/Admin/AdminUser'));
+        $this->files->deleteDirectory($this->laravel->resourcePath('js/admin/admin-user'));
+        $this->files->deleteDirectory($this->laravel->resourcePath('views/admin/admin-user'));
+
+        $this->info('Deleting previous files finished.');
     }
 }
