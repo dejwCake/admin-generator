@@ -36,8 +36,7 @@ trait ResolvesGeneratedActions
                 'only',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Generate only these actions: create, show, edit, delete, export, bulk-delete '
-                . '(index is always generated)',
+                'Generate only these actions: create, show, edit, delete, export, bulk-delete (plus index)',
             ],
             [
                 'except',

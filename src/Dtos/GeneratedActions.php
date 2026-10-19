@@ -27,8 +27,7 @@ final readonly class GeneratedActions
     {
         if ($only !== null && $except !== null) {
             throw new InvalidArgumentException(
-                'The --only and --except options cannot be combined. Pass whichever expresses the '
-                . 'resource more directly.',
+                'The --only and --except options cannot be combined, pass only one of them.',
             );
         }
 
@@ -88,8 +87,7 @@ final readonly class GeneratedActions
 
             if ($action === null) {
                 throw new InvalidArgumentException(sprintf(
-                    '%s does not know the action "%s". Known actions are %s. `index` is always '
-                    . 'generated and cannot be listed.',
+                    '%s does not know the action "%s". Known actions are %s; `index` is always generated.',
                     $option,
                     $name,
                     implode(', ', array_map(
