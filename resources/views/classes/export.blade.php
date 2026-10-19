@@ -13,11 +13,11 @@ namespace {{ $exportNamespace }};
 use {{ $modelFullName }};
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithCustomChunkSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-final class {{ $classBaseName }} implements FromQuery, WithMapping, WithHeadings, WithChunkReading
+final class {{ $classBaseName }} implements FromQuery, WithMapping, WithHeadings, WithCustomChunkSize
 {
     private const int CHUNK = 1000;
 

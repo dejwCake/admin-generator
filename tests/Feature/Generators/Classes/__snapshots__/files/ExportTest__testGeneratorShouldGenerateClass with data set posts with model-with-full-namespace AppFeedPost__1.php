@@ -7,11 +7,11 @@ namespace App\Exports;
 use App\Feed\Post;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\FromQuery;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithCustomChunkSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-final class PostsExport implements FromQuery, WithMapping, WithHeadings, WithChunkReading
+final class PostsExport implements FromQuery, WithMapping, WithHeadings, WithCustomChunkSize
 {
     private const int CHUNK = 1000;
 
