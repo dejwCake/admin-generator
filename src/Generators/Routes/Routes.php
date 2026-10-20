@@ -151,6 +151,8 @@ final class Routes extends Generator
             'hasDelete' => $this->generatedActions->has(GeneratedAction::Delete),
             'hasBulkDelete' => $this->generatedActions->has(GeneratedAction::BulkDelete),
             'hasExport' => $this->generatedActions->has(GeneratedAction::Export),
+            //deprecated alias for templates overridden from 2.4.0, use hasBulkDelete instead
+            'hasBulk' => $this->generatedActions->has(GeneratedAction::BulkDelete),
         ])->render();
     }
 }

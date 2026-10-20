@@ -140,6 +140,9 @@ final class Controller extends ClassGenerator
             'indexEagerLoads' => $indexEagerLoads,
             'showEagerLoads' => $showEagerLoads,
             'editEagerLoads' => $editEagerLoads,
+            //deprecated aliases for templates overridden from 2.4.0, use hasBulkDelete and formColumns instead
+            'hasBulk' => $this->generatedActions->has(GeneratedAction::BulkDelete),
+            'visibleColumns' => $columns->getForForm(),
         ])->render();
     }
 

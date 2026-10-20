@@ -86,6 +86,8 @@ final class UpdateRequest extends ClassGenerator
             // validation in store/update
             'formColumns' => $formColumns,
             'translatableColumns' => $columns->getTranslatable(),
+            //deprecated alias for templates overridden from 2.4.0, use formColumns instead
+            'visibleColumns' => $formColumns,
         ])->render();
     }
 

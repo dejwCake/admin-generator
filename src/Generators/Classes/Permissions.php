@@ -107,6 +107,8 @@ final class Permissions extends ClassGenerator
             'modelDotNotation' => $this->modelDotNotation,
             //has
             'hasImpersonalLogin' => $this->withImpersonalLogin,
+            //deprecated alias for templates overridden from 2.4.0, the permission set is always complete
+            'hasBulk' => true,
         ])->render();
     }
 

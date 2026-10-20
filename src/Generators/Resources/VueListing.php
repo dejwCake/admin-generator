@@ -120,6 +120,8 @@ final class VueListing extends ResourceGenerator
             'columns' => $columns,
             //other
             'dateImports' => $dateImports,
+            //deprecated alias for templates overridden from 2.4.0, use hasBulkDelete instead
+            'hasBulk' => $this->generatedActions->has(GeneratedAction::BulkDelete),
         ])->render();
     }
 }

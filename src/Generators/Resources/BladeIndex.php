@@ -93,6 +93,8 @@ final class BladeIndex extends ResourceGenerator
             'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),
             //columns
             'columns' => $columns,
+            //deprecated alias for templates overridden from 2.4.0, use hasBulkDelete instead
+            'hasBulk' => $this->generatedActions->has(GeneratedAction::BulkDelete),
         ])->render();
     }
 }

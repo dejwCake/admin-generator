@@ -305,10 +305,9 @@ below only matter when you **regenerate** scaffolds.
   working. See README → "Choosing which actions to generate".
 - **Permissions migration** always contains every action's permission; `admin:generate:permissions
   --without-bulk` is still accepted but no longer leaves out bulk-delete.
-- **Overridden generator templates.** If you override the package's Blade templates under
-  `resources/views/vendor/brackets/admin-generator`, update the renamed variables: `$visibleColumns` →
-  `$formColumns`, `$hasBulk` → `$hasBulkDelete`.
-- **Deprecated:** `ColumnCollection::getVisible()`, use `getForForm()`.
+- **Deprecated:** `ColumnCollection::getVisible()`, use `getForForm()`. Templates overridden under
+  `resources/views/vendor/brackets/admin-generator` still receive `$visibleColumns` and `$hasBulk`,
+  but prefer `$formColumns` and `$hasBulkDelete`; the old names will be removed in the next major.
 
 ## Reference
 
