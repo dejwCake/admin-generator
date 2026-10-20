@@ -74,6 +74,19 @@ final class VueShowTest extends TestCase
         self::assertStringContainsString("ReadOnlySwitch from '@craftable/components/ReadOnlySwitch.vue'", $contents);
     }
 
+    /**
+     * Wysiwyg columns hold HTML, so printing them as text would show the raw tags.
+     */
+    public function testWysiwygColumnsRenderAsHtml(): void
+    {
+        $this->artisan('admin:generate:vue-show', ['table_name' => 'categories']);
+
+        $contents = (string) file_get_contents($this->app->basePath('resources/js/admin/category/Show.vue'));
+
+        self::assertStringContainsString('<div v-html="data.perex"></div>', $contents);
+        self::assertStringNotContainsString(':value="data.perex"', $contents);
+    }
+
     public static function getCases(): iterable
     {
         yield 'categories default' => [

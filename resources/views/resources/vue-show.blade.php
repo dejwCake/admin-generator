@@ -42,6 +42,10 @@
             <ShowRow :label="translations.columns.{{ $column->name }}" :value="formatTime(data.{{ $column->name }})"/>
 @elseif(in_array($column->majorType, ['datetime'], true))
             <ShowRow :label="translations.columns.{{ $column->name }}" :value="formatDatetime(data.{{ $column->name }})"/>
+@elseif($column->isWysiwyg)
+            <ShowRow :label="translations.columns.{{ $column->name }}">
+                <div v-html="data.{{ $column->name }}"></div>
+            </ShowRow>
 @elseif($column->isArray())
             <ShowRow :label="translations.columns.{{ $column->name }}" :value="Object.values(data.{{ $column->name }} ?? {}).join(', ')"/>
 @else

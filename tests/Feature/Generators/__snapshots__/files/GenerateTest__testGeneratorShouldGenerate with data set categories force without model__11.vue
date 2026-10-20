@@ -15,7 +15,9 @@
             <ShowRow :label="translations.columns.email" :value="data.email"/>
             <ShowRow :label="translations.columns.language" :value="data.language"/>
             <ShowRow :label="translations.columns.slug" :value="data.slug"/>
-            <ShowRow :label="translations.columns.perex" :value="data.perex"/>
+            <ShowRow :label="translations.columns.perex">
+                <div v-html="data.perex"></div>
+            </ShowRow>
             <ShowRow :label="translations.columns.long_text" :value="data.long_text"/>
             <ShowRow :label="translations.columns.published_at" :value="formatDate(data.published_at)"/>
             <ShowRow :label="translations.columns.published_to" :value="formatDate(data.published_to)"/>
@@ -23,8 +25,12 @@
             <ShowRow :label="translations.columns.time_start" :value="formatTime(data.time_start)"/>
             <ShowRow :label="translations.columns.date_time_end" :value="formatDatetime(data.date_time_end)"/>
             <ShowRow :label="translations.columns.released_at" :value="formatDatetime(data.released_at)"/>
-            <ShowRow :label="translations.columns.text" :value="data.text"/>
-            <ShowRow :label="translations.columns.description" :value="data.description"/>
+            <ShowRow :label="translations.columns.text">
+                <div v-html="data.text"></div>
+            </ShowRow>
+            <ShowRow :label="translations.columns.description">
+                <div v-html="data.description"></div>
+            </ShowRow>
             <ShowRow :label="translations.columns.enabled">
                 <ReadOnlySwitch :modelValue="data.enabled"/>
             </ShowRow>
