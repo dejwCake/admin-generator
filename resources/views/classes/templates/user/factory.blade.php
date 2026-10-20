@@ -70,8 +70,7 @@ final class {{ $modelBaseName }}Factory extends Factory
      */
     public function unverified(): static
     {
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter,SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic
-        return $this->state(fn (array $attributes) => ['email_verified_at' => null]);
+        return $this->state(['email_verified_at' => null]);
     }
 @endif
 @if($hasTwoFactor)
@@ -83,8 +82,7 @@ final class {{ $modelBaseName }}Factory extends Factory
     {
         $encrypter = Container::getInstance()->make(Encrypter::class);
 
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter,SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic
-        return $this->state(fn (array $attributes) => [
+        return $this->state([
             'two_factor_secret' => $encrypter->encrypt('secret'),
             'two_factor_recovery_codes' => $encrypter->encrypt(json_encode(['recovery-code-1'])),
             'two_factor_confirmed_at' => CarbonImmutable::now(),
@@ -100,8 +98,7 @@ final class {{ $modelBaseName }}Factory extends Factory
     {
         $hasher = Container::getInstance()->make(Hasher::class);
 
-        // phpcs:ignore SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter,SlevomatCodingStandard.Functions.StaticClosure.ClosureNotStatic
-        return $this->state(fn (array $attributes) => [
+        return $this->state([
             'password' => $hasher->make($password),
         ]);
     }

@@ -276,10 +276,6 @@ const props = defineProps({
 });
 
 const cardBody = ref(null);
-// The numbers passed to isColumnVisible() are priorities, not column positions: a lower number
-// survives a narrower card, columns sharing a number appear and disappear together, and anything
-// above 3 is hidden once the card is under 1200px -- which an ordinary laptop already is. The
-// generator can only guess, so tune them to this resource rather than leaving them in column order.
 const {isColumnVisible} = useResponsiveColumns(cardBody);
 
 const {
