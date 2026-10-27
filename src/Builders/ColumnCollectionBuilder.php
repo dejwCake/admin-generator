@@ -77,6 +77,26 @@ final class ColumnCollectionBuilder
                 && !$column->isWysiwyg,
         );
 
+        $priorities = $this->resolvePriorities($indexEligible);
+
+        $reassigned = new ColumnCollection();
+
+        foreach ($this->columnCollection as $column) {
+            $reassigned->push(
+                array_key_exists($column->name, $priorities)
+                    ? $column->withPriority($priorities[$column->name])
+                    : $column,
+            );
+        }
+
+        $this->columnCollection = $reassigned;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function resolvePriorities(ColumnCollection $indexEligible): array
+    {
         $fixedPriorities = $indexEligible
             ->pluck('priority')
             ->filter(static fn (?int $priority): bool => $priority !== null)
@@ -90,16 +110,10 @@ final class ColumnCollectionBuilder
 
         $nextPriority = count($priorityMap);
 
-        $indexNames = $indexEligible->pluck('name')->all();
-
         $priorities = [];
         $uuidNames = [];
 
-        foreach ($this->columnCollection as $column) {
-            if (!in_array($column->name, $indexNames, true)) {
-                continue;
-            }
-
+        foreach ($indexEligible as $column) {
             if ($column->priority !== null) {
                 $priorities[$column->name] = $priorityMap[$column->priority];
             } elseif (in_array($column->name, ColumnCollection::UUID_COLUMNS, true)) {
@@ -116,16 +130,6 @@ final class ColumnCollectionBuilder
             $nextPriority++;
         }
 
-        $reassigned = new ColumnCollection();
-
-        foreach ($this->columnCollection as $column) {
-            $reassigned->push(
-                array_key_exists($column->name, $priorities)
-                    ? $column->withPriority($priorities[$column->name])
-                    : $column,
-            );
-        }
-
-        $this->columnCollection = $reassigned;
+        return $priorities;
     }
 }
