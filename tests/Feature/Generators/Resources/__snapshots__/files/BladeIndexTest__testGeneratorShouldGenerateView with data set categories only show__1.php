@@ -12,6 +12,7 @@
             'listing_title' => trans('admin.category.actions.index'),
             'columns' => [
                 'id' => trans('admin.category.columns.id'),
+                'uuid' => trans('admin.category.columns.uuid'),
                 'user_id' => trans('admin.category.columns.user_id'),
                 'title' => trans('admin.category.columns.title'),
                 'name' => trans('admin.category.columns.name'),

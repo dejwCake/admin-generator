@@ -30,6 +30,9 @@
                                 <Sortable v-if="isColumnVisible(2)" :column="'id'" :orderBy="orderBy" @sort="onSort">
                                     {{ translations.columns.id }}
                                 </Sortable>
+                                <Sortable v-if="isColumnVisible(10)" :column="'uuid'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.uuid }}
+                                </Sortable>
                                 <Sortable v-if="isColumnVisible(4)" :column="'user_id'" :orderBy="orderBy" @sort="onSort">
                                     {{ translations.columns.user_id }}
                                 </Sortable>
@@ -104,6 +107,7 @@
                             >
 
                                 <td v-if="isColumnVisible(2)">{{ item.id }}</td>
+                                <td v-if="isColumnVisible(10)">{{ item.uuid }}</td>
                                 <td v-if="isColumnVisible(4)">{{ item.user?.name }}</td>
                                 <td v-if="isColumnVisible(0)">{{ item.title }}</td>
                                 <td v-if="isColumnVisible(0)">{{ item.name }}</td>

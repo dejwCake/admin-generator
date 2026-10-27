@@ -17,6 +17,7 @@ use Database\Factories\CategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,6 +29,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * @property int $id
+ * @property string $uuid
  * @property int|null $user_id
  * @property string $title
  * @property string|null $name
@@ -63,6 +65,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read User|null $user
  */
 #[Fillable([
+    'uuid',
     'user_id',
     'title',
     'name',
@@ -104,6 +107,7 @@ final class Category extends Model implements HasMedia
     use HasMediaCollectionsTrait;
     use HasMediaThumbsTrait;
     use HasTranslations;
+    use HasUuids;
     use ProcessMediaTrait;
     use PublishableTrait;
     use SoftDeletes;
@@ -118,6 +122,16 @@ final class Category extends Model implements HasMedia
         'text',
         'description',
     ];
+
+    /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * @return list<string>
+     */
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
 
     public function posts(): BelongsToMany
     {

@@ -6,6 +6,7 @@
         </div>
         <div class="card-body">
             <ShowRow :label="translations.columns.id" :value="data.id"/>
+            <ShowRow :label="translations.columns.uuid" :value="data.uuid"/>
             <ShowRow :label="translations.columns.user_id" :value="data.user?.name"/>
             <ShowRow :label="translations.columns.title" :value="data.title"/>
             <ShowRow :label="translations.columns.name" :value="data.name"/>

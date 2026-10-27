@@ -127,6 +127,16 @@ final class FactoryTest extends TestCase
         }
     }
 
+    public function testGeneratorShouldLeaveTheUuidColumnToTheModel(): void
+    {
+        $this->artisan('admin:generate:factory', ['table_name' => 'categories']);
+
+        $contents = (string) file_get_contents($this->app->basePath('database/factories/CategoryFactory.php'));
+
+        self::assertStringContainsString("'title' =>", $contents);
+        self::assertStringNotContainsString("'uuid'", $contents);
+    }
+
     public static function getCases(): iterable
     {
         yield 'categories default' => [

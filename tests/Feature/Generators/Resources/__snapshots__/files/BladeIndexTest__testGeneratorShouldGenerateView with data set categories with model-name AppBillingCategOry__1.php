@@ -19,6 +19,7 @@
             'create_btn' => trans('admin.categ-ory.actions.create'),
             'columns' => [
                 'id' => trans('admin.categ-ory.columns.id'),
+                'uuid' => trans('admin.categ-ory.columns.uuid'),
                 'user_id' => trans('admin.categ-ory.columns.user_id'),
                 'title' => trans('admin.categ-ory.columns.title'),
                 'name' => trans('admin.categ-ory.columns.name'),

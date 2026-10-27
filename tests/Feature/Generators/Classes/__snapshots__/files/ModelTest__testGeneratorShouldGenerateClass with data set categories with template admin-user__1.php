@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -25,6 +26,7 @@ use Illuminate\Support\Collection;
 
 /**
  * @property int $id
+ * @property string $uuid
  * @property int|null $user_id
  * @property string $title
  * @property string|null $name
@@ -61,6 +63,7 @@ use Illuminate\Support\Collection;
  */
 #[Appends(['full_name'])]
 #[Fillable([
+    'uuid',
     'user_id',
     'title',
     'name',
@@ -99,6 +102,7 @@ final class Category extends Authenticatable implements CanActivateContract
     use CanActivate;
     use HasFactory;
     use HasTranslations;
+    use HasUuids;
     use Notifiable;
     use SoftDeletes;
 
@@ -111,6 +115,16 @@ final class Category extends Authenticatable implements CanActivateContract
         'text',
         'description',
     ];
+
+    /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * @return list<string>
+     */
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
 
     public function getFullNameAttribute(): string
     {

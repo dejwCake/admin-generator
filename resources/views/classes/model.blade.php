@@ -11,6 +11,7 @@
     assert($hiddenColumns instanceof ColumnCollection);
     assert($translatableColumns instanceof ColumnCollection);
     assert($arrayColumns instanceof ColumnCollection);
+    assert($uuidColumns instanceof ColumnCollection);
 @endphp
 @php echo "<?php";
 @endphp
@@ -94,6 +95,9 @@ namespace {{ $modelNameSpace }};
     }
     if ($hiddenColumns->isNotEmpty()) {
         $uses->push('Illuminate\Database\Eloquent\Attributes\Hidden');
+    }
+    if ($uuidColumns->isNotEmpty()) {
+        $uses->push('Illuminate\Database\Eloquent\Concerns\HasUuids');
     }
     $uses = $uses->unique()->sort();
 @endphp
@@ -185,6 +189,9 @@ final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty()
         $traitUses->push('HasMediaThumbsTrait');
         $traitUses->push('ProcessMediaTrait');
     }
+    if ($uuidColumns->isNotEmpty()) {
+        $traitUses->push('HasUuids');
+    }
     $traitUses = $traitUses->unique()->sort();
 @endphp
 @if(count($traitUses) > 0)
@@ -204,6 +211,18 @@ final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty()
         '{{ $column->name }}',
 @endforeach
     ];
+@endif
+@if ($uuidColumns->isNotEmpty())
+
+    /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * @return list<string>
+     */
+    public function uniqueIds(): array
+    {
+        return [{!! $uuidColumns->pluck('name')->map(static fn (string $name): string => sprintf("'%s'", $name))->implode(', ') !!}];
+    }
 @endif
 @if ($relations->hasBelongsToManyWithoutRelatedTable('roles'))
 

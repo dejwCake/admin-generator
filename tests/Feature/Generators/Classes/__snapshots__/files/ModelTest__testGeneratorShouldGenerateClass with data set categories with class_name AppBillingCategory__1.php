@@ -15,6 +15,7 @@ use Database\Factories\Billing\CategoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,6 +25,7 @@ use Illuminate\Support\Collection;
 
 /**
  * @property int $id
+ * @property string $uuid
  * @property int|null $user_id
  * @property string $title
  * @property string|null $name
@@ -59,6 +61,7 @@ use Illuminate\Support\Collection;
  * @property-read User|null $user
  */
 #[Fillable([
+    'uuid',
     'user_id',
     'title',
     'name',
@@ -97,6 +100,7 @@ final class Category extends Model
     use CreatedByAdminUserTrait;
     use HasFactory;
     use HasTranslations;
+    use HasUuids;
     use PublishableTrait;
     use SoftDeletes;
     use UpdatedByAdminUserTrait;
@@ -110,6 +114,16 @@ final class Category extends Model
         'text',
         'description',
     ];
+
+    /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * @return list<string>
+     */
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
 
     public function posts(): BelongsToMany
     {

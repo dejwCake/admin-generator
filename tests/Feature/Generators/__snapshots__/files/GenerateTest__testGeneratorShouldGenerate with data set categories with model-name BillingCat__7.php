@@ -19,6 +19,7 @@
             'create_btn' => trans('admin.billing_cat.actions.create'),
             'columns' => [
                 'id' => trans('admin.billing_cat.columns.id'),
+                'uuid' => trans('admin.billing_cat.columns.uuid'),
                 'user_id' => trans('admin.billing_cat.columns.user_id'),
                 'title' => trans('admin.billing_cat.columns.title'),
                 'name' => trans('admin.billing_cat.columns.name'),

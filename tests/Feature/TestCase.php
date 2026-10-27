@@ -152,6 +152,7 @@ abstract class TestCase extends Orchestra
 
         $schemaBuilder->create('categories', static function (Blueprint $table): void {
             $table->increments('id');
+            $table->uuid('uuid')->unique();
             $table->foreignId('user_id')->nullable()->constrained('users');
             $table->string('title')->unique();
             $table->string('name')->nullable();

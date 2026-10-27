@@ -7,6 +7,8 @@ namespace Brackets\AdminGenerator\Tests\Feature\Generators\Classes;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+use function file_get_contents;
+
 final class StoreRequestTest extends TestCase
 {
     #[DataProvider('getCases')]
@@ -34,6 +36,18 @@ final class StoreRequestTest extends TestCase
             '--force' => true,
         ]);
         self::assertFileExists($filePath);
+    }
+
+    public function testGeneratorShouldNotValidateTheUuidColumn(): void
+    {
+        $this->artisan('admin:generate:request:store', ['table_name' => 'categories']);
+
+        $contents = (string) file_get_contents(
+            $this->app->basePath('app/Http/Requests/Admin/Category/StoreCategory.php'),
+        );
+
+        self::assertStringContainsString("'title' =>", $contents);
+        self::assertStringNotContainsString("'uuid'", $contents);
     }
 
     public static function getCases(): iterable

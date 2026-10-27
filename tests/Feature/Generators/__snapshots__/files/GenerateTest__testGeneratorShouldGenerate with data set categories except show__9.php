@@ -32,6 +32,7 @@ final class CategoriesExport implements FromQuery, WithMapping, WithHeadings, Wi
     {
         return [
             trans('admin.category.columns.id'),
+            trans('admin.category.columns.uuid'),
             trans('admin.category.columns.user_id'),
             trans('admin.category.columns.title'),
             trans('admin.category.columns.name'),
@@ -69,6 +70,7 @@ final class CategoriesExport implements FromQuery, WithMapping, WithHeadings, Wi
     {
         return [
             $category->id,
+            $category->uuid,
             $category->user_id,
             $category->title,
             $category->name,

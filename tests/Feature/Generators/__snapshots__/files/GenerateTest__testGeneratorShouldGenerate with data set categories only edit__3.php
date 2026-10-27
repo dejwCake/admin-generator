@@ -27,6 +27,7 @@ final class IndexCategory extends FormRequest
             'orderBy' => [
                 Rule::in([
                     'id',
+                    'uuid',
                     'user_id',
                     'title',
                     'name',

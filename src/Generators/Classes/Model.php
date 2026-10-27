@@ -109,6 +109,7 @@ final class Model extends ClassGenerator
             'hiddenColumns' => $columns->getHidden(),
             'translatableColumns' => $columns->getTranslatable(),
             'arrayColumns' => $columns->getArrayColumns(),
+            'uuidColumns' => $columns->getUuid(),
             //media
             'mediaCollections' => $this->mediaCollections,
         ])->render();

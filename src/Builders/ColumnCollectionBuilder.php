@@ -12,6 +12,8 @@ use Illuminate\Support\Collection;
 
 final class ColumnCollectionBuilder
 {
+    private const int LOWEST_PRIORITY = 10;
+
     private ColumnCollection $columnCollection;
 
     public function __construct(private Schema $schema, private ColumnBuilder $columnBuilder,)
@@ -97,8 +99,10 @@ final class ColumnCollectionBuilder
                 $reassigned->push($column);
             } elseif ($column->priority !== null) {
                 $reassigned->push($column->withPriority($priorityMap[$column->priority]));
+            } elseif (in_array($column->name, ColumnCollection::UUID_COLUMNS, true)) {
+                $reassigned->push($column->withPriority(self::LOWEST_PRIORITY));
             } else {
-                $reassigned->push($column->withPriority(min($nextPriority, 10)));
+                $reassigned->push($column->withPriority(min($nextPriority, self::LOWEST_PRIORITY)));
                 $nextPriority++;
             }
         }

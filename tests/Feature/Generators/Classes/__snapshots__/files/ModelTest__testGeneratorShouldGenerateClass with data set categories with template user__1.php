@@ -15,6 +15,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -25,6 +26,7 @@ use Illuminate\Support\Collection;
 
 /**
  * @property int $id
+ * @property string $uuid
  * @property int|null $user_id
  * @property string $title
  * @property string|null $name
@@ -60,6 +62,7 @@ use Illuminate\Support\Collection;
  * @property-read User|null $user
  */
 #[Fillable([
+    'uuid',
     'user_id',
     'title',
     'name',
@@ -98,6 +101,7 @@ final class Category extends Authenticatable implements MustVerifyEmail
     use CreatedByAdminUserTrait;
     use HasFactory;
     use HasTranslations;
+    use HasUuids;
     use Notifiable;
     use SoftDeletes;
     use UpdatedByAdminUserTrait;
@@ -111,6 +115,16 @@ final class Category extends Authenticatable implements MustVerifyEmail
         'text',
         'description',
     ];
+
+    /**
+     * Get the columns that should receive a unique identifier.
+     *
+     * @return list<string>
+     */
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
+    }
 
     /**
      * Send the password reset notification.

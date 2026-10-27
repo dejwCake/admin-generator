@@ -52,6 +52,7 @@ final class CategoriesController extends Controller
                     $request,
                     [
                         'id',
+                        'uuid',
                         'user_id',
                         'title',
                         'name',
@@ -80,6 +81,7 @@ final class CategoriesController extends Controller
                     ],
                     [
                         'id',
+                        'uuid',
                         'title',
                         'name',
                         'first_name',

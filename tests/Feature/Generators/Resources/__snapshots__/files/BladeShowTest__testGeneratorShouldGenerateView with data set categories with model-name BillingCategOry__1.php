@@ -13,6 +13,7 @@
                 'show_title' => trans('admin.billing_categ-ory.actions.show', ['name' => $categOry->title]),
                 'columns' => [
                     'id' => trans('admin.billing_categ-ory.columns.id'),
+                    'uuid' => trans('admin.billing_categ-ory.columns.uuid'),
                     'user_id' => trans('admin.billing_categ-ory.columns.user_id'),
                     'title' => trans('admin.billing_categ-ory.columns.title'),
                     'name' => trans('admin.billing_categ-ory.columns.name'),

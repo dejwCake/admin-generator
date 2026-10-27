@@ -13,6 +13,7 @@
                 'show_title' => trans('admin.billing_cat.actions.show', ['name' => $cat->title]),
                 'columns' => [
                     'id' => trans('admin.billing_cat.columns.id'),
+                    'uuid' => trans('admin.billing_cat.columns.uuid'),
                     'user_id' => trans('admin.billing_cat.columns.user_id'),
                     'title' => trans('admin.billing_cat.columns.title'),
                     'name' => trans('admin.billing_cat.columns.name'),

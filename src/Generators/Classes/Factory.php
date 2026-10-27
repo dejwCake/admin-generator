@@ -90,7 +90,7 @@ final class Factory extends ClassGenerator
             $this->tableName,
             $this->modelVariableName,
             $this->extractTranslatable(),
-        );
+        )->rejectByName(...ColumnCollection::UUID_COLUMNS);
 
         $skipColumns = array_values(
             array_diff(ColumnCollection::SETUP_ONLY_COLUMNS, ColumnCollection::TWO_FACTOR_COLUMNS),

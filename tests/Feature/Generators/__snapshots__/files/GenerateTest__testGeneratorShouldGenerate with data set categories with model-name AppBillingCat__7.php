@@ -19,6 +19,7 @@
             'create_btn' => trans('admin.cat.actions.create'),
             'columns' => [
                 'id' => trans('admin.cat.columns.id'),
+                'uuid' => trans('admin.cat.columns.uuid'),
                 'user_id' => trans('admin.cat.columns.user_id'),
                 'title' => trans('admin.cat.columns.title'),
                 'name' => trans('admin.cat.columns.name'),

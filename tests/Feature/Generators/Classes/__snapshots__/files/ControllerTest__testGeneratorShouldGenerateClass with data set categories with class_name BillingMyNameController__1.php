@@ -50,6 +50,7 @@ final class MyNameController extends Controller
                     $request,
                     [
                         'id',
+                        'uuid',
                         'user_id',
                         'title',
                         'name',
@@ -78,6 +79,7 @@ final class MyNameController extends Controller
                     ],
                     [
                         'id',
+                        'uuid',
                         'title',
                         'name',
                         'first_name',

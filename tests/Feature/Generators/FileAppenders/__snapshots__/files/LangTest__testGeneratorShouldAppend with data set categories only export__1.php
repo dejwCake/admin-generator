@@ -13,6 +13,7 @@ return [
 
         'columns' => [
             'id' => 'ID',
+            'uuid' => 'Uuid',
             'user_id' => 'User',
             'title' => 'Title',
             'name' => 'Name',

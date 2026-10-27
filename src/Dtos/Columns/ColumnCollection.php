@@ -32,6 +32,10 @@ final class ColumnCollection implements IteratorAggregate, Countable
         'two_factor_confirmed_at',
     ];
 
+    public const array UUID_COLUMNS = [
+        'uuid',
+    ];
+
     private const array PREFERRED_LABEL_COLUMNS = ['title', 'name', 'first_name', 'email'];
 
     /** @var Collection<string, Column> */
@@ -91,6 +95,7 @@ final class ColumnCollection implements IteratorAggregate, Countable
                     ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token', 'last_login_at'],
                     true,
                 ))
+                ->reject(static fn (Column $column): bool => in_array($column->name, self::UUID_COLUMNS, true))
                 ->reject(static fn (Column $column): bool => in_array($column->name, self::SETUP_ONLY_COLUMNS, true)),
         );
     }
@@ -214,6 +219,11 @@ final class ColumnCollection implements IteratorAggregate, Countable
         return new self(
             $this->columns->filter(static fn (Column $column) => $column->isArray()),
         );
+    }
+
+    public function getUuid(): self
+    {
+        return $this->filterByName(...self::UUID_COLUMNS);
     }
 
     public function getBoolean(): self

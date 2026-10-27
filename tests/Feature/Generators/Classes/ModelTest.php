@@ -60,6 +60,16 @@ final class ModelTest extends TestCase
         self::assertStringNotContainsString("\n\n\n", $contents);
     }
 
+    public function testGeneratorShouldNotUseHasUuidsWithoutAUuidColumn(): void
+    {
+        $this->artisan('admin:generate:model', ['table_name' => 'posts']);
+
+        $contents = (string) file_get_contents($this->app->basePath('app/Models/Post.php'));
+
+        self::assertStringNotContainsString('HasUuids', $contents);
+        self::assertStringNotContainsString('uniqueIds', $contents);
+    }
+
     public static function getCases(): iterable
     {
         yield 'categories default' => [
