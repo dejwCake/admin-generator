@@ -92,19 +92,38 @@ final class ColumnCollectionBuilder
 
         $indexNames = $indexEligible->pluck('name')->all();
 
-        $reassigned = new ColumnCollection();
+        $priorities = [];
+        $uuidNames = [];
 
         foreach ($this->columnCollection as $column) {
             if (!in_array($column->name, $indexNames, true)) {
-                $reassigned->push($column);
-            } elseif ($column->priority !== null) {
-                $reassigned->push($column->withPriority($priorityMap[$column->priority]));
+                continue;
+            }
+
+            if ($column->priority !== null) {
+                $priorities[$column->name] = $priorityMap[$column->priority];
             } elseif (in_array($column->name, ColumnCollection::UUID_COLUMNS, true)) {
-                $reassigned->push($column->withPriority(self::LOWEST_PRIORITY));
+                $uuidNames[] = $column->name;
             } else {
-                $reassigned->push($column->withPriority(min($nextPriority, self::LOWEST_PRIORITY)));
+                $priorities[$column->name] = min($nextPriority, self::LOWEST_PRIORITY);
                 $nextPriority++;
             }
+        }
+
+        // The uuid ranks after every other column, so it is hidden first, yet a narrow table still shows it.
+        foreach ($uuidNames as $uuidName) {
+            $priorities[$uuidName] = min($nextPriority, self::LOWEST_PRIORITY);
+            $nextPriority++;
+        }
+
+        $reassigned = new ColumnCollection();
+
+        foreach ($this->columnCollection as $column) {
+            $reassigned->push(
+                array_key_exists($column->name, $priorities)
+                    ? $column->withPriority($priorities[$column->name])
+                    : $column,
+            );
         }
 
         $this->columnCollection = $reassigned;

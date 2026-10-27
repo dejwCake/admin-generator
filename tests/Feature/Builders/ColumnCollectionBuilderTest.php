@@ -142,7 +142,7 @@ final class ColumnCollectionBuilderTest extends TestCase
         self::assertSame(2, $columns['extra_field']->priority);
     }
 
-    public function testAssignPrioritiesGivesTheUuidColumnTheLowestPriority(): void
+    public function testAssignPrioritiesRanksTheUuidColumnAfterEveryOtherColumn(): void
     {
         $schemaBuilder = $this->app['db']->connection()->getSchemaBuilder();
 
@@ -150,16 +150,53 @@ final class ColumnCollectionBuilderTest extends TestCase
             $table->increments('id');
             $table->uuid('uuid')->unique();
             $table->string('title');
+            $table->string('number');
             $table->timestamps();
         });
 
         $builder = $this->app->make(ColumnCollectionBuilder::class);
         $columns = $builder->build('invoices')->toArray();
 
-        // 'title' fixed priority 0 → 0, 'id' fixed priority 2 → 1. The uuid gets the lowest
-        // priority instead of the next free one, so it is the first column hidden.
+        // 'title' fixed priority 0 → 0, 'id' fixed priority 2 → 1, 'number' next free → 2. The uuid
+        // comes before 'number' in the table, but is ranked after it, so it is the first column hidden.
         self::assertSame(0, $columns['title']->priority);
         self::assertSame(1, $columns['id']->priority);
+        self::assertSame(2, $columns['number']->priority);
+        self::assertSame(3, $columns['uuid']->priority);
+    }
+
+    public function testAssignPrioritiesKeepsTheUuidColumnVisibleInANarrowTable(): void
+    {
+        $schemaBuilder = $this->app['db']->connection()->getSchemaBuilder();
+
+        $schemaBuilder->create('tokens', static function (Blueprint $table): void {
+            $table->increments('id');
+            $table->uuid('uuid')->unique();
+        });
+
+        $builder = $this->app->make(ColumnCollectionBuilder::class);
+        $columns = $builder->build('tokens')->toArray();
+
+        // 'id' fixed priority 2 → 0, the uuid takes the next one, shown from an 800px container.
+        self::assertSame(0, $columns['id']->priority);
+        self::assertSame(1, $columns['uuid']->priority);
+    }
+
+    public function testAssignPrioritiesCapsTheUuidColumnAtTheLowestPriority(): void
+    {
+        $schemaBuilder = $this->app['db']->connection()->getSchemaBuilder();
+
+        $schemaBuilder->create('wide_items', static function (Blueprint $table): void {
+            $table->increments('id');
+            $table->uuid('uuid')->unique();
+            foreach (range(1, 12) as $index) {
+                $table->string(sprintf('field_%d', $index));
+            }
+        });
+
+        $builder = $this->app->make(ColumnCollectionBuilder::class);
+        $columns = $builder->build('wide_items')->toArray();
+
         self::assertSame(10, $columns['uuid']->priority);
     }
 }
