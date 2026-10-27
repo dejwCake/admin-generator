@@ -65,7 +65,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property-read User|null $user
  */
 #[Fillable([
-    'uuid',
     'user_id',
     'title',
     'name',

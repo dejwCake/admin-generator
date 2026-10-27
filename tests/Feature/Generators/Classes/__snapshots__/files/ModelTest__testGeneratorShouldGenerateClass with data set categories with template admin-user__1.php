@@ -63,7 +63,6 @@ use Illuminate\Support\Collection;
  */
 #[Appends(['full_name'])]
 #[Fillable([
-    'uuid',
     'user_id',
     'title',
     'name',

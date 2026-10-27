@@ -61,7 +61,6 @@ use Illuminate\Support\Collection;
  * @property-read User|null $user
  */
 #[Fillable([
-    'uuid',
     'user_id',
     'title',
     'name',

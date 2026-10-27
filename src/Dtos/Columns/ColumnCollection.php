@@ -116,7 +116,8 @@ final class ColumnCollection implements IteratorAggregate, Countable
                     $column->name,
                     ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token'],
                     true,
-                )),
+                ))
+                ->reject(static fn (Column $column): bool => in_array($column->name, self::UUID_COLUMNS, true)),
         );
     }
 

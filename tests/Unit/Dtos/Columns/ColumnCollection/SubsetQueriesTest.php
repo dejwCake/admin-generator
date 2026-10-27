@@ -34,6 +34,7 @@ final class SubsetQueriesTest extends TestCase
     {
         $collection = new ColumnCollection([
             self::makeColumn('id'),
+            self::makeColumn('uuid'),
             self::makeColumn('created_at', majorType: 'datetime'),
             self::makeColumn('updated_at', majorType: 'datetime'),
             self::makeColumn('deleted_at', majorType: 'datetime'),
