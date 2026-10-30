@@ -27,6 +27,7 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -47,6 +48,8 @@ final class CategoriesController extends Controller
      */
     public function index(IndexCategory $request): array|View
     {
+        $trashed = $request->boolean('trashed');
+
         $data = $this->listingBuilder->for(Category::class)
             ->build()
             ->processRequestAndGet(
@@ -80,6 +83,7 @@ final class CategoriesController extends Controller
                         'updated_by_admin_user_id',
                         'created_at',
                         'updated_at',
+                        'deleted_at',
                     ],
                     [
                         'id',
@@ -98,12 +102,16 @@ final class CategoriesController extends Controller
                         'description',
                     ],
                 ),
-                static function (Builder $query): void {
+                function (Builder $query) use ($trashed): void {
                     $query->with([
                         'createdByAdminUser',
                         'updatedByAdminUser',
                         'user',
                     ]);
+
+                    if ($trashed) {
+                        $this->onlyTrashed($query);
+                    }
                 },
             );
 
@@ -130,6 +138,8 @@ final class CategoriesController extends Controller
                 'updateUrlTemplate' => $this->urlGenerator->route('admin/categories/update', ['category' => ':id']),
                 'bulkAllUrl' => $this->urlGenerator->route('admin/categories/index'),
                 'bulkDestroyUrl' => $this->urlGenerator->route('admin/categories/bulk-destroy'),
+                'bulkForceDestroyUrl' => $this->urlGenerator->route('admin/categories/bulk-force-destroy'),
+                'bulkRestoreUrl' => $this->urlGenerator->route('admin/categories/bulk-restore'),
                 'exportUrl' => $this->urlGenerator->route('admin/categories/export'),
             ],
         );
@@ -259,9 +269,10 @@ final class CategoriesController extends Controller
         $databaseManager->transaction(static function () use ($request): void {
             $request->getIds()
                 ->chunk(1000)
-                ->each(static function ($bulkChunk): void {
+                ->each(static function (Collection $bulkChunk): void {
                     Category::whereIn('id', $bulkChunk)
-                        ->delete();
+                        ->get()
+                        ->each(static fn (Category $category): ?bool => $category->delete());
                 });
         });
 
@@ -285,5 +296,13 @@ final class CategoriesController extends Controller
         $nameOfExportedFile = sprintf('categories_%s.xlsx', $currentTime);
 
         return $excel->download($export, $nameOfExportedFile);
+    }
+
+    /**
+     * @param Builder<Category> $query
+     */
+    private function onlyTrashed(Builder $query): void
+    {
+        $query->onlyTrashed();
     }
 }

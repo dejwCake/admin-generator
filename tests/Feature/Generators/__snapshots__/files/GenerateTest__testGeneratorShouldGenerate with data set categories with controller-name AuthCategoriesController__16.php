@@ -3,7 +3,24 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Admin\Auth\CategoriesController;
+use App\Http\Controllers\Admin\Auth\CategoriesTrashController;
 use Illuminate\Support\Facades\Route;
+
+Route::prefix('categories')
+    ->name('categories/')
+    ->controller(CategoriesTrashController::class)
+    ->group(static function (): void {
+        Route::post('/bulk-force-destroy', 'bulkForceDestroy')
+            ->name('bulk-force-destroy');
+        Route::post('/bulk-restore', 'bulkRestore')
+            ->name('bulk-restore');
+        Route::delete('/{category:id}/force', 'forceDestroy')
+            ->name('force-destroy')
+            ->withTrashed();
+        Route::post('/{category:id}/restore', 'restore')
+            ->name('restore')
+            ->withTrashed();
+    });
 
 Route::prefix('categories')
     ->name('categories/')

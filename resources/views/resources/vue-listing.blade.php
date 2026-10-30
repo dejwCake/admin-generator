@@ -27,6 +27,15 @@
                                 :translations="translations"
                             />
                         </div>
+@if($hasTrash || $hasBulkTrash)
+                        <div class="col-auto mb-3 d-flex align-items-center me-auto">
+                            <ShowDeleted
+                                v-model="showDeleted"
+                                :translations="translations"
+                                @update:modelValue="onShowDeletedChange"
+                            />
+                        </div>
+@endif
                         <div class="col-sm-auto mb-3">
                             <PerPage v-model="pagination.state.per_page"/>
                         </div>
@@ -54,6 +63,11 @@
                                 </Sortable>
 @endif
 @endforeach
+@if($hasTrash || $hasBulkTrash)
+                                <Sortable v-if="showDeleted && isColumnVisible(0)" :column="'deleted_at'" :orderBy="orderBy" @sort="onSort">
+                                    {{ '{{' }} translations.columns.deleted_at }}
+                                </Sortable>
+@endif
 
                                 <th></th>
                             </tr>
@@ -66,12 +80,33 @@
                                         :loading="bulkCheckingAllLoader"
                                         :onCheckAll="() => onBulkItemsClickedAll(bulkAllUrl)"
                                         :onUncheckAll="onBulkItemsClickedAllUncheck"
+@if($hasBulkTrash)
+                                        :onBulkDelete="showDeleted ? null : () => bulkDelete(bulkDestroyUrl, {
+                                            ...translations,
+                                            confirm_title: translations.confirm_delete_title,
+                                            confirm_text: translations.confirm_delete_text_multiple,
+                                            confirm_btn: translations.delete_btn,
+                                        })"
+                                        :onBulkForceDelete="() => bulkForceDelete(bulkForceDestroyUrl, {
+                                            ...translations,
+                                            confirm_title: translations.confirm_delete_title,
+                                            confirm_text: translations.confirm_force_delete_text_multiple,
+                                            confirm_btn: translations.force_delete_btn,
+                                        })"
+                                        :onBulkRestore="showDeleted ? () => bulkRestore(bulkRestoreUrl, {
+                                            ...translations,
+                                            confirm_title: translations.confirm_restore_title,
+                                            confirm_text: translations.confirm_restore_text_multiple,
+                                            confirm_btn: translations.restore_btn,
+                                        }) : null"
+@else
                                         :onBulkDelete="() => bulkDelete(bulkDestroyUrl, {
                                             ...translations,
                                             confirm_title: translations.confirm_delete_title,
                                             confirm_text: translations.confirm_delete_text_multiple,
                                             confirm_btn: translations.delete_btn,
                                         })"
+@endif
                                         :translations="translations"
                                     />
                                 </td>
@@ -96,7 +131,17 @@
 @foreach($columns as $column)
 @if($column->name === 'published_at')
                                 <td v-if="isColumnVisible({{ $column->priority }})" class="text-center text-nowrap" style="position: relative;">
-@if($hasEdit)
+@if($hasEdit && ($hasTrash || $hasBulkTrash))
+                                    <template v-if="showDeleted">{{ '{{' }} formatDatetime(item.{{ $column->name }}) }}</template>
+                                    <PublishedAtColumn
+                                        v-else
+                                        :item="item"
+                                        :url="resolveUrl(updateUrlTemplate, item)"
+                                        :now="now"
+                                        :translations="translations"
+                                        @update:item="onUpdateItem"
+                                    />
+@elseif($hasEdit)
                                     <PublishedAtColumn
                                         :item="item"
                                         :url="resolveUrl(updateUrlTemplate, item)"
@@ -126,7 +171,16 @@
                                 </td>
 @elseif(in_array($column->majorType, ['bool'], true))
                                 <td v-if="isColumnVisible({{ $column->priority }})">
-@if($hasEdit)
+@if($hasEdit && ($hasTrash || $hasBulkTrash))
+                                    <ReadOnlySwitch v-if="showDeleted" :modelValue="item.{{ $column->name }}"/>
+                                    <ToggleSwitch
+                                        v-else
+                                        v-model="collection[index].{{ $column->name }}"
+                                        :url="resolveUrl(updateUrlTemplate, item)"
+                                        column="{{ $column->name }}"
+                                        :row="collection[index]"
+                                    />
+@elseif($hasEdit)
                                     <ToggleSwitch
                                         v-model="collection[index].{{ $column->name }}"
                                         :url="resolveUrl(updateUrlTemplate, item)"
@@ -152,9 +206,66 @@
                                 <td v-if="isColumnVisible({{ $column->priority }})">{{ '{{' }} item.{{ $column->name }} }}</td>
 @endif
 @endforeach
+@if($hasTrash || $hasBulkTrash)
+                                <td v-if="showDeleted && isColumnVisible(0)">{{ '{{' }} formatDatetime(item.deleted_at) }}</td>
+@endif
 
                                 <td>
                                     <div class="d-flex gap-1 justify-content-center">
+@if($hasTrash || $hasBulkTrash)
+@if($hasTrash)
+                                        <RestoreButton
+                                            v-if="showDeleted"
+                                            :disabled="item.restorable === false"
+                                            :url="resolveUrl(restoreUrlTemplate, item)"
+                                            :translations="{
+                                              ...translations,
+                                              confirm_title: translations.confirm_restore_title,
+                                              confirm_text: translations.confirm_restore_text,
+                                              confirm_btn: translations.restore_btn,
+                                            }"
+                                            @restored="loadData"
+                                        />
+@endif
+                                        <template v-{{ $hasTrash ? 'else' : 'if="!showDeleted"' }}>
+@if($hasShow)
+                                            <ShowButton
+                                                :url="resolveUrl(showUrlTemplate, item)"
+                                                :translations="translations"
+                                            />
+@endif
+@if($hasEdit)
+                                            <EditButton
+                                                :url="resolveUrl(editUrlTemplate, item)"
+                                                :translations="translations"
+                                            />
+@endif
+@if($hasDelete)
+                                            <DeleteButton
+                                                :url="resolveUrl(destroyUrlTemplate, item)"
+                                                :translations="{
+                                                  ...translations,
+                                                  confirm_title: translations.confirm_delete_title,
+                                                  confirm_text: translations.confirm_delete_text,
+                                                  confirm_btn: translations.delete_btn,
+                                                }"
+                                                @deleted="loadData"
+                                            />
+@endif
+                                        </template>
+@if($hasTrash)
+                                        <ForceDeleteButton
+                                            :url="resolveUrl(forceDestroyUrlTemplate, item)"
+                                            :translations="{
+                                              ...translations,
+                                              confirm_title: translations.confirm_delete_title,
+                                              confirm_text: translations.confirm_force_delete_text,
+                                              confirm_btn: translations.force_delete_btn,
+                                            }"
+                                            @deleted="loadData"
+                                        />
+@endif
+@else
 @if($hasShow)
                                         <ShowButton
                                             :url="resolveUrl(showUrlTemplate, item)"
@@ -178,6 +289,7 @@
                                             }"
                                             @deleted="loadData"
                                         />
+@endif
 @endif
                                     </div>
                                 </td>
@@ -208,6 +320,9 @@
 @if($hasBulkDelete)
         <ConfirmModal
             :show="confirmModal.show"
+@if($hasBulkTrash)
+            :variant="confirmModal.variant"
+@endif
             :translations="confirmModal.translations"
             @confirm="confirmModal.onConfirm"
             @cancel="confirmModal.show = false"
@@ -251,6 +366,13 @@
     if ($hasDelete) {
         $imports->push("DeleteButton from '@craftable/components/listing/DeleteButton.vue'");
     }
+    if ($hasTrash || $hasBulkTrash) {
+        $imports->push("ShowDeleted from '@craftable/components/listing/ShowDeleted.vue'");
+    }
+    if ($hasTrash) {
+        $imports->push("ForceDeleteButton from '@craftable/components/listing/ForceDeleteButton.vue'");
+        $imports->push("RestoreButton from '@craftable/components/listing/RestoreButton.vue'");
+    }
     if ($hasUserDetailTooltip) {
         $imports->push("UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue'");
     }
@@ -260,6 +382,9 @@
                 ? "ToggleSwitch from '@craftable/components/listing/ToggleSwitch.vue'"
                 : "ReadOnlySwitch from '@craftable/components/ReadOnlySwitch.vue'",
         );
+    }
+    if ($hasSwitchColumns && $hasEdit && ($hasTrash || $hasBulkTrash)) {
+        $imports->push("ReadOnlySwitch from '@craftable/components/ReadOnlySwitch.vue'");
     }
     if ($hasBulkDelete) {
         $imports->push("ConfirmModal from '@craftable/components/ConfirmModal.vue'");
@@ -292,9 +417,17 @@ const props = defineProps({
 @if($hasDelete)
     destroyUrlTemplate: {type: String, required: true},
 @endif
+@if($hasTrash)
+    forceDestroyUrlTemplate: {type: String, required: true},
+    restoreUrlTemplate: {type: String, required: true},
+@endif
 @if($hasBulkDelete)
     bulkAllUrl: {type: String, default: ''},
     bulkDestroyUrl: {type: String, default: ''},
+@endif
+@if($hasBulkTrash)
+    bulkForceDestroyUrl: {type: String, default: ''},
+    bulkRestoreUrl: {type: String, default: ''},
 @endif
 });
 
@@ -308,10 +441,21 @@ const {
     isClickedAll, clickedBulkItemsCount, loadData, filter, resolveUrl,
     onBulkItemClicked,
     onBulkItemsClickedAll, onBulkItemsClickedAllWithPagination,
-    onBulkItemsClickedAllUncheck, bulkDelete, confirmModal,
+    onBulkItemsClickedAllUncheck, bulkDelete,{{ $hasBulkTrash ? ' bulkForceDelete, bulkRestore,' : '' }} confirmModal,
 @else
     loadData, filter, resolveUrl,
 @endif
     onSort, onPageChange, onPerPageChange,{{ $hasPublishedAt && $hasEdit ? ' onUpdateItem,' : '' }}
 } = useAppListing(props);
+@if($hasTrash || $hasBulkTrash)
+
+const showDeleted = ref(false);
+
+function onShowDeletedChange(value) {
+@if($hasBulkDelete)
+    onBulkItemsClickedAllUncheck();
+@endif
+    filter('trashed', value ? 1 : '');
+}
+@endif
 </script>

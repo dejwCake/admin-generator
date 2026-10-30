@@ -33,6 +33,11 @@ final class IndexRequest extends ClassGenerator
     public function handle(): void
     {
         $force = $this->option('force');
+        $template = $this->option('template');
+
+        if ($template !== null) {
+            $this->view = sprintf('classes.templates.%s.index-request', $template);
+        }
 
         if ($this->generateClass($force)) {
             $this->info(sprintf('Generating %s finished', $this->classFullName));
@@ -60,6 +65,8 @@ final class IndexRequest extends ClassGenerator
             'classBaseName' => $this->classBaseName,
             'classNamespace' => $this->classNamespace,
             'modelDotNotation' => $this->modelDotNotation,
+            //has
+            'hasSoftDelete' => $columns->hasByName('deleted_at'),
             //columns
             'columns' => $columns->getToQuery(),
         ])->render();
@@ -72,6 +79,7 @@ final class IndexRequest extends ClassGenerator
         return [
             ['model-name', 'm', InputOption::VALUE_OPTIONAL, 'Generates a code for the given model'],
             ['force', 'f', InputOption::VALUE_NONE, 'Force will delete files before regenerating request'],
+            ['template', 't', InputOption::VALUE_OPTIONAL, 'Specify custom template'],
             [
                 'translatable',
                 'tr',

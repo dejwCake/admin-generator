@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
+use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
 use Brackets\AdminGenerator\Dtos\GeneratedActions;
 use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Generators\Traits\ResolvesGeneratedActions;
@@ -75,32 +76,25 @@ final class VueListing extends ResourceGenerator
     #[Override]
     protected function buildView(): string
     {
-        $columns = $this->columnCollectionBuilder->build(
+        $allColumns = $this->columnCollectionBuilder->build(
             $this->tableName,
             $this->modelVariableName,
             $this->extractTranslatable(),
-        )
-            ->getForIndex();
+        );
+        $columns = $allColumns->getForIndex();
+
+        $hasSoftDelete = $allColumns->hasByName('deleted_at') && $this->option('template') === null;
+        $hasTrash = $hasSoftDelete && $this->generatedActions->has(GeneratedAction::Delete);
+        $hasBulkTrash = $hasSoftDelete && $this->generatedActions->has(GeneratedAction::BulkDelete);
 
         $hasPublishedAt = $columns->hasByName('published_at');
         $hasUserDetailTooltip = $columns->hasByName('created_by_admin_user_id')
             || $columns->hasByName('updated_by_admin_user_id');
 
-        $hasDateColumns = $columns->hasByMajorType('date', 'time', 'datetime')
-            || $hasPublishedAt
-            || $hasUserDetailTooltip;
-
-        $dateImports = new Collection();
-        if ($columns->hasByMajorType('date')) {
-            $dateImports->push('formatDate');
-        }
-        if ($columns->hasByMajorType('time')) {
-            $dateImports->push('formatTime');
-        }
-        if ($columns->hasByMajorType('datetime') || $hasPublishedAt || $hasUserDetailTooltip) {
-            $dateImports->push('formatDatetime');
-        }
-        $dateImports = $dateImports->sort();
+        $dateImports = $this->resolveDateImports(
+            $columns,
+            $hasPublishedAt || $hasUserDetailTooltip || $hasTrash || $hasBulkTrash,
+        );
 
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
@@ -112,10 +106,12 @@ final class VueListing extends ResourceGenerator
             'hasDelete' => $this->generatedActions->has(GeneratedAction::Delete),
             'hasBulkDelete' => $this->generatedActions->has(GeneratedAction::BulkDelete),
             'hasExport' => $this->generatedActions->has(GeneratedAction::Export),
+            'hasTrash' => $hasTrash,
+            'hasBulkTrash' => $hasBulkTrash,
             'hasPublishedAt' => $hasPublishedAt,
             'hasUserDetailTooltip' => $hasUserDetailTooltip,
             'hasSwitchColumns' => $columns->hasByMajorType('bool'),
-            'hasDateColumns' => $hasDateColumns,
+            'hasDateColumns' => $dateImports->isNotEmpty(),
             //columns
             'columns' => $columns,
             //other
@@ -123,5 +119,24 @@ final class VueListing extends ResourceGenerator
             //deprecated alias for templates overridden from 2.4.0, use hasBulkDelete instead
             'hasBulk' => $this->generatedActions->has(GeneratedAction::BulkDelete),
         ])->render();
+    }
+
+    /**
+     * @return Collection<int, string>
+     */
+    private function resolveDateImports(ColumnCollection $columns, bool $needsDatetime): Collection
+    {
+        $dateImports = new Collection();
+        if ($columns->hasByMajorType('date')) {
+            $dateImports->push('formatDate');
+        }
+        if ($columns->hasByMajorType('time')) {
+            $dateImports->push('formatTime');
+        }
+        if ($needsDatetime || $columns->hasByMajorType('datetime')) {
+            $dateImports->push('formatDatetime');
+        }
+
+        return $dateImports->sort();
     }
 }

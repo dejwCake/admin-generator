@@ -38,4 +38,18 @@ final class NamingTest extends TestCase
     {
         self::assertSame('adminUser', Naming::variableName('admin_users'));
     }
+
+    public function testTrashControllerNameReplacesTheControllerSuffix(): void
+    {
+        self::assertSame('CategoriesTrashController', Naming::trashControllerName('CategoriesController'));
+        self::assertSame(
+            'Billing\\MyNameTrashController',
+            Naming::trashControllerName('Billing\\MyNameController'),
+        );
+    }
+
+    public function testTrashControllerNameAppendsTrashWithoutTheControllerSuffix(): void
+    {
+        self::assertSame('CategoriesTrash', Naming::trashControllerName('Categories'));
+    }
 }

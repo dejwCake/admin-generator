@@ -38,6 +38,16 @@ final class IndexRequestTest extends TestCase
 
     public static function getCases(): iterable
     {
+        yield 'admin users with template admin-user' => [
+            'arguments' => ['table_name' => 'admin_users', '--template' => 'admin-user'],
+            'expectedFilePath' => 'app/Http/Requests/Admin/AdminUser/IndexAdminUser.php',
+        ];
+
+        yield 'posts without soft deletes' => [
+            'arguments' => ['table_name' => 'posts'],
+            'expectedFilePath' => 'app/Http/Requests/Admin/Post/IndexPost.php',
+        ];
+
         yield 'categories default' => [
             'arguments' => ['table_name' => 'categories'],
             'expectedFilePath' => 'app/Http/Requests/Admin/Category/IndexCategory.php',

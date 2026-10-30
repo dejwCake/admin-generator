@@ -25,6 +25,7 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Collection;
 
 final class CategoriesController extends Controller
 {
@@ -43,6 +44,8 @@ final class CategoriesController extends Controller
      */
     public function index(IndexCat $request): array|View
     {
+        $trashed = $request->boolean('trashed');
+
         $data = $this->listingBuilder->for(Cat::class)
             ->build()
             ->processRequestAndGet(
@@ -76,6 +79,7 @@ final class CategoriesController extends Controller
                         'updated_by_admin_user_id',
                         'created_at',
                         'updated_at',
+                        'deleted_at',
                     ],
                     [
                         'id',
@@ -94,14 +98,25 @@ final class CategoriesController extends Controller
                         'description',
                     ],
                 ),
-                static function (Builder $query): void {
+                function (Builder $query) use ($trashed): void {
                     $query->with([
                         'createdByAdminUser',
                         'updatedByAdminUser',
                         'user',
                     ]);
+
+                    if ($trashed) {
+                        $this->onlyTrashed($query);
+                    }
                 },
             );
+
+        if ($trashed && !$request->has('bulk')) {
+            $data->each(
+                static fn (Cat $cat): Cat => $cat
+                    ->setAttribute('restorable', $cat->isRestorable()),
+            );
+        }
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {
@@ -125,8 +140,12 @@ final class CategoriesController extends Controller
                 'editUrlTemplate' => $this->urlGenerator->route('admin/cats/edit', ['cat' => ':id']),
                 'updateUrlTemplate' => $this->urlGenerator->route('admin/cats/update', ['cat' => ':id']),
                 'destroyUrlTemplate' => $this->urlGenerator->route('admin/cats/destroy', ['cat' => ':id']),
+                'forceDestroyUrlTemplate' => $this->urlGenerator->route('admin/cats/force-destroy', ['cat' => ':id']),
+                'restoreUrlTemplate' => $this->urlGenerator->route('admin/cats/restore', ['cat' => ':id']),
                 'bulkAllUrl' => $this->urlGenerator->route('admin/cats/index'),
                 'bulkDestroyUrl' => $this->urlGenerator->route('admin/cats/bulk-destroy'),
+                'bulkForceDestroyUrl' => $this->urlGenerator->route('admin/cats/bulk-force-destroy'),
+                'bulkRestoreUrl' => $this->urlGenerator->route('admin/cats/bulk-restore'),
             ],
         );
     }
@@ -250,9 +269,12 @@ final class CategoriesController extends Controller
      *
      * @throws Exception
      */
-    public function destroy(DestroyCat $request, Cat $cat): array|RedirectResponse
-    {
-        $cat->delete();
+    public function destroy(
+        DestroyCat $request,
+        Cat $cat,
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
+        $databaseManager->transaction(static fn (): ?bool => $cat->delete());
 
         if ($request->ajax()) {
             return [
@@ -273,9 +295,10 @@ final class CategoriesController extends Controller
         $databaseManager->transaction(static function () use ($request): void {
             $request->getIds()
                 ->chunk(1000)
-                ->each(static function ($bulkChunk): void {
+                ->each(static function (Collection $bulkChunk): void {
                     Cat::whereIn('id', $bulkChunk)
-                        ->delete();
+                        ->get()
+                        ->each(static fn (Cat $cat): ?bool => $cat->delete());
                 });
         });
 
@@ -286,5 +309,13 @@ final class CategoriesController extends Controller
         }
 
         return $this->redirector->back();
+    }
+
+    /**
+     * @param Builder<Cat> $query
+     */
+    private function onlyTrashed(Builder $query): void
+    {
+        $query->onlyTrashed();
     }
 }

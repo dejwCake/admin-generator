@@ -20,9 +20,17 @@
 @if($hasDelete)
         :destroy-url-template="'{{'{{'}} $destroyUrlTemplate }}'"
 @endif
+@if($hasTrash)
+        :force-destroy-url-template="'{{'{{'}} $forceDestroyUrlTemplate }}'"
+        :restore-url-template="'{{'{{'}} $restoreUrlTemplate }}'"
+@endif
 @if($hasBulkDelete)
         :bulk-all-url="'{{'{{'}} $bulkAllUrl }}'"
         :bulk-destroy-url="'{{'{{'}} $bulkDestroyUrl }}'"
+@endif
+@if($hasBulkTrash)
+        :bulk-force-destroy-url="'{{'{{'}} $bulkForceDestroyUrl }}'"
+        :bulk-restore-url="'{{'{{'}} $bulkRestoreUrl }}'"
 @endif
 @if($hasExport)
         :export-url="'{{'{{'}} $exportUrl }}'"
@@ -39,6 +47,9 @@
 @foreach($columns as $column)
                 '{{ $column->name }}' => trans('admin.{{ $modelLangFormat }}.columns.{{ $column->name }}'),
 @endforeach
+@if($hasTrash || $hasBulkTrash)
+                'deleted_at' => trans('admin.{{ $modelLangFormat }}.columns.deleted_at'),
+@endif
             ],
             'search_placeholder' => trans('brackets/admin-ui::admin.placeholder.search'),
             'search_btn' => trans('brackets/admin-ui::admin.btn.search'),
@@ -50,11 +61,29 @@
 @endif
 @if($hasDelete || $hasBulkDelete)
             'delete_btn' => trans('brackets/admin-ui::admin.btn.delete'),
+@if($hasTrash || $hasBulkTrash)
+            'force_delete_btn' => trans('brackets/admin-ui::admin.btn.force_delete'),
+            'restore_btn' => trans('brackets/admin-ui::admin.btn.restore'),
+@endif
             'confirm_delete_title' => trans('brackets/admin-ui::admin.operation.confirm_delete_title'),
             'confirm_delete_text' => trans('brackets/admin-ui::admin.operation.confirm_delete_text'),
 @endif
+@if($hasTrash)
+            'confirm_force_delete_text' => trans('brackets/admin-ui::admin.operation.confirm_force_delete_text'),
+@endif
+@if($hasTrash || $hasBulkTrash)
+            'confirm_restore_title' => trans('brackets/admin-ui::admin.operation.confirm_restore_title'),
+@endif
+@if($hasTrash)
+            'confirm_restore_text' => trans('brackets/admin-ui::admin.operation.confirm_restore_text'),
+            'not_restorable' => trans('brackets/admin-ui::admin.operation.not_restorable'),
+@endif
 @if($hasBulkDelete)
             'confirm_delete_text_multiple' => trans('brackets/admin-ui::admin.operation.confirm_delete_text_multiple'),
+@endif
+@if($hasBulkTrash)
+            'confirm_force_delete_text_multiple' => trans('brackets/admin-ui::admin.operation.confirm_force_delete_text_multiple'),
+            'confirm_restore_text_multiple' => trans('brackets/admin-ui::admin.operation.confirm_restore_text_multiple'),
 @endif
 @if($hasDelete || $hasBulkDelete)
             'cancel_btn' => trans('brackets/admin-ui::admin.btn.cancel'),
@@ -63,6 +92,9 @@
             'selected_items' => trans('brackets/admin-ui::admin.listing.selected_items'),
             'check_all_items' => trans('brackets/admin-ui::admin.listing.check_all_items'),
             'uncheck_all_items' => trans('brackets/admin-ui::admin.listing.uncheck_all_items'),
+@endif
+@if($hasTrash || $hasBulkTrash)
+            'show_deleted' => trans('brackets/admin-ui::admin.listing.show_deleted'),
 @endif
             'overview' => trans('brackets/admin-ui::admin.pagination.overview'),
             'previous' => trans('brackets/admin-ui::admin.pagination.previous'),

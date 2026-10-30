@@ -22,6 +22,12 @@ return new class extends PermissionMigration
                 'admin.{{ $modelDotNotation }}.edit',
                 'admin.{{ $modelDotNotation }}.delete',
                 'admin.{{ $modelDotNotation }}.bulk-delete',
+@if($hasSoftDelete)
+                'admin.{{ $modelDotNotation }}.restore',
+                'admin.{{ $modelDotNotation }}.bulk-restore',
+                'admin.{{ $modelDotNotation }}.force-delete',
+                'admin.{{ $modelDotNotation }}.bulk-force-delete',
+@endif
 @if($hasImpersonalLogin)
                 'admin.{{ $modelDotNotation }}.impersonal-login',
 @endif

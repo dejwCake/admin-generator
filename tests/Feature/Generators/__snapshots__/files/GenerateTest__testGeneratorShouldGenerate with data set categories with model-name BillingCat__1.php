@@ -137,6 +137,14 @@ final class Cat extends Model
     }
 
     /**
+     * A trashed row can be restored only while every row it belongs to exists and is not trashed.
+     */
+    public function isRestorable(): bool
+    {
+        return $this->user_id === null || $this->user()->exists();
+    }
+
+    /**
      * @return array<string>
      */
     protected function casts(): array

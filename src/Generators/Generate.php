@@ -7,7 +7,9 @@ namespace Brackets\AdminGenerator\Generators;
 use Brackets\AdminGenerator\Dtos\GeneratedActions;
 use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Generators\Traits\ResolvesGeneratedActions;
+use Brackets\AdminGenerator\Naming;
 use Illuminate\Console\Command;
+use Illuminate\Database\Schema\Builder as Schema;
 use Illuminate\Filesystem\Filesystem;
 use Override;
 use Symfony\Component\Console\Input\InputArgument;
@@ -33,7 +35,7 @@ final class Generate extends Command
      */
     protected $description = 'Scaffold complete CRUD admin interface';
 
-    public function __construct(protected readonly Filesystem $files)
+    public function __construct(protected readonly Filesystem $files, private readonly Schema $schema)
     {
         parent::__construct();
     }
@@ -73,6 +75,10 @@ final class Generate extends Command
         ]);
 
         $this->generateRequests($actions, $tableName, $modelName, $force, $belongsToMany, $translatable);
+
+        if ($this->schema->hasColumn($tableName, 'deleted_at')) {
+            $this->generateTrash($actions, $tableName, $modelName, $controllerName, $force, $actionOptions);
+        }
 
         $this->call('admin:generate:routes', [
             'table_name' => $tableName,
@@ -229,6 +235,50 @@ final class Generate extends Command
 
         if ($actions->has(GeneratedAction::Export)) {
             $this->call('admin:generate:request:export', [
+                'table_name' => $tableName,
+                '--model-name' => $modelName,
+                '--force' => $force,
+            ]);
+        }
+    }
+
+    /**
+     * Restore and force delete for a soft-deleting model, next to its delete and bulk delete.
+     *
+     * @param array<string, string|bool> $actionOptions
+     */
+    private function generateTrash(
+        GeneratedActions $actions,
+        string $tableName,
+        ?string $modelName,
+        ?string $controllerName,
+        bool $force,
+        array $actionOptions,
+    ): void {
+        if (!$actions->has(GeneratedAction::Delete) && !$actions->has(GeneratedAction::BulkDelete)) {
+            return;
+        }
+
+        $this->call('admin:generate:trash-controller', [
+            'table_name' => $tableName,
+            'class_name' => $controllerName === null ? null : Naming::trashControllerName($controllerName),
+            '--model-name' => $modelName,
+            '--force' => $force,
+            ...$actionOptions,
+        ]);
+
+        $requests = [];
+        if ($actions->has(GeneratedAction::Delete)) {
+            $requests[] = 'admin:generate:request:force-destroy';
+            $requests[] = 'admin:generate:request:restore';
+        }
+        if ($actions->has(GeneratedAction::BulkDelete)) {
+            $requests[] = 'admin:generate:request:bulk-force-destroy';
+            $requests[] = 'admin:generate:request:bulk-restore';
+        }
+
+        foreach ($requests as $request) {
+            $this->call($request, [
                 'table_name' => $tableName,
                 '--model-name' => $modelName,
                 '--force' => $force,

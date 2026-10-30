@@ -53,6 +53,7 @@ final class IndexCategory extends FormRequest
                     'updated_by_admin_user_id',
                     'created_at',
                     'updated_at',
+                    'deleted_at',
                 ]),
                 'nullable',
             ],
@@ -73,6 +74,10 @@ final class IndexCategory extends FormRequest
             ],
             'per_page' => [
                 'integer',
+                'nullable',
+            ],
+            'trashed' => [
+                'boolean',
                 'nullable',
             ],
         ];

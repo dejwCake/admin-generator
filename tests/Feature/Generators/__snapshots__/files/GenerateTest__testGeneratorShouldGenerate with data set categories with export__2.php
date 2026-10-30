@@ -28,6 +28,7 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -48,6 +49,8 @@ final class CategoriesController extends Controller
      */
     public function index(IndexCategory $request): array|View
     {
+        $trashed = $request->boolean('trashed');
+
         $data = $this->listingBuilder->for(Category::class)
             ->build()
             ->processRequestAndGet(
@@ -81,6 +84,7 @@ final class CategoriesController extends Controller
                         'updated_by_admin_user_id',
                         'created_at',
                         'updated_at',
+                        'deleted_at',
                     ],
                     [
                         'id',
@@ -99,14 +103,25 @@ final class CategoriesController extends Controller
                         'description',
                     ],
                 ),
-                static function (Builder $query): void {
+                function (Builder $query) use ($trashed): void {
                     $query->with([
                         'createdByAdminUser',
                         'updatedByAdminUser',
                         'user',
                     ]);
+
+                    if ($trashed) {
+                        $this->onlyTrashed($query);
+                    }
                 },
             );
+
+        if ($trashed && !$request->has('bulk')) {
+            $data->each(
+                static fn (Category $category): Category => $category
+                    ->setAttribute('restorable', $category->isRestorable()),
+            );
+        }
 
         if ($request->ajax()) {
             if ($request->has('bulk')) {
@@ -130,8 +145,15 @@ final class CategoriesController extends Controller
                 'editUrlTemplate' => $this->urlGenerator->route('admin/categories/edit', ['category' => ':id']),
                 'updateUrlTemplate' => $this->urlGenerator->route('admin/categories/update', ['category' => ':id']),
                 'destroyUrlTemplate' => $this->urlGenerator->route('admin/categories/destroy', ['category' => ':id']),
+                'forceDestroyUrlTemplate' => $this->urlGenerator->route(
+                    'admin/categories/force-destroy',
+                    ['category' => ':id'],
+                ),
+                'restoreUrlTemplate' => $this->urlGenerator->route('admin/categories/restore', ['category' => ':id']),
                 'bulkAllUrl' => $this->urlGenerator->route('admin/categories/index'),
                 'bulkDestroyUrl' => $this->urlGenerator->route('admin/categories/bulk-destroy'),
+                'bulkForceDestroyUrl' => $this->urlGenerator->route('admin/categories/bulk-force-destroy'),
+                'bulkRestoreUrl' => $this->urlGenerator->route('admin/categories/bulk-restore'),
                 'exportUrl' => $this->urlGenerator->route('admin/categories/export'),
             ],
         );
@@ -256,9 +278,12 @@ final class CategoriesController extends Controller
      *
      * @throws Exception
      */
-    public function destroy(DestroyCategory $request, Category $category): array|RedirectResponse
-    {
-        $category->delete();
+    public function destroy(
+        DestroyCategory $request,
+        Category $category,
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
+        $databaseManager->transaction(static fn (): ?bool => $category->delete());
 
         if ($request->ajax()) {
             return [
@@ -279,9 +304,10 @@ final class CategoriesController extends Controller
         $databaseManager->transaction(static function () use ($request): void {
             $request->getIds()
                 ->chunk(1000)
-                ->each(static function ($bulkChunk): void {
+                ->each(static function (Collection $bulkChunk): void {
                     Category::whereIn('id', $bulkChunk)
-                        ->delete();
+                        ->get()
+                        ->each(static fn (Category $category): ?bool => $category->delete());
                 });
         });
 
@@ -305,5 +331,13 @@ final class CategoriesController extends Controller
         $nameOfExportedFile = sprintf('categories_%s.xlsx', $currentTime);
 
         return $excel->download($export, $nameOfExportedFile);
+    }
+
+    /**
+     * @param Builder<Category> $query
+     */
+    private function onlyTrashed(Builder $query): void
+    {
+        $query->onlyTrashed();
     }
 }

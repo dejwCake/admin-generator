@@ -176,6 +176,7 @@ final class GenerateAdminUser extends Command
             'table_name' => self::TABLE_NAME,
             '--model-name' => $modelName,
             '--force' => $force,
+            '--template' => 'admin-user',
             '--translatable' => $translatable,
         ]);
 

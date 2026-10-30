@@ -91,6 +91,8 @@ final class Controller extends ClassGenerator
             $this->extractTranslatable(),
         );
 
+        $hasSoftDelete = $columns->hasByName('deleted_at');
+
         /** @var Collection<int, string> $indexEagerLoads */
         $indexEagerLoads = new Collection();
         if ($columns->hasByName('created_by_admin_user_id')) {
@@ -128,6 +130,9 @@ final class Controller extends ClassGenerator
             'hasDelete' => $this->generatedActions->has(GeneratedAction::Delete),
             'hasBulkDelete' => $this->generatedActions->has(GeneratedAction::BulkDelete),
             'hasExport' => $this->generatedActions->has(GeneratedAction::Export),
+            'hasSoftDelete' => $hasSoftDelete,
+            'hasTrash' => $hasSoftDelete && $this->generatedActions->has(GeneratedAction::Delete),
+            'hasBulkTrash' => $hasSoftDelete && $this->generatedActions->has(GeneratedAction::BulkDelete),
             'hasActivation' => $columns->hasByName('activated'),
             'hasPublishedAt' => $columns->hasByName('published_at'),
             //columns

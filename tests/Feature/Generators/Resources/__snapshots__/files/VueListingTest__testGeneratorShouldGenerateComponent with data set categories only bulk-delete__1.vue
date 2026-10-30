@@ -16,6 +16,13 @@
                                 :translations="translations"
                             />
                         </div>
+                        <div class="col-auto mb-3 d-flex align-items-center me-auto">
+                            <ShowDeleted
+                                v-model="showDeleted"
+                                :translations="translations"
+                                @update:modelValue="onShowDeletedChange"
+                            />
+                        </div>
                         <div class="col-sm-auto mb-3">
                             <PerPage v-model="pagination.state.per_page"/>
                         </div>
@@ -99,6 +106,9 @@
                                 <Sortable v-if="isColumnVisible(10)" :column="'updated_by_admin_user_id'" :orderBy="orderBy" @sort="onSort">
                                     {{ translations.columns.updated_by_admin_user_id }}
                                 </Sortable>
+                                <Sortable v-if="showDeleted && isColumnVisible(0)" :column="'deleted_at'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.deleted_at }}
+                                </Sortable>
 
                                 <th></th>
                             </tr>
@@ -110,12 +120,24 @@
                                         :loading="bulkCheckingAllLoader"
                                         :onCheckAll="() => onBulkItemsClickedAll(bulkAllUrl)"
                                         :onUncheckAll="onBulkItemsClickedAllUncheck"
-                                        :onBulkDelete="() => bulkDelete(bulkDestroyUrl, {
+                                        :onBulkDelete="showDeleted ? null : () => bulkDelete(bulkDestroyUrl, {
                                             ...translations,
                                             confirm_title: translations.confirm_delete_title,
                                             confirm_text: translations.confirm_delete_text_multiple,
                                             confirm_btn: translations.delete_btn,
                                         })"
+                                        :onBulkForceDelete="() => bulkForceDelete(bulkForceDestroyUrl, {
+                                            ...translations,
+                                            confirm_title: translations.confirm_delete_title,
+                                            confirm_text: translations.confirm_force_delete_text_multiple,
+                                            confirm_btn: translations.force_delete_btn,
+                                        })"
+                                        :onBulkRestore="showDeleted ? () => bulkRestore(bulkRestoreUrl, {
+                                            ...translations,
+                                            confirm_title: translations.confirm_restore_title,
+                                            confirm_text: translations.confirm_restore_text_multiple,
+                                            confirm_btn: translations.restore_btn,
+                                        }) : null"
                                         :translations="translations"
                                     />
                                 </td>
@@ -173,9 +195,12 @@
                                         :datetime-text="translations.updated_on + ' ' + formatDatetime(item.updated_at)"
                                     />
                                 </td>
+                                <td v-if="showDeleted && isColumnVisible(0)">{{ formatDatetime(item.deleted_at) }}</td>
 
                                 <td>
                                     <div class="d-flex gap-1 justify-content-center">
+                                        <template v-if=&quot;!showDeleted&quot;>
+                                        </template>
                                     </div>
                                 </td>
                             </tr>
@@ -201,6 +226,7 @@
 
         <ConfirmModal
             :show="confirmModal.show"
+            :variant="confirmModal.variant"
             :translations="confirmModal.translations"
             @confirm="confirmModal.onConfirm"
             @cancel="confirmModal.show = false"
@@ -219,6 +245,7 @@ import Pagination from '@craftable/components/listing/Pagination.vue';
 import PerPage from '@craftable/components/listing/PerPage.vue';
 import ReadOnlySwitch from '@craftable/components/ReadOnlySwitch.vue';
 import Search from '@craftable/components/listing/Search.vue';
+import ShowDeleted from '@craftable/components/listing/ShowDeleted.vue';
 import Sortable from '@craftable/components/listing/Sortable.vue';
 import UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue';
 import {formatDate, formatDatetime, formatTime} from '@craftable/utils/dateFormatters.js';
@@ -233,6 +260,8 @@ const props = defineProps({
     translations: {type: Object, default: () => ({})},
     bulkAllUrl: {type: String, default: ''},
     bulkDestroyUrl: {type: String, default: ''},
+    bulkForceDestroyUrl: {type: String, default: ''},
+    bulkRestoreUrl: {type: String, default: ''},
 });
 
 const cardBody = ref(null);
@@ -244,7 +273,14 @@ const {
     isClickedAll, clickedBulkItemsCount, loadData, filter, resolveUrl,
     onBulkItemClicked,
     onBulkItemsClickedAll, onBulkItemsClickedAllWithPagination,
-    onBulkItemsClickedAllUncheck, bulkDelete, confirmModal,
+    onBulkItemsClickedAllUncheck, bulkDelete, bulkForceDelete, bulkRestore, confirmModal,
     onSort, onPageChange, onPerPageChange,
 } = useAppListing(props);
+
+const showDeleted = ref(false);
+
+function onShowDeletedChange(value) {
+    onBulkItemsClickedAllUncheck();
+    filter('trashed', value ? 1 : '');
+}
 </script>

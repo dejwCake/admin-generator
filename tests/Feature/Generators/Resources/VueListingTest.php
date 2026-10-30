@@ -42,6 +42,11 @@ final class VueListingTest extends TestCase
 
     public static function getCases(): iterable
     {
+        yield 'posts without soft deletes' => [
+            'arguments' => ['table_name' => 'posts'],
+            'expectedFilePath' => 'resources/js/admin/post/Listing.vue',
+        ];
+
         yield 'categories default' => [
             'arguments' => ['table_name' => 'categories'],
             'expectedFilePath' => 'resources/js/admin/category/Listing.vue',

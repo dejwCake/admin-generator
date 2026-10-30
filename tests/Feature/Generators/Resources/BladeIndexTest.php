@@ -42,6 +42,11 @@ final class BladeIndexTest extends TestCase
 
     public static function getCases(): iterable
     {
+        yield 'posts without soft deletes' => [
+            'arguments' => ['table_name' => 'posts'],
+            'expectedFilePath' => 'resources/views/admin/post/index.blade.php',
+        ];
+
         yield 'categories default' => [
             'arguments' => ['table_name' => 'categories'],
             'expectedFilePath' => 'resources/views/admin/category/index.blade.php',

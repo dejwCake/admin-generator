@@ -20,6 +20,10 @@ return new class extends PermissionMigration
                 'admin.category.edit',
                 'admin.category.delete',
                 'admin.category.bulk-delete',
+                'admin.category.restore',
+                'admin.category.bulk-restore',
+                'admin.category.force-delete',
+                'admin.category.bulk-force-delete',
             ]),
             new Collection(),
         );

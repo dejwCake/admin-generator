@@ -40,6 +40,11 @@ final class PermissionsTest extends TestCase
 
     public static function getCases(): iterable
     {
+        yield 'posts without soft deletes' => [
+            'arguments' => ['table_name' => 'posts'],
+            'migrationFile' => 'fill_permissions_for_post.php',
+        ];
+
         yield 'categories default' => [
             'arguments' => ['table_name' => 'categories'],
             'migrationFile' => 'fill_permissions_for_category.php',

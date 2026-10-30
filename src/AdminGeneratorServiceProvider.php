@@ -5,16 +5,21 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator;
 
 use Brackets\AdminGenerator\Generators\Classes\BulkDestroyRequest;
+use Brackets\AdminGenerator\Generators\Classes\BulkForceDestroyRequest;
+use Brackets\AdminGenerator\Generators\Classes\BulkRestoreRequest;
 use Brackets\AdminGenerator\Generators\Classes\Controller;
 use Brackets\AdminGenerator\Generators\Classes\DestroyRequest;
 use Brackets\AdminGenerator\Generators\Classes\Export;
 use Brackets\AdminGenerator\Generators\Classes\ExportRequest;
 use Brackets\AdminGenerator\Generators\Classes\Factory;
+use Brackets\AdminGenerator\Generators\Classes\ForceDestroyRequest;
 use Brackets\AdminGenerator\Generators\Classes\ImpersonalLoginRequest;
 use Brackets\AdminGenerator\Generators\Classes\IndexRequest;
 use Brackets\AdminGenerator\Generators\Classes\Model;
 use Brackets\AdminGenerator\Generators\Classes\Permissions;
+use Brackets\AdminGenerator\Generators\Classes\RestoreRequest;
 use Brackets\AdminGenerator\Generators\Classes\StoreRequest;
+use Brackets\AdminGenerator\Generators\Classes\TrashController;
 use Brackets\AdminGenerator\Generators\Classes\UpdateRequest;
 use Brackets\AdminGenerator\Generators\FileAppenders\Lang;
 use Brackets\AdminGenerator\Generators\Generate;
@@ -51,16 +56,21 @@ final class AdminGeneratorServiceProvider extends ServiceProvider
             GenerateUser::class,
             //Classes
             BulkDestroyRequest::class,
+            BulkForceDestroyRequest::class,
+            BulkRestoreRequest::class,
             Controller::class,
             DestroyRequest::class,
             Export::class,
             ExportRequest::class,
             Factory::class,
+            ForceDestroyRequest::class,
             ImpersonalLoginRequest::class,
             IndexRequest::class,
             Model::class,
             Permissions::class,
+            RestoreRequest::class,
             StoreRequest::class,
+            TrashController::class,
             UpdateRequest::class,
             //FileAppenders
             Lang::class,

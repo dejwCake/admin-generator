@@ -50,6 +50,12 @@ namespace {{ $controllerNamespace }};
         $uses->push(sprintf('App\Http\Requests\Admin\%s\BulkDestroy%s', $modelWithNamespaceFromDefault, $modelBaseName));
         $uses->push('Illuminate\Database\DatabaseManager');
     }
+    if ($hasSoftDelete && $hasDelete) {
+        $uses->push('Illuminate\Database\DatabaseManager');
+    }
+    if ($hasSoftDelete && $hasBulkDelete) {
+        $uses->push('Illuminate\Support\Collection');
+    }
     if ($hasExport) {
         $uses->push(sprintf('App\Exports\%s', $exportBaseName));
         $uses->push('Maatwebsite\Excel\Excel');
@@ -67,7 +73,9 @@ namespace {{ $controllerNamespace }};
     }
     if ($queryColumns->hasByName('created_by_admin_user_id')
         || $queryColumns->hasByName('updated_by_admin_user_id')
-        || $relations->hasBelongsTo())
+        || $relations->hasBelongsTo()
+        || $hasTrash
+        || $hasBulkTrash)
     {
         $uses->push('Illuminate\Database\Eloquent\Builder');
     }
@@ -97,6 +105,10 @@ final class {{ $controllerBaseName }} extends Controller
      */
     public function index(Index{{ $modelBaseName }} $request): array|View
     {
+@if($hasTrash || $hasBulkTrash)
+        $trashed = $request->boolean('trashed');
+
+@endif
         $data = $this->listingBuilder->for({{ $modelBaseName }}::class)
             ->build()
             ->processRequestAndGet(
@@ -106,6 +118,9 @@ final class {{ $controllerBaseName }} extends Controller
 @foreach($queryColumns as $column)
                         '{{ $column->name }}',
 @endforeach
+@if($hasTrash || $hasBulkTrash)
+                        'deleted_at',
+@endif
                     ],
                     [
 @foreach($searchInColumns as $column)
@@ -113,7 +128,21 @@ final class {{ $controllerBaseName }} extends Controller
 @endforeach
                     ],
                 ),
+@if($hasTrash || $hasBulkTrash)
+                function (Builder $query) use ($trashed): void {
 @if($indexEagerLoads->isNotEmpty())
+                    $query->with([
+@foreach($indexEagerLoads as $eagerLoad)
+                        '{{ $eagerLoad }}',
+@endforeach
+                    ]);
+
+@endif
+                    if ($trashed) {
+                        $this->onlyTrashed($query);
+                    }
+                },
+@elseif($indexEagerLoads->isNotEmpty())
                 static function (Builder $query): void {
                     $query->with([
 @foreach($indexEagerLoads as $eagerLoad)
@@ -123,6 +152,15 @@ final class {{ $controllerBaseName }} extends Controller
                 },
 @endif
             );
+@if($hasTrash)
+
+        if ($trashed{!! $hasBulkDelete ? " && !\$request->has('bulk')" : '' !!}) {
+            $data->each(
+                static fn ({{ $modelBaseName }} ${{ $modelVariableName }}): {{ $modelBaseName }} => ${{ $modelVariableName }}
+                    ->setAttribute('restorable', ${{ $modelVariableName }}->isRestorable()),
+            );
+        }
+@endif
 
         if ($request->ajax()) {
 @if($hasBulkDelete)
@@ -146,19 +184,45 @@ final class {{ $controllerBaseName }} extends Controller
 @if($hasCreate)
                 'createUrl' => $this->urlGenerator->route('admin/{{ $resource }}/create'),
 @endif
-@if($hasShow)
-                'showUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/show', ['{{ $modelVariableName }}' => ':id']),
+@php
+    $idUrlTemplates = array_merge(
+        $hasShow ? ['showUrlTemplate' => 'show'] : [],
+        $hasEdit ? ['editUrlTemplate' => 'edit', 'updateUrlTemplate' => 'update'] : [],
+        $hasDelete ? ['destroyUrlTemplate' => 'destroy'] : [],
+        $hasTrash ? ['forceDestroyUrlTemplate' => 'force-destroy', 'restoreUrlTemplate' => 'restore'] : [],
+    );
+@endphp
+@foreach($idUrlTemplates as $urlKey => $routeName)
+@php
+    $routeArguments = sprintf("'admin/%s/%s', ['%s' => ':id']", $resource, $routeName, $modelVariableName);
+    $urlLine = sprintf("                '%s' => \$this->urlGenerator->route(%s),", $urlKey, $routeArguments);
+@endphp
+@if(strlen($urlLine) <= 120)
+{!! $urlLine !!}
+@else
+                '{{ $urlKey }}' => $this->urlGenerator->route(
+                    'admin/{{ $resource }}/{{ $routeName }}',
+                    ['{{ $modelVariableName }}' => ':id'],
+                ),
 @endif
-@if($hasEdit)
-                'editUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/edit', ['{{ $modelVariableName }}' => ':id']),
-                'updateUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/update', ['{{ $modelVariableName }}' => ':id']),
-@endif
-@if($hasDelete)
-                'destroyUrlTemplate' => $this->urlGenerator->route('admin/{{ $resource }}/destroy', ['{{ $modelVariableName }}' => ':id']),
-@endif
+@endforeach
 @if($hasBulkDelete)
                 'bulkAllUrl' => $this->urlGenerator->route('admin/{{ $resource }}/index'),
                 'bulkDestroyUrl' => $this->urlGenerator->route('admin/{{ $resource }}/bulk-destroy'),
+@endif
+@if($hasBulkTrash)
+@foreach(['bulkForceDestroyUrl' => 'bulk-force-destroy', 'bulkRestoreUrl' => 'bulk-restore'] as $urlKey => $routeName)
+@php
+    $urlLine = sprintf("                '%s' => \$this->urlGenerator->route('admin/%s/%s'),", $urlKey, $resource, $routeName);
+@endphp
+@if(strlen($urlLine) <= 120)
+{!! $urlLine !!}
+@else
+                '{{ $urlKey }}' => $this->urlGenerator->route(
+                    'admin/{{ $resource }}/{{ $routeName }}',
+                ),
+@endif
+@endforeach
 @endif
 @if($hasExport)
                 'exportUrl' => $this->urlGenerator->route('admin/{{ $resource }}/export'),
@@ -334,9 +398,18 @@ final class {{ $controllerBaseName }} extends Controller
      *
      * @throws Exception
      */
+@if($hasSoftDelete)
+    public function destroy(
+        Destroy{{ $modelBaseName }} $request,
+        {{ $modelBaseName }} ${{ $modelVariableName }},
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
+        $databaseManager->transaction(static fn (): ?bool => ${{ $modelVariableName }}->delete());
+@else
     public function destroy(Destroy{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}): array|RedirectResponse
     {
         ${{ $modelVariableName }}->delete();
+@endif
 
         if ($request->ajax()) {
             return [
@@ -359,10 +432,18 @@ final class {{ $controllerBaseName }} extends Controller
         $databaseManager->transaction(static function () use ($request): void {
             $request->getIds()
                 ->chunk(1000)
+@if($hasSoftDelete)
+                ->each(static function (Collection $bulkChunk): void {
+                    {{ $modelBaseName }}::whereIn('id', $bulkChunk)
+                        ->get()
+                        ->each(static fn ({{ $modelBaseName }} ${{ $modelVariableName }}): ?bool => ${{ $modelVariableName }}->delete());
+                });
+@else
                 ->each(static function ($bulkChunk): void {
                     {{ $modelBaseName }}::whereIn('id', $bulkChunk)
                         ->delete();
                 });
+@endif
         });
 
         if ($request->ajax()) {
@@ -387,6 +468,16 @@ final class {{ $controllerBaseName }} extends Controller
         $nameOfExportedFile = sprintf('{{ Str::plural($modelVariableName) }}_%s.xlsx', $currentTime);
 
         return $excel->download($export, $nameOfExportedFile);
+    }
+@endif
+@if($hasTrash || $hasBulkTrash)
+
+    /**
+     * {{'@'}}param Builder<{{ $modelBaseName }}> $query
+     */
+    private function onlyTrashed(Builder $query): void
+    {
+        $query->onlyTrashed();
     }
 @endif
 }

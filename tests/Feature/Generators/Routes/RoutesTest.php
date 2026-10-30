@@ -16,6 +16,7 @@ final class RoutesTest extends TestCase
      * @param array<string, string|bool> $arguments
      */
     #[DataProvider('getCases')]
+    #[DataProvider('getCasesWithoutSoftDeletes')]
     #[DataProvider('getGeneratedActionCases')]
     public function testGeneratorWritesPerResourceFile(array $arguments, string $expectedFilePath): void
     {
@@ -73,6 +74,14 @@ final class RoutesTest extends TestCase
 
         self::assertFileExists($this->app->basePath('routes/admin/categories.php'));
         self::assertFileExists($this->app->basePath('routes/admin/posts.php'));
+    }
+
+    public static function getCasesWithoutSoftDeletes(): iterable
+    {
+        yield 'posts without soft deletes' => [
+            'arguments' => ['table_name' => 'posts'],
+            'expectedFilePath' => 'routes/admin/posts.php',
+        ];
     }
 
     public static function getCases(): iterable

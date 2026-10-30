@@ -292,6 +292,30 @@ Minor releases on the 2.x line stay backward compatible: no artisan command or o
 code you already generated keeps working without changes. There is no new major version. The notes
 below only matter when you **regenerate** scaffolds.
 
+### 2.7.0 — trash for soft-deleting models
+
+Only tables with a `deleted_at` column are affected; see README → "Soft-deleting models".
+
+- **Frontend and UI packages.** Regenerated listings use `RestoreButton`, `ForceDeleteButton`,
+  `ShowDeleted`, the `BulkOperationsBar` handlers `onBulkForceDelete` / `onBulkRestore` and
+  `bulkForceDelete` / `bulkRestore` / `confirmModal.variant` from `@dejwcake/craftable` **2.4.0**, and the
+  trash texts from `dejwcake/admin-ui` **2.5.0**. Update both before regenerating; `composer.json`
+  does not enforce this.
+- **`isRestorable()` on the model.** The generated controllers, requests and listing call it. A model
+  generated with `--without-model` (or written by hand) needs the method; `return true;` is enough when
+  the model has no parent rows.
+- **Delete behaviour.** For a soft-deleting model `destroy` runs in a transaction and `bulkDestroy`
+  deletes row by row instead of with one query, so model events and observers now fire for bulk
+  deletes too.
+- **Permissions.** The new permissions are in the generated `fill_permissions_for_*` migration. A
+  resource already migrated needs a new migration adding `admin.{model}.restore`,
+  `admin.{model}.bulk-restore`, `admin.{model}.force-delete` and `admin.{model}.bulk-force-delete`;
+  regenerating the old one does not run it again.
+- **Overridden templates** under `resources/views/vendor/brackets/admin-generator` don't get the
+  trash; compare them with the package's `controller`, `routes`, `blade-index` and `vue-listing`.
+- **`admin:generate:request:index`** accepts `--template`; `admin:generate:admin-user` uses the new
+  `admin-user` template, so the admin-user output is unchanged.
+
 ### 2.5.0 — action selection and show pages
 
 - **Frontend and UI packages.** Regenerated listings and show pages use `ShowButton` and `BackButton`

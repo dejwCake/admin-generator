@@ -8,6 +8,7 @@ use Brackets\AdminGenerator\Dtos\GeneratedActions;
 use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Generators\Generator;
 use Brackets\AdminGenerator\Generators\Traits\ResolvesGeneratedActions;
+use Brackets\AdminGenerator\Naming;
 use Override;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -139,9 +140,14 @@ final class Routes extends Generator
 
     private function buildContent(): string
     {
+        $hasSoftDelete = $this->columnCollectionBuilder->build($this->tableName)->hasByName('deleted_at');
+        $trashControllerFullName = Naming::trashControllerName($this->controllerFullName);
+
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             'controllerFullName' => $this->controllerFullName,
             'controllerBaseName' => basename(str_replace('\\', '/', $this->controllerFullName)),
+            'trashControllerFullName' => $trashControllerFullName,
+            'trashControllerBaseName' => basename(str_replace('\\', '/', $trashControllerFullName)),
             'modelVariableName' => $this->modelVariableName,
             'resource' => $this->resource,
             //has
@@ -151,6 +157,8 @@ final class Routes extends Generator
             'hasDelete' => $this->generatedActions->has(GeneratedAction::Delete),
             'hasBulkDelete' => $this->generatedActions->has(GeneratedAction::BulkDelete),
             'hasExport' => $this->generatedActions->has(GeneratedAction::Export),
+            'hasTrash' => $hasSoftDelete && $this->generatedActions->has(GeneratedAction::Delete),
+            'hasBulkTrash' => $hasSoftDelete && $this->generatedActions->has(GeneratedAction::BulkDelete),
             //deprecated alias for templates overridden from 2.4.0, use hasBulkDelete instead
             'hasBulk' => $this->generatedActions->has(GeneratedAction::BulkDelete),
         ])->render();

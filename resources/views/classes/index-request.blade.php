@@ -35,6 +35,9 @@ final class {{ $classBaseName }} extends FormRequest
 @foreach($columns as $column)
                     '{{ $column->name }}',
 @endforeach
+@if($hasSoftDelete)
+                    'deleted_at',
+@endif
                 ]),
                 'nullable',
             ],
@@ -57,6 +60,12 @@ final class {{ $classBaseName }} extends FormRequest
                 'integer',
                 'nullable',
             ],
+@if($hasSoftDelete)
+            'trashed' => [
+                'boolean',
+                'nullable',
+            ],
+@endif
         ];
     }
 }

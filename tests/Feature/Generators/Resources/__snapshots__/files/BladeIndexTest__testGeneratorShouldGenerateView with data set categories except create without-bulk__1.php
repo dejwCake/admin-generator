@@ -11,6 +11,8 @@
         :edit-url-template="'{{ $editUrlTemplate }}'"
         :update-url-template="'{{ $updateUrlTemplate }}'"
         :destroy-url-template="'{{ $destroyUrlTemplate }}'"
+        :force-destroy-url-template="'{{ $forceDestroyUrlTemplate }}'"
+        :restore-url-template="'{{ $restoreUrlTemplate }}'"
         :export-url="'{{ $exportUrl }}'"
         :translations="{{ json_encode([
             'listing_title' => trans('admin.category.actions.index'),
@@ -39,15 +41,23 @@
                 'views' => trans('admin.category.columns.views'),
                 'created_by_admin_user_id' => trans('admin.category.columns.created_by_admin_user_id'),
                 'updated_by_admin_user_id' => trans('admin.category.columns.updated_by_admin_user_id'),
+                'deleted_at' => trans('admin.category.columns.deleted_at'),
             ],
             'search_placeholder' => trans('brackets/admin-ui::admin.placeholder.search'),
             'search_btn' => trans('brackets/admin-ui::admin.btn.search'),
             'show_btn' => trans('brackets/admin-ui::admin.btn.show'),
             'edit_btn' => trans('brackets/admin-ui::admin.btn.edit'),
             'delete_btn' => trans('brackets/admin-ui::admin.btn.delete'),
+            'force_delete_btn' => trans('brackets/admin-ui::admin.btn.force_delete'),
+            'restore_btn' => trans('brackets/admin-ui::admin.btn.restore'),
             'confirm_delete_title' => trans('brackets/admin-ui::admin.operation.confirm_delete_title'),
             'confirm_delete_text' => trans('brackets/admin-ui::admin.operation.confirm_delete_text'),
+            'confirm_force_delete_text' => trans('brackets/admin-ui::admin.operation.confirm_force_delete_text'),
+            'confirm_restore_title' => trans('brackets/admin-ui::admin.operation.confirm_restore_title'),
+            'confirm_restore_text' => trans('brackets/admin-ui::admin.operation.confirm_restore_text'),
+            'not_restorable' => trans('brackets/admin-ui::admin.operation.not_restorable'),
             'cancel_btn' => trans('brackets/admin-ui::admin.btn.cancel'),
+            'show_deleted' => trans('brackets/admin-ui::admin.listing.show_deleted'),
             'overview' => trans('brackets/admin-ui::admin.pagination.overview'),
             'previous' => trans('brackets/admin-ui::admin.pagination.previous'),
             'next' => trans('brackets/admin-ui::admin.pagination.next'),

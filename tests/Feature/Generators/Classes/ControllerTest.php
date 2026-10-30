@@ -42,6 +42,11 @@ final class ControllerTest extends TestCase
 
     public static function getCases(): iterable
     {
+        yield 'posts without soft deletes' => [
+            'arguments' => ['table_name' => 'posts'],
+            'expectedFilePath' => 'app/Http/Controllers/Admin/PostsController.php',
+        ];
+
         yield 'categories default' => [
             'arguments' => ['table_name' => 'categories'],
             'expectedFilePath' => 'app/Http/Controllers/Admin/CategoriesController.php',

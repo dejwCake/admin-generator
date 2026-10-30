@@ -20,6 +20,10 @@ return new class extends PermissionMigration
                 'admin.billing.cat.edit',
                 'admin.billing.cat.delete',
                 'admin.billing.cat.bulk-delete',
+                'admin.billing.cat.restore',
+                'admin.billing.cat.bulk-restore',
+                'admin.billing.cat.force-delete',
+                'admin.billing.cat.bulk-force-delete',
             ]),
             new Collection(),
         );

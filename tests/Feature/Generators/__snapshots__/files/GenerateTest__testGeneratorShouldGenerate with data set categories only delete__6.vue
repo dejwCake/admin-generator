@@ -16,6 +16,13 @@
                                 :translations="translations"
                             />
                         </div>
+                        <div class="col-auto mb-3 d-flex align-items-center me-auto">
+                            <ShowDeleted
+                                v-model="showDeleted"
+                                :translations="translations"
+                                @update:modelValue="onShowDeletedChange"
+                            />
+                        </div>
                         <div class="col-sm-auto mb-3">
                             <PerPage v-model="pagination.state.per_page"/>
                         </div>
@@ -95,6 +102,9 @@
                                 <Sortable v-if="isColumnVisible(10)" :column="'updated_by_admin_user_id'" :orderBy="orderBy" @sort="onSort">
                                     {{ translations.columns.updated_by_admin_user_id }}
                                 </Sortable>
+                                <Sortable v-if="showDeleted && isColumnVisible(0)" :column="'deleted_at'" :orderBy="orderBy" @sort="onSort">
+                                    {{ translations.columns.deleted_at }}
+                                </Sortable>
 
                                 <th></th>
                             </tr>
@@ -146,16 +156,41 @@
                                         :datetime-text="translations.updated_on + ' ' + formatDatetime(item.updated_at)"
                                     />
                                 </td>
+                                <td v-if="showDeleted && isColumnVisible(0)">{{ formatDatetime(item.deleted_at) }}</td>
 
                                 <td>
                                     <div class="d-flex gap-1 justify-content-center">
-                                        <DeleteButton
-                                            :url="resolveUrl(destroyUrlTemplate, item)"
+                                        <RestoreButton
+                                            v-if="showDeleted"
+                                            :disabled="item.restorable === false"
+                                            :url="resolveUrl(restoreUrlTemplate, item)"
+                                            :translations="{
+                                              ...translations,
+                                              confirm_title: translations.confirm_restore_title,
+                                              confirm_text: translations.confirm_restore_text,
+                                              confirm_btn: translations.restore_btn,
+                                            }"
+                                            @restored="loadData"
+                                        />
+                                        <template v-else>
+                                            <DeleteButton
+                                                :url="resolveUrl(destroyUrlTemplate, item)"
+                                                :translations="{
+                                                  ...translations,
+                                                  confirm_title: translations.confirm_delete_title,
+                                                  confirm_text: translations.confirm_delete_text,
+                                                  confirm_btn: translations.delete_btn,
+                                                }"
+                                                @deleted="loadData"
+                                            />
+                                        </template>
+                                        <ForceDeleteButton
+                                            :url="resolveUrl(forceDestroyUrlTemplate, item)"
                                             :translations="{
                                               ...translations,
                                               confirm_title: translations.confirm_delete_title,
-                                              confirm_text: translations.confirm_delete_text,
-                                              confirm_btn: translations.delete_btn,
+                                              confirm_text: translations.confirm_force_delete_text,
+                                              confirm_btn: translations.force_delete_btn,
                                             }"
                                             @deleted="loadData"
                                         />
@@ -188,11 +223,14 @@
 <script setup>
 import DeleteButton from '@craftable/components/listing/DeleteButton.vue';
 import EmptyState from '@craftable/components/listing/EmptyState.vue';
+import ForceDeleteButton from '@craftable/components/listing/ForceDeleteButton.vue';
 import ListingHeader from '@craftable/components/listing/ListingHeader.vue';
 import Pagination from '@craftable/components/listing/Pagination.vue';
 import PerPage from '@craftable/components/listing/PerPage.vue';
 import ReadOnlySwitch from '@craftable/components/ReadOnlySwitch.vue';
+import RestoreButton from '@craftable/components/listing/RestoreButton.vue';
 import Search from '@craftable/components/listing/Search.vue';
+import ShowDeleted from '@craftable/components/listing/ShowDeleted.vue';
 import Sortable from '@craftable/components/listing/Sortable.vue';
 import UserDetailTooltip from '@craftable/components/UserDetailTooltip.vue';
 import {formatDate, formatDatetime, formatTime} from '@craftable/utils/dateFormatters.js';
@@ -206,6 +244,8 @@ const props = defineProps({
     timezone: {type: String, default: 'UTC'},
     translations: {type: Object, default: () => ({})},
     destroyUrlTemplate: {type: String, required: true},
+    forceDestroyUrlTemplate: {type: String, required: true},
+    restoreUrlTemplate: {type: String, required: true},
 });
 
 const cardBody = ref(null);
@@ -216,4 +256,10 @@ const {
     loadData, filter, resolveUrl,
     onSort, onPageChange, onPerPageChange,
 } = useAppListing(props);
+
+const showDeleted = ref(false);
+
+function onShowDeletedChange(value) {
+    filter('trashed', value ? 1 : '');
+}
 </script>

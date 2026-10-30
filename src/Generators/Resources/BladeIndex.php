@@ -71,11 +71,13 @@ final class BladeIndex extends ResourceGenerator
     #[Override]
     protected function buildView(): string
     {
-        $columns = $this->columnCollectionBuilder->build(
+        $allColumns = $this->columnCollectionBuilder->build(
             $this->tableName,
             $this->modelVariableName,
             $this->extractTranslatable(),
-        )->getForIndex();
+        );
+        $columns = $allColumns->getForIndex();
+        $hasSoftDelete = $allColumns->hasByName('deleted_at');
 
         return $this->viewFactory->make(sprintf('brackets/admin-generator::%s', $this->view), [
             //globals
@@ -88,6 +90,8 @@ final class BladeIndex extends ResourceGenerator
             'hasDelete' => $this->generatedActions->has(GeneratedAction::Delete),
             'hasBulkDelete' => $this->generatedActions->has(GeneratedAction::BulkDelete),
             'hasExport' => $this->generatedActions->has(GeneratedAction::Export),
+            'hasTrash' => $hasSoftDelete && $this->generatedActions->has(GeneratedAction::Delete),
+            'hasBulkTrash' => $hasSoftDelete && $this->generatedActions->has(GeneratedAction::BulkDelete),
             'hasPublishedAt' => $columns->hasByName('published_at'),
             'hasCreatedByAdminUser' => $columns->hasByName('created_by_admin_user_id'),
             'hasUpdatedByAdminUser' => $columns->hasByName('updated_by_admin_user_id'),

@@ -5,7 +5,32 @@
 declare(strict_types=1);
 
 use {{ $controllerFullName }};
+@if($hasTrash || $hasBulkTrash)
+use {{ $trashControllerFullName }};
+@endif
 use Illuminate\Support\Facades\Route;
+@if($hasTrash || $hasBulkTrash)
+
+Route::prefix('{{ $resource }}')
+    ->name('{{ $resource }}/')
+    ->controller({{ $trashControllerBaseName }}::class)
+    ->group(static function (): void {
+@if($hasBulkTrash)
+        Route::post('/bulk-force-destroy', 'bulkForceDestroy')
+            ->name('bulk-force-destroy');
+        Route::post('/bulk-restore', 'bulkRestore')
+            ->name('bulk-restore');
+@endif
+@if($hasTrash)
+        Route::delete('/{{ '{' }}{{ $modelVariableName }}:id}/force', 'forceDestroy')
+            ->name('force-destroy')
+            ->withTrashed();
+        Route::post('/{{ '{' }}{{ $modelVariableName }}:id}/restore', 'restore')
+            ->name('restore')
+            ->withTrashed();
+@endif
+    });
+@endif
 
 Route::prefix('{{ $resource }}')
     ->name('{{ $resource }}/')

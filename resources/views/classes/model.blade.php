@@ -260,6 +260,30 @@ final class {{ $modelBaseName }} extends Model{{ $mediaCollections->isNotEmpty()
 @endif
 @endforeach
 @endif
+@if($hasSoftDelete)
+@php
+    $restorableChecks = $relations->getBelongsTo()
+        ->map(static fn ($belongsTo): string => $columns->filterByName($belongsTo->foreignKeyColumn)->pluck('required')->first()
+            ? sprintf('$this->%s()->exists()', $belongsTo->relationMethodName)
+            : sprintf('$this->%s === null || $this->%s()->exists()', $belongsTo->foreignKeyColumn, $belongsTo->relationMethodName))
+        ->values();
+    if ($restorableChecks->count() > 1) {
+        $restorableChecks = $restorableChecks->map(static fn (string $check): string => str_contains($check, ' || ') ? sprintf('(%s)', $check) : $check);
+    }
+@endphp
+
+    /**
+     * A trashed row can be restored only while every row it belongs to exists and is not trashed.
+     */
+    public function isRestorable(): bool
+    {
+@if($restorableChecks->isEmpty())
+        return true;
+@else
+        return {!! $restorableChecks->implode(PHP_EOL . '            && ') !!};
+@endif
+    }
+@endif
 @if($mediaCollections->isNotEmpty())
 
     public function registerMediaCollections(): void

@@ -9,6 +9,8 @@
         :url="'{{ $url }}'"
         :bulk-all-url="'{{ $bulkAllUrl }}'"
         :bulk-destroy-url="'{{ $bulkDestroyUrl }}'"
+        :bulk-force-destroy-url="'{{ $bulkForceDestroyUrl }}'"
+        :bulk-restore-url="'{{ $bulkRestoreUrl }}'"
         :translations="{{ json_encode([
             'listing_title' => trans('admin.category.actions.index'),
             'columns' => [
@@ -35,17 +37,24 @@
                 'views' => trans('admin.category.columns.views'),
                 'created_by_admin_user_id' => trans('admin.category.columns.created_by_admin_user_id'),
                 'updated_by_admin_user_id' => trans('admin.category.columns.updated_by_admin_user_id'),
+                'deleted_at' => trans('admin.category.columns.deleted_at'),
             ],
             'search_placeholder' => trans('brackets/admin-ui::admin.placeholder.search'),
             'search_btn' => trans('brackets/admin-ui::admin.btn.search'),
             'delete_btn' => trans('brackets/admin-ui::admin.btn.delete'),
+            'force_delete_btn' => trans('brackets/admin-ui::admin.btn.force_delete'),
+            'restore_btn' => trans('brackets/admin-ui::admin.btn.restore'),
             'confirm_delete_title' => trans('brackets/admin-ui::admin.operation.confirm_delete_title'),
             'confirm_delete_text' => trans('brackets/admin-ui::admin.operation.confirm_delete_text'),
+            'confirm_restore_title' => trans('brackets/admin-ui::admin.operation.confirm_restore_title'),
             'confirm_delete_text_multiple' => trans('brackets/admin-ui::admin.operation.confirm_delete_text_multiple'),
+            'confirm_force_delete_text_multiple' => trans('brackets/admin-ui::admin.operation.confirm_force_delete_text_multiple'),
+            'confirm_restore_text_multiple' => trans('brackets/admin-ui::admin.operation.confirm_restore_text_multiple'),
             'cancel_btn' => trans('brackets/admin-ui::admin.btn.cancel'),
             'selected_items' => trans('brackets/admin-ui::admin.listing.selected_items'),
             'check_all_items' => trans('brackets/admin-ui::admin.listing.check_all_items'),
             'uncheck_all_items' => trans('brackets/admin-ui::admin.listing.uncheck_all_items'),
+            'show_deleted' => trans('brackets/admin-ui::admin.listing.show_deleted'),
             'overview' => trans('brackets/admin-ui::admin.pagination.overview'),
             'previous' => trans('brackets/admin-ui::admin.pagination.previous'),
             'next' => trans('brackets/admin-ui::admin.pagination.next'),

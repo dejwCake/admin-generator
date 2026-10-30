@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Tests\Feature\Generators\Classes;
 
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Schema\Blueprint;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -70,8 +71,44 @@ final class ModelTest extends TestCase
         self::assertStringNotContainsString('uniqueIds', $contents);
     }
 
+    public function testRestorableCheckRequiresEveryParentRow(): void
+    {
+        $this->app->get(DatabaseManager::class)->connection()->getSchemaBuilder()
+            ->create('comments', static function (Blueprint $table): void {
+                $table->increments('id');
+                $table->unsignedInteger('post_id');
+                $table->foreign('post_id')->references('id')->on('posts');
+                $table->foreignId('user_id')->nullable()->constrained('users');
+                $table->string('body');
+                $table->softDeletes();
+            });
+
+        $this->artisan('admin:generate:model', ['table_name' => 'comments']);
+
+        self::assertMatchesFileSnapshot($this->app->basePath('app/Models/Comment.php'));
+    }
+
+    public function testRestorableCheckWithoutParentRowsAlwaysAllowsRestore(): void
+    {
+        $this->app->get(DatabaseManager::class)->connection()->getSchemaBuilder()
+            ->create('notes', static function (Blueprint $table): void {
+                $table->increments('id');
+                $table->string('body');
+                $table->softDeletes();
+            });
+
+        $this->artisan('admin:generate:model', ['table_name' => 'notes']);
+
+        self::assertMatchesFileSnapshot($this->app->basePath('app/Models/Note.php'));
+    }
+
     public static function getCases(): iterable
     {
+        yield 'posts without soft deletes' => [
+            'arguments' => ['table_name' => 'posts'],
+            'expectedFilePath' => 'app/Models/Post.php',
+        ];
+
         yield 'categories default' => [
             'arguments' => ['table_name' => 'categories'],
             'expectedFilePath' => 'app/Models/Category.php',

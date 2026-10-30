@@ -106,6 +106,7 @@ final class Permissions extends ClassGenerator
             //globals
             'modelDotNotation' => $this->modelDotNotation,
             //has
+            'hasSoftDelete' => $this->columnCollectionBuilder->build($this->tableName)->hasByName('deleted_at'),
             'hasImpersonalLogin' => $this->withImpersonalLogin,
             //deprecated alias for templates overridden from 2.4.0, the permission set is always complete
             'hasBulk' => true,

@@ -142,6 +142,14 @@ final class Category extends Model implements HasMedia
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * A trashed row can be restored only while every row it belongs to exists and is not trashed.
+     */
+    public function isRestorable(): bool
+    {
+        return $this->user_id === null || $this->user()->exists();
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('gallery')

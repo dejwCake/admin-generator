@@ -112,16 +112,19 @@ final class GenerateTest extends TestCase
         $categoriesExportClass = 'app/Exports/CategoriesExport.php';
         $categoriesCommonWithoutModel = self::without($categoriesCommon, $categoriesModel);
         $categoriesCommonWithoutFactory = self::without($categoriesCommon, $categoriesFactory);
+        $categoriesTrash = self::trashForTable('Category', 'app/Http/Controllers/Admin/CategoriesTrashController.php');
+        $categoriesBulkTrash = self::bulkTrashForTable('Category');
+        $categoriesAllTrash = [...$categoriesTrash, ...$categoriesBulkTrash];
 
         yield 'categories default' => [
             'arguments' => ['table_name' => 'categories'],
-            'expectedFiles' => [...$categoriesCommon, $categoriesBulk],
+            'expectedFiles' => [...$categoriesCommon, $categoriesBulk, ...$categoriesAllTrash],
             'missingFiles' => [$categoriesExportRequest, $categoriesExportClass],
         ];
 
         yield 'categories with translatable text' => [
             'arguments' => ['table_name' => 'categories', '--translatable' => 'text'],
-            'expectedFiles' => [...$categoriesCommon, $categoriesBulk],
+            'expectedFiles' => [...$categoriesCommon, $categoriesBulk, ...$categoriesAllTrash],
             'missingFiles' => [$categoriesExportRequest, $categoriesExportClass],
         ];
 
@@ -132,14 +135,20 @@ final class GenerateTest extends TestCase
                 $categoriesBulk,
                 $categoriesExportRequest,
                 $categoriesExportClass,
+                ...$categoriesAllTrash,
             ],
             'missingFiles' => [],
         ];
 
         yield 'categories without bulk' => [
             'arguments' => ['table_name' => 'categories', '--without-bulk' => true],
-            'expectedFiles' => $categoriesCommon,
-            'missingFiles' => [$categoriesBulk, $categoriesExportRequest, $categoriesExportClass],
+            'expectedFiles' => [...$categoriesCommon, ...$categoriesTrash],
+            'missingFiles' => [
+                $categoriesBulk,
+                $categoriesExportRequest,
+                $categoriesExportClass,
+                ...$categoriesBulkTrash,
+            ],
         ];
 
         yield 'categories with export without bulk' => [
@@ -148,25 +157,30 @@ final class GenerateTest extends TestCase
                 '--with-export' => true,
                 '--without-bulk' => true,
             ],
-            'expectedFiles' => [...$categoriesCommon, $categoriesExportRequest, $categoriesExportClass],
-            'missingFiles' => [$categoriesBulk],
+            'expectedFiles' => [
+                ...$categoriesCommon,
+                $categoriesExportRequest,
+                $categoriesExportClass,
+                ...$categoriesTrash,
+            ],
+            'missingFiles' => [$categoriesBulk, ...$categoriesBulkTrash],
         ];
 
         yield 'categories without model' => [
             'arguments' => ['table_name' => 'categories', '--without-model' => true],
-            'expectedFiles' => [...$categoriesCommonWithoutModel, $categoriesBulk],
+            'expectedFiles' => [...$categoriesCommonWithoutModel, $categoriesBulk, ...$categoriesAllTrash],
             'missingFiles' => [$categoriesModel, $categoriesExportRequest, $categoriesExportClass],
         ];
 
         yield 'categories force without model' => [
             'arguments' => ['table_name' => 'categories', '--without-model' => true, '--force' => true],
-            'expectedFiles' => [...$categoriesCommonWithoutModel, $categoriesBulk],
+            'expectedFiles' => [...$categoriesCommonWithoutModel, $categoriesBulk, ...$categoriesAllTrash],
             'missingFiles' => [$categoriesModel, $categoriesExportRequest, $categoriesExportClass],
         ];
 
         yield 'categories without factory' => [
             'arguments' => ['table_name' => 'categories', '--without-factory' => true],
-            'expectedFiles' => [...$categoriesCommonWithoutFactory, $categoriesBulk],
+            'expectedFiles' => [...$categoriesCommonWithoutFactory, $categoriesBulk, ...$categoriesAllTrash],
             'missingFiles' => [$categoriesFactory, $categoriesExportRequest, $categoriesExportClass],
         ];
 
@@ -179,6 +193,7 @@ final class GenerateTest extends TestCase
             'expectedFiles' => [
                 ...self::without($categoriesCommonWithoutModel, $categoriesFactory),
                 $categoriesBulk,
+                ...$categoriesAllTrash,
             ],
             'missingFiles' => [
                 $categoriesModel,
@@ -193,13 +208,13 @@ final class GenerateTest extends TestCase
                 'table_name' => 'categories',
                 '--media' => ['gallery:image:public:5000'],
             ],
-            'expectedFiles' => [...$categoriesCommon, $categoriesBulk],
+            'expectedFiles' => [...$categoriesCommon, $categoriesBulk, ...$categoriesAllTrash],
             'missingFiles' => [$categoriesExportRequest, $categoriesExportClass],
         ];
 
         yield 'categories with belongs-to-many posts' => [
             'arguments' => ['table_name' => 'categories', '--belongs-to-many' => 'posts'],
-            'expectedFiles' => [...$categoriesCommon, $categoriesBulk],
+            'expectedFiles' => [...$categoriesCommon, $categoriesBulk, ...$categoriesAllTrash],
             'missingFiles' => [$categoriesExportRequest, $categoriesExportClass],
         ];
 
@@ -210,6 +225,12 @@ final class GenerateTest extends TestCase
             'expectedFiles' => [
                 ...$commonForBillingCat,
                 'app/Http/Requests/Admin/Billing/Cat/BulkDestroyCat.php',
+                ...self::trashForTable(
+                    'Billing/Cat',
+                    'app/Http/Controllers/Admin/CategoriesTrashController.php',
+                    'Cat',
+                ),
+                ...self::bulkTrashForTable('Billing/Cat', 'Cat'),
             ],
             'missingFiles' => [
                 ...self::defaultCategoriesPaths(),
@@ -224,6 +245,8 @@ final class GenerateTest extends TestCase
             'expectedFiles' => [
                 ...$commonForOutsideCat,
                 'app/Http/Requests/Admin/Cat/BulkDestroyCat.php',
+                ...self::trashForTable('Cat', 'app/Http/Controllers/Admin/CategoriesTrashController.php'),
+                ...self::bulkTrashForTable('Cat'),
             ],
             'missingFiles' => [
                 ...self::defaultCategoriesPaths(),
@@ -244,6 +267,8 @@ final class GenerateTest extends TestCase
                     'app/Http/Controllers/Admin/Auth/CategoriesController.php',
                 ),
                 $categoriesBulk,
+                ...self::trashForTable('Category', 'app/Http/Controllers/Admin/Auth/CategoriesTrashController.php'),
+                ...$categoriesBulkTrash,
             ],
             'missingFiles' => [$defaultCategoriesController, $categoriesExportRequest, $categoriesExportClass],
         ];
@@ -256,13 +281,15 @@ final class GenerateTest extends TestCase
             'expectedFiles' => [
                 ...self::replaceController($categoriesCommon, 'app/Http/Controllers/Auth/CategoriesController.php'),
                 $categoriesBulk,
+                ...self::trashForTable('Category', 'app/Http/Controllers/Auth/CategoriesTrashController.php'),
+                ...$categoriesBulkTrash,
             ],
             'missingFiles' => [$defaultCategoriesController, $categoriesExportRequest, $categoriesExportClass],
         ];
 
         yield 'categories with force-permissions' => [
             'arguments' => ['table_name' => 'categories', '--force-permissions' => true],
-            'expectedFiles' => [...$categoriesCommon, $categoriesBulk],
+            'expectedFiles' => [...$categoriesCommon, $categoriesBulk, ...$categoriesAllTrash],
             'missingFiles' => [$categoriesExportRequest, $categoriesExportClass],
             'expectsPermissionsMigration' => true,
             'permissionsMigrationSlug' => 'category',
@@ -272,17 +299,21 @@ final class GenerateTest extends TestCase
         $postsBulk = 'app/Http/Requests/Admin/Post/BulkDestroyPost.php';
         $postsExportRequest = 'app/Http/Requests/Admin/Post/ExportPost.php';
         $postsExportClass = 'app/Exports/PostsExport.php';
+        $postsTrash = [
+            ...self::trashForTable('Post', 'app/Http/Controllers/Admin/PostsTrashController.php'),
+            ...self::bulkTrashForTable('Post'),
+        ];
 
         yield 'posts default' => [
             'arguments' => ['table_name' => 'posts'],
             'expectedFiles' => [...$postsCommon, $postsBulk],
-            'missingFiles' => [$postsExportRequest, $postsExportClass],
+            'missingFiles' => [$postsExportRequest, $postsExportClass, ...$postsTrash],
         ];
 
         yield 'posts with belongs-to-many categories' => [
             'arguments' => ['table_name' => 'posts', '--belongs-to-many' => 'categories'],
             'expectedFiles' => [...$postsCommon, $postsBulk],
-            'missingFiles' => [$postsExportRequest, $postsExportClass],
+            'missingFiles' => [$postsExportRequest, $postsExportClass, ...$postsTrash],
         ];
     }
 
@@ -325,6 +356,14 @@ final class GenerateTest extends TestCase
             'routes/admin.php' => [],
             'routes/admin/categories.php' => [],
             'lang/en/admin.php' => [],
+            'app/Http/Controllers/Admin/CategoriesTrashController.php' => [
+                GeneratedAction::Delete,
+                GeneratedAction::BulkDelete,
+            ],
+            'app/Http/Requests/Admin/Category/ForceDestroyCategory.php' => [GeneratedAction::Delete],
+            'app/Http/Requests/Admin/Category/RestoreCategory.php' => [GeneratedAction::Delete],
+            'app/Http/Requests/Admin/Category/BulkForceDestroyCategory.php' => [GeneratedAction::BulkDelete],
+            'app/Http/Requests/Admin/Category/BulkRestoreCategory.php' => [GeneratedAction::BulkDelete],
         ];
     }
 
@@ -473,6 +512,36 @@ final class GenerateTest extends TestCase
             'resources/js/admin/category/Show.vue',
             'resources/js/admin/category/Form.vue',
             'database/factories/CategoryFactory.php',
+        ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function trashForTable(
+        string $requestsDir,
+        string $controllerPath,
+        ?string $modelBaseName = null,
+    ): array {
+        $modelBaseName ??= $requestsDir;
+
+        return [
+            $controllerPath,
+            sprintf('app/Http/Requests/Admin/%s/ForceDestroy%s.php', $requestsDir, $modelBaseName),
+            sprintf('app/Http/Requests/Admin/%s/Restore%s.php', $requestsDir, $modelBaseName),
+        ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function bulkTrashForTable(string $requestsDir, ?string $modelBaseName = null): array
+    {
+        $modelBaseName ??= $requestsDir;
+
+        return [
+            sprintf('app/Http/Requests/Admin/%s/BulkForceDestroy%s.php', $requestsDir, $modelBaseName),
+            sprintf('app/Http/Requests/Admin/%s/BulkRestore%s.php', $requestsDir, $modelBaseName),
         ];
     }
 

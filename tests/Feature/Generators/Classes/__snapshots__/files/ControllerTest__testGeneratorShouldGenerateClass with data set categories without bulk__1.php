@@ -20,6 +20,7 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
@@ -41,6 +42,8 @@ final class CategoriesController extends Controller
      */
     public function index(IndexCategory $request): array|View
     {
+        $trashed = $request->boolean('trashed');
+
         $data = $this->listingBuilder->for(Category::class)
             ->build()
             ->processRequestAndGet(
@@ -74,6 +77,7 @@ final class CategoriesController extends Controller
                         'updated_by_admin_user_id',
                         'created_at',
                         'updated_at',
+                        'deleted_at',
                     ],
                     [
                         'id',
@@ -92,14 +96,25 @@ final class CategoriesController extends Controller
                         'description',
                     ],
                 ),
-                static function (Builder $query): void {
+                function (Builder $query) use ($trashed): void {
                     $query->with([
                         'createdByAdminUser',
                         'updatedByAdminUser',
                         'user',
                     ]);
+
+                    if ($trashed) {
+                        $this->onlyTrashed($query);
+                    }
                 },
             );
+
+        if ($trashed) {
+            $data->each(
+                static fn (Category $category): Category => $category
+                    ->setAttribute('restorable', $category->isRestorable()),
+            );
+        }
 
         if ($request->ajax()) {
             return [
@@ -117,6 +132,11 @@ final class CategoriesController extends Controller
                 'editUrlTemplate' => $this->urlGenerator->route('admin/categories/edit', ['category' => ':id']),
                 'updateUrlTemplate' => $this->urlGenerator->route('admin/categories/update', ['category' => ':id']),
                 'destroyUrlTemplate' => $this->urlGenerator->route('admin/categories/destroy', ['category' => ':id']),
+                'forceDestroyUrlTemplate' => $this->urlGenerator->route(
+                    'admin/categories/force-destroy',
+                    ['category' => ':id'],
+                ),
+                'restoreUrlTemplate' => $this->urlGenerator->route('admin/categories/restore', ['category' => ':id']),
             ],
         );
     }
@@ -240,9 +260,12 @@ final class CategoriesController extends Controller
      *
      * @throws Exception
      */
-    public function destroy(DestroyCategory $request, Category $category): array|RedirectResponse
-    {
-        $category->delete();
+    public function destroy(
+        DestroyCategory $request,
+        Category $category,
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
+        $databaseManager->transaction(static fn (): ?bool => $category->delete());
 
         if ($request->ajax()) {
             return [
@@ -251,5 +274,13 @@ final class CategoriesController extends Controller
         }
 
         return $this->redirector->back();
+    }
+
+    /**
+     * @param Builder<Category> $query
+     */
+    private function onlyTrashed(Builder $query): void
+    {
+        $query->onlyTrashed();
     }
 }

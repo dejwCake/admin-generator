@@ -51,6 +51,29 @@ selected actions.
 referenced by `role_has_permissions`, so regenerating a resource with a narrower set would delete
 grants roles already have. A permission for an action that isn't generated is harmless.
 
+## Soft-deleting models
+
+A table with a `deleted_at` column gets a trash on top of `delete` and `bulk-delete`. Nothing changes
+for a table without it.
+
+- **Delete and Delete permanently.** The listing offers both, single and bulk; the admin chooses.
+  `destroy` and `bulkDestroy` delete row by row (so model events fire) in a transaction.
+- **Show deleted.** A toggle in the listing shows only trashed rows (`onlyTrashed()`), with a sortable
+  `deleted_at` column. Trashed rows offer only **Restore** and **Delete permanently**.
+- **`{Models}TrashController`** (`admin:generate:trash-controller`) holds `forceDestroy`,
+  `bulkForceDestroy`, `restore` and `bulkRestore`, with their requests
+  (`admin:generate:request:{force-destroy,bulk-force-destroy,restore,bulk-restore}`). Its routes are
+  registered before the main ones and resolve trashed rows (`withTrashed()`). Single actions come with
+  `delete`, bulk ones with `bulk-delete`.
+- **Restorable check.** The model gets `isRestorable()`: every `belongsTo` parent must exist and not be
+  trashed (a nullable foreign key may be empty). A row that is not restorable has its Restore button
+  disabled, its restore request fails validation, and bulk restore skips it and reports the count.
+- **Failures are reported, not thrown.** An integrity constraint violation (a unique value now taken
+  by a live row, a row still referenced by another) rolls the operation back and comes back as a
+  validation error with an `admin-ui` message.
+- **Permissions:** `restore`, `bulk-restore`, `force-delete` and `bulk-force-delete` are added to the
+  permissions migration.
+
 ### Deprecated flags
 
 `--with-export` (`-e`) and `--without-bulk` (`-wb`) still work, and are applied on top of
