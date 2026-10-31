@@ -199,8 +199,6 @@
 
                                 <td>
                                     <div class="d-flex gap-1 justify-content-center">
-                                        <template v-if=&quot;!showDeleted&quot;>
-                                        </template>
                                     </div>
                                 </td>
                             </tr>
@@ -280,6 +278,10 @@ const {
 const showDeleted = ref(false);
 
 function onShowDeletedChange(value) {
+    if (!value && orderBy.column === 'deleted_at') {
+        orderBy.column = 'id';
+        orderBy.direction = 'asc';
+    }
     onBulkItemsClickedAllUncheck();
     filter('trashed', value ? 1 : '');
 }

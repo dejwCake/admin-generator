@@ -27,6 +27,12 @@ abstract class TrashRequest extends ClassGenerator
     {
         $force = $this->option('force');
 
+        if (!$this->columnCollectionBuilder->build($this->tableName)->hasByName('deleted_at')) {
+            $this->warn(sprintf('Skipping %s: %s has no deleted_at column.', $this->classBaseName, $this->tableName));
+
+            return;
+        }
+
         if ($this->generateClass($force)) {
             $this->info(sprintf('Generating %s finished', $this->classFullName));
         }

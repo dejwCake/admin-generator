@@ -36,6 +36,14 @@ final class RestoreRequestTest extends TestCase
         self::assertFileExists($filePath);
     }
 
+    public function testGeneratorSkipsTheClassWithoutSoftDeletes(): void
+    {
+        $this->artisan('admin:generate:request:restore', ['table_name' => 'posts'])
+            ->expectsOutput('Skipping RestorePost: posts has no deleted_at column.');
+
+        self::assertFileDoesNotExist($this->app->basePath('app/Http/Requests/Admin/Post/RestorePost.php'));
+    }
+
     public static function getCases(): iterable
     {
         yield 'categories default' => [
@@ -59,29 +67,6 @@ final class RestoreRequestTest extends TestCase
                 '--model-with-full-namespace' => 'App\\Billing\\Category',
             ],
             'expectedFilePath' => 'app/Http/Requests/Admin/Category/RestoreCategory.php',
-        ];
-
-        yield 'posts default' => [
-            'arguments' => ['table_name' => 'posts'],
-            'expectedFilePath' => 'app/Http/Requests/Admin/Post/RestorePost.php',
-        ];
-
-        yield 'posts with model-name Feed\\Article' => [
-            'arguments' => ['table_name' => 'posts', '--model-name' => 'Feed\\Article'],
-            'expectedFilePath' => 'app/Http/Requests/Admin/Feed/Article/RestoreArticle.php',
-        ];
-
-        yield 'posts with model-name App\\Feed\\Article' => [
-            'arguments' => ['table_name' => 'posts', '--model-name' => 'App\\Feed\\Article'],
-            'expectedFilePath' => 'app/Http/Requests/Admin/Article/RestoreArticle.php',
-        ];
-
-        yield 'posts with model-with-full-namespace App\\Feed\\Post' => [
-            'arguments' => [
-                'table_name' => 'posts',
-                '--model-with-full-namespace' => 'App\\Feed\\Post',
-            ],
-            'expectedFilePath' => 'app/Http/Requests/Admin/Post/RestorePost.php',
         ];
     }
 }

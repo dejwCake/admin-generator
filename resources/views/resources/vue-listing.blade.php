@@ -227,7 +227,12 @@
                                             @restored="loadData"
                                         />
 @endif
-                                        <template v-{{ $hasTrash ? 'else' : 'if="!showDeleted"' }}>
+@if($hasShow || $hasEdit || $hasDelete)
+@if($hasTrash)
+                                        <template v-else>
+@else
+                                        <template v-if="!showDeleted">
+@endif
 @if($hasShow)
                                             <ShowButton
                                                 :url="resolveUrl(showUrlTemplate, item)"
@@ -253,6 +258,7 @@
                                             />
 @endif
                                         </template>
+@endif
 @if($hasTrash)
                                         <ForceDeleteButton
                                             :url="resolveUrl(forceDestroyUrlTemplate, item)"
@@ -452,6 +458,10 @@ const {
 const showDeleted = ref(false);
 
 function onShowDeletedChange(value) {
+    if (!value && orderBy.column === 'deleted_at') {
+        orderBy.column = 'id';
+        orderBy.direction = 'asc';
+    }
 @if($hasBulkDelete)
     onBulkItemsClickedAllUncheck();
 @endif

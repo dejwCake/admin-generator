@@ -73,7 +73,7 @@ final class ModelTest extends TestCase
 
     public function testRestorableCheckRequiresEveryParentRow(): void
     {
-        $this->app->get(DatabaseManager::class)->connection()->getSchemaBuilder()
+        $this->app->make(DatabaseManager::class)->connection()->getSchemaBuilder()
             ->create('comments', static function (Blueprint $table): void {
                 $table->increments('id');
                 $table->unsignedInteger('post_id');
@@ -90,7 +90,7 @@ final class ModelTest extends TestCase
 
     public function testRestorableCheckWithoutParentRowsAlwaysAllowsRestore(): void
     {
-        $this->app->get(DatabaseManager::class)->connection()->getSchemaBuilder()
+        $this->app->make(DatabaseManager::class)->connection()->getSchemaBuilder()
             ->create('notes', static function (Blueprint $table): void {
                 $table->increments('id');
                 $table->string('body');

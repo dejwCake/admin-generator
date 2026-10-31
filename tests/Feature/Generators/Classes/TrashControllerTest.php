@@ -44,6 +44,14 @@ final class TrashControllerTest extends TestCase
         self::assertFileDoesNotExist($this->app->basePath('app/Http/Controllers/Admin/CategoriesTrashController.php'));
     }
 
+    public function testGeneratorSkipsTheClassWithoutSoftDeletes(): void
+    {
+        $this->artisan('admin:generate:trash-controller', ['table_name' => 'posts'])
+            ->expectsOutput('Skipping the trash controller: posts has no deleted_at column.');
+
+        self::assertFileDoesNotExist($this->app->basePath('app/Http/Controllers/Admin/PostsTrashController.php'));
+    }
+
     public static function getCases(): iterable
     {
         yield 'categories default' => [

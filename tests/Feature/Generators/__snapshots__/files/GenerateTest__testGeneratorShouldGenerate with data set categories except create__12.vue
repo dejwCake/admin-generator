@@ -357,6 +357,10 @@ const {
 const showDeleted = ref(false);
 
 function onShowDeletedChange(value) {
+    if (!value && orderBy.column === 'deleted_at') {
+        orderBy.column = 'id';
+        orderBy.direction = 'asc';
+    }
     onBulkItemsClickedAllUncheck();
     filter('trashed', value ? 1 : '');
 }

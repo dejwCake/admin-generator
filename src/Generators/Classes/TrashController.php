@@ -46,6 +46,12 @@ final class TrashController extends ClassGenerator
 
         $this->generatedActions = $this->resolveGeneratedActions();
 
+        if (!$this->columnCollectionBuilder->build($this->tableName)->hasByName('deleted_at')) {
+            $this->warn(sprintf('Skipping the trash controller: %s has no deleted_at column.', $this->tableName));
+
+            return;
+        }
+
         if (
             !$this->generatedActions->has(GeneratedAction::Delete)
             && !$this->generatedActions->has(GeneratedAction::BulkDelete)
