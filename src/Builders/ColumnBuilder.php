@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 final readonly class ColumnBuilder
 {
     public const array WYSIWYG_COLUMN_NAMES = ['perex', 'text', 'body', 'description'];
+    private const array SOFT_DELETE_INDEX_COLUMNS = ['deleted_at', 'deleted_unique'];
 
     public function __construct(
         private ServerStoreRulesBuilder $serverStoreRulesBuilder,
@@ -29,8 +30,12 @@ final readonly class ColumnBuilder
         string $modelVariableName,
         ?array $translatable = null,
     ): Column {
-        $hasUniqueIndex = $this->hasUniqueIndex($name, $indexes);
-        $hasUniqueDeleteAtIndex = $this->hasUniqueDeletedAtIndex($name, $indexes);
+        $uniqueIndex = $this->findUniqueIndex($name, $indexes);
+        $hasUniqueIndex = $uniqueIndex !== null;
+        $hasUniqueDeleteAtIndex = $uniqueIndex !== null && $this->isSoftDeleteAware($uniqueIndex);
+        $uniqueScopeColumns = $uniqueIndex === null
+            ? []
+            : array_values(array_diff($this->keyColumns($uniqueIndex), [$name]));
 
         $majorType = $this->getMajorTypeFromType($type);
         $isForeignKey = $this->isForeignKey($name);
@@ -56,6 +61,7 @@ final readonly class ColumnBuilder
                 $tableName,
                 $hasSoftDelete && $hasUniqueDeleteAtIndex,
                 $isTranslatable,
+                $uniqueScopeColumns,
             ),
             serverUpdateRules: $this->serverUpdateRulesBuilder->build(
                 $name,
@@ -67,25 +73,39 @@ final readonly class ColumnBuilder
                 $hasSoftDelete && $hasUniqueDeleteAtIndex,
                 $modelVariableName,
                 $isTranslatable,
+                $uniqueScopeColumns,
             ),
             frontendRules: $this->frontendRulesBuilder->build($name, $majorType, $nullable === false, $isForeignKey),
         );
     }
 
-    private function hasUniqueIndex(string $name, Collection $indexes): bool
+    /**
+     * @return array{name: string, columns: array<int, string>, unique: bool, primary: bool}|null
+     */
+    private function findUniqueIndex(string $name, Collection $indexes): ?array
     {
-        return $indexes->contains(static fn (array $index): bool
-            => in_array($name, $index['columns'], true) && ($index['unique'] && !$index['primary']));
+        return $indexes->first(fn (array $index): bool
+            => $index['unique']
+                && !$index['primary']
+                && array_last($this->keyColumns($index)) === $name);
     }
 
-    private function hasUniqueDeletedAtIndex(string $name, Collection $indexes): bool
+    /**
+     * @param array{columns: array<int, string>} $index
+     * @return array<int, string>
+     */
+    private function keyColumns(array $index): array
     {
-        return $indexes->contains(static fn (array $index): bool
-            => in_array($name, $index['columns'], true)
-                && ($index['unique'] && !$index['primary'])
-                && (str_contains($index['name'], 'deleted_at')
-                    || in_array('deleted_at', $index['columns'], true)
-                    || in_array('deleted_unique', $index['columns'], true)));
+        return array_values(array_diff($index['columns'], self::SOFT_DELETE_INDEX_COLUMNS));
+    }
+
+    /**
+     * @param array{name: string, columns: array<int, string>} $index
+     */
+    private function isSoftDeleteAware(array $index): bool
+    {
+        return str_contains($index['name'], 'deleted_at')
+            || array_intersect($index['columns'], self::SOFT_DELETE_INDEX_COLUMNS) !== [];
     }
 
     private function isForeignKey(string $name): bool

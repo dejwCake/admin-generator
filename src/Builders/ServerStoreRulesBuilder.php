@@ -40,11 +40,12 @@ final class ServerStoreRulesBuilder
         string $tableName,
         bool $excludeDeletedAt,
         bool $isTranslatable = false,
+        array $uniqueScopeColumns = [],
     ): Collection {
         $this->serverStoreRules = new Collection();
         $this->buildByRequire($required);
         $this->buildByName($name);
-        $this->getByUnique($name, $type, $unique, $tableName, $excludeDeletedAt);
+        $this->getByUnique($name, $type, $unique, $tableName, $excludeDeletedAt, $uniqueScopeColumns);
         $this->getByMajorType($majorType, $isTranslatable);
 
         return $this->serverStoreRules;
@@ -77,6 +78,7 @@ final class ServerStoreRulesBuilder
         bool $unique,
         string $tableName,
         bool $excludeDeletedAt,
+        array $uniqueScopeColumns,
     ): void {
         if ($unique || $name === 'slug') {
             $this->serverStoreRules->push(
@@ -87,6 +89,7 @@ final class ServerStoreRulesBuilder
                     in_array($type, ['json', 'jsonb'], true),
                     $excludeDeletedAt,
                     false,
+                    $uniqueScopeColumns,
                 ),
             );
         }

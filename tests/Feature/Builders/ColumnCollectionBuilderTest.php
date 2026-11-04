@@ -227,4 +227,37 @@ final class ColumnCollectionBuilderTest extends TestCase
         self::assertNotNull($uniqueRule);
         self::assertStringContainsString("->whereNull('deleted_at')", (string) $uniqueRule);
     }
+
+    public function testBuildScopesCompositeUniqueIndexByItsOtherKeyColumns(): void
+    {
+        $schemaBuilder = $this->app['db']->connection()->getSchemaBuilder();
+
+        $schemaBuilder->create('membership_items', static function (Blueprint $table): void {
+            $table->increments('id');
+            $table->unsignedInteger('group_id');
+            $table->unsignedInteger('member_id');
+            $table->softDeletes();
+            $table->integer('deleted_unique')
+                ->nullable()
+                ->storedAs('CASE WHEN deleted_at IS NULL THEN 1 END');
+            $table->unique(['group_id', 'member_id', 'deleted_unique']);
+        });
+
+        $builder = $this->app->make(ColumnCollectionBuilder::class);
+        $columns = $builder->build('membership_items')->toArray();
+
+        self::assertNull($columns['group_id']->serverUpdateRules->first(
+            static fn (ServerUpdateRule $rule): bool => $rule instanceof UniqueRule,
+        ));
+
+        $expected = "Rule::unique('membership_items', 'member_id')" . PHP_EOL
+            . "                    ->where('group_id', \$this->input('group_id', \$this->membershipItem->group_id))"
+            . PHP_EOL
+            . '                    ->ignore($this->membershipItem->getKey(), $this->membershipItem->getKeyName())'
+            . PHP_EOL
+            . "                    ->whereNull('deleted_at')";
+        self::assertSame($expected, (string) $columns['member_id']->serverUpdateRules->first(
+            static fn (ServerUpdateRule $rule): bool => $rule instanceof UniqueRule,
+        ));
+    }
 }

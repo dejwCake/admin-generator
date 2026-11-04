@@ -13,6 +13,7 @@ final readonly class UniqueRule implements ServerStoreRule, ServerUpdateRule
         private bool $locale = false,
         private bool $deletedAt = false,
         private bool $ignore = false,
+        private array $scopeColumns = [],
     ) {
     }
 
@@ -21,6 +22,16 @@ final readonly class UniqueRule implements ServerStoreRule, ServerUpdateRule
         $column = sprintf("'%s'", $this->columnName);
         if ($this->locale) {
             $column = sprintf("'%s'->'.\$locale", $this->columnName);
+        }
+
+        $scope = '';
+        foreach ($this->scopeColumns as $scopeColumn) {
+            $scope .= sprintf(
+                PHP_EOL . "                    ->where('%s', \$this->input('%s'%s))",
+                $scopeColumn,
+                $scopeColumn,
+                $this->ignore ? sprintf(', $this->%s->%s', $this->modelVariableName, $scopeColumn) : '',
+            );
         }
 
         $ignore = '';
@@ -39,6 +50,7 @@ final readonly class UniqueRule implements ServerStoreRule, ServerUpdateRule
         }
 
         return sprintf("Rule::unique('%s', %s)", $this->tableName, $column)
+            . $scope
             . $ignore
             . $deletedAt;
     }

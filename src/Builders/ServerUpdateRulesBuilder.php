@@ -41,11 +41,20 @@ final class ServerUpdateRulesBuilder
         bool $excludeDeletedAt,
         string $modelVariableName,
         bool $isTranslatable = false,
+        array $uniqueScopeColumns = [],
     ): Collection {
         $this->serverUpdateRules = new Collection();
         $this->buildByRequire($required);
         $this->buildByName($name);
-        $this->getByUnique($name, $type, $unique, $tableName, $excludeDeletedAt, $modelVariableName);
+        $this->getByUnique(
+            $name,
+            $type,
+            $unique,
+            $tableName,
+            $excludeDeletedAt,
+            $modelVariableName,
+            $uniqueScopeColumns,
+        );
         $this->getByMajorType($majorType, $isTranslatable);
 
         return $this->serverUpdateRules;
@@ -79,6 +88,7 @@ final class ServerUpdateRulesBuilder
         string $tableName,
         bool $excludeDeletedAt,
         string $modelVariableName,
+        array $uniqueScopeColumns,
     ): void {
         if ($unique || $name === 'slug') {
             $this->serverUpdateRules->push(
@@ -89,6 +99,7 @@ final class ServerUpdateRulesBuilder
                     in_array($type, ['json', 'jsonb'], true),
                     $excludeDeletedAt,
                     true,
+                    $uniqueScopeColumns,
                 ),
             );
         }

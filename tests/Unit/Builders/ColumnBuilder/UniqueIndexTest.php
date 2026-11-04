@@ -145,6 +145,63 @@ final class UniqueIndexTest extends TestCase
         self::assertStringContainsString("->whereNull('deleted_at')", (string) $uniqueRule);
     }
 
+    public function testCompositeIndexDoesNotMakeTheLeadingColumnUnique(): void
+    {
+        $column = $this->buildColumn(name: 'team_id', indexes: $this->compositeIndex(['team_id', 'user_id']));
+
+        $hasUniqueRule = $column->serverStoreRules->contains(
+            static fn ($rule): bool => $rule instanceof UniqueRule,
+        );
+
+        self::assertFalse($hasUniqueRule);
+    }
+
+    public function testCompositeIndexScopesTheUniqueRuleOfTheLastColumn(): void
+    {
+        $column = $this->buildColumn(name: 'user_id', indexes: $this->compositeIndex(['team_id', 'user_id']));
+
+        $storeRule = $column->serverStoreRules->first(static fn ($rule): bool => $rule instanceof UniqueRule);
+        $updateRule = $column->serverUpdateRules->first(static fn ($rule): bool => $rule instanceof UniqueRule);
+
+        self::assertNotNull($storeRule);
+        self::assertStringContainsString("->where('team_id', \$this->input('team_id'))", (string) $storeRule);
+        self::assertNotNull($updateRule);
+        self::assertStringContainsString(
+            "->where('team_id', \$this->input('team_id', \$this->article->team_id))",
+            (string) $updateRule,
+        );
+    }
+
+    public function testCompositeIndexWithDeletedUniqueScopesOnlyByKeyColumns(): void
+    {
+        $column = $this->buildColumn(
+            name: 'user_id',
+            indexes: $this->compositeIndex(['team_id', 'user_id', 'deleted_unique']),
+            hasSoftDelete: true,
+        );
+
+        $storeRule = (string) $column->serverStoreRules->first(static fn ($rule): bool => $rule instanceof UniqueRule);
+
+        self::assertStringContainsString("->where('team_id', \$this->input('team_id'))", $storeRule);
+        self::assertStringContainsString("->whereNull('deleted_at')", $storeRule);
+        self::assertStringNotContainsString('deleted_unique', $storeRule);
+    }
+
+    /**
+     * @param array<int, string> $columns
+     */
+    private function compositeIndex(array $columns): Collection
+    {
+        return new Collection([
+            [
+                'name' => 'items_composite_unique',
+                'columns' => $columns,
+                'unique' => true,
+                'primary' => false,
+            ],
+        ]);
+    }
+
     private function buildColumn(
         string $name = 'title',
         ?Collection $indexes = null,

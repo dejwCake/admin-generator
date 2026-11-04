@@ -43,6 +43,40 @@ final class UniqueRuleTest extends TestCase
         self::assertSame($expected, (string) $rule);
     }
 
+    public function testWithScopeColumnsForStore(): void
+    {
+        $rule = new UniqueRule(
+            tableName: 'team_members',
+            columnName: 'user_id',
+            modelVariableName: null,
+            deletedAt: true,
+            scopeColumns: ['team_id'],
+        );
+
+        $expected = "Rule::unique('team_members', 'user_id')" . PHP_EOL .
+            "                    ->where('team_id', \$this->input('team_id'))" . PHP_EOL .
+            "                    ->whereNull('deleted_at')";
+
+        self::assertSame($expected, (string) $rule);
+    }
+
+    public function testWithScopeColumnsForUpdateFallsBackToTheModelValue(): void
+    {
+        $rule = new UniqueRule(
+            tableName: 'team_members',
+            columnName: 'user_id',
+            modelVariableName: 'teamMember',
+            ignore: true,
+            scopeColumns: ['team_id'],
+        );
+
+        $expected = "Rule::unique('team_members', 'user_id')" . PHP_EOL .
+            "                    ->where('team_id', \$this->input('team_id', \$this->teamMember->team_id))" . PHP_EOL .
+            '                    ->ignore($this->teamMember->getKey(), $this->teamMember->getKeyName())';
+
+        self::assertSame($expected, (string) $rule);
+    }
+
     public function testCombinedLocaleIgnoreDeletedAt(): void
     {
         $rule = new UniqueRule(
