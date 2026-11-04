@@ -24,6 +24,7 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -173,9 +174,14 @@ final class UsersController extends Controller
      *
      * @throws Exception
      */
-    public function destroy(DestroyUser $request, User $user): array|RedirectResponse
-    {
-        $user->delete();
+    public function destroy(
+        DestroyUser $request,
+        User $user,
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
+        $databaseManager->transaction(static function () use ($user): void {
+            $user->delete();
+        });
 
         if ($request->ajax()) {
             return [

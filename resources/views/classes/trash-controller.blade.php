@@ -52,7 +52,9 @@ final class {{ $controllerBaseName }} extends Controller
     public function forceDestroy(ForceDestroy{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}): array|RedirectResponse
     {
         $this->runInTransaction(
-            static fn (): ?bool => ${{ $modelVariableName }}->forceDelete(),
+            static function () use (${{ $modelVariableName }}): void {
+                ${{ $modelVariableName }}->forceDelete();
+            },
             'brackets/admin-ui::admin.operation.force_delete_failed',
         );
 
@@ -82,7 +84,9 @@ final class {{ $controllerBaseName }} extends Controller
                         {{ $modelBaseName }}::withTrashed()
                             ->whereIn('id', $bulkChunk)
                             ->get()
-                            ->each(static fn ({{ $modelBaseName }} ${{ $modelVariableName }}): ?bool => ${{ $modelVariableName }}->forceDelete());
+                            ->each(static function ({{ $modelBaseName }} ${{ $modelVariableName }}): void {
+                                ${{ $modelVariableName }}->forceDelete();
+                            });
                     });
             },
             'brackets/admin-ui::admin.operation.force_delete_failed',
@@ -107,7 +111,9 @@ final class {{ $controllerBaseName }} extends Controller
     public function restore(Restore{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}): array|RedirectResponse
     {
         $this->runInTransaction(
-            static fn (): bool => ${{ $modelVariableName }}->restore(),
+            static function () use (${{ $modelVariableName }}): void {
+                ${{ $modelVariableName }}->restore();
+            },
             'brackets/admin-ui::admin.operation.restore_failed',
         );
 
@@ -139,7 +145,9 @@ final class {{ $controllerBaseName }} extends Controller
 
         $this->runInTransaction(
             static function () use ($restorable): void {
-                $restorable->each(static fn ({{ $modelBaseName }} ${{ $modelVariableName }}): bool => ${{ $modelVariableName }}->restore());
+                $restorable->each(static function ({{ $modelBaseName }} ${{ $modelVariableName }}): void {
+                    ${{ $modelVariableName }}->restore();
+                });
             },
             'brackets/admin-ui::admin.operation.restore_failed',
         );

@@ -34,7 +34,9 @@ final class CategoriesTrashController extends Controller
     public function forceDestroy(ForceDestroyCategory $request, Category $category): array|RedirectResponse
     {
         $this->runInTransaction(
-            static fn (): ?bool => $category->forceDelete(),
+            static function () use ($category): void {
+                $category->forceDelete();
+            },
             'brackets/admin-ui::admin.operation.force_delete_failed',
         );
 
@@ -62,7 +64,9 @@ final class CategoriesTrashController extends Controller
                         Category::withTrashed()
                             ->whereIn('id', $bulkChunk)
                             ->get()
-                            ->each(static fn (Category $category): ?bool => $category->forceDelete());
+                            ->each(static function (Category $category): void {
+                                $category->forceDelete();
+                            });
                     });
             },
             'brackets/admin-ui::admin.operation.force_delete_failed',
@@ -85,7 +89,9 @@ final class CategoriesTrashController extends Controller
     public function restore(RestoreCategory $request, Category $category): array|RedirectResponse
     {
         $this->runInTransaction(
-            static fn (): bool => $category->restore(),
+            static function () use ($category): void {
+                $category->restore();
+            },
             'brackets/admin-ui::admin.operation.restore_failed',
         );
 
@@ -115,7 +121,9 @@ final class CategoriesTrashController extends Controller
 
         $this->runInTransaction(
             static function () use ($restorable): void {
-                $restorable->each(static fn (Category $category): bool => $category->restore());
+                $restorable->each(static function (Category $category): void {
+                    $category->restore();
+                });
             },
             'brackets/admin-ui::admin.operation.restore_failed',
         );

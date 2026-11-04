@@ -282,7 +282,9 @@ final class CategoriesController extends Controller
         Category $category,
         DatabaseManager $databaseManager,
     ): array|RedirectResponse {
-        $databaseManager->transaction(static fn (): ?bool => $category->delete());
+        $databaseManager->transaction(static function () use ($category): void {
+            $category->delete();
+        });
 
         if ($request->ajax()) {
             return [
@@ -298,15 +300,19 @@ final class CategoriesController extends Controller
      *
      * @throws Exception
      */
-    public function bulkDestroy(BulkDestroyCategory $request, DatabaseManager $databaseManager): array|RedirectResponse
-    {
+    public function bulkDestroy(
+        BulkDestroyCategory $request,
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
         $databaseManager->transaction(static function () use ($request): void {
             $request->getIds()
                 ->chunk(1000)
                 ->each(static function (Collection $bulkChunk): void {
                     Category::whereIn('id', $bulkChunk)
                         ->get()
-                        ->each(static fn (Category $category): ?bool => $category->delete());
+                        ->each(static function (Category $category): void {
+                            $category->delete();
+                        });
                 });
         });
 

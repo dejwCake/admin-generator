@@ -56,6 +56,7 @@ namespace {{ $controllerNamespace }};
     }
     if ($hasDelete) {
         $uses->push(sprintf('App\Http\Requests\Admin\%s\Destroy%s', $modelWithNamespaceFromDefault, $modelBaseName));
+        $uses->push('Illuminate\Database\DatabaseManager');
     }
     if ($hasCreate || $hasEdit) {
         foreach ($relations->getBelongsToMany() as $belongsToMany) {
@@ -68,6 +69,7 @@ namespace {{ $controllerNamespace }};
     if ($hasBulkDelete) {
         $uses->push(sprintf('App\Http\Requests\Admin\%s\BulkDestroy%s', $modelWithNamespaceFromDefault, $modelBaseName));
         $uses->push('Illuminate\Database\DatabaseManager');
+        $uses->push('Illuminate\Support\Collection');
     }
     $uses = $uses->unique()->sort();
 @endphp
@@ -348,9 +350,14 @@ final class {{ $controllerBaseName }} extends Controller
      *
      * @throws Exception
      */
-    public function destroy(Destroy{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}): array|RedirectResponse
-    {
-        ${{ $modelVariableName }}->delete();
+    public function destroy(
+        Destroy{{ $modelBaseName }} $request,
+        {{ $modelBaseName }} ${{ $modelVariableName }},
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
+        $databaseManager->transaction(static function () use (${{ $modelVariableName }}): void {
+            ${{ $modelVariableName }}->delete();
+        });
 
         if ($request->ajax()) {
             return [
@@ -368,14 +375,19 @@ final class {{ $controllerBaseName }} extends Controller
      *
      * @throws Exception
      */
-    public function bulkDestroy(BulkDestroy{{ $modelBaseName }} $request, DatabaseManager $databaseManager): array|RedirectResponse
-    {
+    public function bulkDestroy(
+        BulkDestroy{{ $modelBaseName }} $request,
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
         $databaseManager->transaction(static function () use ($request): void {
             $request->getIds()
                 ->chunk(1000)
-                ->each(static function ($bulkChunk): void {
+                ->each(static function (Collection $bulkChunk): void {
                     {{ $modelBaseName }}::whereIn('id', $bulkChunk)
-                        ->delete();
+                        ->get()
+                        ->each(static function ({{ $modelBaseName }} ${{ $modelVariableName }}): void {
+                            ${{ $modelVariableName }}->delete();
+                        });
                 });
         });
 

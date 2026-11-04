@@ -30,6 +30,7 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Excel;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -191,9 +192,14 @@ final class AdminUsersController extends Controller
      *
      * @throws Exception
      */
-    public function destroy(DestroyAdminUser $request, AdminUser $adminUser): array|RedirectResponse
-    {
-        $adminUser->delete();
+    public function destroy(
+        DestroyAdminUser $request,
+        AdminUser $adminUser,
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
+        $databaseManager->transaction(static function () use ($adminUser): void {
+            $adminUser->delete();
+        });
 
         if ($request->ajax()) {
             return [
@@ -209,14 +215,19 @@ final class AdminUsersController extends Controller
      *
      * @throws Exception
      */
-    public function bulkDestroy(BulkDestroyAdminUser $request, DatabaseManager $databaseManager): array|RedirectResponse
-    {
+    public function bulkDestroy(
+        BulkDestroyAdminUser $request,
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
         $databaseManager->transaction(static function () use ($request): void {
             $request->getIds()
                 ->chunk(1000)
-                ->each(static function ($bulkChunk): void {
+                ->each(static function (Collection $bulkChunk): void {
                     AdminUser::whereIn('id', $bulkChunk)
-                        ->delete();
+                        ->get()
+                        ->each(static function (AdminUser $adminUser): void {
+                            $adminUser->delete();
+                        });
                 });
         });
 

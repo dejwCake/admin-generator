@@ -28,6 +28,7 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
+use Illuminate\Support\Collection;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 final class UsersController extends Controller
@@ -217,9 +218,14 @@ final class UsersController extends Controller
      *
      * @throws Exception
      */
-    public function destroy(DestroyUser $request, User $user): array|RedirectResponse
-    {
-        $user->delete();
+    public function destroy(
+        DestroyUser $request,
+        User $user,
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
+        $databaseManager->transaction(static function () use ($user): void {
+            $user->delete();
+        });
 
         if ($request->ajax()) {
             return [
@@ -235,14 +241,19 @@ final class UsersController extends Controller
      *
      * @throws Exception
      */
-    public function bulkDestroy(BulkDestroyUser $request, DatabaseManager $databaseManager): array|RedirectResponse
-    {
+    public function bulkDestroy(
+        BulkDestroyUser $request,
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
         $databaseManager->transaction(static function () use ($request): void {
             $request->getIds()
                 ->chunk(1000)
-                ->each(static function ($bulkChunk): void {
+                ->each(static function (Collection $bulkChunk): void {
                     User::whereIn('id', $bulkChunk)
-                        ->delete();
+                        ->get()
+                        ->each(static function (User $user): void {
+                            $user->delete();
+                        });
                 });
         });
 

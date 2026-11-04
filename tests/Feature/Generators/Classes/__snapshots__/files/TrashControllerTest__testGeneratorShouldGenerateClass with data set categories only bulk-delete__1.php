@@ -39,7 +39,9 @@ final class CategoriesTrashController extends Controller
                         Category::withTrashed()
                             ->whereIn('id', $bulkChunk)
                             ->get()
-                            ->each(static fn (Category $category): ?bool => $category->forceDelete());
+                            ->each(static function (Category $category): void {
+                                $category->forceDelete();
+                            });
                     });
             },
             'brackets/admin-ui::admin.operation.force_delete_failed',
@@ -71,7 +73,9 @@ final class CategoriesTrashController extends Controller
 
         $this->runInTransaction(
             static function () use ($restorable): void {
-                $restorable->each(static fn (Category $category): bool => $category->restore());
+                $restorable->each(static function (Category $category): void {
+                    $category->restore();
+                });
             },
             'brackets/admin-ui::admin.operation.restore_failed',
         );

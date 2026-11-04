@@ -404,7 +404,9 @@ final class {{ $controllerBaseName }} extends Controller
         {{ $modelBaseName }} ${{ $modelVariableName }},
         DatabaseManager $databaseManager,
     ): array|RedirectResponse {
-        $databaseManager->transaction(static fn (): ?bool => ${{ $modelVariableName }}->delete());
+        $databaseManager->transaction(static function () use (${{ $modelVariableName }}): void {
+            ${{ $modelVariableName }}->delete();
+        });
 @else
     public function destroy(Destroy{{ $modelBaseName }} $request, {{ $modelBaseName }} ${{ $modelVariableName }}): array|RedirectResponse
     {
@@ -427,8 +429,10 @@ final class {{ $controllerBaseName }} extends Controller
      *
      * @throws Exception
      */
-    public function bulkDestroy(BulkDestroy{{ $modelBaseName }} $request, DatabaseManager $databaseManager): array|RedirectResponse
-    {
+    public function bulkDestroy(
+        BulkDestroy{{ $modelBaseName }} $request,
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
         $databaseManager->transaction(static function () use ($request): void {
             $request->getIds()
                 ->chunk(1000)
@@ -436,7 +440,9 @@ final class {{ $controllerBaseName }} extends Controller
                 ->each(static function (Collection $bulkChunk): void {
                     {{ $modelBaseName }}::whereIn('id', $bulkChunk)
                         ->get()
-                        ->each(static fn ({{ $modelBaseName }} ${{ $modelVariableName }}): ?bool => ${{ $modelVariableName }}->delete());
+                        ->each(static function ({{ $modelBaseName }} ${{ $modelVariableName }}): void {
+                            ${{ $modelVariableName }}->delete();
+                        });
                 });
 @else
                 ->each(static function ($bulkChunk): void {

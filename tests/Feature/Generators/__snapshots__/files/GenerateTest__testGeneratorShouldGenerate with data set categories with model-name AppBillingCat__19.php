@@ -34,7 +34,9 @@ final class CategoriesTrashController extends Controller
     public function forceDestroy(ForceDestroyCat $request, Cat $cat): array|RedirectResponse
     {
         $this->runInTransaction(
-            static fn (): ?bool => $cat->forceDelete(),
+            static function () use ($cat): void {
+                $cat->forceDelete();
+            },
             'brackets/admin-ui::admin.operation.force_delete_failed',
         );
 
@@ -62,7 +64,9 @@ final class CategoriesTrashController extends Controller
                         Cat::withTrashed()
                             ->whereIn('id', $bulkChunk)
                             ->get()
-                            ->each(static fn (Cat $cat): ?bool => $cat->forceDelete());
+                            ->each(static function (Cat $cat): void {
+                                $cat->forceDelete();
+                            });
                     });
             },
             'brackets/admin-ui::admin.operation.force_delete_failed',
@@ -85,7 +89,9 @@ final class CategoriesTrashController extends Controller
     public function restore(RestoreCat $request, Cat $cat): array|RedirectResponse
     {
         $this->runInTransaction(
-            static fn (): bool => $cat->restore(),
+            static function () use ($cat): void {
+                $cat->restore();
+            },
             'brackets/admin-ui::admin.operation.restore_failed',
         );
 
@@ -115,7 +121,9 @@ final class CategoriesTrashController extends Controller
 
         $this->runInTransaction(
             static function () use ($restorable): void {
-                $restorable->each(static fn (Cat $cat): bool => $cat->restore());
+                $restorable->each(static function (Cat $cat): void {
+                    $cat->restore();
+                });
             },
             'brackets/admin-ui::admin.operation.restore_failed',
         );

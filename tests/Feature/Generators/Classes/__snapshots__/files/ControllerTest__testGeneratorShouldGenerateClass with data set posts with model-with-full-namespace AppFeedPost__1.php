@@ -213,8 +213,10 @@ final class PostsController extends Controller
      *
      * @throws Exception
      */
-    public function bulkDestroy(BulkDestroyPost $request, DatabaseManager $databaseManager): array|RedirectResponse
-    {
+    public function bulkDestroy(
+        BulkDestroyPost $request,
+        DatabaseManager $databaseManager,
+    ): array|RedirectResponse {
         $databaseManager->transaction(static function () use ($request): void {
             $request->getIds()
                 ->chunk(1000)

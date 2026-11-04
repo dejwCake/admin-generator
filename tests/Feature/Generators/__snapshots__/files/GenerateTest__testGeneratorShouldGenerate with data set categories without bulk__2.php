@@ -265,7 +265,9 @@ final class CategoriesController extends Controller
         Category $category,
         DatabaseManager $databaseManager,
     ): array|RedirectResponse {
-        $databaseManager->transaction(static fn (): ?bool => $category->delete());
+        $databaseManager->transaction(static function () use ($category): void {
+            $category->delete();
+        });
 
         if ($request->ajax()) {
             return [
