@@ -31,7 +31,8 @@ final class ColumnCollectionBuilder
     ): ColumnCollection {
         $modelVariableName ??= Naming::variableName($tableName);
         $this->columnCollection = new ColumnCollection();
-        $columns = new Collection($this->schema->getColumns($tableName));
+        $columns = (new Collection($this->schema->getColumns($tableName)))
+            ->filter(static fn (array $column): bool => $column['generation'] === null);
         $indexes = new Collection($this->schema->getIndexes($tableName));
 
         $hasSoftDelete = $columns->contains(static fn (array $column): bool => $column['name'] === 'deleted_at');

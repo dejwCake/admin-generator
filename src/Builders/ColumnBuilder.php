@@ -83,7 +83,9 @@ final readonly class ColumnBuilder
         return $indexes->contains(static fn (array $index): bool
             => in_array($name, $index['columns'], true)
                 && ($index['unique'] && !$index['primary'])
-                && str_contains($index['name'], 'deleted_at'));
+                && (str_contains($index['name'], 'deleted_at')
+                    || in_array('deleted_at', $index['columns'], true)
+                    || in_array('deleted_unique', $index['columns'], true)));
     }
 
     private function isForeignKey(string $name): bool

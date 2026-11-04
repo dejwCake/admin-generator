@@ -11,6 +11,7 @@ use Brackets\AdminGenerator\Builders\ServerUpdateRulesBuilder;
 use Brackets\AdminGenerator\Dtos\Columns\Column;
 use Brackets\AdminGenerator\Dtos\Columns\Rules\UniqueRule;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class UniqueIndexTest extends TestCase
@@ -106,6 +107,42 @@ final class UniqueIndexTest extends TestCase
 
         self::assertNotNull($uniqueRule);
         self::assertStringNotContainsString("->whereNull('deleted_at')", (string) $uniqueRule);
+    }
+
+    /**
+     * @return array<string, array{array<int, string>}>
+     */
+    public static function softDeleteAwareIndexColumns(): array
+    {
+        return [
+            'deleted_at column' => [['code', 'deleted_at']],
+            'deleted_unique column' => [['code', 'deleted_unique']],
+        ];
+    }
+
+    /**
+     * @param array<int, string> $columns
+     */
+    #[DataProvider('softDeleteAwareIndexColumns')]
+    public function testSoftDeleteAwareIndexColumnWithSoftDeleteAddsWhereNullClause(array $columns): void
+    {
+        $indexes = new Collection([
+            [
+                'name' => 'items_code_unique',
+                'columns' => $columns,
+                'unique' => true,
+                'primary' => false,
+            ],
+        ]);
+
+        $column = $this->buildColumn(name: 'code', indexes: $indexes, hasSoftDelete: true);
+
+        $uniqueRule = $column->serverStoreRules->first(
+            static fn ($rule): bool => $rule instanceof UniqueRule,
+        );
+
+        self::assertNotNull($uniqueRule);
+        self::assertStringContainsString("->whereNull('deleted_at')", (string) $uniqueRule);
     }
 
     private function buildColumn(

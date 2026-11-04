@@ -199,4 +199,32 @@ final class ColumnCollectionBuilderTest extends TestCase
 
         self::assertSame(10, $columns['uuid']->priority);
     }
+
+    public function testBuildSkipsGeneratedColumns(): void
+    {
+        $schemaBuilder = $this->app['db']->connection()->getSchemaBuilder();
+
+        $schemaBuilder->create('generated_items', static function (Blueprint $table): void {
+            $table->increments('id');
+            $table->string('code');
+            $table->softDeletes();
+            $table->integer('deleted_unique')
+                ->nullable()
+                ->storedAs('CASE WHEN deleted_at IS NULL THEN 1 END');
+            $table->unique(['code', 'deleted_unique']);
+        });
+
+        $builder = $this->app->make(ColumnCollectionBuilder::class);
+        $result = $builder->build('generated_items');
+
+        self::assertFalse($result->hasByName('deleted_unique'));
+        self::assertTrue($result->hasByName('code'));
+        self::assertTrue($result->hasByName('deleted_at'));
+
+        $uniqueRule = $result->toArray()['code']->serverStoreRules->first(
+            static fn ($rule): bool => $rule instanceof UniqueRule,
+        );
+        self::assertNotNull($uniqueRule);
+        self::assertStringContainsString("->whereNull('deleted_at')", (string) $uniqueRule);
+    }
 }
