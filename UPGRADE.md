@@ -292,6 +292,15 @@ Minor releases on the 2.x line stay backward compatible: no artisan command or o
 code you already generated keeps working without changes. There is no new major version. The notes
 below only matter when you **regenerate** scaffolds.
 
+### 2.8.0 — show-deleted toggle from the frontend package
+
+Only listings of tables with a `deleted_at` column are affected.
+
+- **Frontend package.** Regenerated listings take `showDeleted` from `useAppListing(props)`, which
+  `useBaseListing` returns from `@dejwcake/craftable` **2.5.0**; the local `showDeleted` ref and
+  `onShowDeletedChange()` are gone. Update the frontend before regenerating; `composer.json` does
+  not enforce this. On an older version the toggle does nothing and trashed rows never show.
+
 ### 2.7.0 — trash for soft-deleting models
 
 Only tables with a `deleted_at` column are affected; see README → "Soft-deleting models".
