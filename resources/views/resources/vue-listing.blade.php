@@ -29,11 +29,7 @@
                         </div>
 @if($hasTrash || $hasBulkTrash)
                         <div class="col-auto mb-3 d-flex align-items-center me-auto">
-                            <ShowDeleted
-                                v-model="showDeleted"
-                                :translations="translations"
-                                @update:modelValue="onShowDeletedChange"
-                            />
+                            <ShowDeleted v-model="showDeleted" :translations="translations"/>
                         </div>
 @endif
                         <div class="col-sm-auto mb-3">
@@ -451,21 +447,6 @@ const {
 @else
     loadData, filter, resolveUrl,
 @endif
-    onSort, onPageChange, onPerPageChange,{{ $hasPublishedAt && $hasEdit ? ' onUpdateItem,' : '' }}
+    onSort, onPageChange, onPerPageChange,{{ $hasPublishedAt && $hasEdit ? ' onUpdateItem,' : '' }}{{ $hasTrash || $hasBulkTrash ? ' showDeleted,' : '' }}
 } = useAppListing(props);
-@if($hasTrash || $hasBulkTrash)
-
-const showDeleted = ref(false);
-
-function onShowDeletedChange(value) {
-    if (!value && orderBy.column === 'deleted_at') {
-        orderBy.column = 'id';
-        orderBy.direction = 'asc';
-    }
-@if($hasBulkDelete)
-    onBulkItemsClickedAllUncheck();
-@endif
-    filter('trashed', value ? 1 : '');
-}
-@endif
 </script>

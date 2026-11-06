@@ -19,11 +19,7 @@
                             />
                         </div>
                         <div class="col-auto mb-3 d-flex align-items-center me-auto">
-                            <ShowDeleted
-                                v-model="showDeleted"
-                                :translations="translations"
-                                @update:modelValue="onShowDeletedChange"
-                            />
+                            <ShowDeleted v-model="showDeleted" :translations="translations"/>
                         </div>
                         <div class="col-sm-auto mb-3">
                             <PerPage v-model="pagination.state.per_page"/>
@@ -296,16 +292,6 @@ const {isColumnVisible} = useResponsiveColumns(cardBody);
 const {
     pagination, orderBy, filters, search, collection, now,
     loadData, filter, resolveUrl,
-    onSort, onPageChange, onPerPageChange, onUpdateItem,
+    onSort, onPageChange, onPerPageChange, onUpdateItem, showDeleted,
 } = useAppListing(props);
-
-const showDeleted = ref(false);
-
-function onShowDeletedChange(value) {
-    if (!value && orderBy.column === 'deleted_at') {
-        orderBy.column = 'id';
-        orderBy.direction = 'asc';
-    }
-    filter('trashed', value ? 1 : '');
-}
 </script>
