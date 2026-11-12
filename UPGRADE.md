@@ -1,5 +1,12 @@
 # Upgrade `dejwcake/admin-generator` v1 → v2
 
+## Next v2 minor (unreleased): `admin:generate:admin-user:profile` is deprecated
+
+The command keeps generating the same files and now prints a deprecation warning. Its replacement
+are the profile and password pages of `dejwcake/admin-auth` — same URLs and route names. Keep
+regenerating it as long as you keep your generated profile; to switch, delete the generated files
+as admin-auth's `UPGRADE.md` describes and stop calling the command. It will be removed in v3.
+
 This document covers upgrading the `admin-generator` package from the **v1** branch (`v1`, the legacy `1.x` line) to **v2** (this branch / the `v2-dev` line).
 
 Most consumers only invoke artisan commands and won't touch `admin-generator` source code — for them the upgrade is a `composer.json` bump plus a stack version bump. Plugin authors who *extend* generator classes have more work because the namespaces moved.

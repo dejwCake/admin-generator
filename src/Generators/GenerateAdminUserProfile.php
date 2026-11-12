@@ -15,6 +15,8 @@ final class GenerateAdminUserProfile extends Command
 {
     use FileManipulations;
 
+    public const string DEPRECATION_WARNING = 'Deprecated, will be removed in v3: use the admin-auth profile pages (admin-auth UPGRADE.md).';
+
     /**
      * The name and signature of the console command.
      *
@@ -29,7 +31,7 @@ final class GenerateAdminUserProfile extends Command
      * @var string
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
-    protected $description = 'Scaffold admin "My Profile" feature (controller, views, routes)';
+    protected $description = 'Scaffold admin "My Profile" feature (deprecated: use the admin-auth profile pages)';
 
     public function __construct(protected readonly Filesystem $files)
     {
@@ -38,6 +40,8 @@ final class GenerateAdminUserProfile extends Command
 
     public function handle(): void
     {
+        $this->warn(self::DEPRECATION_WARNING);
+
         $tableName = $this->argument('table_name') ?: 'admin_users';
         $modelName = $this->option('model-name');
         $controllerName = $this->option('controller-name') ?: 'ProfileController';

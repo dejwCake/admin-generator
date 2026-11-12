@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators;
 
+use Brackets\AdminGenerator\Generators\GenerateAdminUserProfile;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -41,7 +42,9 @@ final class GenerateAdminUserProfileTest extends TestCase
             self::assertFileDoesNotExist($this->app->basePath($relativePath));
         }
 
-        $this->artisan('admin:generate:admin-user:profile', $arguments);
+        $this->artisan('admin:generate:admin-user:profile', $arguments)
+            ->expectsOutputToContain(GenerateAdminUserProfile::DEPRECATION_WARNING)
+            ->assertSuccessful();
 
         foreach ($expectedFiles as $relativePath) {
             $path = $this->app->basePath($relativePath);

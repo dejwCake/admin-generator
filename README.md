@@ -88,6 +88,15 @@ The generators whose output depends on the selection (`admin:generate:controller
 `admin:generate:lang`) accept the same options, so each one can be run on its own. The others
 generate one action's files and are simply not called when that action is left out.
 
+## Deprecated: `admin:generate:admin-user:profile`
+
+`dejwcake/admin-auth` now ships the admin's "My profile" (`/admin/profile`) and "Change password"
+(`/admin/password`) pages, with the URLs and route names this command generates. The command still
+works in v2 and prints a deprecation warning; it will be removed in v3. A generated profile keeps
+being used — admin-auth registers its pages only when the application has no `admin/edit-profile`
+route. To switch, delete the generated files and register the admin-auth components (admin-auth
+`UPGRADE.md`).
+
 ## Issues
 Where do I report issues?
 If something is not working as expected, please open an issue in the main repository https://github.com/dejwCake/craftable.
