@@ -51,6 +51,16 @@ selected actions.
 referenced by `role_has_permissions`, so regenerating a resource with a narrower set would delete
 grants roles already have. A permission for an action that isn't generated is harmless.
 
+## Two-factor columns
+
+`two_factor_secret`, `two_factor_recovery_codes` and `two_factor_confirmed_at` — added to `users` by
+Fortify and to `admin_users` by `dejwcake/admin-auth`'s two-factor migration — never reach generated
+forms, validation rules, listings and their queries, search, show pages, exports or factory
+definitions, for any table that has them. A generated model keeps them in `$fillable` (and the
+secret and recovery codes in `$hidden`), as the Fortify user model needs; generated controllers
+only save validated fields, which never include them. Their column labels stay in the generated
+translations.
+
 ## Soft-deleting models
 
 A table with a `deleted_at` column gets a trash on top of `delete` and `bulk-delete`. Nothing changes

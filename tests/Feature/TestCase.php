@@ -58,6 +58,10 @@ abstract class TestCase extends Orchestra
             $table->boolean('activated')->default(false);
             $table->boolean('forbidden')->default(false);
             $table->string('language', 2)->default('en');
+            // added by admin-auth's two-factor migration
+            $table->text('two_factor_secret')->nullable();
+            $table->text('two_factor_recovery_codes')->nullable();
+            $table->timestamp('two_factor_confirmed_at')->nullable();
 
             $table->softDeletes('deleted_at');
             $table->timestamps();

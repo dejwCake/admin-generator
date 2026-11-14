@@ -47,7 +47,7 @@ final class {{ $modelBaseName }}Factory extends Factory
 
 @endif
         return [
-@foreach($columns->getNonTranslatable() as $column)
+@foreach($columns->getNonTranslatable()->rejectByName(...ColumnCollection::TWO_FACTOR_COLUMNS) as $column)
 @if($column->name === 'created_by_admin_user_id' || $column->name === 'updated_by_admin_user_id')
             '{{ $column->name }}' => $adminUserId,
 @else

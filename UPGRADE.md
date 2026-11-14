@@ -1,11 +1,21 @@
 # Upgrade `dejwcake/admin-generator` v1 → v2
 
-## Next v2 minor (unreleased): `admin:generate:admin-user:profile` is deprecated
+## 2.9.0 (unreleased)
+
+### `admin:generate:admin-user:profile` is deprecated
 
 The command keeps generating the same files and now prints a deprecation warning. Its replacement
 are the profile and password pages of `dejwcake/admin-auth` — same URLs and route names. Keep
 regenerating it as long as you keep your generated profile; to switch, delete the generated files
 as admin-auth's `UPGRADE.md` describes and stop calling the command. It will be removed in v3.
+
+### Two-factor columns are skipped
+
+`two_factor_secret`, `two_factor_recovery_codes` and `two_factor_confirmed_at` (admin-auth's
+two-factor migration on `admin_users`, Fortify on `users`) are left out of generated forms, rules,
+listings, search, show pages, exports and — new — factory definitions. Regenerating the admin-users
+CRUD after running admin-auth's migration is optional and adds only their translation labels; a
+factory generated before it stays valid. No action needed.
 
 This document covers upgrading the `admin-generator` package from the **v1** branch (`v1`, the legacy `1.x` line) to **v2** (this branch / the `v2-dev` line).
 

@@ -66,6 +66,25 @@ final class GenerateAdminUserTest extends TestCase
         }
     }
 
+    public function testTwoFactorColumnsAreNotGenerated(): void
+    {
+        $this->artisan('admin:generate:admin-user', ['--with-export' => true]);
+
+        $files = [
+            ...self::COMMON_EXPECTED_FILES,
+            'app/Http/Requests/Admin/AdminUser/BulkDestroyAdminUser.php',
+            'app/Http/Requests/Admin/AdminUser/ExportAdminUser.php',
+            'app/Exports/AdminUsersExport.php',
+        ];
+        // Column labels in the translations are kept, as for the users table.
+        $files = array_diff($files, ['lang/en/admin.php']);
+
+        foreach ($files as $relativePath) {
+            $contents = (string) file_get_contents($this->app->basePath($relativePath));
+            self::assertStringNotContainsString('two_factor', $contents, $relativePath);
+        }
+    }
+
     public function testGeneratorWithForceShouldOverwriteFiles(): void
     {
         $filePaths = [
