@@ -23,7 +23,7 @@ When the admins have second factors (admin-auth's two-factor columns or passkeys
 `dejwcake/admin-auth` registers its security reset route, `admin:generate:admin-user` adds a
 "Reset two-factor" row action. It imports `SecurityResetButton` from `@dejwcake/craftable` — update
 `@dejwcake/craftable` together with admin-auth. Without the reset route the generated code is
-unchanged and the command warns. See README → "Resetting another admin's two-factor".
+unchanged. See README → "Resetting another admin's two-factor".
 
 To get the button without regenerating, change two spots of the generated admin-users CRUD:
 

@@ -108,11 +108,9 @@ final class GenerateAdminUserTest extends TestCase
         self::assertStringContainsString('v-if="canSecurityReset && item.id !== currentAdminId"', $listing);
     }
 
-    public function testFactorsWithoutTheResetRouteWarnAndGenerateNoReset(): void
+    public function testFactorsWithoutTheResetRouteGenerateNoReset(): void
     {
-        $this->artisan('admin:generate:admin-user')
-            ->expectsOutputToContain('dejwcake/admin-auth has no security reset route')
-            ->assertSuccessful();
+        $this->artisan('admin:generate:admin-user')->assertSuccessful();
 
         $this->assertNoSecurityReset();
     }
@@ -127,7 +125,7 @@ final class GenerateAdminUserTest extends TestCase
             },
         );
 
-        $this->artisan('admin:generate:admin-user')->doesntExpectOutputToContain('security reset route');
+        $this->artisan('admin:generate:admin-user')->assertSuccessful();
 
         $this->assertNoSecurityReset();
     }

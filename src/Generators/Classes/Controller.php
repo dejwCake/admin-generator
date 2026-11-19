@@ -22,9 +22,6 @@ final class Controller extends ClassGenerator
     use FileManipulations;
     use ResolvesGeneratedActions;
 
-    private const string MISSING_RESET_ROUTE
-        = 'Admins have second factors, but dejwcake/admin-auth has no security reset route: update it to get the "Reset two-factor" button.';
-
     protected GeneratedActions $generatedActions;
 
     /**
@@ -54,7 +51,7 @@ final class Controller extends ClassGenerator
     {
         $force = $this->option('force');
         $template = $this->option('template');
-        $this->hasSecurityReset = $this->detectSecurityReset($securityResetDetector, $template);
+        $this->hasSecurityReset = $securityResetDetector->isUsable($template, $this->tableName);
         $belongsToMany = $this->option('belongs-to-many');
         $media = $this->option('media');
 
@@ -201,29 +198,6 @@ final class Controller extends ClassGenerator
     protected function getDefaultNamespace(string $rootNamespace): string
     {
         return sprintf('%s\Http\Controllers\Admin', $rootNamespace);
-    }
-
-    /**
-     * The admin-users CRUD gets admin-auth's security reset when the project can use it; warns when the
-     * admins have second factors but the installed admin-auth has no reset route.
-     */
-    private function detectSecurityReset(SecurityResetDetector $securityResetDetector, ?string $template): bool
-    {
-        if ($template !== 'admin-user') {
-            return false;
-        }
-
-        if (!$securityResetDetector->hasSecondFactors($this->tableName)) {
-            return false;
-        }
-
-        if (!$securityResetDetector->hasResetRoute()) {
-            $this->warn(self::MISSING_RESET_ROUTE);
-
-            return false;
-        }
-
-        return true;
     }
 
     private function addToSidebar(): void

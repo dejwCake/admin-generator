@@ -39,9 +39,7 @@ final class BladeIndex extends ResourceGenerator
 
     public function handle(SecurityResetDetector $securityResetDetector): void
     {
-        // Only the admin-users listing gets admin-auth's security reset, and only when the project can use it.
-        $this->hasSecurityReset = $this->option('template') === 'admin-user'
-            && $securityResetDetector->isUsable($this->tableName);
+        $this->hasSecurityReset = $securityResetDetector->isUsable($this->option('template'), $this->tableName);
 
         $force = (bool) $this->option('force');
         $template = $this->option('template');

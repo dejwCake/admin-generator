@@ -71,8 +71,7 @@ the project can use it:
 - the route `brackets/admin-auth::admin/admin-users/security-reset` is registered (admin-auth with the
   reset).
 
-Otherwise the generated code is the same as without it. When the admins have second factors but the
-route is missing, the command warns that `dejwcake/admin-auth` should be updated.
+Otherwise the generated code is the same as without it.
 
 The generated controller's `index()` passes `securityResetUrlTemplate`, `canSecurityReset` (the
 permission `admin.admin-user.security-reset`) and `currentAdminId`; the listing renders
