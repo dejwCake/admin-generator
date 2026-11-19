@@ -61,6 +61,23 @@ secret and recovery codes in `$hidden`), as the Fortify user model needs; genera
 only save validated fields, which never include them. Their column labels stay in the generated
 translations.
 
+## Resetting another admin's two-factor
+
+`admin:generate:admin-user` adds a "Reset two-factor" row action to the admin-users listing — it calls
+`dejwcake/admin-auth`'s security reset, which removes that admin's TOTP and passkeys — but only when
+the project can use it:
+
+- the admin users table has `two_factor_confirmed_at` **or** an `admin_passkeys` table exists, and
+- the route `brackets/admin-auth::admin/admin-users/security-reset` is registered (admin-auth with the
+  reset).
+
+Otherwise the generated code is the same as without it. When the admins have second factors but the
+route is missing, the command warns that `dejwcake/admin-auth` should be updated.
+
+The generated controller's `index()` passes `securityResetUrlTemplate`, `canSecurityReset` (the
+permission `admin.admin-user.security-reset`) and `currentAdminId`; the listing renders
+`SecurityResetButton` from `@dejwcake/craftable` with the permission and never on the admin's own row.
+
 ## Soft-deleting models
 
 A table with a `deleted_at` column gets a trash on top of `delete` and `bulk-delete`. Nothing changes

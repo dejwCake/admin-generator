@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
+use Brackets\AdminGenerator\Builders\SecurityResetDetector;
 use Brackets\AdminGenerator\Dtos\GeneratedActions;
 use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Generators\Traits\ResolvesGeneratedActions;
@@ -34,8 +35,14 @@ final class BladeIndex extends ResourceGenerator
 
     protected string $view = 'resources.blade-index';
 
-    public function handle(): void
+    private bool $hasSecurityReset = false;
+
+    public function handle(SecurityResetDetector $securityResetDetector): void
     {
+        // Only the admin-users listing gets admin-auth's security reset, and only when the project can use it.
+        $this->hasSecurityReset = $this->option('template') === 'admin-user'
+            && $securityResetDetector->isUsable($this->tableName);
+
         $force = (bool) $this->option('force');
         $template = $this->option('template');
 
@@ -84,6 +91,7 @@ final class BladeIndex extends ResourceGenerator
             'modelJSName' => $this->modelJSName,
             'modelLangFormat' => $this->modelLangFormat,
             //has
+            'hasSecurityReset' => $this->hasSecurityReset,
             'hasCreate' => $this->generatedActions->has(GeneratedAction::Create),
             'hasShow' => $this->generatedActions->has(GeneratedAction::Show),
             'hasEdit' => $this->generatedActions->has(GeneratedAction::Edit),

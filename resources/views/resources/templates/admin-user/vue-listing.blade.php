@@ -154,6 +154,13 @@
 
                                 <td>
                                     <div class="d-flex gap-1 justify-content-center">
+@if($hasSecurityReset)
+                                        <SecurityResetButton
+                                            v-if="canSecurityReset && item.id !== currentAdminId"
+                                            :url="resolveUrl(securityResetUrlTemplate, item)"
+                                            :translations="translations.security_reset"
+                                        />
+@endif
                                         <button
                                             v-if="canImpersonalLogin"
                                             class="btn btn-sm btn-success"
@@ -273,6 +280,9 @@
     if ($hasBulkDelete) {
         $imports->push("ConfirmModal from '@craftable/components/ConfirmModal.vue'");
     }
+    if ($hasSecurityReset) {
+        $imports->push("SecurityResetButton from '@craftable/components/listing/SecurityResetButton.vue'");
+    }
     $imports = $imports->unique()->sort();
 @endphp
 <script setup>
@@ -309,6 +319,11 @@ const props = defineProps({
     resendActivationUrlTemplate: {type: String, default: ''},
     impersonalLoginUrlTemplate: {type: String, default: ''},
     canImpersonalLogin: {type: Boolean, default: false},
+@if($hasSecurityReset)
+    securityResetUrlTemplate: {type: String, default: ''},
+    canSecurityReset: {type: Boolean, default: false},
+    currentAdminId: {type: [Number, String], default: null},
+@endif
 });
 
 const cardBody = ref(null);

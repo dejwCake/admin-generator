@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators;
 
+use Brackets\AdminGenerator\Builders\SecurityResetDetector;
 use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
+use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Routing\Router;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class GenerateAdminUserTest extends TestCase
@@ -13,6 +17,12 @@ final class GenerateAdminUserTest extends TestCase
     private const array PRE_EXISTING_APPEND_TARGETS = [
         'routes/admin.php',
         'lang/en/admin.php',
+    ];
+
+    private const array SECURITY_RESET_FILES = [
+        'app/Http/Controllers/Admin/AdminUsersController.php',
+        'resources/js/admin/admin-user/Listing.vue',
+        'resources/views/admin/admin-user/index.blade.php',
     ];
 
     private const array COMMON_EXPECTED_FILES = [
@@ -85,6 +95,43 @@ final class GenerateAdminUserTest extends TestCase
         }
     }
 
+    public function testSecurityResetIsGeneratedWhenUsable(): void
+    {
+        $this->registerSecurityResetRoute();
+
+        $this->artisan('admin:generate:admin-user')->assertSuccessful();
+
+        foreach (self::SECURITY_RESET_FILES as $relativePath) {
+            self::assertMatchesFileSnapshot($this->app->basePath($relativePath));
+        }
+        $listing = (string) file_get_contents($this->app->basePath('resources/js/admin/admin-user/Listing.vue'));
+        self::assertStringContainsString('v-if="canSecurityReset && item.id !== currentAdminId"', $listing);
+    }
+
+    public function testFactorsWithoutTheResetRouteWarnAndGenerateNoReset(): void
+    {
+        $this->artisan('admin:generate:admin-user')
+            ->expectsOutputToContain('dejwcake/admin-auth has no security reset route')
+            ->assertSuccessful();
+
+        $this->assertNoSecurityReset();
+    }
+
+    public function testNoSecondFactorsGenerateNoReset(): void
+    {
+        $this->registerSecurityResetRoute();
+        $this->app->make(DatabaseManager::class)->connection()->getSchemaBuilder()->table(
+            'admin_users',
+            static function (Blueprint $table): void {
+                $table->dropColumn(['two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at']);
+            },
+        );
+
+        $this->artisan('admin:generate:admin-user')->doesntExpectOutputToContain('security reset route');
+
+        $this->assertNoSecurityReset();
+    }
+
     public function testGeneratorWithForceShouldOverwriteFiles(): void
     {
         $filePaths = [
@@ -115,6 +162,23 @@ final class GenerateAdminUserTest extends TestCase
 
         foreach ($filePaths as $relativePath) {
             self::assertFileExists($this->app->basePath($relativePath));
+        }
+    }
+
+    private function registerSecurityResetRoute(): void
+    {
+        $router = $this->app->make(Router::class);
+        $router->post('/admin/admin-users/{targetAdminId}/security-reset', static fn (): string => 'ok')
+            ->name(SecurityResetDetector::ROUTE);
+        $router->getRoutes()->refreshNameLookups();
+    }
+
+    private function assertNoSecurityReset(): void
+    {
+        foreach (self::SECURITY_RESET_FILES as $relativePath) {
+            $contents = (string) file_get_contents($this->app->basePath($relativePath));
+            self::assertStringNotContainsStringIgnoringCase('securityreset', $contents, $relativePath);
+            self::assertStringNotContainsString('security_reset', $contents, $relativePath);
         }
     }
 

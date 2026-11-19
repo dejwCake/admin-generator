@@ -180,6 +180,14 @@ final class {{ $controllerBaseName }} extends Controller
                 ),
                 'activation' => $this->config->get('admin-auth.activation_enabled'),
                 'canImpersonalLogin' => $this->gate->check('admin.{{ $modelDotNotation }}.impersonal-login'),
+@if($hasSecurityReset)
+                'securityResetUrlTemplate' => $this->urlGenerator->route(
+                    'brackets/admin-auth::admin/admin-users/security-reset',
+                    ['targetAdminId' => ':id'],
+                ),
+                'canSecurityReset' => $this->gate->check('admin.{{ $modelDotNotation }}.security-reset'),
+                'currentAdminId' => $request->user($this->guard)?->getAuthIdentifier(),
+@endif
             ],
         );
     }

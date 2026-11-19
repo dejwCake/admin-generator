@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators;
 
+use Brackets\AdminGenerator\Builders\SecurityResetDetector;
 use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -582,5 +584,21 @@ final class GenerateTest extends TestCase
     private static function resourceKebab(string $studlyConcat): string
     {
         return strtolower((string) preg_replace('/(?<!^)([A-Z])/', '-$1', $studlyConcat));
+    }
+
+    public function testOtherCrudsGetNoSecurityReset(): void
+    {
+        $router = $this->app->make(Router::class);
+        $router->post('/admin/admin-users/{targetAdminId}/security-reset', static fn (): string => 'ok')
+            ->name(SecurityResetDetector::ROUTE);
+        $router->getRoutes()->refreshNameLookups();
+
+        $this->artisan('admin:generate', ['table_name' => 'categories']);
+
+        $files = ['app/Http/Controllers/Admin/CategoriesController.php', 'resources/js/admin/category/Listing.vue'];
+        foreach ($files as $file) {
+            $contents = (string) file_get_contents($this->app->basePath($file));
+            self::assertStringNotContainsStringIgnoringCase('securityreset', $contents, $file);
+        }
     }
 }

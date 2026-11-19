@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Generators\Resources;
 
+use Brackets\AdminGenerator\Builders\SecurityResetDetector;
 use Brackets\AdminGenerator\Dtos\Columns\ColumnCollection;
 use Brackets\AdminGenerator\Dtos\GeneratedActions;
 use Brackets\AdminGenerator\Enums\GeneratedAction;
@@ -36,8 +37,14 @@ final class VueListing extends ResourceGenerator
 
     protected string $view = 'resources.vue-listing';
 
-    public function handle(): void
+    private bool $hasSecurityReset = false;
+
+    public function handle(SecurityResetDetector $securityResetDetector): void
     {
+        // Only the admin-users listing gets admin-auth's security reset, and only when the project can use it.
+        $this->hasSecurityReset = $this->option('template') === 'admin-user'
+            && $securityResetDetector->isUsable($this->tableName);
+
         $force = (bool) $this->option('force');
         $template = $this->option('template');
 
@@ -100,6 +107,7 @@ final class VueListing extends ResourceGenerator
             //globals
             'relations' => $this->relations,
             //has
+            'hasSecurityReset' => $this->hasSecurityReset,
             'hasCreate' => $this->generatedActions->has(GeneratedAction::Create),
             'hasShow' => $this->generatedActions->has(GeneratedAction::Show),
             'hasEdit' => $this->generatedActions->has(GeneratedAction::Edit),

@@ -17,6 +17,38 @@ listings, search, show pages, exports and — new — factory definitions. Regen
 CRUD after running admin-auth's migration is optional and adds only their translation labels; a
 factory generated before it stays valid. No action needed.
 
+### "Reset two-factor" in the admin-users listing
+
+When the admins have second factors (admin-auth's two-factor columns or passkeys table) and
+`dejwcake/admin-auth` registers its security reset route, `admin:generate:admin-user` adds a
+"Reset two-factor" row action. It imports `SecurityResetButton` from `@dejwcake/craftable` — update
+`@dejwcake/craftable` together with admin-auth. Without the reset route the generated code is
+unchanged and the command warns. See README → "Resetting another admin's two-factor".
+
+To get the button without regenerating, change two spots of the generated admin-users CRUD:
+
+1. `AdminUsersController::index()` — add to the view data:
+
+   ```php
+   'securityResetUrlTemplate' => $this->urlGenerator->route(
+       'brackets/admin-auth::admin/admin-users/security-reset',
+       ['targetAdminId' => ':id'],
+   ),
+   'canSecurityReset' => $this->gate->check('admin.admin-user.security-reset'),
+   'currentAdminId' => $request->user($this->guard)?->getAuthIdentifier(),
+   ```
+
+2. `resources/js/admin/admin-user/Listing.vue` and `resources/views/admin/admin-user/index.blade.php`
+   — import `SecurityResetButton from '@craftable/components/listing/SecurityResetButton.vue'`, add the
+   props `securityResetUrlTemplate`, `canSecurityReset` and `currentAdminId`, render
+   `<SecurityResetButton v-if="canSecurityReset && item.id !== currentAdminId"
+   :url="resolveUrl(securityResetUrlTemplate, item)" :translations="translations.security_reset" />`
+   before the impersonal-login button, and pass the props and the `security_reset` translations
+   (`brackets/admin-auth::admin.security_reset.*`) from the index view. A freshly generated CRUD shows
+   the exact code.
+
+Then rebuild the assets.
+
 This document covers upgrading the `admin-generator` package from the **v1** branch (`v1`, the legacy `1.x` line) to **v2** (this branch / the `v2-dev` line).
 
 Most consumers only invoke artisan commands and won't touch `admin-generator` source code — for them the upgrade is a `composer.json` bump plus a stack version bump. Plugin authors who *extend* generator classes have more work because the namespaces moved.

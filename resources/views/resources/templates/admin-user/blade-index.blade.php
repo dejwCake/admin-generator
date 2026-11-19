@@ -31,6 +31,11 @@
         :impersonal-login-url-template="'{{'{{'}} $impersonalLoginUrlTemplate }}'"
         :activation="!!'{{'{{'}} $activation }}'"
         :can-impersonal-login="{{'{{'}} json_encode($canImpersonalLogin) }}"
+@if($hasSecurityReset)
+        :security-reset-url-template="'{{'{{'}} $securityResetUrlTemplate }}'"
+        :can-security-reset="{{'{{'}} json_encode($canSecurityReset) }}"
+        :current-admin-id="{{'{{'}} json_encode($currentAdminId) }}"
+@endif
         :translations="{{'{{'}} json_encode([
             'listing_title' => trans('admin.{{ $modelLangFormat }}.actions.index'),
 @if($hasCreate)
@@ -46,6 +51,16 @@
             ],
             'impersonal_login_btn' => trans('brackets/admin-ui::admin.operation.impersonal_login'),
             'resend_activation_btn' => trans('brackets/admin-ui::admin.operation.resend_activation'),
+@if($hasSecurityReset)
+            'security_reset' => [
+                'reset_btn' => trans('brackets/admin-auth::admin.security_reset.reset_btn'),
+                'confirm_title' => trans('brackets/admin-auth::admin.security_reset.confirm_title'),
+                'confirm_text' => trans('brackets/admin-auth::admin.security_reset.confirm_text'),
+                'current_password' => trans('brackets/admin-auth::admin.security_reset.current_password'),
+                'confirm_btn' => trans('brackets/admin-auth::admin.security_reset.confirm_btn'),
+                'cancel_btn' => trans('brackets/admin-ui::admin.btn.cancel'),
+            ],
+@endif
             'search_placeholder' => trans('brackets/admin-ui::admin.placeholder.search'),
             'search_btn' => trans('brackets/admin-ui::admin.btn.search'),
 @if($hasShow)
