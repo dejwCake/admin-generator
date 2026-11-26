@@ -51,7 +51,7 @@ final class Controller extends ClassGenerator
     {
         $force = $this->option('force');
         $template = $this->option('template');
-        $this->hasSecurityReset = $securityResetDetector->isUsable($template, $this->tableName);
+        $this->hasSecurityReset = $securityResetDetector->isUsable($template);
         $belongsToMany = $this->option('belongs-to-many');
         $media = $this->option('media');
 

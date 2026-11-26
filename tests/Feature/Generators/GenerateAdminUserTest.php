@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators;
 
-use Brackets\AdminGenerator\Builders\SecurityResetDetector;
 use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
-use Illuminate\Database\DatabaseManager;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Routing\Router;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class GenerateAdminUserTest extends TestCase
@@ -76,28 +72,10 @@ final class GenerateAdminUserTest extends TestCase
         }
     }
 
-    public function testTwoFactorColumnsAreNotGenerated(): void
-    {
-        $this->artisan('admin:generate:admin-user', ['--with-export' => true]);
-
-        $files = [
-            ...self::COMMON_EXPECTED_FILES,
-            'app/Http/Requests/Admin/AdminUser/BulkDestroyAdminUser.php',
-            'app/Http/Requests/Admin/AdminUser/ExportAdminUser.php',
-            'app/Exports/AdminUsersExport.php',
-        ];
-        // Column labels in the translations are kept, as for the users table.
-        $files = array_diff($files, ['lang/en/admin.php']);
-
-        foreach ($files as $relativePath) {
-            $contents = (string) file_get_contents($this->app->basePath($relativePath));
-            self::assertStringNotContainsString('two_factor', $contents, $relativePath);
-        }
-    }
-
     public function testSecurityResetIsGeneratedWhenUsable(): void
     {
         $this->registerSecurityResetRoute();
+        $this->createSecondFactorTable();
 
         $this->artisan('admin:generate:admin-user')->assertSuccessful();
 
@@ -108,8 +86,22 @@ final class GenerateAdminUserTest extends TestCase
         self::assertStringContainsString('v-if="canSecurityReset && item.id !== currentAdminId"', $listing);
     }
 
+    public function testSecurityResetChecksAdminAuthsPermissionWithACustomModelName(): void
+    {
+        $this->registerSecurityResetRoute();
+        $this->createSecondFactorTable();
+
+        $this->artisan('admin:generate:admin-user', ['--model-name' => 'Auth\\User'])->assertSuccessful();
+
+        $controller = (string) file_get_contents(
+            $this->app->basePath('app/Http/Controllers/Admin/AdminUsersController.php'),
+        );
+        self::assertStringContainsString("->check('admin.admin-user.security-reset')", $controller);
+    }
+
     public function testFactorsWithoutTheResetRouteGenerateNoReset(): void
     {
+        $this->createSecondFactorTable();
         $this->artisan('admin:generate:admin-user')->assertSuccessful();
 
         $this->assertNoSecurityReset();
@@ -118,12 +110,6 @@ final class GenerateAdminUserTest extends TestCase
     public function testNoSecondFactorsGenerateNoReset(): void
     {
         $this->registerSecurityResetRoute();
-        $this->app->make(DatabaseManager::class)->connection()->getSchemaBuilder()->table(
-            'admin_users',
-            static function (Blueprint $table): void {
-                $table->dropColumn(['two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at']);
-            },
-        );
 
         $this->artisan('admin:generate:admin-user')->assertSuccessful();
 
@@ -161,14 +147,6 @@ final class GenerateAdminUserTest extends TestCase
         foreach ($filePaths as $relativePath) {
             self::assertFileExists($this->app->basePath($relativePath));
         }
-    }
-
-    private function registerSecurityResetRoute(): void
-    {
-        $router = $this->app->make(Router::class);
-        $router->post('/admin/admin-users/{targetAdminId}/security-reset', static fn (): string => 'ok')
-            ->name(SecurityResetDetector::ROUTE);
-        $router->getRoutes()->refreshNameLookups();
     }
 
     private function assertNoSecurityReset(): void

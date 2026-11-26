@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Brackets\AdminGenerator\Tests\Feature\Generators;
 
-use Brackets\AdminGenerator\Builders\SecurityResetDetector;
 use Brackets\AdminGenerator\Enums\GeneratedAction;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
-use Illuminate\Routing\Router;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -588,10 +586,8 @@ final class GenerateTest extends TestCase
 
     public function testOtherCrudsGetNoSecurityReset(): void
     {
-        $router = $this->app->make(Router::class);
-        $router->post('/admin/admin-users/{targetAdminId}/security-reset', static fn (): string => 'ok')
-            ->name(SecurityResetDetector::ROUTE);
-        $router->getRoutes()->refreshNameLookups();
+        $this->registerSecurityResetRoute();
+        $this->createSecondFactorTable();
 
         $this->artisan('admin:generate', ['table_name' => 'categories']);
 

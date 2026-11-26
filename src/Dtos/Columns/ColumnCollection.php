@@ -20,7 +20,7 @@ use Traversable;
 final class ColumnCollection implements IteratorAggregate, Countable
 {
     /**
-     * Two-factor columns (Fortify on users, admin-auth on admin_users): never in forms, rules, listings,
+     * Fortify's two-factor columns on users: never in forms, rules, listings,
      * exports or factory definitions (a fake secret would lock a seeded user behind the challenge).
      * They stay fillable for the Fortify user model.
      */

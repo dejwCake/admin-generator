@@ -54,9 +54,9 @@ grants roles already have. A permission for an action that isn't generated is ha
 ## Two-factor columns
 
 `two_factor_secret`, `two_factor_recovery_codes` and `two_factor_confirmed_at` — added to `users` by
-Fortify and to `admin_users` by `dejwcake/admin-auth`'s two-factor migration — never reach generated
-forms, validation rules, listings and their queries, search, show pages, exports or factory
-definitions, for any table that has them. A generated model keeps them in `$fillable` (and the
+Fortify — never reach generated forms, validation rules, listings and their queries, search, show
+pages, exports or factory definitions, for any table that has them. (`dejwcake/admin-auth` keeps the
+admins' authenticator app in its own `admin_two_factors` table, so `admin_users` has no such columns.) A generated model keeps them in `$fillable` (and the
 secret and recovery codes in `$hidden`), as the Fortify user model needs; generated controllers
 only save validated fields, which never include them. Their column labels stay in the generated
 translations.
@@ -67,7 +67,7 @@ translations.
 `dejwcake/admin-auth`'s security reset, which removes that admin's TOTP and passkeys — but only when
 the project can use it:
 
-- the admin users table has `two_factor_confirmed_at` **or** an `admin_passkeys` table exists, and
+- admin-auth's `admin_two_factors` **or** `admin_passkeys` table exists, and
 - the route `brackets/admin-auth::admin/admin-users/security-reset` is registered (admin-auth with the
   reset).
 

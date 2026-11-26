@@ -39,7 +39,7 @@ final class BladeIndex extends ResourceGenerator
 
     public function handle(SecurityResetDetector $securityResetDetector): void
     {
-        $this->hasSecurityReset = $securityResetDetector->isUsable($this->option('template'), $this->tableName);
+        $this->hasSecurityReset = $securityResetDetector->isUsable($this->option('template'));
 
         $force = (bool) $this->option('force');
         $template = $this->option('template');

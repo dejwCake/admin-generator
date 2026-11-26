@@ -6,80 +6,51 @@ namespace Brackets\AdminGenerator\Tests\Feature\Builders\SecurityResetDetector;
 
 use Brackets\AdminGenerator\Builders\SecurityResetDetector;
 use Brackets\AdminGenerator\Tests\Feature\TestCase;
-use Illuminate\Database\DatabaseManager;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Routing\Router;
-use Override;
 
-class IsUsableTest extends TestCase
+final class IsUsableTest extends TestCase
 {
-    #[Override]
-    protected function tearDown(): void
+    public function testTwoFactorTableAndTheRoute(): void
     {
-        $this->app->make(DatabaseManager::class)->connection()->getSchemaBuilder()->dropIfExists('admin_passkeys');
+        $this->registerSecurityResetRoute();
+        $this->createSecondFactorTable();
 
-        parent::tearDown();
-    }
-
-    public function testTotpColumnsAndTheRoute(): void
-    {
-        $this->registerResetRoute();
-
-        self::assertTrue($this->detector()->isUsable('admin-user', 'admin_users'));
+        self::assertTrue($this->detector()->isUsable('admin-user'));
     }
 
     public function testPasskeysTableAndTheRoute(): void
     {
-        $this->registerResetRoute();
-        $this->createPasskeysTable();
+        $this->registerSecurityResetRoute();
+        $this->createSecondFactorTable(SecurityResetDetector::PASSKEYS_TABLE);
 
-        self::assertTrue($this->detector()->isUsable('admin-user', 'categories'));
+        self::assertTrue($this->detector()->isUsable('admin-user'));
     }
 
     public function testFactorsWithoutTheRoute(): void
     {
-        $this->createPasskeysTable();
+        $this->createSecondFactorTable(SecurityResetDetector::PASSKEYS_TABLE);
 
-        self::assertFalse($this->detector()->isUsable('admin-user', 'admin_users'));
+        self::assertFalse($this->detector()->isUsable('admin-user'));
     }
 
     public function testRouteWithoutFactors(): void
     {
-        $this->registerResetRoute();
+        $this->registerSecurityResetRoute();
 
-        self::assertFalse($this->detector()->isUsable('admin-user', 'categories'));
+        self::assertFalse($this->detector()->isUsable('admin-user'));
     }
 
     public function testOtherTemplate(): void
     {
-        $this->registerResetRoute();
+        $this->registerSecurityResetRoute();
 
-        self::assertFalse($this->detector()->isUsable('user', 'admin_users'));
+        self::assertFalse($this->detector()->isUsable('user'));
     }
 
     public function testNoTemplate(): void
     {
-        $this->registerResetRoute();
+        $this->registerSecurityResetRoute();
 
-        self::assertFalse($this->detector()->isUsable(null, 'admin_users'));
-    }
-
-    private function registerResetRoute(): void
-    {
-        $router = $this->app->make(Router::class);
-        $router->post('/admin/admin-users/{targetAdminId}/security-reset', static fn (): string => 'ok')
-            ->name(SecurityResetDetector::ROUTE);
-        $router->getRoutes()->refreshNameLookups();
-    }
-
-    private function createPasskeysTable(): void
-    {
-        $this->app->make(DatabaseManager::class)->connection()->getSchemaBuilder()->create(
-            'admin_passkeys',
-            static function (Blueprint $table): void {
-                $table->id();
-            },
-        );
+        self::assertFalse($this->detector()->isUsable(null));
     }
 
     private function detector(): SecurityResetDetector

@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace Brackets\AdminGenerator\Tests\Feature;
 
 use Brackets\AdminGenerator\AdminGeneratorServiceProvider;
+use Brackets\AdminGenerator\Builders\SecurityResetDetector;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Env;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Override;
 use Spatie\Snapshots\MatchesSnapshots;
 use SplFileInfo;
 
@@ -27,6 +30,17 @@ abstract class TestCase extends Orchestra
         parent::setUp();
 
         $this->setUpDatabase($this->app);
+    }
+
+    #[Override]
+    protected function tearDown(): void
+    {
+        // MariaDB commits DDL at once, so RefreshDatabase cannot roll back the tables a test created.
+        $schemaBuilder = $this->app->make(DatabaseManager::class)->connection()->getSchemaBuilder();
+        $schemaBuilder->dropIfExists(SecurityResetDetector::TWO_FACTORS_TABLE);
+        $schemaBuilder->dropIfExists(SecurityResetDetector::PASSKEYS_TABLE);
+
+        parent::tearDown();
     }
 
     protected function setUpDatabase(Application $app): void
@@ -58,10 +72,6 @@ abstract class TestCase extends Orchestra
             $table->boolean('activated')->default(false);
             $table->boolean('forbidden')->default(false);
             $table->string('language', 2)->default('en');
-            // added by admin-auth's two-factor migration
-            $table->text('two_factor_secret')->nullable();
-            $table->text('two_factor_recovery_codes')->nullable();
-            $table->timestamp('two_factor_confirmed_at')->nullable();
 
             $table->softDeletes('deleted_at');
             $table->timestamps();
@@ -255,6 +265,27 @@ abstract class TestCase extends Orchestra
                 'prefix' => '',
             ]);
         }
+    }
+
+    /**
+     * A table of admin-auth's second-factor migrations; the detector only checks that it exists.
+     */
+    protected function createSecondFactorTable(string $table = SecurityResetDetector::TWO_FACTORS_TABLE): void
+    {
+        $this->app->make(DatabaseManager::class)->connection()->getSchemaBuilder()->create(
+            $table,
+            static function (Blueprint $blueprint): void {
+                $blueprint->id();
+            },
+        );
+    }
+
+    protected function registerSecurityResetRoute(): void
+    {
+        $router = $this->app->make(Router::class);
+        $router->post('/admin/admin-users/{targetAdminId}/security-reset', static fn (): string => 'ok')
+            ->name(SecurityResetDetector::ROUTE);
+        $router->getRoutes()->refreshNameLookups();
     }
 
     /**

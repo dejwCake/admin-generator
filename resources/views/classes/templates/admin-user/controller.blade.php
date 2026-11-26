@@ -185,7 +185,7 @@ final class {{ $controllerBaseName }} extends Controller
                     'brackets/admin-auth::admin/admin-users/security-reset',
                     ['targetAdminId' => ':id'],
                 ),
-                'canSecurityReset' => $this->gate->check('admin.{{ $modelDotNotation }}.security-reset'),
+                'canSecurityReset' => $this->gate->check('admin.admin-user.security-reset'),
                 'currentAdminId' => $request->user($this->guard)?->getAuthIdentifier(),
 @endif
             ],
